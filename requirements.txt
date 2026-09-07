@@ -1,0 +1,5 @@
+medmnist>=3.0
+torch>=2.0
+numpy>=1.24
+# No LLM SDK required: the hybrid layer (llm.py) uses stdlib urllib against any
+# OpenAI-compatible endpoint (e.g. a local open model served by Ollama / vLLM).

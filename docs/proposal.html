@@ -1,0 +1,189 @@
+<html>
+<head>
+<meta charset="utf-8"/>
+<style>
+  body { font-family: Calibri, Helvetica, Arial, sans-serif; font-size: 11pt; color:#1a1a1a; line-height:1.4; }
+  h1 { font-size: 20pt; color:#0f172a; margin-bottom:2pt; }
+  h2 { font-size: 14pt; color:#0f172a; border-bottom:1px solid #cbd5e1; padding-bottom:2pt; margin-top:20pt; }
+  h3 { font-size: 12pt; color:#1e293b; margin-top:14pt; }
+  .sub { color:#475569; font-size:11pt; margin-top:0; }
+  table { border-collapse: collapse; width:100%; margin:8pt 0; font-size:9.5pt; }
+  th, td { border:1px solid #94a3b8; padding:4pt 6pt; vertical-align:top; text-align:left; }
+  th { background:#e2e8f0; }
+  .meta td:first-child { background:#f1f5f9; font-weight:bold; width:26%; }
+  code { font-family: Consolas, monospace; background:#f1f5f9; padding:0 2pt; }
+  .note { color:#475569; font-style:italic; }
+  .g { text-align:center; }
+  .fill { background:#334155; color:#334155; }
+  ul { margin-top:4pt; }
+</style>
+</head>
+<body>
+
+<h1>Hybrid Agentic Training Framework for Neural Networks on MedMNIST</h1>
+<p class="sub">Integrated Project Proposal and Pre-Project Documentation &middot; <b>Acronym: HAT-MedMNIST</b> <span class="note">(name provisional)</span></p>
+
+<table class="meta">
+  <tr><td>Project acronym</td><td>HAT-MedMNIST</td></tr>
+  <tr><td>Planned duration</td><td>12 months</td></tr>
+  <tr><td>Target output</td><td>Validated software MVP (research/engineering demonstrator)</td></tr>
+  <tr><td>Target TRL</td><td>TRL 7 &mdash; system prototype demonstrated in a representative operational environment</td></tr>
+  <tr><td>Development model</td><td>Hybrid Agile / stage-gate</td></tr>
+  <tr><td>Core design principle</td><td>Maximum cohesion, minimum coupling</td></tr>
+  <tr><td>Distinctive approach</td><td>Hybrid agents (deterministic execution + open-model reasoning), no vendor lock-in</td></tr>
+  <tr><td>Domain</td><td>Agentic AI / medical-image benchmarks (non-clinical)</td></tr>
+</table>
+
+<h2>PART I &mdash; Project Team and Responsibilities</h2>
+<p>The team is organised around three reference roles (names to be inserted before submission).</p>
+<table>
+  <tr><th>Role</th><th>Member</th><th>Main responsibilities</th></tr>
+  <tr><td>Technical Responsible (TR)</td><td>[Name]</td><td>Owns technical architecture, scientific soundness, agent design, representation and training strategy, integration, and technical acceptance of deliverables.</td></tr>
+  <tr><td>Project Manager (PM)</td><td>[Name]</td><td>Coordinates scope, schedule, resources, costs, reporting, cross-activity dependencies, risk management, and stakeholder communication.</td></tr>
+  <tr><td>Reviewer (REV)</td><td>[Name]</td><td>Independently reviews work packages, activity lines, deliverables, KPIs, traceability, reproducibility, and coherence with the state of the art and target TRL. Also embodied in the project as the automated consistency/anomaly agent (WP6).</td></tr>
+</table>
+
+<h2>PART II &mdash; General Project Proposal</h2>
+
+<h3>1. Project Data and Abstract</h3>
+<p>The project develops and validates a <b>modular, hybrid agentic framework</b> for training neural networks on the MedMNIST suite. Distinct software agents own bounded prerogatives across the training lifecycle &mdash; data ingestion, profiling and <b>ambiguity handling</b>, <b>representation design</b>, experiment design, training, evaluation, <b>abstention on uncertain cases</b>, enrichment, and reporting &mdash; while an independent <b>consistency/anomaly agent</b> audits every stage and can veto promotion. The architecture follows maximum cohesion and minimum coupling: each agent has one responsibility, and agents interact only through explicit, versioned artefacts.</p>
+<p>The approach is <b>hybrid</b>: execution steps that must be reproducible (data, splits, training, metrics) are deterministic, while genuine judgement points (ambiguity assessment, representation design, configuration choice, consistency review) use reasoning from an <b>open large language model</b> served through a provider-agnostic interface, with a deterministic heuristic fallback. This deliberately avoids any model "owned by a company" and keeps the whole pipeline runnable offline and reproducibly.</p>
+<p>The result is a software MVP that orchestrates repeatable training experiments, compares agent-driven decisions with a conventional baseline, handles the "no confident finding" case, and generates auditable evidence. The project is a research and engineering demonstrator on benchmark data; clinical deployment, diagnosis, and patient-facing use are out of scope.</p>
+
+<h3>2. Positioning with Respect to the State of the Art</h3>
+<p>Conventional training pipelines are typically tightly coupled scripts or notebooks in which data preparation, model configuration, optimisation, validation, and reporting are interdependent, limiting maintainability, reproducibility, and auditability. Recent LLM-agent frameworks, conversely, often push non-determinism into every step, harming reproducibility and creating dependence on a single proprietary model.</p>
+<p>HAT-MedMNIST advances beyond both by combining a <b>role-based agentic orchestration layer</b> with <b>explicit artefact contracts</b>, a <b>hybrid deterministic/open-model design</b> that confines non-determinism to declared decision points, <b>full decision provenance</b>, and an <b>independent automated reviewer</b> that verifies outputs. Progress is assessed not only by predictive performance but by engineering quality: modularity, reproducibility, robustness, auditability, and the ability to replace or upgrade one agent without redesigning the system. The Reviewer will specifically assess coherence of the claimed advancement with the state of the art.</p>
+
+<h3>3. Scientific and Technological Objectives</h3>
+<ul>
+  <li>Design a multi-agent architecture for neural-network training with explicit, cohesive, weakly-coupled responsibilities communicating only through typed artefacts.</li>
+  <li>Introduce a <b>representation-architect agent</b> that reasons about the best input representation (normalization, label-preserving augmentation) for the task, records the decision, and applies it deterministically.</li>
+  <li>Introduce a <b>hybrid reasoning seam</b> using open models, with heuristic fallback, so decisions are reasoned yet reproducible and provider-independent.</li>
+  <li>Implement a reproducible data and experiment pipeline for selected MedMNIST tasks, including <b>ambiguity handling</b> and leakage-safe splits.</li>
+  <li>Handle the <b>"no confident finding"</b> case via an abstention / out-of-distribution agent.</li>
+  <li>Provide an <b>independent consistency/anomaly agent</b> (automated reviewer) that audits every stage and can veto promotion.</li>
+  <li>Compare agentic and conventional workflows under common conditions with transparent baselines, and deliver an integrated MVP demonstrated at TRL 7.</li>
+</ul>
+
+<h3>4. Proposal Themes</h3>
+<ul>
+  <li><b>Scientific development:</b> study of role-specialised hybrid agents and their effect on training quality, repeatability, and decision traceability, including the representation-design and abstention mechanisms.</li>
+  <li><b>Competitive industrial development:</b> a differentiated orchestration capability that reduces experimentation time and improves maintainability and auditability, without proprietary-model lock-in.</li>
+  <li><b>Pre-competitive enabling development:</b> reusable artefact contracts, evaluation protocols, and governance components (the consistency/anomaly agent) applicable beyond MedMNIST.</li>
+  <li><b>Technology transfer and valorisation:</b> transition from MVP to configurable training platforms, validation services, and domain-specific extensions.</li>
+</ul>
+<p class="note">Synergies with other projects are not foreseen at this stage.</p>
+
+<h3>5. Expected Results and Main Deliverables</h3>
+<p>Objectives describe the intended capability; deliverables are the concrete, reviewable outputs that demonstrate it.</p>
+<table>
+  <tr><th>ID</th><th>Deliverable</th><th>Work package</th></tr>
+  <tr><td>D1</td><td>Requirements, modular architecture &amp; interface specification, governance rules, feasibility study, baseline protocol</td><td>WP1</td></tr>
+  <tr><td>D2</td><td>Reproducible data-understanding &amp; representation pipeline (profiling, ambiguity flags, representation plan, leakage-safe splits)</td><td>WP2</td></tr>
+  <tr><td>D3</td><td>Hybrid multi-agent orchestration engine with artefact contracts, decision provenance, and data-driven model-design loop</td><td>WP3</td></tr>
+  <tr><td>D4</td><td>Evaluation, data enrichment, benchmark comparison, ablations, reproducibility package</td><td>WP4</td></tr>
+  <tr><td>D5</td><td>Integrated MVP with abstention/OOD handling, demonstration scenario, documentation, final validation dossier, exploitation roadmap</td><td>WP5</td></tr>
+  <tr><td>D6</td><td>Consistency/anomaly governance agent + traceability &amp; reproducibility evidence (cross-cutting)</td><td>WP6</td></tr>
+</table>
+
+<h3>6. Technical-Scientific Feasibility, Impact, and Valorisation</h3>
+<p>Feasibility is supported by a bounded benchmark suite, deliberately small models (the contribution is the orchestration, not the classifier), modular components with automated tests, and measurable acceptance criteria. Work follows a hybrid Agile / stage-gate model: short iterations inside each WP, with formal gate reviews controlling architecture, data readiness, model validation, MVP integration, and final acceptance.</p>
+<p>Expected impact: less manual coordination and rework, stronger reproducibility, faster diagnosis of training failures via error analysis and the anomaly agent, clearer allocation of responsibility, and freedom from proprietary-model dependence. The industrial value is a reusable software asset rather than a one-off experiment. Valorisation follows an <b>MVP &rarr; higher-gain-product</b> cycle: the MVP proves the core orchestration, representation, abstention, and governance capabilities; productisation may add scalable compute, domain adapters, enterprise governance, integration APIs, monitoring dashboards, and support services. Exploitation models include licensed software, managed experimentation services, and reusable internal platforms.</p>
+
+<h3>7. Legal, Ethical, and Governance Framing</h3>
+<p>Only data and tools whose licences permit the planned research use will be used; MedMNIST provenance, licences, and generated artefacts are documented. Data minimisation, access control, secure storage, reproducibility, model limitations, bias analysis, and human review are addressed in the project records. Because the work is a research demonstrator on benchmark data, no clinical claims are made and no diagnostic decision is delegated to the system; the abstention agent explicitly routes uncertain cases to human review.</p>
+
+<h3>8. Verification of Project Outcomes and TRL</h3>
+<p>Outcome verification is based on the WP structure: each activity line produces a deliverable and one or more KPIs. The Reviewer verifies completeness, objective evidence, test results, traceability to requirements, reproducibility, and consistency between results and declared TRL.</p>
+<p>The target is <b>TRL 7</b>: a system prototype demonstrated in a representative operational environment. Here the representative environment is a realistic end-to-end software workflow &mdash; automated ingestion, agent-architected representation, coordinated agent decisions with logged provenance, controlled training, evaluation against a baseline, abstention on uncertain cases, cross-cutting consistency auditing with veto, recovery from expected faults, and an end-to-end demonstration executed by a user other than the implementer. This target does not imply clinical validation or certification.</p>
+
+<h2>PART III &mdash; Project Structure, Work Plan, and Costs</h2>
+
+<h3>9. System Architecture</h3>
+<p>Agents never call one another; they read and write <b>versioned, typed artefacts</b> on a shared Blackboard, and a stateless Orchestrator sequences them. This makes "minimum coupling" concrete: any agent can be replaced or upgraded without touching another. The cross-cutting Reviewer agent (WP6) audits each artefact after every stage and can veto promotion to the next.</p>
+<p>DIAGRAMPLACEHOLDER</p>
+<p class="note">Hybrid decision points are shown in blue; deterministic steps in grey; cross-cutting governance in orange. Each blue agent uses open-model reasoning with a deterministic heuristic fallback, and records the provenance (<code>source</code>) of every decision.</p>
+
+<h3>10. Work Packages Overview</h3>
+<table>
+  <tr><th>WP</th><th>Title</th><th>Purpose</th><th>Deliverable</th><th>WP KPI</th></tr>
+  <tr><td>WP1</td><td>Requirements &amp; Architecture</td><td>Scope, roles, artefact contracts, governance, feasibility, baseline &amp; acceptance criteria (Agile).</td><td>D1</td><td>100% critical requirements traced; architecture &amp; coupling review approved.</td></tr>
+  <tr><td>WP2</td><td>Data Understanding &amp; Representation</td><td>Ingestion, profiling, ambiguity handling, representation design, leakage-safe splits.</td><td>D2</td><td>&ge;99% samples profiled; splits reproduced from seed; representation plan validated.</td></tr>
+  <tr><td>WP3</td><td>Hybrid Agentic Orchestration &amp; Model Design</td><td>Orchestrator, contracts, provenance, data- &amp; representation-driven config and training.</td><td>D3</td><td>All planned agents integrated; &ge;95% nominal runs without manual repair; 0 direct inter-agent calls.</td></tr>
+  <tr><td>WP4</td><td>Evaluation, Enrichment &amp; Comparison</td><td>Metrics, data enrichment, baseline comparison, ablations, error analysis.</td><td>D4</td><td>Baseline met or exceeded on primary metric; repeated-run variance within threshold.</td></tr>
+  <tr><td>WP5</td><td>MVP Integration &amp; Validation</td><td>Integrate, add abstention/OOD, demonstrate, document, assess TRL, costs, exploitation.</td><td>D5</td><td>End-to-end acceptance pass; independent demonstration completed; TRL 7 evidence approved.</td></tr>
+  <tr><td>WP6</td><td>Consistency &amp; Anomaly Governance</td><td>Automated reviewer auditing all stages with veto; traceability &amp; reproducibility (cross-cutting).</td><td>D6</td><td>&ge;90% injected inconsistencies detected; 100% agent decisions logged; full run reproducible.</td></tr>
+</table>
+
+<h3>11. Activity Lines, Deliverables, Links, and KPIs</h3>
+<table>
+  <tr><th>LA</th><th>Resp.</th><th>Activity / Deliverable</th><th>Type</th><th>Linked</th><th>Key Performance Indicator</th><th>Verification evidence</th></tr>
+  <tr><td>1.1</td><td>PM</td><td>Requirements, scope &amp; acceptance plan (functional: accuracy, precision, decision boundaries; non-functional: interpretability, agent-duty disentanglement, usability by a non-technical team)</td><td>Document</td><td>All</td><td>&ge;90% stakeholder requirements agreed; 100% critical requirements owned</td><td>Approved requirement matrix &amp; review minutes</td></tr>
+  <tr><td>1.2</td><td>TR</td><td>Modular agent architecture &amp; artefact-contract specification</td><td>Design</td><td>2.x, 3.x</td><td>All agent duties &amp; interfaces documented; coupling review passed (0 direct inter-agent calls)</td><td>Architecture document &amp; contract tests</td></tr>
+  <tr><td>1.3</td><td>REV/PM</td><td>Feasibility study vs state of the art</td><td>Report</td><td>1.1, 1.2</td><td>Feasibility approved; functional &amp; non-functional baseline defined</td><td>Feasibility dossier &amp; review sign-off</td></tr>
+  <tr><td>2.1</td><td>TR</td><td>Ingestion + profiling / ambiguity agent (DataProfile)</td><td>Software</td><td>1.2, 3.2</td><td>&ge;99% samples profiled; ambiguity flags produced; deterministic ingestion</td><td>Pipeline logs &amp; data-lineage report</td></tr>
+  <tr><td>2.2</td><td>TR</td><td>Representation-architect preprocessing (RepresentationPlan) + leakage-safe splits</td><td>Software</td><td>2.1, 3.2</td><td>Train-only normalization stats; augmentations from label-preserving set; splits reproduced from seed</td><td>Representation plan artefact &amp; rerun evidence</td></tr>
+  <tr><td>2.3</td><td>REV</td><td>Data quality, leakage &amp; representation audit</td><td>Report</td><td>2.1, 2.2, 6.1</td><td>No unresolved leakage; representation plan independently validated</td><td>Audit checklist &amp; rerun evidence</td></tr>
+  <tr><td>3.1</td><td>TR</td><td>Orchestrator + Blackboard + artefact contracts (core engine)</td><td>Software</td><td>1.2, 2.x</td><td>100% planned agents integrated; &ge;95% nominal runs without manual repair</td><td>Integration-test report &amp; trace logs</td></tr>
+  <tr><td>3.2</td><td>TR</td><td>Experiment-design (config from profile + representation) + training</td><td>Software</td><td>2.1, 2.2, 4.1</td><td>Config provenance logged; training reproducible from seed + config</td><td>Experiment registry &amp; trained artefacts</td></tr>
+  <tr><td>3.3</td><td>REV</td><td>Intermediate review gate + fault handling / fallback</td><td>Software/Test</td><td>3.1, 6.1</td><td>Veto mechanism functional; &ge;90% recovery from modelled faults; 100% decisions logged</td><td>Fault-injection report &amp; audit logs</td></tr>
+  <tr><td>4.1</td><td>TR</td><td>Evaluation agent + conventional baseline</td><td>Model/Report</td><td>3.2</td><td>Baseline met or exceeded on agreed primary metric; common seeds used</td><td>Evaluation report &amp; baseline comparison</td></tr>
+  <tr><td>4.2</td><td>TR</td><td>Data enrichment (multi-source / augmentation) with provenance</td><td>Software/Dataset</td><td>2.2, 4.1</td><td>Enrichment provenance tracked; &ge;1 enrichment scenario compared</td><td>Enrichment lineage &amp; comparison</td></tr>
+  <tr><td>4.3</td><td>REV/TR</td><td>Robustness, ablation (incl. representation on/off) &amp; error analysis</td><td>Report</td><td>4.1, 4.2</td><td>&ge;3 ablation scenarios; repeated-run variance within threshold</td><td>Ablation report &amp; reproducibility package</td></tr>
+  <tr><td>5.1</td><td>TR</td><td>Integrated MVP + abstention / OOD ("no finding") handling</td><td>Prototype</td><td>3.3, 4.3</td><td>End-to-end run by an independent user; abstention lowers error on the covered set</td><td>Acceptance test &amp; demonstration record</td></tr>
+  <tr><td>5.2</td><td>PM/REV</td><td>Final documentation, TRL assessment, cost &amp; exploitation roadmap</td><td>Document</td><td>All</td><td>100% mandatory deliverables accepted; no open critical risk; TRL 7 evidence mapped</td><td>Final dossier &amp; signed review checklist</td></tr>
+  <tr><td>6.1</td><td>REV</td><td>Consistency / anomaly agent monitoring all stages, with veto</td><td>Software</td><td>All</td><td>&ge;90% injected inconsistencies detected; 100% agent decisions audited</td><td>Anomaly reports &amp; injection evidence</td></tr>
+  <tr><td>6.2</td><td>PM</td><td>Traceability &amp; reproducibility package</td><td>Document</td><td>All</td><td>Full run reproducible from stored artefacts, config &amp; seeds</td><td>Reproducibility rerun &amp; artefact registry</td></tr>
+</table>
+
+<h3>12. Indicative Gantt (12 months)</h3>
+<p class="note">Overlap is intentional where activity lines exchange validated intermediate artefacts. WP6 is cross-cutting.</p>
+<table>
+  <tr><th>WP / Month</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th></tr>
+  <tr><td>WP1</td><td class="fill">.</td><td class="fill">.</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td>WP2</td><td></td><td class="fill">.</td><td class="fill">.</td><td class="fill">.</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td>WP3</td><td></td><td></td><td class="fill">.</td><td class="fill">.</td><td class="fill">.</td><td class="fill">.</td><td class="fill">.</td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td>WP4</td><td></td><td></td><td></td><td></td><td class="fill">.</td><td class="fill">.</td><td class="fill">.</td><td class="fill">.</td><td class="fill">.</td><td></td><td></td><td></td></tr>
+  <tr><td>WP5</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="fill">.</td><td class="fill">.</td><td class="fill">.</td><td class="fill">.</td><td class="fill">.</td></tr>
+  <tr><td>WP6</td><td></td><td class="fill">.</td><td class="fill">.</td><td class="fill">.</td><td class="fill">.</td><td class="fill">.</td><td class="fill">.</td><td class="fill">.</td><td class="fill">.</td><td class="fill">.</td><td class="fill">.</td><td class="fill">.</td></tr>
+</table>
+
+<h3>13. Risk Plan</h3>
+<table>
+  <tr><th>Risk</th><th>Impact</th><th>Prob.</th><th>Effects &amp; rationale</th><th>Actions &amp; solutions</th><th>Linked LA</th></tr>
+  <tr><td>Data leakage / invalid split</td><td>High</td><td>Medium</td><td>Inflated performance, invalid conclusions.</td><td>Train-only normalization stats, seeded splits, leakage tests, reviewer approval before training.</td><td>2.2, 2.3, 6.1</td></tr>
+  <tr><td>Non-deterministic LLM reasoning</td><td>Medium</td><td>Medium</td><td>Irreproducible decisions, unstable results.</td><td>Temperature 0, deterministic heuristic fallback, provenance logging, guardrails on agent outputs.</td><td>3.2, 6.1</td></tr>
+  <tr><td>Agent interaction / contract failure</td><td>High</td><td>Medium</td><td>Deadlock, inconsistent decisions, incomplete runs.</td><td>Typed artefact contracts, timeouts/retries, orchestrator veto, reviewer invariants, fault-injection tests.</td><td>3.1, 3.3</td></tr>
+  <tr><td>Representation choice harms task</td><td>Medium</td><td>Medium</td><td>Unsafe augmentation or normalization degrades learning.</td><td>Label-preserving guardrail set, independent reviewer re-validation, representation on/off ablation.</td><td>2.2, 2.3, 4.3</td></tr>
+  <tr><td>Performance below baseline</td><td>High</td><td>Medium</td><td>Weak scientific / industrial value.</td><td>Baseline-first strategy, ablations, alternative agent policies, documented negative results.</td><td>4.1, 4.3</td></tr>
+  <tr><td>Data loss or corruption</td><td>High</td><td>Low</td><td>Lost experiments, non-reproducibility, delay.</td><td>Versioned artefacts, checksums, immutable registry, restore tests.</td><td>2.1, 3.2</td></tr>
+  <tr><td>Proprietary-model / vendor lock-in</td><td>Medium</td><td>Low</td><td>Cost, dependence, non-portability.</td><td>Open-model via OpenAI-compatible seam; no proprietary dependency; heuristic fallback.</td><td>3.2, 6.1</td></tr>
+  <tr><td>Unmodelled critical event</td><td>High</td><td>Low</td><td>Potential loss of funding, evidence, or acceptance.</td><td>Contingency reserve, incident log, change-control, escalation path, periodic risk review.</td><td>All</td></tr>
+</table>
+
+<h3>14. Cost Structure and Budget Framework</h3>
+<p>Total budget to be defined; shares are a planning baseline, replaceable with contractual amounts. Compute is comparatively low because models are deliberately small and reasoning uses a local open model.</p>
+<table>
+  <tr><th>Cost category</th><th>Indicative share</th><th>Main drivers</th><th>Value / industrial rationale</th></tr>
+  <tr><td>Personnel</td><td>55%</td><td>Architecture, data &amp; representation engineering, agent development, experiments, PM, review.</td><td>Reusable know-how, software assets, documentation.</td></tr>
+  <tr><td>Compute &amp; storage</td><td>18%</td><td>Training runs, local open-model serving, experiment registry, backups, test environments.</td><td>Repeatability, comparison, representative demonstration.</td></tr>
+  <tr><td>Software &amp; tools</td><td>5%</td><td>Development, monitoring, collaboration; open-source-first.</td><td>Reduced implementation time; no licence lock-in.</td></tr>
+  <tr><td>Validation &amp; quality</td><td>10%</td><td>Independent review, test design, reproducibility, fault injection, anomaly-agent evaluation.</td><td>Higher acceptance probability; protects credibility.</td></tr>
+  <tr><td>Documentation &amp; dissemination</td><td>5%</td><td>Technical documentation, demonstration material, final reporting.</td><td>Supports transfer, reuse, exploitation.</td></tr>
+  <tr><td>Contingency</td><td>7%</td><td>Unplanned compute, rework, integration or risk response.</td><td>Protects schedule and deliverable completion.</td></tr>
+</table>
+
+<h3>15. Final Acceptance Criteria</h3>
+<ul>
+  <li>All mandatory deliverables complete, versioned, and linked to requirements and activity lines.</li>
+  <li>KPIs measured with documented procedures and objective evidence.</li>
+  <li>The hybrid agentic workflow demonstrated end-to-end on selected MedMNIST tasks in a representative software environment, including abstention on uncertain cases.</li>
+  <li>Results reproducible from stored configurations, code, data references, and seeds; every agent decision carries logged provenance.</li>
+  <li>No critical risk remains without an approved mitigation or acceptance decision.</li>
+  <li>The Reviewer confirms coherence of the scientific advancement, industrial potential, and TRL 7 evidence.</li>
+</ul>
+
+<p class="note">This document constitutes the initial pre-project documentation and provides the baseline for detailed planning, implementation, monitoring, and final review.</p>
+
+</body>
+</html>
