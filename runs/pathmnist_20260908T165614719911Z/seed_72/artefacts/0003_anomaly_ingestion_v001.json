@@ -1,0 +1,24 @@
+{
+  "artefact": "anomaly_ingestion",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T17:14:03.400278+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Ingestion stage is internally consistent. Loaded split sizes (train=89996, val=10004, test=7180) match official PathMNIST splits exactly. n_classes=9 aligns with the 9 listed labels. Provenance is well-documented: archive MD5, per-split index SHA-256 hashes, and a Zenodo data reference are all present. subsampled=false confirms full-dataset use. The test_domain_note correctly flags the known CRC-VAL-HE-7K domain shift (different clinical center), which is a dataset characteristic, not a defect. Run manifest is coherent: seed 72 matches run_id, deterministic_torch=true, and all package versions are recorded. No deterministic findings were raised. Minor observation: llm_model 'qwen3.8' is an atypical model identifier for an Ollama deployment; worth confirming it resolves to the intended base",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "llm_model 'qwen3.8' is not a standard Qwen release name; verify the Ollama tag resolves to the intended model to avoid silent fallback",
+      "test_domain_note documents cross-center domain shift for the test split; ensure downstream evaluation reports this as a known limitation rather than treating it as in-distribution performance"
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "ingestion"
+  },
+  "payload_sha256": "93ea8851f0893275cefcc31763acbe7f9a3df2f78d8781bffbd9cd488da73d8d",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 3,
+  "version": 1
+}

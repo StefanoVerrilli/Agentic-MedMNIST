@@ -1,0 +1,21 @@
+{
+  "artefact": "anomaly_abstention",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T17:18:59.205036+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 2,
+    "comment": "All primary abstention metrics are internally consistent: test_coverage (0.774095) + abstain_rate (0.225905) = 1.0; selective_risk (0.11353) = 1 − accuracy_on_covered (0.88647); human_review_count (1622) ≈ 7180 × 0.225905; validation_coverage (0.80008) meets the 0.8 target. No deterministic findings are present. The ood_auroc of 0.25401 is below the 0.5 chance level, which is a legitimate concern; however, it is explicitly scoped as a 'controlled_corruption_proxy' using max_softmax (a known-weak confidence signal) under mild σ=0.25 Gaussian noise. The anomaly_abstention reviewer's suggestion to verify the AUROC computation convention (P(score|OOD) vs P(score|ID), or possible 1−AUROC inversion) is reasonable and should be addressed in a follow-up, but it does not invalidate the in-distribut",
+    "deterministic_issues": [],
+    "llm_issues": [],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "abstention"
+  },
+  "payload_sha256": "846f77bb34bb9f83464af9d428ebf9bec6100a91f07c14141d46c764c31780b1",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 18,
+  "version": 2
+}

@@ -1,0 +1,21 @@
+{
+  "artefact": "anomaly_preprocessing",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T16:57:46.376390+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Preprocessing stage evidence is internally consistent. All split sizes (train=89996, val=10004, test=7180) sum to samples_profiled=107180; per-split class-count arrays sum exactly to their split totals; imbalance_ratio 1.633908 matches 12885/7886; n_classes=9, n_channels=3, image_shape 28×28×3, schema_version 1.0, and dataset name are uniform across ingestion, profiling, and data_profile artefacts. Deterministic mode (seed 42) is confirmed. No deterministic findings are outstanding. Two minor, non-blocking observations: (1) the ambiguity_risks prose cites test-set max/min ≈ 3.64 while the structured class_counts yield 1338/339 ≈ 3.95 — a cosmetic rounding slip in narrative text only, structured data is correct; (2) created_at timestamp 2026-09-08 is a future-dated system-clock artefact, no",
+    "deterministic_issues": [],
+    "llm_issues": [],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "preprocessing"
+  },
+  "payload_sha256": "69f154e85adfa54b7169d24f823b0813120e557142c0c6ca396f9cc52a0277a3",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 8,
+  "version": 1
+}

@@ -1,0 +1,84 @@
+{
+  "artefact": "data_profile",
+  "artefact_type": "DataProfile",
+  "created_at": "2026-09-08T17:06:01.780348+00:00",
+  "payload": {
+    "ambiguity_note": "Several label boundaries are inherently ambiguous in H&E histopathology: 'background' vs 'debris' (both may include non-specific material, artifacts, or out-of-focus regions); 'cancer-associated stroma' vs 'smooth muscle' (the invasive-front transition zone is a known diagnostic gray area); and 'mucus' (intracellular goblet-cell content vs. extracellular pools) can overlap with 'background' or 'debris'. The 'normal colon mucosa' label also lacks a defined threshold for reactive or metaplastic changes. These ambiguities are compounded by the fact that test annotations come from a different site",
+    "ambiguity_risks": [
+      "Cross-center domain shift: test images (CRC-VAL-HE-7K) originate from a different clinical center, introducing uncontrolled variation in H&E staining protocol, section thickness, scanner color calibration, and slide preparation that can shift pixel-level feature distributions.",
+      "Severe test-set class-distribution shift: 'debris' drops from 10,360 (train) to 339 (test) (~30× reduction), 'smooth muscle' from 12,182 to 592, and 'cancer-associated stroma' from 9,401 to 421, suggesting different tissue composition or annotation granularity at the external site.",
+      "Test-set imbalance (max/min ≈ 3.64) is more than double the train imbalance (1.63), meaning minority classes in test (debris, smooth muscle, stroma) are under-represented relative to their training exposure, inflating variance in per-class metrics.",
+      "The 'background' class (847 test vs 9,509 train) may reflect different cropping or tiling strategies at the external center, making it unclear whether the model is learning tissue features or site-specific artifact patterns.",
+      "Annotation protocol heterogeneity: a different clinical center may apply different inclusion/exclusion criteria for ambiguous classes (e.g., what fraction of a tile must be stroma vs smooth muscle), creating label-noise that is not present in the training distribution.",
+      "The small absolute test counts for 'debris' (339) and 'cancer-associated stroma' (421) limit statistical power for reliable per-class evaluation and increase sensitivity to a handful of mislabeled tiles.",
+      "No information is provided about whether the external site used the same tile size, magnification, or preprocessing pipeline, making it impossible to rule out resolution or scale shift as a confound.",
+      "The 'normal colon mucosa' label assumes a binary normal/abnormal distinction; inter-observer variability in defining 'normal' (e.g., mild dysplasia, reactive atypia) may be systematically different across centers, introducing label drift that is invisible in aggregate accuracy."
+    ],
+    "blank_image_fraction": 0.0,
+    "class_counts": {
+      "test": [
+        1338,
+        847,
+        339,
+        634,
+        1035,
+        592,
+        741,
+        421,
+        1233
+      ],
+      "train": [
+        9366,
+        9509,
+        10360,
+        10401,
+        8006,
+        12182,
+        7886,
+        9401,
+        12885
+      ],
+      "val": [
+        1041,
+        1057,
+        1152,
+        1156,
+        890,
+        1354,
+        877,
+        1045,
+        1432
+      ]
+    },
+    "dataset": "pathmnist",
+    "decision_source": "qwen3.8",
+    "duplicate_train_samples": 0,
+    "image_shape_hwc": [
+      28,
+      28,
+      3
+    ],
+    "imbalance_ratio": 1.633908,
+    "n_channels": 3,
+    "n_classes": 9,
+    "official_data_fraction": 1.0,
+    "profiled_fraction": 1.0,
+    "samples_profiled": 107180,
+    "schema_version": "1.0",
+    "train_channel_mean_unit": [
+      0.740545,
+      0.53298219,
+      0.70582885
+    ],
+    "train_channel_std_unit": [
+      0.12368222,
+      0.17676253,
+      0.12443067
+    ]
+  },
+  "payload_sha256": "fd2fbbcb6739da54d0f65f1e1cc7d6fe57e2a5f6bd14bf6a096144d47f790f1b",
+  "producer": "profiling",
+  "run_id": "seed_47",
+  "sequence": 4,
+  "version": 1
+}

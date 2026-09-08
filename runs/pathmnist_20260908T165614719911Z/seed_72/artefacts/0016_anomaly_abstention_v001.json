@@ -1,0 +1,26 @@
+{
+  "artefact": "anomaly_abstention",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T17:18:38.333506+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "Abstention metrics are internally consistent: test_coverage (0.774095) + abstain_rate (0.225905) = 1.0; selective_risk (0.11353) = 1 − accuracy_on_covered (0.88647); human_review_count (1622) ≈ 7180 × 0.225905; validation_coverage (0.80008) meets the 0.8 target. Prior-stage artefacts (ingestion through evaluation) remain mutually consistent with no new contradictions. One warning: ood_auroc = 0.25401 is substantially below the 0.5 chance level, indicating that max_softmax confidence is anti-correlated with the controlled Gaussian-noise corruption (σ=0.25). While the scope is explicitly a 'controlled_corruption_proxy' and the perturbation is mild, an AUROC this far below chance suggests the confidence signal may be inverted for this corruption type. This does not invalidate the in-distribut",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "ood_auroc 0.25401 is well below 0.5 (chance), indicating max_softmax confidence is anti-correlated with the σ=0.25 Gaussian corruption; verify whether the AUROC is computed as P(score|OOD) vs P(score|ID) or if a 1−AUROC convention is in play",
+      "Recurring cosmetic issue: narrative text in multiple prior stages cites test-set max/min ≈ 3.64 while 1338/339 ≈ 3.95; structured fields are correct but the prose discrepancy persists across all stages",
+      "LLM identifier 'qwen3.8' is non-standard for a Qwen release; confirm the Ollama tag resolves to the intended base model to rule out silent fallback",
+      "data_profile / dataset_manifest appears truncated in supplied evidence (labels list cut mid-entry); confirm full manifest is persisted in the pipeline store"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "abstention"
+  },
+  "payload_sha256": "bdb69b3d55a200e3e0ded12342d51520e247df1548712c57adcee4427bdacec3",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 16,
+  "version": 1
+}

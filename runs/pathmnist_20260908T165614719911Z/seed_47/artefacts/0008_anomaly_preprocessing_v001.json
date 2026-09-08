@@ -1,0 +1,21 @@
+{
+  "artefact": "anomaly_preprocessing",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T17:06:54.998749+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Preprocessing stage is internally consistent and complete. All split sizes (89996/10004/7180) match official sizes across ingestion, profiling, data_profile, and manifest. Class counts sum correctly per split. Imbalance ratio 1.633908 verified (12885/7886). Zero duplicates, zero blank images, 100% profiled. Provenance (SHA-256 per split + archive MD5) is present. Channel statistics are plausible for H&E (green channel lower mean, higher std). One minor text inconsistency: data_profile narrative cites test-set imbalance as ≈3.64, but the actual max/min from class_counts is 1338/339 ≈ 3.95 (the 3.64 figure corresponds to 1233/339). This is a narrative-only error already flagged by the profiling stage; the structured class_counts are correct. Two non-blocking metadata notes (future timestamp",
+    "deterministic_issues": [],
+    "llm_issues": [],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "preprocessing"
+  },
+  "payload_sha256": "a5daf49749f8c25817768e7e5f80c1c178d3449e1fe2c4eb350cae20c6d10627",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 8,
+  "version": 1
+}

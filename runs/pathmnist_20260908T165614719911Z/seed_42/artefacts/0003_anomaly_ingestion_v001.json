@@ -1,0 +1,23 @@
+{
+  "artefact": "anomaly_ingestion",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T16:56:36.264933+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Ingestion stage is internally consistent. Dataset manifest and run manifest agree on dataset name (pathmnist), schema version (1.0), and split sizes (train=89996, val=10004, test=7180) match official sizes with no subsampling. All integrity hashes (archive MD5, per-split SHA256) are present. Deterministic mode is enabled with seed 42. No deterministic findings to address. Minor note: created_at timestamp (2026-09-08) is in the future relative to typical wall-clock, likely a system clock artifact; does not affect pipeline correctness. Ready to proceed to next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "created_at timestamp (2026-09-08) is in the future; likely a system clock misconfiguration but does not affect data integrity or reproducibility."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "ingestion"
+  },
+  "payload_sha256": "7775b4622b1d5694de326d5ec78b4996d141f1caa913f9db27e1bd1573937b3f",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 3,
+  "version": 1
+}

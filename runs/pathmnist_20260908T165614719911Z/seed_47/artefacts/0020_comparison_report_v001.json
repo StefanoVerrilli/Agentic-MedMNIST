@@ -1,0 +1,20 @@
+{
+  "artefact": "comparison_report",
+  "artefact_type": "ComparisonReport",
+  "created_at": "2026-09-08T17:11:03.162958+00:00",
+  "payload": {
+    "accuracy_delta": 0.034262,
+    "agentic_accuracy": 0.780223,
+    "baseline_accuracy": 0.745961,
+    "baseline_met_or_exceeded": true,
+    "common_seed": 47,
+    "common_split_fingerprint": "9afc9ed3c5a00c7391bcdd170372981b088ec7867c12f721313eda0b303c7505",
+    "primary_metric": "accuracy",
+    "schema_version": "1.0"
+  },
+  "payload_sha256": "e2374f5132f34ddddd8ca6f99a6b8c806e529f1b4980a27b7ae484d8e1b0f100",
+  "producer": "run",
+  "run_id": "seed_47",
+  "sequence": 20,
+  "version": 1
+}

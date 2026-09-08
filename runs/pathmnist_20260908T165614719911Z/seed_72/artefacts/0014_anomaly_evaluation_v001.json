@@ -1,0 +1,25 @@
+{
+  "artefact": "anomaly_evaluation",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T17:18:15.405302+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "All five prior-stage artefacts (ingestion, preprocessing, profiling, experiment_design, training) are mutually consistent: split sizes 89996/10004/7180, n_classes=9, train imbalance 12885/7886≈1.634, and the full provenance chain (MD5, per-split SHA-256, Zenodo DOI) reconcile without contradiction. No deterministic findings are present and none are warranted. The three recurring minor observations—(1) narrative test-set ratio 3.64 vs. computed 3.95 (cosmetic; structured fields correct), (2) non-standard LLM tag 'qwen3.8', (3) apparent truncation of the data_profile/manifest in the supplied evidence—are consistently flagged across stages, do not affect numerical correctness, and do not block progression. The pipeline is ready to proceed to evaluation.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Narrative text in multiple stages cites test-set max/min≈3.64 while 1338/339≈3.95; cosmetic arithmetic slip, structured fields are correct",
+      "LLM identifier 'qwen3.8' is non-standard for a Qwen release; confirm the Ollama tag resolves to the intended base model to rule out silent fallback",
+      "data_profile / dataset_manifest appears truncated in the supplied evidence (labels list cut mid-entry); verify the full manifest is persisted in the pipeline store before evaluation scoring"
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "evaluation"
+  },
+  "payload_sha256": "1eaabe1713cbdc265cf9539e1aef64aa2debdac74e06f2b59bc13b118d0a1d6a",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 14,
+  "version": 1
+}

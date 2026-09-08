@@ -1,0 +1,24 @@
+{
+  "artefact": "anomaly_ingestion",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T17:05:44.617699+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Ingestion manifests are internally consistent: loaded split sizes match official sizes exactly (train 89996, val 10004, test 7180), label count (9) matches n_classes, provenance SHA-256 hashes are present for all splits, and the archive MD5 is recorded. No deterministic findings were raised. Two minor metadata notes (neither blocking): (1) created_at timestamp (2026-09-08) is in the future relative to typical wall-clock, likely a system-clock or test-environment artifact; (2) llm_model 'qwen3.8' is an atypical model identifier but is not involved in data loading. No action required; proceed to next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "created_at timestamp (2026-09-08) is in the future; likely clock skew or test-environment artifact – no data-integrity impact",
+      "llm_model 'qwen3.8' is a non-standard identifier; verify it resolves to the intended Ollama model if LLM-assisted steps follow"
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "ingestion"
+  },
+  "payload_sha256": "896334c9b6ae3aba335118da7d5cf46e20a403b4860ee940fa536648d921cd5a",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 3,
+  "version": 1
+}

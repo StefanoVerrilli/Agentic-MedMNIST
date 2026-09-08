@@ -1,0 +1,21 @@
+{
+  "artefact": "anomaly_experiment_design",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T17:15:35.429524+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "All prior-stage artefacts (ingestion, preprocessing, profiling) are internally consistent: split sizes (89996/10004/7180), n_classes=9, train imbalance 12885/7886≈1.634, and provenance chain (MD5, per-split SHA-256, Zenodo DOI) reconcile across stages. The data_profile correctly characterises cross-center domain shift (CRC-VAL-HE-7K) and severe test-set class-distribution skew as dataset limitations rather than pipeline defects, which is appropriate for experiment design. Three minor observations: (1) the data_profile narrative still cites test-set max/min≈3.64, whereas 1338/339≈3.95—this arithmetic slip was flagged in preprocessing but persists in the profile text; structured fields are correct, so impact is cosmetic. (2) The LLM identifier 'qwen3.8' is non-standard for a Qwen release; if",
+    "deterministic_issues": [],
+    "llm_issues": [],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "experiment_design"
+  },
+  "payload_sha256": "a496b7b2701b9f21e0adb39a363f52dbf6703c80b0520ba8625c2a178b12eefa",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 10,
+  "version": 1
+}

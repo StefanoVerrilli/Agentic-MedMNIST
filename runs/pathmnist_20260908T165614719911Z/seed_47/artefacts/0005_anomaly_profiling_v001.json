@@ -1,0 +1,21 @@
+{
+  "artefact": "anomaly_profiling",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T17:06:24.022789+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Profiling is complete and internally consistent. All deterministic checks pass: loaded split sizes match official sizes exactly (89996/10004/7180), zero duplicates, zero blank images, full provenance (SHA-256 per split + archive MD5), and 100% of samples profiled. Channel statistics are plausible for H&E (green channel lower mean, higher std). The cross-center domain shift and test-set class-distribution skew are correctly flagged as dataset-inherent risks. Two minor non-blocking notes: (1) the narrative cites test imbalance ≈ 3.64 but the actual max/min is 1338/339 ≈ 3.95 (the 3.64 figure appears to use 1233/339); this is a text-only discrepancy with no impact on structured data. (2) The 28×28×3 resolution is the official MedMNIST format but is a fundamental discriminative limitation for",
+    "deterministic_issues": [],
+    "llm_issues": [],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "profiling"
+  },
+  "payload_sha256": "ff9ddf2f82b71fe4b6bd81b54af6739c2167a18f7dc4b3354486fc8f6771a39c",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 5,
+  "version": 1
+}

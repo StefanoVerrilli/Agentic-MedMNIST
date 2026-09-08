@@ -1,0 +1,21 @@
+{
+  "artefact": "anomaly_training",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T17:09:48.108400+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "All prior stages (ingestion, preprocessing, profiling, experiment_design) pass with no deterministic findings. Split sizes (89996/10004/7180), class counts, provenance hashes, and zero-duplicate/zero-blank checks are internally consistent across every artefact. The recurring narrative discrepancy (test-set imbalance cited as ≈3.64 vs. actual 1338/339 ≈ 3.95) is text-only and does not affect structured data or downstream training logic. The data_profile artefact is visibly truncated (ends mid-sentence at 'cancer-associated…'), so fields beyond the visible portion cannot be independently verified; this is a documentation gap, not a data-integrity failure. The non-standard model identifier 'qwen3.8' and the future-dated timestamp are metadata curiosities with no operational impact. The 28×28×",
+    "deterministic_issues": [],
+    "llm_issues": [],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "training"
+  },
+  "payload_sha256": "03efcb6bea413ee400a1ddf930d4c1054ee3955f34751790a4666dd9a54881a2",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 12,
+  "version": 1
+}

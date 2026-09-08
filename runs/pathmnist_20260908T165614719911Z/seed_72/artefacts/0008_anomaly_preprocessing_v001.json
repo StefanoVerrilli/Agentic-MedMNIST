@@ -1,0 +1,25 @@
+{
+  "artefact": "anomaly_preprocessing",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T17:15:09.504215+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Preprocessing-stage artefacts are internally consistent. All split totals (89996/10004/7180 = 107180) reconcile with samples_profiled and official PathMNIST sizes. Train imbalance ratio 1.633908 = 12885/7886 verified. Provenance chain (MD5, per-split SHA-256, Zenodo DOI) is complete. Domain-shift and class-distribution risks for the external test set (CRC-VAL-HE-7K) are correctly characterised as dataset limitations, not pipeline defects. Two minor observations: (1) the LLM identifier 'qwen3.8' is non-standard for a Qwen release—confirm the Ollama tag resolves to the intended base model to rule out silent fallback; (2) the narrative risk text cites test-set max/min ≈ 3.64, but 1338/339 ≈ 3.95; the qualitative conclusion (more than double train imbalance) still holds, so this is a cosmetic,",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "LLM identifier 'qwen3.8' is not a standard Qwen release name; verify the Ollama tag resolves to the intended model to avoid silent fallback to a different base",
+      "Narrative risk text states test-set imbalance max/min ≈ 3.64, but actual 1338/339 ≈ 3.95; cosmetic arithmetic slip in LLM-generated prose, structured fields are correct",
+      "dataset_manifest appears truncated in the supplied evidence (labels list cut at 'colorectal…'); confirm the full manifest is persisted in the pipeline store"
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "preprocessing"
+  },
+  "payload_sha256": "a51d1bbad147fd4aa66d6bd82952c1beef0dd47a61b19fc7a411df53f502b25d",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 8,
+  "version": 1
+}

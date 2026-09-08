@@ -1,0 +1,17 @@
+{
+  "artefact": "reporting_status",
+  "artefact_type": "ReportingStatus",
+  "created_at": "2026-09-08T17:10:17.113226+00:00",
+  "payload": {
+    "artefact_versions": 17,
+    "complete_through_stage": "abstention",
+    "decision_events": 52,
+    "dossier_path": "dossier.json",
+    "schema_version": "1.0"
+  },
+  "payload_sha256": "aa250d3cb86e71593ccc3eb176a2812f06842c61f98a61adc66668fd7d82e250",
+  "producer": "reporting",
+  "run_id": "seed_47",
+  "sequence": 17,
+  "version": 1
+}

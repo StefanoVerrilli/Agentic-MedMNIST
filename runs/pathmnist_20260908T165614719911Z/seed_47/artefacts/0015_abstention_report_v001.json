@@ -1,0 +1,27 @@
+{
+  "artefact": "abstention_report",
+  "artefact_type": "AbstentionReport",
+  "created_at": "2026-09-08T17:09:58.968749+00:00",
+  "payload": {
+    "abstain_rate": 0.241226,
+    "accuracy_on_covered": 0.866557,
+    "base_test_accuracy": 0.780223,
+    "calibrated_on": "validation",
+    "human_review_count": 1732,
+    "method": "max_softmax",
+    "ood_auroc": 0.259561,
+    "ood_corruption": "unit_scale_gaussian_noise_sigma_0.25",
+    "ood_scope": "controlled_corruption_proxy",
+    "schema_version": "1.0",
+    "selective_risk": 0.133443,
+    "target_validation_coverage": 0.8,
+    "test_coverage": 0.758774,
+    "threshold": 0.59065115,
+    "validation_coverage": 0.80008
+  },
+  "payload_sha256": "6178f65c189b661e57df65ca72b9fd3f85ed3c73f2decb810adb44b4b8e2cf7c",
+  "producer": "abstention",
+  "run_id": "seed_47",
+  "sequence": 15,
+  "version": 1
+}

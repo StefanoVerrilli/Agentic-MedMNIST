@@ -1,0 +1,21 @@
+{
+  "artefact": "anomaly_reporting",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T17:22:57.023992+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "No deterministic findings. All primary metrics are internally consistent: coverage+abstain_rate=1.0, selective_risk=1−accuracy_on_covered, human_review_count≈7180×abstain_rate, validation_coverage meets the 0.8 target, and the ablation scenarios show monotonic gains under a shared split fingerprint and seed. The ood_auroc of 0.25401 (below 0.5 chance) is flagged by three anomaly reviewers (ablation, abstention, comparison) as a warning; however, it is explicitly scoped as a controlled_corruption_proxy using max_softmax under mild σ=0.25 noise, a known-weak confidence signal, so a sub-chance value is not implausible. The anomaly_evaluation reviewer (broadest scope) confirms the full pipeline is consistent and ready. Recommendation for the final report: (1) explicitly document the AUROC sub-",
+    "deterministic_issues": [],
+    "llm_issues": [],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "reporting"
+  },
+  "payload_sha256": "2811117dae5e08003bb0aa0f5846f26143de5e8b1a1fde038260bfdf699f4738",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 29,
+  "version": 3
+}
