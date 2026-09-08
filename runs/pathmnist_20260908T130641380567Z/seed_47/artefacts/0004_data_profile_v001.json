@@ -1,0 +1,81 @@
+{
+  "artefact": "data_profile",
+  "artefact_type": "DataProfile",
+  "created_at": "2026-09-08T13:17:53.946250+00:00",
+  "payload": {
+    "ambiguity_note": "The class 'colorectal adenocarcinoma epithelium' may be ambiguous as it could be confused with 'lymphocytes' or 'cancer-associated stroma' in some images.",
+    "ambiguity_risks": [
+      "Labeling ambiguity",
+      "Potential misclassification",
+      "Dataset shift between training and test sets",
+      "Class imbalance",
+      "Domain shift in test set"
+    ],
+    "blank_image_fraction": 0.0,
+    "class_counts": {
+      "test": [
+        1338,
+        847,
+        339,
+        634,
+        1035,
+        592,
+        741,
+        421,
+        1233
+      ],
+      "train": [
+        9366,
+        9509,
+        10360,
+        10401,
+        8006,
+        12182,
+        7886,
+        9401,
+        12885
+      ],
+      "val": [
+        1041,
+        1057,
+        1152,
+        1156,
+        890,
+        1354,
+        877,
+        1045,
+        1432
+      ]
+    },
+    "dataset": "pathmnist",
+    "decision_source": "qwen2.5:7b",
+    "duplicate_train_samples": 0,
+    "image_shape_hwc": [
+      28,
+      28,
+      3
+    ],
+    "imbalance_ratio": 1.633908,
+    "n_channels": 3,
+    "n_classes": 9,
+    "official_data_fraction": 1.0,
+    "profiled_fraction": 1.0,
+    "samples_profiled": 107180,
+    "schema_version": "1.0",
+    "train_channel_mean_unit": [
+      0.740545,
+      0.53298219,
+      0.70582885
+    ],
+    "train_channel_std_unit": [
+      0.12368222,
+      0.17676253,
+      0.12443067
+    ]
+  },
+  "payload_sha256": "9955049b7b0019afdca4da234f2a3213c34f33a35e01801e44a3bcbe244507ec",
+  "producer": "profiling",
+  "run_id": "seed_47",
+  "sequence": 4,
+  "version": 1
+}

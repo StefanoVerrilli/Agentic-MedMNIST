@@ -1,0 +1,28 @@
+{
+  "artefact": "anomaly_preprocessing",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T13:06:57.220411+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "The preprocessing stage appears to be well-structured, but there are several risks and ambiguities that need to be monitored, particularly related to class interpretation and dataset variability.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Mix of tissue types and cancer stages may lead to interpretation variability",
+      "Class imbalance could affect model performance",
+      "Potential for misclassification exists, especially for less common classes",
+      "Need for expert validation to ensure accurate class labels",
+      "Limited test domain, with test images from a different clinical center",
+      "Dataset shift between training and test sets could impact model generalization"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen2.5:7b",
+    "stage": "preprocessing"
+  },
+  "payload_sha256": "3e0df3e792c0d8fa6b0f6607e9acf6375c40a7077fccaf69a4152bb2fc47757b",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 8,
+  "version": 1
+}

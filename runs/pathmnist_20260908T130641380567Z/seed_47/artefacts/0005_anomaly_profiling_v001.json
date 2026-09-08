@@ -1,0 +1,23 @@
+{
+  "artefact": "anomaly_profiling",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T13:17:54.593513+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "The dataset and profiling appear to be correctly set up with no deterministic issues found. However, there are some ambiguities noted in the class labels that should be addressed.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Ambiguity in class 'colorectal adenocarcinoma epithelium' may lead to misclassification."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen2.5:7b",
+    "stage": "profiling"
+  },
+  "payload_sha256": "4c07a3d6b8e6c289541708c398c5fe684492fcea205e067e08e441238489e46a",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 5,
+  "version": 1
+}

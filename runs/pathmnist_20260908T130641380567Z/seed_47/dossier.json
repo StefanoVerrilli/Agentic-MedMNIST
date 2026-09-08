@@ -1,0 +1,967 @@
+{
+  "artefact_registry": [
+    {
+      "artefact": "run_manifest",
+      "path": "artefacts/0001_run_manifest_v001.json",
+      "producer": "run",
+      "sha256": "4cdaf95c9d388e79b99e11f3f81c20ffc9477bfe4551e4af027da703b1b67c73",
+      "type": "RunManifest",
+      "version": 1
+    },
+    {
+      "artefact": "dataset_manifest",
+      "path": "artefacts/0002_dataset_manifest_v001.json",
+      "producer": "ingestion",
+      "sha256": "e749ae3162dd47c9dcc8013e796a1044c000c76f9277f25c9a348d24fcd1dd7b",
+      "type": "DatasetManifest",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_ingestion",
+      "path": "artefacts/0003_anomaly_ingestion_v001.json",
+      "producer": "reviewer",
+      "sha256": "de9c1efbd8c5a44693e31f560c18b182b76bae244dab0f6244077e0660605b58",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "data_profile",
+      "path": "artefacts/0004_data_profile_v001.json",
+      "producer": "profiling",
+      "sha256": "9955049b7b0019afdca4da234f2a3213c34f33a35e01801e44a3bcbe244507ec",
+      "type": "DataProfile",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_profiling",
+      "path": "artefacts/0005_anomaly_profiling_v001.json",
+      "producer": "reviewer",
+      "sha256": "4c07a3d6b8e6c289541708c398c5fe684492fcea205e067e08e441238489e46a",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "representation_plan",
+      "path": "artefacts/0006_representation_plan_v001.json",
+      "producer": "preprocessing",
+      "sha256": "a663fb390022cea1317d2753f9ea204ce63e1c7357e31c5440599892340cc8d2",
+      "type": "RepresentationPlan",
+      "version": 1
+    },
+    {
+      "artefact": "split_manifest",
+      "path": "artefacts/0007_split_manifest_v001.json",
+      "producer": "preprocessing",
+      "sha256": "f3df09b55572d7ce642130fca5d7af45fd32b75fa37253344b08636b5100a5ec",
+      "type": "SplitManifest",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_preprocessing",
+      "path": "artefacts/0008_anomaly_preprocessing_v001.json",
+      "producer": "reviewer",
+      "sha256": "2f037396318074ea4fd92e958b6f749ca32baa8b90e97a802e80cd8ceee085b5",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "representation_plan",
+      "path": "artefacts/0009_representation_plan_v002.json",
+      "producer": "preprocessing",
+      "sha256": "a663fb390022cea1317d2753f9ea204ce63e1c7357e31c5440599892340cc8d2",
+      "type": "RepresentationPlan",
+      "version": 2
+    },
+    {
+      "artefact": "split_manifest",
+      "path": "artefacts/0010_split_manifest_v002.json",
+      "producer": "preprocessing",
+      "sha256": "f3df09b55572d7ce642130fca5d7af45fd32b75fa37253344b08636b5100a5ec",
+      "type": "SplitManifest",
+      "version": 2
+    },
+    {
+      "artefact": "anomaly_preprocessing",
+      "path": "artefacts/0011_anomaly_preprocessing_v002.json",
+      "producer": "reviewer",
+      "sha256": "c569f417c92c3add47f027c6ac2799a234a5f24a2f4585949cb41e28f53427af",
+      "type": "AnomalyReport",
+      "version": 2
+    },
+    {
+      "artefact": "train_config",
+      "path": "artefacts/0012_train_config_v001.json",
+      "producer": "experiment_design",
+      "sha256": "acd3bb9f8871fa3c1bda41cd36644f6bdc5860a7d090a6973fb96e3a5eb591b5",
+      "type": "TrainConfig",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_experiment_design",
+      "path": "artefacts/0013_anomaly_experiment_design_v001.json",
+      "producer": "reviewer",
+      "sha256": "449fe80b3538e27ad8f7c89f3854c247da723806fbc2921d4a7a85edef8b8757",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "train_config",
+      "path": "artefacts/0014_train_config_v002.json",
+      "producer": "experiment_design",
+      "sha256": "acd3bb9f8871fa3c1bda41cd36644f6bdc5860a7d090a6973fb96e3a5eb591b5",
+      "type": "TrainConfig",
+      "version": 2
+    },
+    {
+      "artefact": "anomaly_experiment_design",
+      "path": "artefacts/0015_anomaly_experiment_design_v002.json",
+      "producer": "reviewer",
+      "sha256": "082fa91e1bfd6a999b29810d2df11736e5dca56e8b2afaa59d7369423277335a",
+      "type": "AnomalyReport",
+      "version": 2
+    },
+    {
+      "artefact": "train_result",
+      "path": "artefacts/0016_train_result_v001.json",
+      "producer": "training",
+      "sha256": "1a3c6661b146aa8fc2e4b941d949ece69bd4a121a1fdba957ae17bc7fb2c10bb",
+      "type": "TrainResult",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_training",
+      "path": "artefacts/0017_anomaly_training_v001.json",
+      "producer": "reviewer",
+      "sha256": "70038aa63c941decef7e369bd2d5995d451f0cccaf259cbc6d2140481b41113f",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "train_result",
+      "path": "artefacts/0018_train_result_v002.json",
+      "producer": "training",
+      "sha256": "e1ff326d82766b2073d0134a0112e74fb16281d29fd0954f32dc0869c22a90a3",
+      "type": "TrainResult",
+      "version": 2
+    },
+    {
+      "artefact": "anomaly_training",
+      "path": "artefacts/0019_anomaly_training_v002.json",
+      "producer": "reviewer",
+      "sha256": "145bcbc9b214be22c6dc07c767137406b002c932aff382d404e79bd27b339a3d",
+      "type": "AnomalyReport",
+      "version": 2
+    },
+    {
+      "artefact": "evaluation_report",
+      "path": "artefacts/0020_evaluation_report_v001.json",
+      "producer": "evaluation",
+      "sha256": "758f6d208be1f4605728bec748d7dec6daa85d59d59e272b1213356eccfc1724",
+      "type": "EvalReport",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_evaluation",
+      "path": "artefacts/0021_anomaly_evaluation_v001.json",
+      "producer": "reviewer",
+      "sha256": "3043644324684771bef7c69ab8806d682a190f81746e066cb9a8e8d16ad48236",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "evaluation_report",
+      "path": "artefacts/0022_evaluation_report_v002.json",
+      "producer": "evaluation",
+      "sha256": "758f6d208be1f4605728bec748d7dec6daa85d59d59e272b1213356eccfc1724",
+      "type": "EvalReport",
+      "version": 2
+    },
+    {
+      "artefact": "anomaly_evaluation",
+      "path": "artefacts/0023_anomaly_evaluation_v002.json",
+      "producer": "reviewer",
+      "sha256": "db24bec23ceef16b87c16dfcd92274b01e61db7b3b43f4c09530159ce2e0a013",
+      "type": "AnomalyReport",
+      "version": 2
+    },
+    {
+      "artefact": "abstention_report",
+      "path": "artefacts/0024_abstention_report_v001.json",
+      "producer": "abstention",
+      "sha256": "e70573036c0810f687842d86378501b383a4a8a0cec3335648084d76f8c28fe6",
+      "type": "AbstentionReport",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_abstention",
+      "path": "artefacts/0025_anomaly_abstention_v001.json",
+      "producer": "reviewer",
+      "sha256": "99ad05d645f90ea2ce8880137993aa4ab1e642132bf4b6b98b20a628c6155305",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "abstention_report",
+      "path": "artefacts/0026_abstention_report_v002.json",
+      "producer": "abstention",
+      "sha256": "e70573036c0810f687842d86378501b383a4a8a0cec3335648084d76f8c28fe6",
+      "type": "AbstentionReport",
+      "version": 2
+    },
+    {
+      "artefact": "anomaly_abstention",
+      "path": "artefacts/0027_anomaly_abstention_v002.json",
+      "producer": "reviewer",
+      "sha256": "33936062b3df2b953e940fdff7ce52e3c68c0f54b40c623e3a650d7c39acb198",
+      "type": "AnomalyReport",
+      "version": 2
+    },
+    {
+      "artefact": "reporting_status",
+      "path": "artefacts/0028_reporting_status_v001.json",
+      "producer": "reporting",
+      "sha256": "cedf2b0286e2afceb31085cc98eb60be5485132f6f27f662a2d7320b8f8ad07a",
+      "type": "ReportingStatus",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_reporting",
+      "path": "artefacts/0029_anomaly_reporting_v001.json",
+      "producer": "reviewer",
+      "sha256": "8edc0829add4c2410922767f745d8d611de12cbdbf51b4333f698d298e4bb6bb",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "reporting_status",
+      "path": "artefacts/0030_reporting_status_v002.json",
+      "producer": "reporting",
+      "sha256": "d1b6725fd36f2fc7ecf62a89c95a9051747f543992cb70944c4c2e3c82751600",
+      "type": "ReportingStatus",
+      "version": 2
+    },
+    {
+      "artefact": "anomaly_reporting",
+      "path": "artefacts/0031_anomaly_reporting_v002.json",
+      "producer": "reviewer",
+      "sha256": "35c69ee173dcafbdf1c386afc6657b0f32777e588c3db904a57d8249746b400f",
+      "type": "AnomalyReport",
+      "version": 2
+    },
+    {
+      "artefact": "baseline_report",
+      "path": "artefacts/0032_baseline_report_v001.json",
+      "producer": "baseline",
+      "sha256": "aea644e4a524ce5ebc15de7aeec0e8c43518949e1fa743a52a2fb0c2bf79a773",
+      "type": "BaselineReport",
+      "version": 1
+    },
+    {
+      "artefact": "comparison_report",
+      "path": "artefacts/0033_comparison_report_v001.json",
+      "producer": "run",
+      "sha256": "3ae6392153725254963ddfd3b0c3cb4d90e0b166d443530367af5a1da961bc5d",
+      "type": "ComparisonReport",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_comparison",
+      "path": "artefacts/0034_anomaly_comparison_v001.json",
+      "producer": "reviewer",
+      "sha256": "1808c7225d0643cf9726c29af45d8d741bc6221555fd5b30a669a6c9414987a0",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "ablation_report",
+      "path": "artefacts/0035_ablation_report_v001.json",
+      "producer": "ablation",
+      "sha256": "54831c55761333e4b581a840d64403fa3b7da90219d59ca43236af2cb5335148",
+      "type": "AblationReport",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_ablation",
+      "path": "artefacts/0036_anomaly_ablation_v001.json",
+      "producer": "reviewer",
+      "sha256": "e7f31f893e6b8b8f5d8480d62afb4f11bd75113c164b511186139d5572fd16b2",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "reporting_status",
+      "path": "artefacts/0037_reporting_status_v003.json",
+      "producer": "reporting",
+      "sha256": "c8a59b7c98ed4614353771b145e3cd2851cb1ddec444ea85b13e9e0d67a678f0",
+      "type": "ReportingStatus",
+      "version": 3
+    },
+    {
+      "artefact": "anomaly_reporting",
+      "path": "artefacts/0038_anomaly_reporting_v003.json",
+      "producer": "reviewer",
+      "sha256": "8edc0829add4c2410922767f745d8d611de12cbdbf51b4333f698d298e4bb6bb",
+      "type": "AnomalyReport",
+      "version": 3
+    }
+  ],
+  "decision_events": 109,
+  "decision_log": "decision_log.jsonl",
+  "latest_artefacts": {
+    "ablation_report": {
+      "common_split_fingerprint": "9afc9ed3c5a00c7391bcdd170372981b088ec7867c12f721313eda0b303c7505",
+      "scenarios": [
+        {
+          "accuracy": 0.736212,
+          "augmentations": [],
+          "macro_f1": 0.67128,
+          "name": "representation_off",
+          "normalization": "unit",
+          "seed": 47
+        },
+        {
+          "accuracy": 0.785237,
+          "augmentations": [],
+          "macro_f1": 0.718854,
+          "name": "standardize_only",
+          "normalization": "standardize",
+          "seed": 47
+        },
+        {
+          "accuracy": 0.790808,
+          "augmentations": [
+            "hflip"
+          ],
+          "macro_f1": 0.725185,
+          "name": "standardize_hflip",
+          "normalization": "standardize",
+          "seed": 47
+        }
+      ],
+      "schema_version": "1.0"
+    },
+    "abstention_report": {
+      "abstain_rate": 0.30766,
+      "accuracy_on_covered": 0.918125,
+      "base_test_accuracy": 0.826184,
+      "calibrated_on": "validation",
+      "human_review_count": 2209,
+      "method": "max_softmax",
+      "ood_auroc": 0.16881,
+      "ood_corruption": "unit_scale_gaussian_noise_sigma_0.25",
+      "ood_scope": "controlled_corruption_proxy",
+      "schema_version": "1.0",
+      "selective_risk": 0.081875,
+      "target_validation_coverage": 0.8,
+      "test_coverage": 0.69234,
+      "threshold": 0.79766214,
+      "validation_coverage": 0.80008
+    },
+    "anomaly_ablation": {
+      "action": "revise",
+      "attempt": 1,
+      "comment": "The project should address ambiguities in class labels, particularly 'colorectal adenocarcinoma epithelium', to prevent misclassification and ensure accurate model training and validation. Additionally, the potential for dataset shift and class imbalance should be considered.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "Ambiguity in class 'colorectal adenocarcinoma epithelium' may lead to misclassification.",
+        "Potential for dataset shift between training and test sets due to different clinical centers.",
+        "Class imbalance may affect model performance."
+      ],
+      "schema_version": "1.0",
+      "severity": "warning",
+      "source": "qwen2.5:7b",
+      "stage": "ablation"
+    },
+    "anomaly_abstention": {
+      "action": "revise",
+      "attempt": 2,
+      "comment": "The project should address ambiguities in class labels, particularly 'colorectal adenocarcinoma epithelium', to prevent misclassification and ensure accurate model training and validation. Additionally, the potential for dataset shift and class imbalance should be considered.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "Ambiguity in class 'colorectal adenocarcinoma epithelium' may lead to misclassification.",
+        "Potential for dataset shift between training and test sets due to different clinical centers.",
+        "Class imbalance may affect model performance."
+      ],
+      "schema_version": "1.0",
+      "severity": "warning",
+      "source": "qwen2.5:7b",
+      "stage": "abstention"
+    },
+    "anomaly_comparison": {
+      "action": "revise",
+      "attempt": 1,
+      "comment": "The project should address ambiguities in class labels, particularly 'colorectal adenocarcinoma epithelium', to prevent misclassification and ensure accurate model training and validation. Additionally, the potential for dataset shift and class imbalance should be considered.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "Ambiguity in class 'colorectal adenocarcinoma epithelium' may lead to misclassification.",
+        "Potential for dataset shift between training and test sets due to different clinical centers.",
+        "Class imbalance may affect model performance."
+      ],
+      "schema_version": "1.0",
+      "severity": "warning",
+      "source": "qwen2.5:7b",
+      "stage": "comparison"
+    },
+    "anomaly_evaluation": {
+      "action": "revise",
+      "attempt": 2,
+      "comment": "The project should address ambiguities in class labels, particularly 'colorectal adenocarcinoma epithelium', to prevent misclassification and ensure accurate model training and validation. Additionally, the potential for dataset shift and class imbalance should be considered.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "Ambiguity in class 'colorectal adenocarcinoma epithelium' may lead to misclassification.",
+        "Potential for dataset shift between training and test sets due to different clinical centers.",
+        "Class imbalance may affect model performance."
+      ],
+      "schema_version": "1.0",
+      "severity": "warning",
+      "source": "qwen2.5:7b",
+      "stage": "evaluation"
+    },
+    "anomaly_experiment_design": {
+      "action": "revise",
+      "attempt": 2,
+      "comment": "The experiment design requires addressing ambiguities in class labels, particularly 'colorectal adenocarcinoma epithelium', to prevent misclassification and ensure accurate model training and validation. The representation plan should also consider the potential impact of dataset shift and class imbalance.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "Ambiguity in class 'colorectal adenocarcinoma epithelium' may lead to misclassification.",
+        "Potential for dataset shift between training and test sets due to different clinical centers.",
+        "Class imbalance may affect model performance."
+      ],
+      "schema_version": "1.0",
+      "severity": "warning",
+      "source": "qwen2.5:7b",
+      "stage": "experiment_design"
+    },
+    "anomaly_ingestion": {
+      "action": "continue",
+      "attempt": 1,
+      "comment": "The dataset and run manifest appear to be correctly formatted and contain all necessary information. There are no deterministic findings to address.",
+      "deterministic_issues": [],
+      "llm_issues": [],
+      "schema_version": "1.0",
+      "severity": "ok",
+      "source": "qwen2.5:7b",
+      "stage": "ingestion"
+    },
+    "anomaly_preprocessing": {
+      "action": "revise",
+      "attempt": 2,
+      "comment": "The preprocessing stage requires addressing ambiguities in class labels, particularly 'colorectal adenocarcinoma epithelium', to prevent misclassification and ensure accurate model training and validation.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "Ambiguity in class 'colorectal adenocarcinoma epithelium' may lead to misclassification."
+      ],
+      "schema_version": "1.0",
+      "severity": "warning",
+      "source": "qwen2.5:7b",
+      "stage": "preprocessing"
+    },
+    "anomaly_profiling": {
+      "action": "continue",
+      "attempt": 1,
+      "comment": "The dataset and profiling appear to be correctly set up with no deterministic issues found. However, there are some ambiguities noted in the class labels that should be addressed.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "Ambiguity in class 'colorectal adenocarcinoma epithelium' may lead to misclassification."
+      ],
+      "schema_version": "1.0",
+      "severity": "ok",
+      "source": "qwen2.5:7b",
+      "stage": "profiling"
+    },
+    "anomaly_reporting": {
+      "action": "revise",
+      "attempt": 1,
+      "comment": "The project should address ambiguities in class labels, particularly 'colorectal adenocarcinoma epithelium', to prevent misclassification and ensure accurate model training and validation. Additionally, the potential for dataset shift and class imbalance should be considered.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "Ambiguity in class 'colorectal adenocarcinoma epithelium' may lead to misclassification.",
+        "Potential for dataset shift between training and test sets due to different clinical centers.",
+        "Class imbalance may affect model performance."
+      ],
+      "schema_version": "1.0",
+      "severity": "warning",
+      "source": "qwen2.5:7b",
+      "stage": "reporting"
+    },
+    "anomaly_training": {
+      "action": "revise",
+      "attempt": 2,
+      "comment": "The project requires addressing ambiguities in class labels, particularly 'colorectal adenocarcinoma epithelium', to prevent misclassification and ensure accurate model training and validation. The representation plan should also consider the potential impact of dataset shift and class imbalance.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "Ambiguity in class 'colorectal adenocarcinoma epithelium' may lead to misclassification.",
+        "Potential for dataset shift between training and test sets due to different clinical centers.",
+        "Class imbalance may affect model performance."
+      ],
+      "schema_version": "1.0",
+      "severity": "warning",
+      "source": "qwen2.5:7b",
+      "stage": "training"
+    },
+    "baseline_report": {
+      "accuracy": 0.745961,
+      "checkpoint_path": "blobs/baseline_model.pt",
+      "config": {
+        "batch_size": 128,
+        "class_weighting": false,
+        "device": "cpu",
+        "epochs": 8,
+        "hidden": 16,
+        "lr": 0.001,
+        "rationale": "Fixed conventional control with the agentic run's epoch budget.",
+        "schema_version": "1.0",
+        "seed": 47,
+        "source": "baseline:fixed",
+        "weight_decay": 0.0001
+      },
+      "dataset": "pathmnist",
+      "macro_f1": 0.683094,
+      "schema_version": "1.0",
+      "seed": 47,
+      "split_fingerprint": "9afc9ed3c5a00c7391bcdd170372981b088ec7867c12f721313eda0b303c7505"
+    },
+    "comparison_report": {
+      "accuracy_delta": 0.080223,
+      "agentic_accuracy": 0.826184,
+      "baseline_accuracy": 0.745961,
+      "baseline_met_or_exceeded": true,
+      "common_seed": 47,
+      "common_split_fingerprint": "9afc9ed3c5a00c7391bcdd170372981b088ec7867c12f721313eda0b303c7505",
+      "primary_metric": "accuracy",
+      "schema_version": "1.0"
+    },
+    "data_profile": {
+      "ambiguity_note": "The class 'colorectal adenocarcinoma epithelium' may be ambiguous as it could be confused with 'lymphocytes' or 'cancer-associated stroma' in some images.",
+      "ambiguity_risks": [
+        "Labeling ambiguity",
+        "Potential misclassification",
+        "Dataset shift between training and test sets",
+        "Class imbalance",
+        "Domain shift in test set"
+      ],
+      "blank_image_fraction": 0.0,
+      "class_counts": {
+        "test": [
+          1338,
+          847,
+          339,
+          634,
+          1035,
+          592,
+          741,
+          421,
+          1233
+        ],
+        "train": [
+          9366,
+          9509,
+          10360,
+          10401,
+          8006,
+          12182,
+          7886,
+          9401,
+          12885
+        ],
+        "val": [
+          1041,
+          1057,
+          1152,
+          1156,
+          890,
+          1354,
+          877,
+          1045,
+          1432
+        ]
+      },
+      "dataset": "pathmnist",
+      "decision_source": "qwen2.5:7b",
+      "duplicate_train_samples": 0,
+      "image_shape_hwc": [
+        28,
+        28,
+        3
+      ],
+      "imbalance_ratio": 1.633908,
+      "n_channels": 3,
+      "n_classes": 9,
+      "official_data_fraction": 1.0,
+      "profiled_fraction": 1.0,
+      "samples_profiled": 107180,
+      "schema_version": "1.0",
+      "train_channel_mean_unit": [
+        0.740545,
+        0.53298219,
+        0.70582885
+      ],
+      "train_channel_std_unit": [
+        0.12368222,
+        0.17676253,
+        0.12443067
+      ]
+    },
+    "dataset_manifest": {
+      "archive_md5": "a8b06965200029087d5bd730944a56c1",
+      "data_reference": "https://zenodo.org/records/10519652/files/pathmnist.npz?download=1",
+      "dataset": "pathmnist",
+      "labels": [
+        "adipose",
+        "background",
+        "debris",
+        "lymphocytes",
+        "mucus",
+        "smooth muscle",
+        "normal colon mucosa",
+        "cancer-associated stroma",
+        "colorectal adenocarcinoma epithelium"
+      ],
+      "license": "CC BY 4.0",
+      "loaded_split_sizes": {
+        "test": 7180,
+        "train": 89996,
+        "val": 10004
+      },
+      "n_channels": 3,
+      "n_classes": 9,
+      "official_split_sizes": {
+        "test": 7180,
+        "train": 89996,
+        "val": 10004
+      },
+      "schema_version": "1.0",
+      "selected_index_sha256": {
+        "test": "27ab586ecd9b4ac7278c6a91cf0b336a2ba742afe742d13eff51f702635791e8",
+        "train": "1478a96c1d8ad06d0a600d6c9b8d5c8dddd83fbda22307ab449764f013683b51",
+        "val": "a13f875ade8e54f5aee16ff205c36aa628396dddec09a33a175fcf9cbbb9d402"
+      },
+      "subsampled": false,
+      "task": "multi-class",
+      "test_domain_note": "CRC-VAL-HE-7K test images originate from a different clinical center."
+    },
+    "evaluation_report": {
+      "accuracy": 0.826184,
+      "balanced_accuracy": 0.792527,
+      "confusion_matrix": [
+        [
+          1241,
+          36,
+          4,
+          0,
+          16,
+          39,
+          1,
+          0,
+          1
+        ],
+        [
+          0,
+          847,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          9,
+          293,
+          0,
+          0,
+          1,
+          0,
+          36,
+          0
+        ],
+        [
+          0,
+          0,
+          64,
+          563,
+          0,
+          0,
+          5,
+          0,
+          2
+        ],
+        [
+          38,
+          165,
+          6,
+          0,
+          774,
+          1,
+          2,
+          45,
+          4
+        ],
+        [
+          0,
+          62,
+          111,
+          0,
+          1,
+          336,
+          0,
+          82,
+          0
+        ],
+        [
+          4,
+          0,
+          37,
+          33,
+          16,
+          0,
+          560,
+          10,
+          81
+        ],
+        [
+          0,
+          6,
+          127,
+          2,
+          1,
+          40,
+          9,
+          200,
+          36
+        ],
+        [
+          0,
+          3,
+          21,
+          22,
+          16,
+          1,
+          45,
+          7,
+          1118
+        ]
+      ],
+      "macro_f1": 0.778892,
+      "macro_precision": 0.793121,
+      "macro_recall": 0.792527,
+      "n_samples": 7180,
+      "per_class": [
+        {
+          "f1": 0.946967,
+          "label": 0,
+          "name": "adipose",
+          "precision": 0.967264,
+          "recall": 0.927504,
+          "support": 1338
+        },
+        {
+          "f1": 0.857722,
+          "label": 1,
+          "name": "background",
+          "precision": 0.750887,
+          "recall": 1.0,
+          "support": 847
+        },
+        {
+          "f1": 0.58483,
+          "label": 2,
+          "name": "debris",
+          "precision": 0.441931,
+          "recall": 0.864307,
+          "support": 339
+        },
+        {
+          "f1": 0.897927,
+          "label": 3,
+          "name": "lymphocytes",
+          "precision": 0.908065,
+          "recall": 0.888013,
+          "support": 634
+        },
+        {
+          "f1": 0.832706,
+          "label": 4,
+          "name": "mucus",
+          "precision": 0.93932,
+          "recall": 0.747826,
+          "support": 1035
+        },
+        {
+          "f1": 0.665347,
+          "label": 5,
+          "name": "smooth muscle",
+          "precision": 0.803828,
+          "recall": 0.567568,
+          "support": 592
+        },
+        {
+          "f1": 0.821717,
+          "label": 6,
+          "name": "normal colon mucosa",
+          "precision": 0.900322,
+          "recall": 0.755735,
+          "support": 741
+        },
+        {
+          "f1": 0.499376,
+          "label": 7,
+          "name": "cancer-associated stroma",
+          "precision": 0.526316,
+          "recall": 0.475059,
+          "support": 421
+        },
+        {
+          "f1": 0.903434,
+          "label": 8,
+          "name": "colorectal adenocarcinoma epithelium",
+          "precision": 0.900161,
+          "recall": 0.906732,
+          "support": 1233
+        }
+      ],
+      "primary_metric": "accuracy",
+      "roc_auc_ovr_macro": 0.9648,
+      "schema_version": "1.0",
+      "split": "test"
+    },
+    "reporting_status": {
+      "artefact_versions": 37,
+      "complete_through_stage": "abstention",
+      "decision_events": 106,
+      "dossier_path": "dossier.json",
+      "schema_version": "1.0"
+    },
+    "representation_plan": {
+      "augmentation_factor": 4,
+      "augmentations": [
+        "hflip",
+        "vflip",
+        "rotate90"
+      ],
+      "normalization": "standardize",
+      "rationale": "Standardizing the data is chosen to handle the class imbalance and channel variance effectively. Given the high imbalance and the presence of ambiguous classes, standardizing ensures that the model learns from the distribution of pixel intensities more effectively, reducing the impact of class imbalance and channel-specific variations.",
+      "schema_version": "1.0",
+      "source": "qwen2.5:7b",
+      "stats_source": "train",
+      "train_channel_mean_unit": [
+        0.740545,
+        0.53298219,
+        0.70582885
+      ],
+      "train_channel_std_unit": [
+        0.12368222,
+        0.17676253,
+        0.12443067
+      ]
+    },
+    "run_manifest": {
+      "created_at": "2026-09-08T13:17:49.114579+00:00",
+      "dataset": "pathmnist",
+      "deterministic_torch": true,
+      "llm_mode": "ollama",
+      "llm_model": "qwen2.5:7b",
+      "package_versions": {
+        "medmnist": "3.0.2",
+        "numpy": "2.4.6",
+        "pydantic": "2.13.5",
+        "scikit-learn": "1.9.0",
+        "torch": "2.14.0+cu126"
+      },
+      "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.35",
+      "python_version": "3.11.15",
+      "run_id": "seed_47",
+      "schema_version": "1.0",
+      "seed": 47
+    },
+    "split_manifest": {
+      "augmented_train_size": 359984,
+      "dataset": "pathmnist",
+      "official_test_separate_center": true,
+      "schema_version": "1.0",
+      "seed": 47,
+      "selected_index_sha256": {
+        "test": "27ab586ecd9b4ac7278c6a91cf0b336a2ba742afe742d13eff51f702635791e8",
+        "train": "1478a96c1d8ad06d0a600d6c9b8d5c8dddd83fbda22307ab449764f013683b51",
+        "val": "a13f875ade8e54f5aee16ff205c36aa628396dddec09a33a175fcf9cbbb9d402"
+      },
+      "strategy": "official",
+      "test_size": 7180,
+      "train_size": 89996,
+      "train_stats_only": true,
+      "val_size": 10004
+    },
+    "train_config": {
+      "batch_size": 32,
+      "class_weighting": false,
+      "device": "cpu",
+      "epochs": 8,
+      "hidden": 16,
+      "lr": 0.001,
+      "rationale": "Given the small dataset size and the need for efficient training, a batch size of 32 was chosen. The number of epochs was set to the maximum of 8 based on the provided information. A hidden layer size of 16 was selected to keep the model simple and prevent overfitting. The learning rate and weight decay were set to low values to ensure stable training. Class weighting was not applied due to the relatively balanced class distribution.",
+      "schema_version": "1.0",
+      "seed": 47,
+      "source": "qwen2.5:7b",
+      "weight_decay": 0.001
+    },
+    "train_result": {
+      "best_epoch": 7,
+      "best_val_accuracy": 0.927029,
+      "checkpoint_path": "blobs/agentic_model_v002.pt",
+      "checkpoint_sha256": "17fb5440d2181b00c68c0fb71d7268167bec45b1394dce2c8c495df273ab4509",
+      "device": "cpu",
+      "epochs_completed": 8,
+      "final_train_loss": 0.21346,
+      "final_val_accuracy": 0.914834,
+      "history": [
+        {
+          "epoch": 1,
+          "train_loss": 0.531481,
+          "val_accuracy": 0.868752
+        },
+        {
+          "epoch": 2,
+          "train_loss": 0.333008,
+          "val_accuracy": 0.891643
+        },
+        {
+          "epoch": 3,
+          "train_loss": 0.285253,
+          "val_accuracy": 0.908137
+        },
+        {
+          "epoch": 4,
+          "train_loss": 0.260617,
+          "val_accuracy": 0.917433
+        },
+        {
+          "epoch": 5,
+          "train_loss": 0.242671,
+          "val_accuracy": 0.912535
+        },
+        {
+          "epoch": 6,
+          "train_loss": 0.229877,
+          "val_accuracy": 0.921831
+        },
+        {
+          "epoch": 7,
+          "train_loss": 0.22025,
+          "val_accuracy": 0.927029
+        },
+        {
+          "epoch": 8,
+          "train_loss": 0.21346,
+          "val_accuracy": 0.914834
+        }
+      ],
+      "schema_version": "1.0",
+      "seed": 47
+    }
+  },
+  "run_id": "seed_47",
+  "status": "completed_with_warning",
+  "updated_at": "2026-09-08T13:29:01.546348+00:00"
+}

@@ -1,0 +1,23 @@
+{
+  "artefact": "anomaly_preprocessing",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T13:17:57.555829+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "There are ambiguities in class labels that could lead to misclassification. The preprocessing plan should address these ambiguities to ensure accurate model training and validation.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Ambiguity in class 'colorectal adenocarcinoma epithelium' may lead to misclassification."
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen2.5:7b",
+    "stage": "preprocessing"
+  },
+  "payload_sha256": "2f037396318074ea4fd92e958b6f749ca32baa8b90e97a802e80cd8ceee085b5",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 8,
+  "version": 1
+}

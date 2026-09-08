@@ -1,0 +1,25 @@
+{
+  "artefact": "anomaly_reporting",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T13:25:03.131818+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 2,
+    "comment": "The project should address ambiguities in class labels, particularly 'colorectal adenocarcinoma epithelium', to prevent misclassification and ensure accurate model training and validation. Additionally, the potential for dataset shift and class imbalance should be considered.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Ambiguity in class 'colorectal adenocarcinoma epithelium' may lead to misclassification.",
+      "Potential for dataset shift between training and test sets due to different clinical centers.",
+      "Class imbalance may affect model performance."
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen2.5:7b",
+    "stage": "reporting"
+  },
+  "payload_sha256": "35c69ee173dcafbdf1c386afc6657b0f32777e588c3db904a57d8249746b400f",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 31,
+  "version": 2
+}

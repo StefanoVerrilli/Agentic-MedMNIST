@@ -1,0 +1,27 @@
+{
+  "artefact": "anomaly_evaluation",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T13:36:22.626860+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "The evaluation report indicates significant class imbalance and potential misclassification risks, particularly for 'colorectal adenocarcinoma epithelium'. The project should address these issues to improve model performance and reliability.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Ambiguity in class 'colorectal adenocarcinoma epithelium' may lead to misclassification.",
+      "Class imbalance",
+      "Potential misclassification risks",
+      "Dataset shift between training and test sets",
+      "Domain shift in test set"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen2.5:7b",
+    "stage": "evaluation"
+  },
+  "payload_sha256": "9e4988821c799c49827925b78caa7e47a0247591d1c2997564ce6c384b0f6616",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 21,
+  "version": 1
+}

@@ -1,0 +1,28 @@
+{
+  "artefact": "anomaly_evaluation",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T13:13:55.079704+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 2,
+    "comment": "Multiple stages of the experiment, including design, preprocessing, and training, have identified significant risks and ambiguities. These issues, particularly related to class interpretation and dataset variability, need to be carefully managed to ensure the robustness and reliability of the model. Expert validation and addressing class imbalance are critical.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Mix of tissue types and cancer stages may lead to interpretation variability",
+      "Class imbalance could affect model performance",
+      "Potential for misclassification exists, especially for less common classes",
+      "Need for expert validation to ensure accurate class labels",
+      "Limited test domain, with test images from a different clinical center",
+      "Dataset shift between training and test sets could impact model generalization"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen2.5:7b",
+    "stage": "evaluation"
+  },
+  "payload_sha256": "67630b935f222e74e0440f9b3031d1ee4681e0ad2cf91e6178605da5bc459404",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 23,
+  "version": 2
+}

@@ -1,0 +1,21 @@
+{
+  "artefact": "anomaly_ingestion",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T13:06:50.100022+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "The dataset and run manifest appear to be correctly formatted and contain all necessary information.",
+    "deterministic_issues": [],
+    "llm_issues": [],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen2.5:7b",
+    "stage": "ingestion"
+  },
+  "payload_sha256": "2bc9a9721705938145857289e228fa6fb91d20e4b337cb4896720c2f6d7e340a",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 3,
+  "version": 1
+}

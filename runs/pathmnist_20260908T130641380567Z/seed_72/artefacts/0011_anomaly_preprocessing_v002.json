@@ -1,0 +1,24 @@
+{
+  "artefact": "anomaly_preprocessing",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T13:29:13.205491+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 2,
+    "comment": "The preprocessing stage has ambiguities in class labels, particularly with 'colorectal adenocarcinoma epithelium', which may lead to misclassification. The augmentation and normalization plan should be adjusted to address these ambiguities and ensure accurate model training.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Ambiguity in class 'colorectal adenocarcinoma epithelium' may lead to misclassification.",
+      "Augmentation and normalization plan should address class ambiguity."
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen2.5:7b",
+    "stage": "preprocessing"
+  },
+  "payload_sha256": "218dc3741a8cf9c7c78d09d0aec3138115e88d11c8b173cf8d2b42e3a96c2a33",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 11,
+  "version": 2
+}

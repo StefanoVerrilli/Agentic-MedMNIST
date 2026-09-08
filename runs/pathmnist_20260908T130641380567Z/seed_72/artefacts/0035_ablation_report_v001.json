@@ -1,0 +1,42 @@
+{
+  "artefact": "ablation_report",
+  "artefact_type": "AblationReport",
+  "created_at": "2026-09-08T13:40:24.748839+00:00",
+  "payload": {
+    "common_split_fingerprint": "9afc9ed3c5a00c7391bcdd170372981b088ec7867c12f721313eda0b303c7505",
+    "scenarios": [
+      {
+        "accuracy": 0.790251,
+        "augmentations": [],
+        "macro_f1": 0.704036,
+        "name": "representation_off",
+        "normalization": "unit",
+        "seed": 72
+      },
+      {
+        "accuracy": 0.800696,
+        "augmentations": [],
+        "macro_f1": 0.734721,
+        "name": "standardize_only",
+        "normalization": "standardize",
+        "seed": 72
+      },
+      {
+        "accuracy": 0.858914,
+        "augmentations": [
+          "hflip"
+        ],
+        "macro_f1": 0.801557,
+        "name": "standardize_hflip",
+        "normalization": "standardize",
+        "seed": 72
+      }
+    ],
+    "schema_version": "1.0"
+  },
+  "payload_sha256": "64ecefe77c19b3c3e61050858bf2a9a28dc3650eb90c689b7fbd0739bbd5d847",
+  "producer": "ablation",
+  "run_id": "seed_72",
+  "sequence": 35,
+  "version": 1
+}

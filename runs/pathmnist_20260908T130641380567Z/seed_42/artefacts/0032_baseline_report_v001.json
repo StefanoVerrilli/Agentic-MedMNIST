@@ -1,0 +1,32 @@
+{
+  "artefact": "baseline_report",
+  "artefact_type": "BaselineReport",
+  "created_at": "2026-09-08T13:14:32.761302+00:00",
+  "payload": {
+    "accuracy": 0.818663,
+    "checkpoint_path": "blobs/baseline_model.pt",
+    "config": {
+      "batch_size": 128,
+      "class_weighting": false,
+      "device": "cpu",
+      "epochs": 8,
+      "hidden": 16,
+      "lr": 0.001,
+      "rationale": "Fixed conventional control with the agentic run's epoch budget.",
+      "schema_version": "1.0",
+      "seed": 42,
+      "source": "baseline:fixed",
+      "weight_decay": 0.0001
+    },
+    "dataset": "pathmnist",
+    "macro_f1": 0.763733,
+    "schema_version": "1.0",
+    "seed": 42,
+    "split_fingerprint": "9afc9ed3c5a00c7391bcdd170372981b088ec7867c12f721313eda0b303c7505"
+  },
+  "payload_sha256": "24d62b430935b91ed803f2423675c6e9377d2d19e793151cf146513df9c83b80",
+  "producer": "baseline",
+  "run_id": "seed_42",
+  "sequence": 32,
+  "version": 1
+}

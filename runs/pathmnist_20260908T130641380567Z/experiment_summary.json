@@ -1,0 +1,34 @@
+{
+  "agentic_accuracy_mean": 0.836676,
+  "agentic_accuracy_population_std": 0.008119,
+  "created_at": "2026-09-08T13:40:26.975851+00:00",
+  "dataset": "pathmnist",
+  "experiment_id": "20260908T130641380567Z",
+  "runs": [
+    {
+      "accuracy_delta": 0.027298,
+      "agentic_accuracy": 0.845961,
+      "baseline_accuracy": 0.818663,
+      "run_root": "runs/pathmnist_20260908T130641380567Z/seed_42",
+      "seed": 42,
+      "status": "completed_with_warning"
+    },
+    {
+      "accuracy_delta": 0.080223,
+      "agentic_accuracy": 0.826184,
+      "baseline_accuracy": 0.745961,
+      "run_root": "runs/pathmnist_20260908T130641380567Z/seed_47",
+      "seed": 47,
+      "status": "completed_with_warning"
+    },
+    {
+      "accuracy_delta": 0.066295,
+      "agentic_accuracy": 0.837883,
+      "baseline_accuracy": 0.771588,
+      "run_root": "runs/pathmnist_20260908T130641380567Z/seed_72",
+      "seed": 72,
+      "status": "completed_with_warning"
+    }
+  ],
+  "sequential_ollama_calls": true
+}

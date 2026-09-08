@@ -1,0 +1,28 @@
+{
+  "artefact": "anomaly_ablation",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T13:40:25.851591+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "The project must address ambiguities in class labels, particularly with 'colorectal adenocarcinoma epithelium', to prevent misclassification. The augmentation and normalization plan should be adjusted accordingly. Additionally, the class imbalance and potential dataset shifts should be managed to improve model performance and reliability.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Ambiguity in class 'colorectal adenocarcinoma epithelium' may lead to misclassification.",
+      "Class imbalance",
+      "Potential misclassification risks",
+      "Dataset shift between training and test sets",
+      "Domain shift in test set",
+      "Augmentation and normalization plan should address class ambiguity."
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen2.5:7b",
+    "stage": "ablation"
+  },
+  "payload_sha256": "df4b65bda9bc558300026c4cdd9e4c689e0ab6b777aa7a2c2ba9ee4421023cd6",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 36,
+  "version": 1
+}

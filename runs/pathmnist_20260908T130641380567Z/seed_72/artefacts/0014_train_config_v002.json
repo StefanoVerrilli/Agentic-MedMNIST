@@ -1,0 +1,23 @@
+{
+  "artefact": "train_config",
+  "artefact_type": "TrainConfig",
+  "created_at": "2026-09-08T13:29:15.976651+00:00",
+  "payload": {
+    "batch_size": 32,
+    "class_weighting": false,
+    "device": "cpu",
+    "epochs": 8,
+    "hidden": 16,
+    "lr": 0.001,
+    "rationale": "Given the small dataset size and the need for efficient training, a batch size of 32 was chosen. The number of epochs was set to the maximum of 8 based on the provided information. A hidden layer size of 16 was selected to keep the model simple and prevent overfitting. The learning rate and weight decay were set to low values to ensure stable training. Class weighting was not applied due to the relatively balanced class distribution.",
+    "schema_version": "1.0",
+    "seed": 72,
+    "source": "qwen2.5:7b",
+    "weight_decay": 0.001
+  },
+  "payload_sha256": "7995661657533d7414155e02e74c8b2b20fbabc9bc92d478134acd5f19aa5d1c",
+  "producer": "experiment_design",
+  "run_id": "seed_72",
+  "sequence": 14,
+  "version": 2
+}
