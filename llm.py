@@ -1,53 +1,229 @@
-"""The 'hybrid' seam: LLM reasoning where judgement is needed, deterministic
-fallback everywhere else.
+"""Strict, sequential Ollama reasoning seam.
 
-Provider-agnostic on purpose (satisfies the "avoid a model owned by a company"
-principle): it talks to any OpenAI-compatible endpoint, so you point it at a
-local open model (Ollama / vLLM) via env vars. With no endpoint configured it
-returns the heuristic fallback, so the whole pipeline still runs offline and
-reproducibly.
-
-    export AGENTIC_LLM_BASE=http://localhost:11434/v1   # e.g. Ollama
-    export AGENTIC_LLM_MODEL=llama3.1
+Only the declared judgement points use this module.  Calls target Ollama's
+native ``/api/chat`` endpoint with a JSON Schema, temperature zero and an
+in-process global lock: even if callers are threaded, only one model request is
+active at a time.  Invalid or unavailable responses use a validated heuristic
+fallback unless ``required=True``.
 """
 from __future__ import annotations
 
 import json
 import os
+import threading
+import time
 import urllib.request
+import uuid
+from dataclasses import dataclass
+from typing import Any, Callable, Generic, Protocol, TypeVar
+
+from pydantic import BaseModel, ValidationError
 
 
-def _extract_json(text: str) -> str:
-    start, end = text.find("{"), text.rfind("}")
-    return text[start:end + 1] if start != -1 and end != -1 else "{}"
+DecisionT = TypeVar("DecisionT", bound=BaseModel)
+AuditSink = Callable[..., Any]
+Transport = Callable[[str, dict[str, Any], float], dict[str, Any]]
+_GLOBAL_OLLAMA_LOCK = threading.Lock()
 
 
-def reason_json(system: str, user: str, fallback: dict) -> dict:
-    """Return a dict merged over `fallback`. Uses the LLM when configured,
-    otherwise (or on any error) returns the deterministic fallback tagged as
-    such, so every decision records its provenance."""
-    base = os.environ.get("AGENTIC_LLM_BASE")
-    if not base:
-        return {**fallback, "source": "heuristic"}
-    model = os.environ.get("AGENTIC_LLM_MODEL", "llama3.1")
-    key = os.environ.get("AGENTIC_LLM_KEY", "not-needed")
-    try:
-        payload = {
-            "model": model,
-            "temperature": 0,
-            "messages": [
-                {"role": "system", "content": system},
-                {"role": "user", "content": user},
-            ],
-        }
-        req = urllib.request.Request(
-            base.rstrip("/") + "/chat/completions",
-            data=json.dumps(payload).encode(),
-            headers={"Content-Type": "application/json",
-                     "Authorization": f"Bearer {key}"},
+class OllamaDecisionError(RuntimeError):
+    """Raised when Ollama is required and no validated response is obtained."""
+
+
+@dataclass(frozen=True)
+class ReasonedDecision(Generic[DecisionT]):
+    value: DecisionT
+    source: str
+    used_fallback: bool
+    attempts: int
+    request_id: str | None
+
+
+class Reasoner(Protocol):
+    """Provider-neutral interface consumed by hybrid agents."""
+
+    model: str
+    seed: int
+
+    @property
+    def enabled(self) -> bool: ...
+
+    def decide(
+        self,
+        *,
+        stage: str,
+        system: str,
+        user: str,
+        response_model: type[DecisionT],
+        fallback: DecisionT | dict[str, Any],
+        audit: AuditSink | None = None,
+    ) -> ReasonedDecision[DecisionT]: ...
+
+
+class OllamaReasoner:
+    """Small provider seam for schema-constrained local Ollama decisions."""
+
+    def __init__(
+        self,
+        base_url: str | None = None,
+        model: str = "qwen2.5:7b",
+        *,
+        timeout: float = 90.0,
+        retries: int = 1,
+        required: bool = False,
+        keep_alive: str = "5m",
+        seed: int = 42,
+        transport: Transport | None = None,
+    ):
+        self.base_url = _normalise_base_url(base_url) if base_url else None
+        self.model = model
+        self.timeout = timeout
+        self.retries = max(0, retries)
+        self.required = required
+        self.keep_alive = keep_alive
+        self.seed = seed
+        self._transport = transport or _post_json
+
+    @classmethod
+    def from_env(cls, *, required: bool = False, seed: int = 42) -> "OllamaReasoner":
+        return cls(
+            base_url=os.environ.get("AGENTIC_LLM_BASE"),
+            model=os.environ.get("AGENTIC_LLM_MODEL", "qwen2.5:7b"),
+            timeout=float(os.environ.get("AGENTIC_LLM_TIMEOUT", "90")),
+            retries=int(os.environ.get("AGENTIC_LLM_RETRIES", "1")),
+            required=required,
+            keep_alive=os.environ.get("AGENTIC_LLM_KEEP_ALIVE", "5m"),
+            seed=seed,
         )
-        resp = json.load(urllib.request.urlopen(req, timeout=60))
-        data = json.loads(_extract_json(resp["choices"][0]["message"]["content"]))
-        return {**fallback, **data, "source": model}
-    except Exception as exc:  # any failure -> stay reproducible
-        return {**fallback, "source": f"heuristic(fallback:{type(exc).__name__})"}
+
+    @property
+    def enabled(self) -> bool:
+        return self.base_url is not None
+
+    def decide(
+        self,
+        *,
+        stage: str,
+        system: str,
+        user: str,
+        response_model: type[DecisionT],
+        fallback: DecisionT | dict[str, Any],
+        audit: AuditSink | None = None,
+    ) -> ReasonedDecision[DecisionT]:
+        validated_fallback = response_model.model_validate(fallback)
+        schema = response_model.model_json_schema()
+        if not self.enabled:
+            _audit(
+                audit,
+                "llm_decision",
+                stage=stage,
+                schema=response_model.__name__,
+                status="heuristic",
+                source="heuristic",
+                attempts=0,
+            )
+            return ReasonedDecision(validated_fallback, "heuristic", True, 0, None)
+
+        request_id = uuid.uuid4().hex
+        schema_text = json.dumps(schema, ensure_ascii=False, sort_keys=True)
+        messages = [
+            {
+                "role": "system",
+                "content": (
+                    system
+                    + " Return only JSON conforming exactly to this schema: "
+                    + schema_text
+                ),
+            },
+            {"role": "user", "content": user},
+        ]
+        payload = {
+            "model": self.model,
+            "messages": messages,
+            "stream": False,
+            "format": schema,
+            "keep_alive": self.keep_alive,
+            "options": {"temperature": 0, "seed": self.seed},
+        }
+
+        errors: list[str] = []
+        for attempt in range(1, self.retries + 2):
+            started = time.monotonic()
+            try:
+                with _GLOBAL_OLLAMA_LOCK:
+                    response = self._transport(
+                        f"{self.base_url}/api/chat", payload, self.timeout
+                    )
+                content = response["message"]["content"]
+                parsed = json.loads(content)
+                decision = response_model.model_validate(parsed)
+                _audit(
+                    audit,
+                    "llm_decision",
+                    stage=stage,
+                    schema=response_model.__name__,
+                    status="validated",
+                    source=self.model,
+                    attempts=attempt,
+                    request_id=request_id,
+                    elapsed_seconds=round(time.monotonic() - started, 4),
+                    prompt_tokens=response.get("prompt_eval_count"),
+                    completion_tokens=response.get("eval_count"),
+                    total_duration_ns=response.get("total_duration"),
+                )
+                return ReasonedDecision(
+                    decision, self.model, False, attempt, request_id
+                )
+            except (KeyError, TypeError, ValueError, ValidationError, OSError) as exc:
+                errors.append(type(exc).__name__)
+
+        error_summary = ",".join(errors)
+        _audit(
+            audit,
+            "llm_decision",
+            stage=stage,
+            schema=response_model.__name__,
+            status="fallback" if not self.required else "failed",
+            source="heuristic:fallback",
+            attempts=self.retries + 1,
+            request_id=request_id,
+            error_types=error_summary,
+        )
+        if self.required:
+            raise OllamaDecisionError(
+                f"Ollama returned no valid {response_model.__name__} after "
+                f"{self.retries + 1} attempts ({error_summary})"
+            )
+        return ReasonedDecision(
+            validated_fallback,
+            f"heuristic:fallback:{errors[-1] if errors else 'unknown'}",
+            True,
+            self.retries + 1,
+            request_id,
+        )
+
+
+def _normalise_base_url(base_url: str) -> str:
+    base = base_url.rstrip("/")
+    for suffix in ("/v1", "/api"):
+        if base.endswith(suffix):
+            base = base[: -len(suffix)]
+    if not base.startswith(("http://", "https://")):
+        raise ValueError("AGENTIC_LLM_BASE must start with http:// or https://")
+    return base
+
+
+def _post_json(url: str, payload: dict[str, Any], timeout: float) -> dict[str, Any]:
+    request = urllib.request.Request(
+        url,
+        data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(request, timeout=timeout) as response:
+        return json.load(response)
+
+
+def _audit(sink: AuditSink | None, event: str, **details: Any) -> None:
+    if sink is not None:
+        sink(event, **details)
