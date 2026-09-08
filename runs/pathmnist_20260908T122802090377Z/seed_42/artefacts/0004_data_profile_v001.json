@@ -1,0 +1,82 @@
+{
+  "artefact": "data_profile",
+  "artefact_type": "DataProfile",
+  "created_at": "2026-09-08T12:28:18.247158+00:00",
+  "payload": {
+    "ambiguity_note": "The dataset includes a mix of tissue types and cancer stages, which could lead to ambiguity in interpretation, especially for less common classes like 'debris' and 'lymphocytes'.",
+    "ambiguity_risks": [
+      "Interpretation variability",
+      "Class imbalance",
+      "Potential for misclassification",
+      "Need for expert validation",
+      "Limited test domain",
+      "Dataset shift between training and test sets"
+    ],
+    "blank_image_fraction": 0.0,
+    "class_counts": {
+      "test": [
+        1338,
+        847,
+        339,
+        634,
+        1035,
+        592,
+        741,
+        421,
+        1233
+      ],
+      "train": [
+        9366,
+        9509,
+        10360,
+        10401,
+        8006,
+        12182,
+        7886,
+        9401,
+        12885
+      ],
+      "val": [
+        1041,
+        1057,
+        1152,
+        1156,
+        890,
+        1354,
+        877,
+        1045,
+        1432
+      ]
+    },
+    "dataset": "pathmnist",
+    "decision_source": "qwen2.5:7b",
+    "duplicate_train_samples": 0,
+    "image_shape_hwc": [
+      28,
+      28,
+      3
+    ],
+    "imbalance_ratio": 1.633908,
+    "n_channels": 3,
+    "n_classes": 9,
+    "official_data_fraction": 1.0,
+    "profiled_fraction": 1.0,
+    "samples_profiled": 107180,
+    "schema_version": "1.0",
+    "train_channel_mean_unit": [
+      0.740545,
+      0.53298219,
+      0.70582885
+    ],
+    "train_channel_std_unit": [
+      0.12368222,
+      0.17676253,
+      0.12443067
+    ]
+  },
+  "payload_sha256": "7de49d4e8936e9d7b7c56719dc2fa69562ad637707662e7533d86a93f9afeadf",
+  "producer": "profiling",
+  "run_id": "seed_42",
+  "sequence": 4,
+  "version": 1
+}

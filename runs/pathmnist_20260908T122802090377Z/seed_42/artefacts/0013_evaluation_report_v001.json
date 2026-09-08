@@ -1,0 +1,197 @@
+{
+  "artefact": "evaluation_report",
+  "artefact_type": "EvalReport",
+  "created_at": "2026-09-08T12:33:14.343639+00:00",
+  "payload": {
+    "accuracy": 0.870334,
+    "balanced_accuracy": 0.830249,
+    "confusion_matrix": [
+      [
+        1335,
+        0,
+        0,
+        0,
+        0,
+        3,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        847,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        9,
+        0,
+        312,
+        0,
+        0,
+        3,
+        0,
+        14,
+        1
+      ],
+      [
+        0,
+        0,
+        53,
+        541,
+        0,
+        0,
+        20,
+        0,
+        20
+      ],
+      [
+        106,
+        26,
+        0,
+        0,
+        889,
+        0,
+        2,
+        0,
+        12
+      ],
+      [
+        55,
+        1,
+        54,
+        0,
+        0,
+        399,
+        0,
+        83,
+        0
+      ],
+      [
+        20,
+        0,
+        11,
+        4,
+        9,
+        0,
+        547,
+        28,
+        122
+      ],
+      [
+        6,
+        0,
+        98,
+        0,
+        7,
+        60,
+        2,
+        199,
+        49
+      ],
+      [
+        8,
+        0,
+        18,
+        5,
+        9,
+        0,
+        13,
+        0,
+        1180
+      ]
+    ],
+    "macro_f1": 0.828912,
+    "macro_precision": 0.847308,
+    "macro_recall": 0.830249,
+    "n_samples": 7180,
+    "per_class": [
+      {
+        "f1": 0.92805,
+        "label": 0,
+        "name": "adipose",
+        "precision": 0.867446,
+        "recall": 0.997758,
+        "support": 1338
+      },
+      {
+        "f1": 0.984311,
+        "label": 1,
+        "name": "background",
+        "precision": 0.969108,
+        "recall": 1.0,
+        "support": 847
+      },
+      {
+        "f1": 0.705085,
+        "label": 2,
+        "name": "debris",
+        "precision": 0.571429,
+        "recall": 0.920354,
+        "support": 339
+      },
+      {
+        "f1": 0.913851,
+        "label": 3,
+        "name": "lymphocytes",
+        "precision": 0.983636,
+        "recall": 0.853312,
+        "support": 634
+      },
+      {
+        "f1": 0.912263,
+        "label": 4,
+        "name": "mucus",
+        "precision": 0.972648,
+        "recall": 0.858937,
+        "support": 1035
+      },
+      {
+        "f1": 0.754967,
+        "label": 5,
+        "name": "smooth muscle",
+        "precision": 0.858065,
+        "recall": 0.673986,
+        "support": 592
+      },
+      {
+        "f1": 0.82566,
+        "label": 6,
+        "name": "normal colon mucosa",
+        "precision": 0.936644,
+        "recall": 0.738192,
+        "support": 741
+      },
+      {
+        "f1": 0.534228,
+        "label": 7,
+        "name": "cancer-associated stroma",
+        "precision": 0.614198,
+        "recall": 0.472684,
+        "support": 421
+      },
+      {
+        "f1": 0.901796,
+        "label": 8,
+        "name": "colorectal adenocarcinoma epithelium",
+        "precision": 0.852601,
+        "recall": 0.957015,
+        "support": 1233
+      }
+    ],
+    "primary_metric": "accuracy",
+    "roc_auc_ovr_macro": 0.977488,
+    "schema_version": "1.0",
+    "split": "test"
+  },
+  "payload_sha256": "c75ae6619b1e557a427be3b34d64cff9afd913909dddf3f0e4cdf77a60d6fc07",
+  "producer": "evaluation",
+  "run_id": "seed_42",
+  "sequence": 13,
+  "version": 1
+}

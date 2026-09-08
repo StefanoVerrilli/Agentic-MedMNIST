@@ -1,0 +1,21 @@
+{
+  "artefact": "anomaly_profiling",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T12:28:18.751657+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "The dataset and run manifest appear to be correctly formatted and contain all necessary information. The data profile indicates a balanced distribution of classes and no ambiguity issues were found.",
+    "deterministic_issues": [],
+    "llm_issues": [],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen2.5:7b",
+    "stage": "profiling"
+  },
+  "payload_sha256": "e97c6cac965d8a4f1033e50da332242556cf893bb308d37af37a6dabd66141f6",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 5,
+  "version": 1
+}

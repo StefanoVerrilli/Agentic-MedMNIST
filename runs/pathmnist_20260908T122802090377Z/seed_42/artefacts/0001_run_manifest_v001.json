@@ -1,0 +1,29 @@
+{
+  "artefact": "run_manifest",
+  "artefact_type": "RunManifest",
+  "created_at": "2026-09-08T12:28:02.097550+00:00",
+  "payload": {
+    "created_at": "2026-09-08T12:28:02.091242+00:00",
+    "dataset": "pathmnist",
+    "deterministic_torch": true,
+    "llm_mode": "ollama",
+    "llm_model": "qwen2.5:7b",
+    "package_versions": {
+      "medmnist": "3.0.2",
+      "numpy": "2.4.6",
+      "pydantic": "2.13.5",
+      "scikit-learn": "1.9.0",
+      "torch": "2.14.0+cu126"
+    },
+    "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.35",
+    "python_version": "3.11.15",
+    "run_id": "seed_42",
+    "schema_version": "1.0",
+    "seed": 42
+  },
+  "payload_sha256": "97fc6ae817adb72969faf2f8403bb2af821bf5579efbacea81431ec9d0639a85",
+  "producer": "run",
+  "run_id": "seed_42",
+  "sequence": 1,
+  "version": 1
+}

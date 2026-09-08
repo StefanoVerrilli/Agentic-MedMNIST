@@ -1,0 +1,64 @@
+{
+  "artefact": "train_result",
+  "artefact_type": "TrainResult",
+  "created_at": "2026-09-08T12:33:12.544529+00:00",
+  "payload": {
+    "best_epoch": 7,
+    "best_val_accuracy": 0.941124,
+    "checkpoint_path": "blobs/agentic_model_v001.pt",
+    "checkpoint_sha256": "a55de6f3de5f9c57cb9c751e3f0845bb74f4bb107abb1e04cde83f052dfc531d",
+    "device": "cpu",
+    "epochs_completed": 8,
+    "final_train_loss": 0.178044,
+    "final_val_accuracy": 0.928828,
+    "history": [
+      {
+        "epoch": 1,
+        "train_loss": 0.437255,
+        "val_accuracy": 0.903039
+      },
+      {
+        "epoch": 2,
+        "train_loss": 0.255058,
+        "val_accuracy": 0.92413
+      },
+      {
+        "epoch": 3,
+        "train_loss": 0.220263,
+        "val_accuracy": 0.930128
+      },
+      {
+        "epoch": 4,
+        "train_loss": 0.203333,
+        "val_accuracy": 0.933127
+      },
+      {
+        "epoch": 5,
+        "train_loss": 0.190984,
+        "val_accuracy": 0.937925
+      },
+      {
+        "epoch": 6,
+        "train_loss": 0.185946,
+        "val_accuracy": 0.939424
+      },
+      {
+        "epoch": 7,
+        "train_loss": 0.181848,
+        "val_accuracy": 0.941124
+      },
+      {
+        "epoch": 8,
+        "train_loss": 0.178044,
+        "val_accuracy": 0.928828
+      }
+    ],
+    "schema_version": "1.0",
+    "seed": 42
+  },
+  "payload_sha256": "8825afa788e8056b0850ab7f466b590608497276cc955b0d155958e3b280d944",
+  "producer": "training",
+  "run_id": "seed_42",
+  "sequence": 11,
+  "version": 1
+}
