@@ -1,0 +1,21 @@
+class_weights:
+- 1.04177987575531
+- 1.0261131525039673
+- 0.9418253302574158
+- 0.938112735748291
+- 1.218749761581421
+- 0.8009613156318665
+- 1.2372952699661255
+- 1.0379012823104858
+- 0.7572612166404724
+depth: 4
+dropout: 0.2
+hidden: 32
+in_channels: 3
+label_smoothing: 0.05
+lr: 0.0002
+model_family: resnet18
+n_classes: 9
+optimizer: adamw
+scheduler: cosine
+weight_decay: 0.0001

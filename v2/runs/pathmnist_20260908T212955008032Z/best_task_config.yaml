@@ -1,0 +1,50 @@
+{
+  "data": {
+    "augmentations": [
+      "hflip",
+      "vflip",
+      "rotate90"
+    ],
+    "batch_size": 128,
+    "data_root": null,
+    "download": true,
+    "normalization": "standardize",
+    "seed": 42,
+    "test_limit": null,
+    "train_limit": null,
+    "val_limit": null
+  },
+  "model": {
+    "class_weights": [
+      1.04177987575531,
+      1.0261131525039673,
+      0.9418253302574158,
+      0.938112735748291,
+      1.218749761581421,
+      0.8009613156318665,
+      1.2372952699661255,
+      1.0379012823104858,
+      0.7572612166404724
+    ],
+    "depth": 4,
+    "dropout": 0.25,
+    "hidden": 64,
+    "label_smoothing": 0.1,
+    "lr": 0.001,
+    "model_family": "residual_cnn",
+    "optimizer": "adamw",
+    "scheduler": "cosine",
+    "weight_decay": 0.01
+  },
+  "seed_everything": 42,
+  "trainer": {
+    "accelerator": "gpu",
+    "deterministic": true,
+    "devices": 1,
+    "enable_progress_bar": true,
+    "gradient_clip_val": 1.0,
+    "logger": false,
+    "max_epochs": 15,
+    "num_sanity_val_steps": 0
+  }
+}

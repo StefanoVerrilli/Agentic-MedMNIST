@@ -1,0 +1,31 @@
+{
+  "artefact": "train_config",
+  "artefact_type": "TrainConfig",
+  "created_at": "2026-09-08T21:13:42.973249+00:00",
+  "payload": {
+    "batch_size": 128,
+    "class_weighting": true,
+    "depth": 3,
+    "device": "cuda",
+    "dropout": 0.25,
+    "early_stopping_patience": 3,
+    "epochs": 15,
+    "gradient_clip_val": 1.0,
+    "hidden": 48,
+    "label_smoothing": 0.05,
+    "lr": 0.0003,
+    "model_family": "residual_cnn",
+    "optimizer": "adamw",
+    "rationale": "Selected from 4 validation-only trials. Widens the proven residual_cnn from hidden=32 to 48 at the same depth=3, with a small dropout bump to 0.25 to regularize the extra parameters. All other hyperparameters (adamw, cosine, lr=3e-4, wd=1e-4, class_weighting, label_smoothing=0.05, hflip+vflip, standardize) are held at the round-1 optimum to isolate the capacity effect.",
+    "scheduler": "cosine",
+    "schema_version": "1.0",
+    "seed": 42,
+    "source": "agentic_search:selected:qwen3.8",
+    "weight_decay": 0.0001
+  },
+  "payload_sha256": "9f5ea59007dce5a049015fb05e70d71ec865387aa01c33529ab6425f04527e95",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 16,
+  "version": 1
+}

@@ -1,0 +1,34 @@
+{
+  "artefact": "run_manifest",
+  "artefact_type": "RunManifest",
+  "created_at": "2026-09-08T21:29:55.027736+00:00",
+  "payload": {
+    "code_sha256": "17a278575427489fc0f39715fbccab4e5b095405f886368663cc299853748468",
+    "created_at": "2026-09-08T21:29:55.008848+00:00",
+    "dataset": "pathmnist",
+    "deterministic_torch": true,
+    "lightning_cli": true,
+    "llm_mode": "ollama",
+    "llm_model": "qwen3.8",
+    "llm_model_digest": null,
+    "package_versions": {
+      "jsonargparse": "4.52.0",
+      "lightning": "2.6.5",
+      "medmnist": "3.0.2",
+      "numpy": "2.4.6",
+      "pydantic": "2.13.5",
+      "scikit-learn": "1.9.0",
+      "torch": "2.14.0+cu126"
+    },
+    "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.35",
+    "python_version": "3.11.15",
+    "run_id": "seed_42",
+    "schema_version": "1.0",
+    "seed": 42
+  },
+  "payload_sha256": "26f95abcdb2d9e66969c07e095a668e298e0059bb570664719939ed576d65e03",
+  "producer": "run",
+  "run_id": "seed_42",
+  "sequence": 1,
+  "version": 1
+}

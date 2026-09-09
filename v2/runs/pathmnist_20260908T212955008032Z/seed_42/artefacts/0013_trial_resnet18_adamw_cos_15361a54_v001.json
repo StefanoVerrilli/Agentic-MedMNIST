@@ -1,0 +1,58 @@
+{
+  "artefact": "trial_resnet18_adamw_cos_15361a54",
+  "artefact_type": "TrialResult",
+  "created_at": "2026-09-08T21:35:11.929850+00:00",
+  "payload": {
+    "best_epoch": 2,
+    "candidate_id": "resnet18_adamw_cos",
+    "checkpoint_path": "blobs/search/trial_resnet18_adamw_cos_15361a54.ckpt",
+    "checkpoint_sha256": "f0fbbcd2b86d656dedb6188d03c2e767abd853edeb0d7d1358a2b0f1740fd7c4",
+    "config": {
+      "batch_size": 64,
+      "class_weighting": true,
+      "depth": 3,
+      "device": "cuda",
+      "dropout": 0.2,
+      "early_stopping_patience": 1,
+      "epochs": 2,
+      "gradient_clip_val": 1.0,
+      "hidden": 32,
+      "label_smoothing": 0.05,
+      "lr": 0.0005,
+      "model_family": "resnet18",
+      "optimizer": "adamw",
+      "rationale": "Tests a structurally different backbone (resnet18) that introduces batch-norm, multi-scale feature maps, and skip connections beyond the custom residual_cnn. Learning rate halved to 5e-4 and batch size reduced to 64 to stabilize training of the deeper network. Retains the proven adamw+cosine pairing, standardize normalization, all three augmentations, and class weighting. If resnet18 matches or beats the residual_cnn, it confirms that richer inductive bias (BN, multi-resolution) is the key factor rather than the specific residual block design.",
+      "scheduler": "cosine",
+      "schema_version": "1.0",
+      "seed": 42,
+      "source": "qwen3.8",
+      "weight_decay": 0.01
+    },
+    "config_hash": "15361a54c82d75ab6867f4af3e213225348ecca721447004c1f01c709c1bd745",
+    "decision_source": "qwen3.8",
+    "duration_seconds": 62.3345,
+    "error": null,
+    "lightning_csv_path": "blobs/search/lightning_logs/trial_resnet18_adamw_cos_15361a54/version_0/metrics.csv",
+    "representation": {
+      "augmentations": [
+        "hflip",
+        "vflip",
+        "rotate90"
+      ],
+      "normalization": "standardize",
+      "rationale": "Tests a structurally different backbone (resnet18) that introduces batch-norm, multi-scale feature maps, and skip connections beyond the custom residual_cnn. Learning rate halved to 5e-4 and batch size reduced to 64 to stabilize training of the deeper network. Retains the proven adamw+cosine pairing, standardize normalization, all three augmentations, and class weighting. If resnet18 matches or beats the residual_cnn, it confirms that richer inductive bias (BN, multi-resolution) is the key factor rather than the specific residual block design."
+    },
+    "round_index": 2,
+    "schema_version": "1.0",
+    "status": "completed",
+    "training_log_path": "blobs/search/trial_resnet18_adamw_cos_15361a54.training.jsonl",
+    "validation_accuracy": 0.97481,
+    "validation_balanced_accuracy": 0.975541,
+    "validation_macro_f1": 0.975065
+  },
+  "payload_sha256": "ceb069ea248b33600f19e561a59f427b1a06e14360e363862a6ac1ad4e7f74ba",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 13,
+  "version": 1
+}

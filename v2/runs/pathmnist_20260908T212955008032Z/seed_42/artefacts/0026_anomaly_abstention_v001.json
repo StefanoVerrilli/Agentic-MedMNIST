@@ -1,0 +1,25 @@
+{
+  "artefact": "anomaly_abstention",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T21:42:33.984022+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "The abstention stage is methodologically sound and internally consistent. All arithmetic checks pass: (1) abstain_rate (0.439276) = 1 − test_coverage (0.560724) ✓; (2) selective_risk (0.026826) = 1 − accuracy_on_covered (0.973174) ✓; (3) human_review_count (3154) = 7180 × 0.439276 ≈ 3154 ✓; (4) ood_auroc (0.979091) = mean of the three predictive_entropy test AUROCs (0.97835, 0.983618, 0.975304) ✓; (5) ood_validation_auroc (0.999483) = mean of the three predictive_entropy validation AUROCs ✓; (6) validation_coverage (0.80008) matches the 0.8 target ✓; (7) base_test_accuracy (0.887883) matches the evaluation report ✓. The OOD evaluation is properly structured with 3 severity levels × 2 scoring methods, honestly scoped as 'controlled_corruption_proxy', and includes a SHA-256 hash for the evidence blob. The threshold (0.73257684) was calibrated on validation to hit the 0.8 coverage target, which it achieved precisely.\n\nPrimary concern (warning): The test coverage (56.07%) is substantially below the validation coverage (80.01%), a 24 pp gap. This means the abstention mechanism, calibrated to cover 80% of predictions, only covers 56% on the test set, routing 3,154 samples (44%) to human review. This is a direct consequence of the distribution shift / overfitting flagged in the evaluation stage (val acc 0.997 vs test acc 0.888), where the model is more uncertain on test samples and thus more frequently exceeds the entropy threshold. While not a methodological error, it significantly reduces the practical utility of the selective prediction pipeline on the target population.\n\nSecondary note: The OOD evaluation relies solely on unit-scale Gaussian noise at three sigma levels. While appropriately labeled as a 'controlled_corruption_proxy', this is a narrow corruption family and does not capture semantic OOD shifts (e.g., different tissue types, staining artifacts, or scanner variability). The ood_pass=true verdict should be interpreted within this limited scope.\n\nNo deterministic errors were found. The stage is internally consistent and the methodology is correctly applied. Recommend proceeding, with the understanding that the abstention mechanism's real-world coverage will be lower than the 80% design target due to the underlying distribution shift.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Test coverage (56.07%) is 24 pp below the validation coverage target (80%), meaning 44% of test samples (3,154) are routed to human review rather than auto-predicted; this is a consequence of the val/test distribution shift but significantly reduces practical utility of the selective pipeline.",
+      "OOD evaluation is limited to a single corruption family (unit-scale Gaussian noise at 3 severity levels); semantic OOD shifts (staining variation, different tissue types, scanner artifacts) are not assessed, so ood_pass=true should be interpreted narrowly.",
+      "The large val/test coverage gap (80% vs 56%) suggests the entropy threshold calibrated on validation is not transferable to the test distribution; a test-aware or adaptive threshold strategy could improve coverage without sacrificing selective risk."
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "abstention"
+  },
+  "payload_sha256": "2ed4f8cf8155659bd95c731115f8b1258a317026f2f3e229fe9d1557f8f8df1a",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 26,
+  "version": 1
+}

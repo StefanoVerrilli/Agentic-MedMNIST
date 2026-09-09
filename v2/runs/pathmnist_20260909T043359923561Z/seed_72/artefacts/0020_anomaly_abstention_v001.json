@@ -1,0 +1,34 @@
+{
+  "artefact": "anomaly_abstention",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-09T05:10:30.040970+00:00",
+  "payload": {
+    "action": "stop",
+    "attempt": 1,
+    "comment": "The deterministic finding of OOD AUROC below random chance (0.306 headline; as low as 0.026–0.031 at σ=0.4) is a fundamental failure of the abstention mechanism and cannot be dismissed. At σ≥0.25, max_softmax confidence is *inversely* correlated with OOD-ness: the model becomes more confident on corrupted inputs than on clean ones. This means the abstention router would actively accept OOD samples and reject in-distribution samples at moderate-to-high noise, which is the opposite of its intended function. The predictive_entropy score shows the same pattern (AUROC 0.127 at σ=0.25, 0.026 at σ=0.4), ruling out a single-score artifact.\n\nSecondary concerns:\n1. Coverage transfer gap: the threshold calibrated to 80% validation coverage yields only 49.7% test coverage (30 pp drop), consistent with the cross-center domain shift (official_test_separate_center=true). The selective-risk figure (0.028) and covered accuracy (0.972) look strong in isolation but are computed on a test subset that is disproportionately the model's most confident (and, per the OOD results, potentially most miscalibrated) predictions.\n2. The OOD evaluation uses a controlled Gaussian-noise proxy (ood_scope='controlled_corruption_proxy'), which is a reasonable stress test but does not cover semantic OOD (e.g., unstained tissue, foreign material). The failure on a simple corruption proxy suggests the model's confidence landscape is fundamentally miscalibrated under any distribution shift.\n3. Recurring cross-stage issues persist: (a) data_profile references '96×96 patch resolution' while image_shape_hwc is [28,28,3]; (b) representation_plan.rationale contains model-architecture upgrade text misattributed from train_config; (c) llm_model_digest is null for qwen3.8 across all artefacts; (d) rationale strings appear truncated with '…'.\n\nRequired revisions before this stage can pass:\n- Replace or augment max_softmax with a confidence measure that is OOD-aware (e.g., energy score, ensemble disagreement, Mahalanobis distance in feature space, or a dedicated OOD detector). Re-evaluate AUROC across all noise severities; all must exceed 0.5 with a meaningful margin.\n- Re-calibrate the abstention threshold using a method robust to the val→test domain shift (e.g., quantile matching on a held-out OOD set, or conformal prediction with finite-sample guarantees).\n- Report OOD AUROC per severity level as a first-class metric in the abstention report, not buried in a sub-list.\n- Resolve the recurring factual contradictions (96×96 vs 28×28), fix the misattributed rationale text, pin the LLM model digest, and verify full rationale strings are stored.\n- Add a note in the abstention report explicitly acknowledging that the 97.2% covered accuracy is conditional on the model's (demonstrably unreliable) confidence ranking under distribution shift.",
+    "deterministic_issues": [
+      "warning:OOD AUROC is below random chance"
+    ],
+    "llm_issues": [
+      "OOD AUROC is below random chance (0.306 headline; 0.031 max_softmax and 0.026 predictive_entropy at σ=0.4) — the abstention confidence score is inversely correlated with OOD-ness, making the router actively harmful for out-of-distribution inputs",
+      "At σ=0.25, both max_softmax (0.186) and predictive_entropy (0.127) AUROC are far below 0.5, confirming the failure is not score-specific but reflects a fundamental miscalibration of the model's confidence landscape under distribution shift",
+      "Coverage transfer gap: 80% validation coverage collapses to 49.7% test coverage (30 pp drop), indicating the threshold calibrated on validation is poorly transferable under the cross-center domain shift",
+      "The 97.2% accuracy_on_covered and 0.028 selective_risk are computed on a test subset selected by a confidence score that is demonstrably anti-correlated with OOD-ness, making these figures unreliable indicators of real-world selective performance",
+      "OOD evaluation is limited to a controlled Gaussian-noise proxy (ood_scope='controlled_corruption_proxy'); no semantic OOD scenarios (unstained tissue, foreign material, different staining protocol) are tested",
+      "Recurring factual contradiction: data_profile.ambiguity_risks references '96×96 patch resolution' but image_shape_hwc is [28,28,3] — persists across preprocessing, profiling, configuration_replay, training, and evaluation stages",
+      "representation_plan.rationale contains model-architecture upgrade text ('hidden 48→64, depth 3→4') instead of justification for standardize normalization and hflip/vflip/rotate90 augmentation; content misattributed from train_config/best_configuration",
+      "llm_model_digest is null for qwen3.8 (ollama) in run_manifest and all prior stage artefacts; LLM-generated narrative lacks a pinned model fingerprint, creating a reproducibility and auditability gap",
+      "Rationale strings in best_configuration, train_config, and representation_plan appear truncated (end with '…'); full text not verifiable in stored artefacts",
+      "The abstention report does not explicitly flag that the OOD failure invalidates the confidence-based routing; ood_pass=false is present but the headline metrics (accuracy_on_covered, selective_risk) are presented without this critical caveat"
+    ],
+    "schema_version": "1.0",
+    "severity": "critical",
+    "source": "qwen3.8",
+    "stage": "abstention"
+  },
+  "payload_sha256": "4ef37b202013e2ebfad23cb079d2df711b802f3e5639d004f86aaaa42ccf5e0c",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 20,
+  "version": 1
+}

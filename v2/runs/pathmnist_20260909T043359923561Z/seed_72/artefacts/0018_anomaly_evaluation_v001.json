@@ -1,0 +1,29 @@
+{
+  "artefact": "anomaly_evaluation",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-09T05:09:55.389364+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "The evaluation report is numerically consistent: all per-class precision/recall/F1 values, macro-averages, balanced accuracy, and overall accuracy (6335/7180 = 0.88231) are correctly derived from the confusion matrix. The prediction artifact (7180 test samples, logits+probabilities+targets) is coherent. No deterministic findings were raised.\n\nHowever, several reporting and consistency gaps warrant revision before the evaluation is accepted as final:\n\n1. **Domain shift not acknowledged in the evaluation report.** The split_manifest explicitly states `official_test_separate_center: true`, and the training-stage review flagged an imbalance-ratio shift (3.95 vs 1.63). The ~11.5 pp val→test accuracy drop (0.9974 → 0.8823) is almost certainly driven by this cross-center domain shift, yet the evaluation_report contains no note, caveat, or reference to it. A reader comparing val and test numbers without context would misattribute the gap to overfitting.\n\n2. **No confidence intervals or variance estimates for small-sample per-class metrics.** Debris (n=339), cancer-associated stroma (n=421), and smooth muscle (n=592) have per-class F1 values of 0.79, 0.65, and 0.67 respectively. With these sample sizes, the 95 % CI on per-class recall spans roughly ±5–7 pp. Reporting point estimates without CIs (or at minimum a note on effective sample size) overstates precision. The training-stage review already flagged this; it should be addressed in the evaluation report.\n\n3. **Recurring factual contradiction (96×96 vs 28×28).** The data_profile.ambiguity_risks still reference '96×96 patch resolution' while image_shape_hwc is [28,28,3]. This error has persisted through preprocessing, profiling, configuration_replay, and training stages. It must be corrected in the data_profile before the evaluation is finalised, as it undermines trust in the data description.\n\n4. **representation_plan.rationale misattribution.** The rationale text in representation_plan (and best_configuration, train_config) contains model-architecture upgrade language ('hidden 48→64, depth 3→4') rather than a justification for the standardize normalization and hflip/vflip/rotate90 augmentation choices. This is a content-attribution error that has recurred across stages.\n\n5. **llm_model_digest is null.** The qwen3.8 (ollama) model fingerprint is absent from the run_manifest and all stage artefacts. LLM-generated narrative text (rationales, anomaly comments) therefore lacks a pinned model version, creating a reproducibility and auditability gap.\n\n6. **Truncated rationale strings.** Rationale fields in best_configuration, train_config, and representation_plan end with '…'. Verify the stored YAML contains the full text; if truncation is in the source, the justification is incomplete.\n\n7. **Primary metric choice.** The report designates 'accuracy' as primary_metric. In the presence of 9-class imbalance and cross-center domain shift, accuracy (0.882) is less informative than macro-F1 (0.855) or balanced accuracy (0.866). While the selection rule ('accuracy within tolerance, then macro-F1') is defensible for model selection, the evaluation report should present macro-F1 or balanced accuracy as the headline metric for interpretability.\n\nNone of these are computational errors—the numbers are correct—but they are reporting and consistency gaps that should be resolved before the evaluation artefact is considered final.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Domain shift (official_test_separate_center=true, imbalance ratio 3.95 vs 1.63) is not explicitly acknowledged in the evaluation_report; the 11.5 pp val→test gap is unexplained",
+      "No confidence intervals or variance estimates for per-class metrics on small-sample classes (debris n=339, stroma n=421, smooth muscle n=592)",
+      "Recurring factual contradiction: data_profile.ambiguity_risks references '96×96 patch resolution' but image_shape_hwc is [28,28,3]",
+      "representation_plan.rationale contains model-architecture upgrade text instead of justification for standardize normalization and augmentation choices; content misattributed from train_config/best_configuration",
+      "llm_model_digest is null for qwen3.8 (ollama) across run_manifest and all stage artefacts; LLM narrative lacks a pinned model fingerprint",
+      "Rationale strings in best_configuration, train_config, and representation_plan appear truncated (end with '…'); full text not verifiable",
+      "Primary metric is 'accuracy' (0.882) despite 9-class imbalance and cross-center domain shift; macro-F1 (0.855) or balanced accuracy (0.866) would be more informative headline metrics"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "evaluation"
+  },
+  "payload_sha256": "6f9e9f15d68da4114bb7ea0a1c4511f96bb04d743cb515ce9b8c84662a85a8f3",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 18,
+  "version": 1
+}

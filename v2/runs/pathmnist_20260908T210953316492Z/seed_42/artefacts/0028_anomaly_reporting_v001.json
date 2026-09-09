@@ -1,0 +1,21 @@
+{
+  "artefact": "anomaly_reporting",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T21:18:58.245808+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "All computational results verify correctly: confusion matrix sums, per-class metrics, macro averages, abstention arithmetic, OOD AUROC means, training history, and model-selection rule all check out. However, a cross-artefact inconsistency persists across the model_search and training anomaly reviews: the preprocessing review comment states augmented_train_size = 359984 (89996×4), while the split_manifest records 269988 (89996×3). With augmentations [hflip, vflip], the correct multiplier is ×3 (original + 2 augmented copies), so the preprocessing comment's ×4 is a factual error in the dossier. This documentation discrepancy should be corrected in the preprocessing artefact before the reporting stage is finalised. No deterministic findings were raised; all other artefacts are internally and",
+    "deterministic_issues": [],
+    "llm_issues": [],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "reporting"
+  },
+  "payload_sha256": "1440a0ea8805ffad004e1b679eef17bb0d5107bb3a120d07ef4b796c88f1cb4a",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 28,
+  "version": 1
+}

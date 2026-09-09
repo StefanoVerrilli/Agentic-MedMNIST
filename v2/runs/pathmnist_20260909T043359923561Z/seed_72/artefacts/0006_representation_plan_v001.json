@@ -1,0 +1,33 @@
+{
+  "artefact": "representation_plan",
+  "artefact_type": "RepresentationPlan",
+  "created_at": "2026-09-09T05:02:33.987894+00:00",
+  "payload": {
+    "augmentation_factor": 4,
+    "augmentations": [
+      "hflip",
+      "vflip",
+      "rotate90"
+    ],
+    "normalization": "standardize",
+    "rationale": "Normalization choice: The three H&E channels exhibit markedly different means (0.741, 0.533, 0.706) and standard deviations (0.124, 0.177, 0.124). Standardizing (z-scoring) centers each channel at zero and scales to unit variance, ensuring the network does not implicitly weight the eosin channel (lower mean, higher std) differently from hematoxylin or the third channel. Unit normalization would preserve the disparate offsets and variances, forcing the first-layer weights to compensate; standardize removes that inductive bias and is the safer default for multi-channel histopathology inputs.\n\nAugmentation choice: All three permitted transforms—hflip, vflip, and rotate90—are explicitly orientation-safe for tissue-type labels (tissue morphology such as glandular architecture, stromal texture, and cellular density is invariant to global flips and 90° rotation). Because the design evidence is train-only, these augmentations expand the effective training set without risking label corruption at inference. The class imbalance is moderate (ratio ≈ 1.63; min 7 886 vs max 12 885), so the additional 3× sample diversity from the three transforms is particularly beneficial for the under-represented classes (indices 4 and 6 with ~7.9–8.0 k samples) while remaining harmless for the majority classes. At 28×28 the patches are small enough that a 90° rotation does not introduce significant boundary artifacts, and the combination of hflip + vflip + rotate90 yields up to 8 distinct orientations per patch, effectively tripling the training signal without any data leakage.\n\nNo other schema options are available, so the decision is constrained to these selections. The combination of standardize + all three augmentations maximizes training diversity under the guardrails while keeping the representation channel-agnostic and orientation-invariant.",
+    "schema_version": "1.0",
+    "source": "qwen3.8",
+    "stats_source": "train",
+    "train_channel_mean_unit": [
+      0.740545,
+      0.53298219,
+      0.70582885
+    ],
+    "train_channel_std_unit": [
+      0.12368222,
+      0.17676253,
+      0.12443067
+    ]
+  },
+  "payload_sha256": "1ba57fa369f6cd6c9fad65b2118c43451dfe6ed525a97675e5fed1290f17cd5e",
+  "producer": "preprocessing",
+  "run_id": "seed_72",
+  "sequence": 6,
+  "version": 1
+}

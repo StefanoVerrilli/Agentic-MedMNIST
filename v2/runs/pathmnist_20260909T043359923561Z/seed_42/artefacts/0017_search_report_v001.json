@@ -1,0 +1,27 @@
+{
+  "artefact": "search_report",
+  "artefact_type": "SearchReport",
+  "created_at": "2026-09-09T04:39:11.698602+00:00",
+  "payload": {
+    "completed_trials": 4,
+    "failed_trials": 0,
+    "schema_version": "1.0",
+    "selected_candidate_id": "res_cnn_wider_deep",
+    "selected_config_hash": "f770eaa3c9c009dc1bdf577474aafe0dfd8fb3ce311ac8d4b4e19239d0b2550d",
+    "selected_validation_accuracy": 0.982707,
+    "selected_validation_macro_f1": 0.982735,
+    "selection_rule": "accuracy_tolerance_then_macro_f1",
+    "test_metrics_used": false,
+    "trial_artefacts": [
+      "trial_res_cnn_std_adamw_196ff6d3",
+      "trial_tiny_cnn_sgd_plateau_fbcfe45e",
+      "trial_res_cnn_wider_deep_f770eaa3",
+      "trial_resnet18_adamw_cos_15361a54"
+    ]
+  },
+  "payload_sha256": "f3d1f7e3aa1e60a63ada9ce3aa13a8102295ef8bf3a298d78c4fba352ad942ee",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 17,
+  "version": 1
+}

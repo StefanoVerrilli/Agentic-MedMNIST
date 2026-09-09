@@ -1,0 +1,51 @@
+{
+  "artefact": "best_configuration",
+  "artefact_type": "BestConfiguration",
+  "created_at": "2026-09-09T04:39:11.701204+00:00",
+  "payload": {
+    "lightning_config_path": "best_config.yaml",
+    "lightning_config_sha256": "44270f4713829a008449249815ae50e12619bfb2172b572070135f9408fbf85e",
+    "representation": {
+      "augmentations": [
+        "hflip",
+        "vflip",
+        "rotate90"
+      ],
+      "normalization": "standardize",
+      "rationale": "Direct capacity upgrade of the round-1 winner (hidden 48→64, depth 3→4). The 97.64% result left ~2.4% error; a wider, deeper residual stack should capture finer-grained pathology patterns. Dropout raised 0.2→0.25 and label_smoothing 0.05→0.1 to regularize the extra parameters. All other hyperparameters (adamw, cosine, lr=1e-3, wd=0.01, bs=128, standardize, 3 augmentations, class_weighting) are held constant to isolate the capacity effect."
+    },
+    "schema_version": "1.0",
+    "selected_candidate_id": "res_cnn_wider_deep",
+    "selected_config_hash": "f770eaa3c9c009dc1bdf577474aafe0dfd8fb3ce311ac8d4b4e19239d0b2550d",
+    "selection_rule": "accuracy within tolerance, then macro-F1; test locked",
+    "test_metrics_used": false,
+    "train_config": {
+      "batch_size": 128,
+      "class_weighting": true,
+      "depth": 4,
+      "device": "cuda",
+      "dropout": 0.25,
+      "early_stopping_patience": 3,
+      "epochs": 15,
+      "gradient_clip_val": 1.0,
+      "hidden": 64,
+      "label_smoothing": 0.1,
+      "lr": 0.001,
+      "model_family": "residual_cnn",
+      "optimizer": "adamw",
+      "rationale": "Selected from 4 validation-only trials. Direct capacity upgrade of the round-1 winner (hidden 48→64, depth 3→4). The 97.64% result left ~2.4% error; a wider, deeper residual stack should capture finer-grained pathology patterns. Dropout raised 0.2→0.25 and label_smoothing 0.05→0.1 to regularize the extra parameters. All other hyperparameters (adamw, cosine, lr=1e-3, wd=0.01, bs=128, standardize, 3 augmentations, class_weighting) are held constant to isolate the capacity effect.",
+      "scheduler": "cosine",
+      "schema_version": "1.0",
+      "seed": 42,
+      "source": "agentic_search:selected:qwen3.8",
+      "weight_decay": 0.01
+    },
+    "validation_accuracy": 0.982707,
+    "validation_macro_f1": 0.982735
+  },
+  "payload_sha256": "74279b96956e7d3a13606464f4d72d1f0fd034509251b4b6e8ab41dd1bdcb3f3",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 18,
+  "version": 1
+}

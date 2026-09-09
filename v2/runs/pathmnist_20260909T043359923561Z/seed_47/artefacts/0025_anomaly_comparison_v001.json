@@ -1,0 +1,27 @@
+{
+  "artefact": "anomaly_comparison",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-09T05:00:37.825759+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "The comparison-stage arithmetic is correct: accuracy_delta = 0.9 − 0.840251 = 0.059749, baseline_met_or_exceeded is true, and the common seed (47) and split fingerprint match between baseline_report and the agentic run. No deterministic findings are present, which is consistent.\n\nHowever, the comparison report is thin for a stage whose purpose is to substantiate the agentic model's advantage:\n\n1. **No statistical significance test or confidence interval on the delta.** With n = 7180 the SE of accuracy is ≈ 0.0035, so the 5.97 pp gap is clearly significant (~17 SE), but this should be stated explicitly (e.g., a two-proportion z-test or bootstrap CI on the paired delta) rather than left to the reader to infer.\n\n2. **Single-metric comparison.** Only accuracy is reported. The macro-F1 delta (0.870039 − 0.784172 = 0.085867) is actually larger and more informative for the imbalanced 9-class problem; balanced accuracy and per-class deltas are absent. A multi-metric table would strengthen the comparison.\n\n3. **No per-class comparison.** The baseline report provides only aggregate accuracy and macro-F1. Without per-class baseline metrics it is impossible to identify where the agentic model specifically improves (e.g., cancer-associated stroma recall 0.485, smooth muscle recall 0.823) or whether any class regresses.\n\n4. **Capacity asymmetry not explicitly framed.** The baseline is a tiny_cnn (depth = 2, hidden = 16, no dropout, no class weighting, no label smoothing) while the agentic model is architecturally larger. The rationale field calls it a 'fixed conventional control,' but the comparison report should explicitly note that the delta conflates architecture capacity with the agentic search process, so the reader does not over-attribute the gain to the search alone.\n\n5. **No multiple-comparison or correction note.** If per-class deltas are added, a Bonferroni or FDR correction should accompany them.\n\nNone of these are arithmetic errors; they are omissions that weaken the evidentiary weight of the comparison. Recommend revising the comparison report to include (a) a significance test / CI on the accuracy delta, (b) a multi-metric summary (accuracy, macro-F1, balanced accuracy), (c) per-class deltas where baseline per-class data is available, and (d) an explicit note on the capacity asymmetry.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "No statistical significance test or confidence interval reported on the 5.97 pp accuracy delta; with n=7180 this should be trivially significant but must be stated.",
+      "Comparison limited to a single metric (accuracy); macro-F1 delta (0.0859) and balanced-accuracy delta are omitted despite being more informative for the imbalanced 9-class task.",
+      "No per-class comparison provided; baseline report lacks per-class metrics, preventing identification of which classes drive the improvement or whether any regress.",
+      "Capacity asymmetry (tiny_cnn depth=2/hidden=16 vs. larger agentic architecture) is not explicitly framed in the comparison report; the delta conflates model capacity with the agentic search contribution.",
+      "No multiple-comparison correction noted; if per-class deltas are added, FDR/Bonferroni adjustment should be applied."
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "comparison"
+  },
+  "payload_sha256": "e94df728f1fdedaada5f55d9634f3b41bee118fb1fa645efe7ea8e0a2e0443d9",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 25,
+  "version": 1
+}

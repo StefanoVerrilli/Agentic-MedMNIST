@@ -1,0 +1,25 @@
+{
+  "artefact": "anomaly_configuration_replay",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-09T04:50:49.211193+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Configuration replay is internally consistent and well-documented. Key checks pass: (1) Split sizes (89996/10004/7180) match official PathMNIST partition; subsampled=false, profiled_fraction=1.0 confirm full-dataset usage. (2) Augmentation factor 4 (original + hflip/vflip/rotate90) correctly yields augmented_train_size=359984. (3) Normalization stats (mean/std) are sourced from train only (stats_source='train', train_stats_only=true), preventing val/test leakage. (4) Seed 47 is consistent across train_config, split_manifest, and best_configuration. (5) Config hash f770eaa3c9c0… is consistent between selected_config_hash and the source field in train_config/representation_plan. (6) test_metrics_used=false and selection_rule explicitly states 'test locked; frozen and replayed without test-dependent adaptation' — no test leakage. (7) Validation metrics (acc=0.9827, macro-F1=0.9827) are reasonable and close, consistent with a well-performing 9-class model. (8) All provenance hashes (archive_md5, per-split sha256, lightning_config_sha256) are present. Minor pre-existing issues carried from earlier stages: (a) LLM narrative in ambiguity_risks references '96×96 patch resolution' while actual image_shape_hwc is [28,28,3] — prose-only factual error, structured data is correct; (b) llm_model_digest is null for qwen3.8, limiting full reproducibility of LLM-generated narrative; (c) test-set class distribution deviates from train/val (adipose ×1.79, debris ×0.41, stroma ×0.56) due to external-center sampling — properly documented. None of these affect the configuration's correctness or the replay's validity. The omitted run_manifest is expected at the configuration stage prior to execution. No deterministic findings. Proceed to training.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "LLM narrative in ambiguity_risks references '96×96 patch resolution' but actual image_shape_hwc is [28,28,3]; prose-only factual inconsistency, structured data is correct.",
+      "llm_model_digest is null for qwen3.8 (ollama); exact model weights not pinned by content hash, limiting full reproducibility of LLM-dependent narrative steps.",
+      "Test-set class distribution deviates substantially from train/val (adipose ×1.79, debris ×0.41, stroma ×0.56); per-class test metrics for debris (n=339), stroma (n=421), smooth muscle (n=592) will be statistically noisy — properly documented but worth monitoring downstream."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "configuration_replay"
+  },
+  "payload_sha256": "3fe3443125d737ef52782fcfa74eda217e7ba92927725cf13c3e802bc128aac7",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 13,
+  "version": 1
+}

@@ -1,0 +1,35 @@
+{
+  "artefact": "anomaly_reporting",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-09T04:48:55.661484+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "The reporting stage is internally consistent and all arithmetic cross-checks pass. Verification: (1) Confusion matrix rows sum to per-class supports (total 7,180); accuracy 6,375/7,180 = 0.887883 ✓; macro-F1, macro-precision, macro-recall, balanced accuracy all mutually consistent ✓. (2) Abstention report: test_coverage 0.560724 = 1 − 0.439276 ✓; selective_risk 0.026826 = 1 − 0.973174 ✓; human_review_count 3154 = 7180 × 0.439276 ✓; ood_auroc 0.979091 = mean of three predictive_entropy test AUROCs ✓; ood_validation_auroc 0.999483 = mean of three validation AUROCs ✓. (3) Comparison: accuracy_delta 0.066574 = 0.887883 − 0.821309 ✓; common_seed 42 and split_fingerprint 9afc9ed3… identical in both reports ✓; baseline_met_or_exceeded = true ✓. (4) Search: test_metrics_used = false ✓; 4 completed, 0 failed trials ✓. (5) Prediction artifact: 7,180 test + 10,004 validation samples, includes logits/probabilities/targets ✓.\n\nNo deterministic errors found. The reporting correctly aggregates all pipeline artefacts and surfaces the key concerns through anomaly reports. However, several warning-level concerns warrant attention before deployment:\n\n1. Severe validation-to-test generalization gap: val_acc 0.9972 → test_acc 0.8879 (~11 pp); val_macro_f1 0.9972 → test_macro_f1 0.8555 (~14 pp). The selection criterion (validation accuracy 0.9827) does not reflect test performance, suggesting the selection rule may be unreliable for this split.\n2. Cancer-associated stroma (class 7) critically underperforming: recall 0.508, F1 0.647; 105/421 misclassified as debris, 71 as smooth muscle. Smooth muscle (class 5): F1 0.705, recall 0.799. Debris (class 2) precision only 0.614.\n3. Test abstention rate 43.9% vs. validation 20%: ~24 pp coverage drop from the 80% calibration target; nearly half of test predictions deferred to human review, operationally costly.\n4. OOD evaluation limited to unit-scale Gaussian noise at 3 severity levels; does not cover semantic OOD shifts (tissue type variation, imaging artifacts, domain shift).\n5. 17 artefacts omitted from the dossier (including best_configuration, train_config, all trial artefacts, search_plan, split_manifest, data_profile, run_manifest), reducing full auditability. Rationale strings in best_configuration and train_config are truncated (end with '…').\n6. early_stopping_patience changed from 1 (search trials) to 3 (final training) without explicit in-rationale documentation.\n7. reporting_status.complete_through_stage is 'comparison' rather than 'reporting'; while this may be by design (reporting is the aggregation step), it creates ambiguity about whether the reporting stage itself is marked complete.\n\nThe reporting stage fulfils its aggregation and cross-referencing role correctly. The flagged issues are model-quality and operational-readiness concerns that the reporting appropriately surfaces. Recommend addressing the generalization gap, class-specific underperformance, and abstention calibration before any deployment decision.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Severe validation-to-test generalization gap: val_acc 0.9972 → test_acc 0.8879 (~11 pp); val_macro_f1 0.9972 → test_macro_f1 0.8555 (~14 pp); selection criterion (val accuracy 0.9827) does not reflect test performance",
+      "Cancer-associated stroma (class 7) critically underperforming: recall 0.508, F1 0.647; 105/421 misclassified as debris, 71 as smooth muscle",
+      "Smooth muscle (class 5) underperforming: F1 0.705, recall 0.799; 61/592 misclassified as background, 42 as debris",
+      "Debris (class 2) low precision 0.614; 105 samples from class 7 and 42 from class 5 incorrectly assigned to debris",
+      "Adipose (class 0) recall only 0.843; 178/1338 misclassified as smooth muscle, 23 as adenocarcinoma",
+      "Test abstention rate 43.9% vs. validation 20%: ~24 pp coverage drop from the 80% calibration target; nearly half of test predictions deferred to human review",
+      "OOD evaluation limited to unit-scale Gaussian noise at 3 severity levels; does not cover semantic OOD shifts (tissue type variation, imaging artifacts, domain shift)",
+      "17 artefacts omitted from dossier (best_configuration, train_config, all trial artefacts, search_plan, split_manifest, data_profile, run_manifest, etc.), reducing full auditability",
+      "Rationale strings truncated in best_configuration, train_config, and trial configs (end with '…'), reducing full auditability of design justification",
+      "early_stopping_patience changed from 1 (search trials) to 3 (final training) without explicit in-rationale documentation of the deliberate escalation",
+      "reporting_status.complete_through_stage is 'comparison' rather than 'reporting', creating ambiguity about whether the reporting stage itself is marked complete",
+      "No statistical significance test (e.g., paired bootstrap CI or McNemar test) reported on the 7,180-sample test set to formally confirm the 6.66 pp accuracy delta is non-random",
+      "No per-class delta decomposition in comparison report to show whether improvement is uniform or concentrated in specific classes"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "reporting"
+  },
+  "payload_sha256": "b23c670305e663264357c3b23d5e40ad556268a034f644bba37ec865b23b5b78",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 33,
+  "version": 2
+}

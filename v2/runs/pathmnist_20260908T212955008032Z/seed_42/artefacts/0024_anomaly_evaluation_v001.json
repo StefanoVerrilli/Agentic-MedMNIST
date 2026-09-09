@@ -1,0 +1,28 @@
+{
+  "artefact": "anomaly_evaluation",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T21:41:56.110450+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "The evaluation stage is methodologically sound and internally consistent. All confusion-matrix row sums match per-class supports (total 7,180), per-class precision/recall/F1 values are arithmetically correct against the matrix, and the test split was properly isolated (test_locked, test_metrics_used=false in search). The prediction artifact includes logits, probabilities, and targets with a valid SHA-256.\n\nHowever, the results reveal a serious generalisation concern that must be flagged:\n\n1. **Validation–test gap ≈ 11 pp**: Best validation accuracy is 0.997201 (epoch 11) while test accuracy is 0.887883. The search-trial validation accuracy for the same candidate was 0.982707, meaning the test accuracy (0.8879) is actually *below* the search-trial validation score. This pattern is consistent with overfitting to the validation set during the extended 14-epoch final training (patience 3, cosine LR), or with a distribution shift between validation and test splits. Either way, the model's true generalisation performance is substantially lower than the selection criterion implied.\n\n2. **Class 7 (cancer-associated stroma) recall = 0.508**: Nearly half of this class is misclassified, predominantly into debris (105) and smooth muscle (71). F1 is 0.647, the lowest of all nine classes. For a pathology classification task this is a clinically significant failure mode.\n\n3. **Adipose → smooth muscle confusion**: 178 of 1,338 adipose samples are misclassified as smooth muscle, the single largest off-diagonal cell. Combined with smooth-muscle recall of 0.799, this pair accounts for a large share of total errors.\n\n4. **Balanced accuracy (0.8665) is 2.1 pp below overall accuracy (0.8879)**, confirming that the higher-accuracy classes (background, lymphocytes, adenocarcinoma) are masking weaker performance on rarer classes.\n\n5. **Minor documentation issues** (carried from prior stages): rationale strings are truncated with '…' in best_configuration, train_config, and trial configs; the early_stopping_patience change from 1 (search) to 3 (final) is not explicitly justified in the rationale text.\n\nNone of these are evaluation-methodology errors; the test evaluation was correctly executed. The findings are model-performance issues that should drive any subsequent iteration (e.g., stronger regularisation, class-specific augmentation for stroma/smooth-muscle, or a re-examination of the validation/test split for distribution shift).",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Validation accuracy 0.997201 vs test accuracy 0.887883: an ~11 pp gap indicating severe overfitting to the validation set or distribution shift; test accuracy is below the search-trial validation accuracy (0.982707) for the same candidate.",
+      "Class 7 (cancer-associated stroma) recall is only 0.508 (F1 0.647); 105 samples misclassified as debris and 71 as smooth muscle — the worst-performing class.",
+      "Largest single confusion: 178 adipose samples misclassified as smooth muscle; smooth-muscle recall is 0.799, compounding the adipose/smooth-muscle confusion pair.",
+      "Balanced accuracy (0.8665) trails overall accuracy (0.8879) by 2.1 pp, indicating class-imbalance-driven performance masking.",
+      "Rationale strings in best_configuration, train_config, and trial configs are truncated with '…', limiting full auditability of design justification.",
+      "early_stopping_patience changed from 1 (search trials) to 3 (final train_config) without an explicit justification note in the rationale text."
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "evaluation"
+  },
+  "payload_sha256": "5e784c14f5ae01aa836df913b0ae7f5792fd4b42ef5934ac87fd67f6fbe3a66d",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 24,
+  "version": 1
+}

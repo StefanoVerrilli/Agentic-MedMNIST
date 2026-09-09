@@ -1,0 +1,1322 @@
+{
+  "artefact_registry": [
+    {
+      "artefact": "run_manifest",
+      "path": "artefacts/0001_run_manifest_v001.json",
+      "producer": "run",
+      "sha256": "059c0d11c9d84fd9968674ad3b62d50bd1085213bde41583dfcaef4eff65162d",
+      "type": "RunManifest",
+      "version": 1
+    },
+    {
+      "artefact": "dataset_manifest",
+      "path": "artefacts/0002_dataset_manifest_v001.json",
+      "producer": "ingestion",
+      "sha256": "e749ae3162dd47c9dcc8013e796a1044c000c76f9277f25c9a348d24fcd1dd7b",
+      "type": "DatasetManifest",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_ingestion",
+      "path": "artefacts/0003_anomaly_ingestion_v001.json",
+      "producer": "reviewer",
+      "sha256": "a4d4d1c3b8faad85096aa96c6af5d408e382a0bd48644119ac29ce0705594fc4",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "data_profile",
+      "path": "artefacts/0004_data_profile_v001.json",
+      "producer": "profiling",
+      "sha256": "8f3249cc4bbcb56ef543d49d8048b300e7e8a0f355eea08098aebaefc50aab0c",
+      "type": "DataProfile",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_profiling",
+      "path": "artefacts/0005_anomaly_profiling_v001.json",
+      "producer": "reviewer",
+      "sha256": "6be344b0a1310dcf47fcc48f280d3185d73c246897379591cac98383ad84a7bc",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "representation_plan",
+      "path": "artefacts/0006_representation_plan_v001.json",
+      "producer": "preprocessing",
+      "sha256": "da59103b73726b6d74462336a5ae77e400e2a4888308bcc055f7804148f50c33",
+      "type": "RepresentationPlan",
+      "version": 1
+    },
+    {
+      "artefact": "split_manifest",
+      "path": "artefacts/0007_split_manifest_v001.json",
+      "producer": "preprocessing",
+      "sha256": "d944ca6d92f559d3690c72ffb2ee4c4e9f5981ee02d36a3a7edcc68c449096ee",
+      "type": "SplitManifest",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_preprocessing",
+      "path": "artefacts/0008_anomaly_preprocessing_v001.json",
+      "producer": "reviewer",
+      "sha256": "98499bbe6973e71c966990352f581b03b287b4dc29ff1b8f2d27c32fa9d50f16",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "search_plan",
+      "path": "artefacts/0009_search_plan_v001.json",
+      "producer": "model_search",
+      "sha256": "34f06b2af59b098d6d74a482b8031b198f7163ecb4cb9920e83fe8c734c32b84",
+      "type": "SearchPlan",
+      "version": 1
+    },
+    {
+      "artefact": "trial_res_cnn_std_adamw_c428a8eb",
+      "path": "artefacts/0010_trial_res_cnn_std_adamw_c428a8eb_v001.json",
+      "producer": "model_search",
+      "sha256": "56b42628759181ace0847b57709bb810a33628be5a027e097608d7d71a1fd4f3",
+      "type": "TrialResult",
+      "version": 1
+    },
+    {
+      "artefact": "trial_tiny_cnn_sgd_plateau_f592b079",
+      "path": "artefacts/0011_trial_tiny_cnn_sgd_plateau_f592b079_v001.json",
+      "producer": "model_search",
+      "sha256": "71bfcc5bddd8e28829d67d2db7a660d25cbcaa8bf5e72e07192abb1c4deda78e",
+      "type": "TrialResult",
+      "version": 1
+    },
+    {
+      "artefact": "trial_res_cnn_wider_d3_584c2d8c",
+      "path": "artefacts/0012_trial_res_cnn_wider_d3_584c2d8c_v001.json",
+      "producer": "model_search",
+      "sha256": "f9131682e7f31acfbe123e145784084a988a4d5581c4689e426128bd0a33319d",
+      "type": "TrialResult",
+      "version": 1
+    },
+    {
+      "artefact": "trial_resnet18_deep_d4_6d0f785c",
+      "path": "artefacts/0013_trial_resnet18_deep_d4_6d0f785c_v001.json",
+      "producer": "model_search",
+      "sha256": "e33683104b593c7d8a8801c6571cf4654890ee6893b7edea9c9e0b71260dfd9b",
+      "type": "TrialResult",
+      "version": 1
+    },
+    {
+      "artefact": "representation_plan",
+      "path": "artefacts/0014_representation_plan_v002.json",
+      "producer": "model_search",
+      "sha256": "bc798ec3acf1fc9f43d76843a19585ee7e25be0118ffdcdff5ee55ff17104f2c",
+      "type": "RepresentationPlan",
+      "version": 2
+    },
+    {
+      "artefact": "split_manifest",
+      "path": "artefacts/0015_split_manifest_v002.json",
+      "producer": "model_search",
+      "sha256": "d708441a9c9dea070ca243e43f2fa708636a32e0d649760ac821738fe75fe6c4",
+      "type": "SplitManifest",
+      "version": 2
+    },
+    {
+      "artefact": "train_config",
+      "path": "artefacts/0016_train_config_v001.json",
+      "producer": "model_search",
+      "sha256": "9f5ea59007dce5a049015fb05e70d71ec865387aa01c33529ab6425f04527e95",
+      "type": "TrainConfig",
+      "version": 1
+    },
+    {
+      "artefact": "search_report",
+      "path": "artefacts/0017_search_report_v001.json",
+      "producer": "model_search",
+      "sha256": "9f73f2466c566ebe36a59d5d17eab57c047c81da6d7dee241490112348efca87",
+      "type": "SearchReport",
+      "version": 1
+    },
+    {
+      "artefact": "best_configuration",
+      "path": "artefacts/0018_best_configuration_v001.json",
+      "producer": "model_search",
+      "sha256": "461a673447e4e55351ff27fb7ca548649d037c95fd31a8f1a961ba79dddefa5c",
+      "type": "BestConfiguration",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_model_search",
+      "path": "artefacts/0019_anomaly_model_search_v001.json",
+      "producer": "reviewer",
+      "sha256": "549f44d14fc8fd13e332053354adeddf9e35bb398289592a0f4473b6eb297776",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "train_result",
+      "path": "artefacts/0020_train_result_v001.json",
+      "producer": "training",
+      "sha256": "b183eb963633ec470b2c7a2dc1e5c8d6364546de83b168c33a79f0ebe2194e8d",
+      "type": "TrainResult",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_training",
+      "path": "artefacts/0021_anomaly_training_v001.json",
+      "producer": "reviewer",
+      "sha256": "e39d7bceaf89d6614c97d661d80023d60efe67676b6d1605f2ed1bd1e4becc47",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "prediction_artifact",
+      "path": "artefacts/0022_prediction_artifact_v001.json",
+      "producer": "evaluation",
+      "sha256": "3a63cfca6cad1c72ad882b6b7500a556eeae689c4ee070f1f6aadb650cd698f2",
+      "type": "PredictionArtifact",
+      "version": 1
+    },
+    {
+      "artefact": "evaluation_report",
+      "path": "artefacts/0023_evaluation_report_v001.json",
+      "producer": "evaluation",
+      "sha256": "31871c5d7e13159996ebfab4962176c8d942daafd68aa789bfe134e775c7a28b",
+      "type": "EvalReport",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_evaluation",
+      "path": "artefacts/0024_anomaly_evaluation_v001.json",
+      "producer": "reviewer",
+      "sha256": "d01652dce00c7205d41ac77da279f71cfbe46e4e849bab971efdf87e9ba9b980",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "abstention_report",
+      "path": "artefacts/0025_abstention_report_v001.json",
+      "producer": "abstention",
+      "sha256": "f81cb85fb2013cb7ec8fb1f3233ba2c97c04f17569c7c883eb4e6f8180a75285",
+      "type": "AbstentionReport",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_abstention",
+      "path": "artefacts/0026_anomaly_abstention_v001.json",
+      "producer": "reviewer",
+      "sha256": "df4435c90bc6807cfca8c300677f40e59111f8b8f0fd67782ecb0a6d009e06a7",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "reporting_status",
+      "path": "artefacts/0027_reporting_status_v001.json",
+      "producer": "reporting",
+      "sha256": "b4dba35f528c110e812bb11061f2ee0c7b775e59e520e0f373bc9fd3a62e0aa6",
+      "type": "ReportingStatus",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_reporting",
+      "path": "artefacts/0028_anomaly_reporting_v001.json",
+      "producer": "reviewer",
+      "sha256": "1440a0ea8805ffad004e1b679eef17bb0d5107bb3a120d07ef4b796c88f1cb4a",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "baseline_report",
+      "path": "artefacts/0029_baseline_report_v001.json",
+      "producer": "baseline",
+      "sha256": "dc38ebf3fee2218c533b7562b272fe0dc22d82f61a24e9793552cfc476be1e56",
+      "type": "BaselineReport",
+      "version": 1
+    },
+    {
+      "artefact": "comparison_report",
+      "path": "artefacts/0030_comparison_report_v001.json",
+      "producer": "run",
+      "sha256": "978294847f6c0a7f307266acc3de4c8ae67cf74abb5781c8665980359bb0bcf9",
+      "type": "ComparisonReport",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_comparison",
+      "path": "artefacts/0031_anomaly_comparison_v001.json",
+      "producer": "reviewer",
+      "sha256": "acbba8ae251391ea71e3ad0ed80c2373fcc0a4c0e667763aec1fde5e754b09f9",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "reporting_status",
+      "path": "artefacts/0032_reporting_status_v002.json",
+      "producer": "reporting",
+      "sha256": "483994c96633bff1aa27587723a5bb8c3d417dd55ed59ea0421e5ae3ebb8dd15",
+      "type": "ReportingStatus",
+      "version": 2
+    },
+    {
+      "artefact": "anomaly_reporting",
+      "path": "artefacts/0033_anomaly_reporting_v002.json",
+      "producer": "reviewer",
+      "sha256": "0be1a230096d3528814f5c6796beab9fd63958be8eb72c42adcb599ca317679a",
+      "type": "AnomalyReport",
+      "version": 2
+    }
+  ],
+  "decision_events": 88,
+  "decision_log": "decision_log.jsonl",
+  "latest_artefacts": {
+    "abstention_report": {
+      "abstain_rate": 0.594568,
+      "accuracy_on_covered": 0.994504,
+      "base_test_accuracy": 0.890251,
+      "calibrated_on": "validation",
+      "human_review_count": 4269,
+      "method": "max_softmax",
+      "ood_auroc": 0.873799,
+      "ood_corruption": "unit_scale_gaussian_noise_multi_severity",
+      "ood_evidence_path": "blobs/ood_probabilities.npz",
+      "ood_evidence_sha256": "47d29b9d2faa6b94e3e32399a8f6b2de11576d12842b7cbe546378409c0b0479",
+      "ood_pass": true,
+      "ood_scenarios": [
+        {
+          "corruption": "unit_scale_gaussian_noise_sigma_0.15",
+          "score": "max_softmax",
+          "test_auroc": 0.903044,
+          "validation_auroc": 0.991713
+        },
+        {
+          "corruption": "unit_scale_gaussian_noise_sigma_0.15",
+          "score": "predictive_entropy",
+          "test_auroc": 0.905907,
+          "validation_auroc": 0.992102
+        },
+        {
+          "corruption": "unit_scale_gaussian_noise_sigma_0.25",
+          "score": "max_softmax",
+          "test_auroc": 0.888165,
+          "validation_auroc": 0.990341
+        },
+        {
+          "corruption": "unit_scale_gaussian_noise_sigma_0.25",
+          "score": "predictive_entropy",
+          "test_auroc": 0.859864,
+          "validation_auroc": 0.986518
+        },
+        {
+          "corruption": "unit_scale_gaussian_noise_sigma_0.4",
+          "score": "max_softmax",
+          "test_auroc": 0.830187,
+          "validation_auroc": 0.982686
+        },
+        {
+          "corruption": "unit_scale_gaussian_noise_sigma_0.4",
+          "score": "predictive_entropy",
+          "test_auroc": 0.763476,
+          "validation_auroc": 0.970605
+        }
+      ],
+      "ood_scope": "controlled_corruption_proxy",
+      "ood_validation_auroc": 0.988247,
+      "schema_version": "1.0",
+      "selective_risk": 0.005496,
+      "target_validation_coverage": 0.8,
+      "test_coverage": 0.405432,
+      "threshold": 0.9424752,
+      "validation_coverage": 0.80008
+    },
+    "anomaly_abstention": {
+      "action": "continue",
+      "attempt": 1,
+      "comment": "Abstention report is internally consistent. Arithmetic verified: test_coverage (0.405432) + abstain_rate (0.594568) = 1.0; selective_risk (0.005496) = 1 − accuracy_on_covered (0.994504); human_review_count (4269) = 7180 × 0.594568. OOD headline AUROC (0.873799) equals the mean of the three max_softmax test AUROCs (0.903044, 0.888165, 0.830187); validation AUROC (0.988247) equals the mean of the three max_softmax validation AUROCs. Threshold calibrated on validation to hit 0.8 coverage (achieved 0.80008) is applied to test, yielding 0.405432 coverage — a large gap, but the mechanism is behaving conservatively rather than incorrectly (selective risk 0.55%, covered accuracy 99.45%). OOD scope is appropriately labelled 'controlled_corruption_proxy'. No deterministic findings. Cross-artefact a1",
+      "deterministic_issues": [],
+      "llm_issues": [],
+      "schema_version": "1.0",
+      "severity": "ok",
+      "source": "qwen3.8",
+      "stage": "abstention"
+    },
+    "anomaly_comparison": {
+      "action": "continue",
+      "attempt": 1,
+      "comment": "Comparison stage is internally consistent and arithmetically correct. Verified: accuracy_delta (0.068942) = agentic (0.890251) − baseline (0.821309); baseline_met_or_exceeded is true since 0.890251 > 0.821309; common_seed 42 matches both baseline_report and train_result; common_split_fingerprint is identical across both reports and the comparison report; primary_metric 'accuracy' is consistent with both reports. The agentic model (res_cnn_wider_d3, val_acc 0.9708) outperforms the fixed baseline (tiny_cnn, acc 0.8213) by 6.89 pp under identical seed and split. One cross-artefact documentation note persists from earlier stages: the preprocessing review comment cites augmented_train_size 359984 (89996×4) while the split_manifest records 269988 (89996×3); with [hflip, vflip] the ×3 value is ar",
+      "deterministic_issues": [],
+      "llm_issues": [],
+      "schema_version": "1.0",
+      "severity": "ok",
+      "source": "qwen3.8",
+      "stage": "comparison"
+    },
+    "anomaly_evaluation": {
+      "action": "revise",
+      "attempt": 1,
+      "comment": "Evaluation report is internally consistent: confusion matrix rows sum to per-class supports (total 7180), diagonal sum 6392/7180 = 0.890251 matches reported accuracy, and all per-class precision/recall/F1 values verify correctly against the matrix. Macro metrics (precision 0.870877, recall 0.87288, F1 0.863665) are correct averages. Prediction artifact test_samples (7180) matches n_samples. Test metrics were not used in model selection (test_metrics_used=false confirmed in both best_configuration and search_report). Config hashes are consistent across artifacts. The only issue is the inherited cross-artifact documentation inconsistency: the preprocessing review comment states augmented_train_size 359984 (89996×4) while split_manifest records 269988 (89996×3); with augmentations [hflip, vfl",
+      "deterministic_issues": [],
+      "llm_issues": [],
+      "schema_version": "1.0",
+      "severity": "warning",
+      "source": "qwen3.8",
+      "stage": "evaluation"
+    },
+    "anomaly_ingestion": {
+      "action": "continue",
+      "attempt": 1,
+      "comment": "Ingestion stage is internally consistent. Dataset manifest: 9 labels match n_classes=9; loaded split sizes (89996/10004/7180) exactly match official sizes with subsampled=false; schema_version 1.0; all SHA-256 index hashes and archive MD5 present. Run manifest: dataset name aligns with dataset manifest; deterministic_torch=true; seed=42 matches run_id; package versions are plausible for the stated date; created_at (21:09:53) is ~10 s before the authoritative current UTC (21:10:03), which is expected. No deterministic findings, no omitted artefacts. Minor note: llm_model_digest is null, meaning the LLM version is not pinned; this is acceptable at ingestion but should be resolved before any LLM-dependent stage to guarantee reproducibility. The test_domain_note referencing CRC-VAL-HE-7K is a",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "llm_model_digest is null; pin the model digest before any LLM-dependent stage to ensure reproducibility"
+      ],
+      "schema_version": "1.0",
+      "severity": "ok",
+      "source": "qwen3.8",
+      "stage": "ingestion"
+    },
+    "anomaly_model_search": {
+      "action": "revise",
+      "attempt": 1,
+      "comment": "Model search is internally consistent: 4/4 trials completed across 2 rounds as planned; selection of res_cnn_wider_d3 (val_acc 0.9708, macro-F1 0.9706) is correct under the accuracy-then-macro-F1 rule with 0.005 tolerance (next-best resnet18_deep_d4 at 0.9604 is outside tolerance); test_metrics_used=false confirmed; config_hash matches between trial and best_config; final config correctly escalates epochs 2→15 and patience 1→3 per search_plan.final_epochs. One cross-artefact discrepancy: the preprocessing review comment states 'augmented_train_size 359984 = 89996×4', but the authoritative split_manifest records augmented_train_size 269988 (= 89996×3). This is a 1×-factor mismatch in the augmentation multiplier between the two documents. It does not affect the search results (which operate",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "Cross-artefact inconsistency: preprocessing review comment asserts augmented_train_size 359984 (89996×4) while split_manifest records 269988 (89996×3); the augmentation multiplier is off by one between the two documents."
+      ],
+      "schema_version": "1.0",
+      "severity": "warning",
+      "source": "qwen3.8",
+      "stage": "model_search"
+    },
+    "anomaly_preprocessing": {
+      "action": "continue",
+      "attempt": 1,
+      "comment": "Preprocessing stage is internally consistent. All arithmetic verified: class counts sum to official split sizes (89996/10004/7180); imbalance ratios (1.634 train, 3.947 test) and test-to-train prevalence ratios are arithmetically correct; augmented_train_size 359984 = 89996×4. SHA-256 index hashes are consistent across dataset_manifest, split_manifest, and ingestion artefact. Normalization (standardize, train-stats-only) and augmentations (hflip/vflip/rotate90) are appropriate for orientation-invariant tissue-type labels. Cross-institutional domain shift and class-boundary ambiguity are inherent dataset properties, correctly documented. One minor reproducibility note: llm_model_digest is null in the run manifest; pinning the exact model digest would strengthen auditability of LLM-assisted",
+      "deterministic_issues": [],
+      "llm_issues": [],
+      "schema_version": "1.0",
+      "severity": "ok",
+      "source": "qwen3.8",
+      "stage": "preprocessing"
+    },
+    "anomaly_profiling": {
+      "action": "continue",
+      "attempt": 1,
+      "comment": "Profiling stage is internally consistent and thorough. All class counts sum correctly to official split sizes (89996/10004/7180); imbalance ratios (1.63 train, 3.95 test) and per-class proportions are arithmetically verified. Channel statistics are in [0,1] range, consistent with normalized input. No blank images or duplicates. The cross-institutional domain shift (test-to-train prevalence ratios 0.41–1.79) and label-ambiguity risks are well-documented and should be carried into downstream evaluation design (e.g., per-class metrics, domain-shift-aware baselines). One residual gap: llm_model_digest remains null (flagged in ingestion); this does not affect the deterministic profiling outputs but should be pinned before any LLM-dependent downstream stage to preserve reproducibility. No new or",
+      "deterministic_issues": [],
+      "llm_issues": [],
+      "schema_version": "1.0",
+      "severity": "ok",
+      "source": "qwen3.8",
+      "stage": "profiling"
+    },
+    "anomaly_reporting": {
+      "action": "revise",
+      "attempt": 1,
+      "comment": "All computational results verify correctly: confusion matrix row sums match per-class supports (total 7180), diagonal 6392/7180 = 0.890251 matches reported accuracy, per-class and macro metrics are arithmetically consistent, abstention arithmetic (coverage + abstain = 1.0, selective_risk = 1 − accuracy_on_covered, human_review_count = 7180 × 0.594568 = 4269) checks out, OOD headline AUROCs equal the mean of per-scenario values, training history shows a valid cosine LR schedule over 15 epochs, and the comparison delta (0.068942) is correct. One cross-artefact documentation inconsistency persists: the preprocessing review comment asserts augmented_train_size = 359984 (89996×4), while the split_manifest records 269988 (89996×3). With augmentations [hflip, vflip], the ×3 multiplier (original +",
+      "deterministic_issues": [],
+      "llm_issues": [],
+      "schema_version": "1.0",
+      "severity": "warning",
+      "source": "qwen3.8",
+      "stage": "reporting"
+    },
+    "anomaly_training": {
+      "action": "revise",
+      "attempt": 1,
+      "comment": "Training stage is internally consistent: 15/15 epochs completed, best checkpoint at epoch 15 (val_acc 0.994902), cosine LR schedule decays correctly to 0, config hashes match between best_configuration and the selected trial, selection rule (accuracy-then-macro-F1, 0.005 tolerance) correctly picks res_cnn_wider_d3 over resnet18_deep_d4 (gap 0.0104 > 0.005), test_metrics_used=false confirmed. One cross-artefact inconsistency persists: the preprocessing review comment states augmented_train_size 359984 (89996×4) while split_manifest records 269988 (89996×3). With augmentations [hflip, vflip], 3 copies (original + 2) = 269988 is the arithmetically consistent value, making the ×4 claim in the preprocessing comment erroneous. This is a documentation discrepancy, not a training-correctness fault",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "Cross-artefact inconsistency: preprocessing review comment asserts augmented_train_size 359984 (89996×4) while split_manifest records 269988 (89996×3); with augmentations [hflip, vflip] the ×3 multiplier (original + 2 augmented copies) is the consistent value, so the preprocessing comment's ×4 is incorrect"
+      ],
+      "schema_version": "1.0",
+      "severity": "warning",
+      "source": "qwen3.8",
+      "stage": "training"
+    },
+    "baseline_report": {
+      "accuracy": 0.821309,
+      "checkpoint_path": "blobs/baseline_model.ckpt",
+      "checkpoint_sha256": "36e0a4815663033c1ca894e0ed10f82590059a2406ad13cde0b380f5c0901ccd",
+      "config": {
+        "batch_size": 128,
+        "class_weighting": false,
+        "depth": 2,
+        "device": "cuda",
+        "dropout": 0.0,
+        "early_stopping_patience": 3,
+        "epochs": 15,
+        "gradient_clip_val": 1.0,
+        "hidden": 16,
+        "label_smoothing": 0.0,
+        "lr": 0.001,
+        "model_family": "tiny_cnn",
+        "optimizer": "adamw",
+        "rationale": "Fixed conventional control with the agentic run's epoch budget.",
+        "scheduler": "cosine",
+        "schema_version": "1.0",
+        "seed": 42,
+        "source": "baseline:fixed",
+        "weight_decay": 0.0001
+      },
+      "dataset": "pathmnist",
+      "lightning_csv_path": "blobs/lightning_logs/baseline_model/version_0/metrics.csv",
+      "macro_f1": 0.750857,
+      "schema_version": "1.0",
+      "seed": 42,
+      "split_fingerprint": "9afc9ed3c5a00c7391bcdd170372981b088ec7867c12f721313eda0b303c7505",
+      "training_log_path": "blobs/baseline_model.training.jsonl"
+    },
+    "best_configuration": {
+      "lightning_config_path": "best_config.yaml",
+      "lightning_config_sha256": "a88b0dc16a76bc1fbf34eff6900a59eeffda7318a2fecb7861bfa3d85ba63e97",
+      "representation": {
+        "augmentations": [
+          "hflip",
+          "vflip"
+        ],
+        "normalization": "standardize",
+        "rationale": "Widens the proven residual_cnn from hidden=32 to 48 at the same depth=3, with a small dropout bump to 0.25 to regularize the extra parameters. All other hyperparameters (adamw, cosine, lr=3e-4, wd=1e-4, class_weighting, label_smoothing=0.05, hflip+vflip, standardize) are held at the round-1 optimum to isolate the capacity effect."
+      },
+      "schema_version": "1.0",
+      "selected_candidate_id": "res_cnn_wider_d3",
+      "selected_config_hash": "584c2d8c09f24f2965f222246dfc628ef542e32ee50f66b4f662ceaa2e0e3716",
+      "selection_rule": "accuracy within tolerance, then macro-F1; test locked",
+      "test_metrics_used": false,
+      "train_config": {
+        "batch_size": 128,
+        "class_weighting": true,
+        "depth": 3,
+        "device": "cuda",
+        "dropout": 0.25,
+        "early_stopping_patience": 3,
+        "epochs": 15,
+        "gradient_clip_val": 1.0,
+        "hidden": 48,
+        "label_smoothing": 0.05,
+        "lr": 0.0003,
+        "model_family": "residual_cnn",
+        "optimizer": "adamw",
+        "rationale": "Selected from 4 validation-only trials. Widens the proven residual_cnn from hidden=32 to 48 at the same depth=3, with a small dropout bump to 0.25 to regularize the extra parameters. All other hyperparameters (adamw, cosine, lr=3e-4, wd=1e-4, class_weighting, label_smoothing=0.05, hflip+vflip, standardize) are held at the round-1 optimum to isolate the capacity effect.",
+        "scheduler": "cosine",
+        "schema_version": "1.0",
+        "seed": 42,
+        "source": "agentic_search:selected:qwen3.8",
+        "weight_decay": 0.0001
+      },
+      "validation_accuracy": 0.970812,
+      "validation_macro_f1": 0.970627
+    },
+    "comparison_report": {
+      "accuracy_delta": 0.068942,
+      "agentic_accuracy": 0.890251,
+      "baseline_accuracy": 0.821309,
+      "baseline_met_or_exceeded": true,
+      "common_seed": 42,
+      "common_split_fingerprint": "9afc9ed3c5a00c7391bcdd170372981b088ec7867c12f721313eda0b303c7505",
+      "primary_metric": "accuracy",
+      "schema_version": "1.0"
+    },
+    "data_profile": {
+      "ambiguity_note": "Several class boundaries are inherently ambiguous in H&E histopathology: 'debris' vs 'background' vs 'mucus' overlap in appearance; 'cancer-associated stroma' vs 'smooth muscle' can be indistinguishable at the patch level; 'normal colon mucosa' vs early 'colorectal adenocarcinoma epithelium' involves a dysplastic continuum. The test set (CRC-VAL-7K) originates from a different clinical center, introducing uncontrolled variation in staining protocol, scanner calibration, and tissue preparation that can shift the visual appearance of every class, compounding label ambiguity. The test prevalence,",
+      "ambiguity_risks": [
+        "Cross-institutional domain shift: test images from a different clinical center introduce uncontrolled staining, scanner, and tissue-preparation variability that is not captured by train/val splits.",
+        "Severe class-prevalence shift in test: 'adipose' prevalence nearly doubles (10.4%→18.6%, ratio 1.79) while 'debris' nearly halves (11.5%→4.7%, ratio 0.41), violating the i.i.d. assumption and biasing accuracy metrics.",
+        "Small per-class test counts (debris n=339, stroma n=421, smooth muscle n=592) yield high variance in per-class accuracy and make confidence intervals wide.",
+        "Label ambiguity between 'debris', 'background', and 'mucus' is exacerbated by inter-center staining differences, increasing misclassification risk that is not a model failure but a definitional one.",
+        "'Cancer-associated stroma' vs 'smooth muscle' boundary is patch-level ambiguous; inter-center variation in section thickness and fixation can shift which label a pathologist assigns.",
+        "Test-to-train prevalence ratios span 0.41–1.79, meaning a model trained on the train distribution will face a shifted prior at test time, inflating apparent error for under-represented test classes.",
+        "The 1.63× train imbalance is mild, but the effective test imbalance (adipose:debris ≈ 4:1) is substantially higher, so overall accuracy in the test set is dominated by adipose and mucus predictions.",
+        "No information on whether the 9-class taxonomy was applied identically across centers; a single pathologist vs. multi-reader labeling protocol difference would introduce systematic label noise in the test set."
+      ],
+      "blank_image_fraction": 0.0,
+      "class_counts": {
+        "test": [
+          1338,
+          847,
+          339,
+          634,
+          1035,
+          592,
+          741,
+          421,
+          1233
+        ],
+        "train": [
+          9366,
+          9509,
+          10360,
+          10401,
+          8006,
+          12182,
+          7886,
+          9401,
+          12885
+        ],
+        "val": [
+          1041,
+          1057,
+          1152,
+          1156,
+          890,
+          1354,
+          877,
+          1045,
+          1432
+        ]
+      },
+      "class_proportions": {
+        "test": [
+          0.18635097,
+          0.11796657,
+          0.04721448,
+          0.08830084,
+          0.14415042,
+          0.08245125,
+          0.10320334,
+          0.0586351,
+          0.17172702
+        ],
+        "train": [
+          0.10407129,
+          0.10566025,
+          0.11511623,
+          0.1155718,
+          0.08895951,
+          0.13536157,
+          0.08762612,
+          0.1044602,
+          0.14317303
+        ],
+        "val": [
+          0.10405838,
+          0.10565774,
+          0.11515394,
+          0.11555378,
+          0.08896441,
+          0.13534586,
+          0.08766493,
+          0.10445822,
+          0.14314274
+        ]
+      },
+      "dataset": "pathmnist",
+      "decision_source": "qwen3.8",
+      "duplicate_train_samples": 0,
+      "image_shape_hwc": [
+        28,
+        28,
+        3
+      ],
+      "imbalance_ratio": 1.633908,
+      "n_channels": 3,
+      "n_classes": 9,
+      "official_data_fraction": 1.0,
+      "profiled_fraction": 1.0,
+      "samples_profiled": 107180,
+      "schema_version": "1.0",
+      "test_imbalance_ratio": 3.946903,
+      "test_to_train_prevalence_ratio": [
+        1.79060883,
+        1.11647069,
+        0.41014621,
+        0.76403442,
+        1.62040482,
+        0.60911862,
+        1.17776921,
+        0.5613152,
+        1.19943693
+      ],
+      "train_channel_mean_unit": [
+        0.740545,
+        0.53298219,
+        0.70582885
+      ],
+      "train_channel_std_unit": [
+        0.12368222,
+        0.17676253,
+        0.12443067
+      ]
+    },
+    "dataset_manifest": {
+      "archive_md5": "a8b06965200029087d5bd730944a56c1",
+      "data_reference": "https://zenodo.org/records/10519652/files/pathmnist.npz?download=1",
+      "dataset": "pathmnist",
+      "labels": [
+        "adipose",
+        "background",
+        "debris",
+        "lymphocytes",
+        "mucus",
+        "smooth muscle",
+        "normal colon mucosa",
+        "cancer-associated stroma",
+        "colorectal adenocarcinoma epithelium"
+      ],
+      "license": "CC BY 4.0",
+      "loaded_split_sizes": {
+        "test": 7180,
+        "train": 89996,
+        "val": 10004
+      },
+      "n_channels": 3,
+      "n_classes": 9,
+      "official_split_sizes": {
+        "test": 7180,
+        "train": 89996,
+        "val": 10004
+      },
+      "schema_version": "1.0",
+      "selected_index_sha256": {
+        "test": "27ab586ecd9b4ac7278c6a91cf0b336a2ba742afe742d13eff51f702635791e8",
+        "train": "1478a96c1d8ad06d0a600d6c9b8d5c8dddd83fbda22307ab449764f013683b51",
+        "val": "a13f875ade8e54f5aee16ff205c36aa628396dddec09a33a175fcf9cbbb9d402"
+      },
+      "subsampled": false,
+      "task": "multi-class",
+      "test_domain_note": "CRC-VAL-HE-7K test images originate from a different clinical center."
+    },
+    "evaluation_report": {
+      "accuracy": 0.890251,
+      "balanced_accuracy": 0.87288,
+      "confusion_matrix": [
+        [
+          1089,
+          0,
+          1,
+          0,
+          3,
+          230,
+          5,
+          0,
+          10
+        ],
+        [
+          0,
+          847,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          9,
+          0,
+          292,
+          0,
+          0,
+          33,
+          0,
+          5,
+          0
+        ],
+        [
+          0,
+          0,
+          14,
+          619,
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          22,
+          29,
+          1,
+          0,
+          912,
+          1,
+          53,
+          2,
+          15
+        ],
+        [
+          19,
+          3,
+          13,
+          0,
+          2,
+          534,
+          0,
+          20,
+          1
+        ],
+        [
+          0,
+          0,
+          14,
+          6,
+          0,
+          0,
+          687,
+          18,
+          16
+        ],
+        [
+          1,
+          0,
+          72,
+          0,
+          3,
+          73,
+          8,
+          223,
+          41
+        ],
+        [
+          0,
+          0,
+          3,
+          14,
+          1,
+          0,
+          19,
+          7,
+          1189
+        ]
+      ],
+      "macro_f1": 0.863665,
+      "macro_precision": 0.870877,
+      "macro_recall": 0.87288,
+      "n_samples": 7180,
+      "per_class": [
+        {
+          "f1": 0.878935,
+          "label": 0,
+          "name": "adipose",
+          "precision": 0.955263,
+          "recall": 0.813901,
+          "support": 1338
+        },
+        {
+          "f1": 0.98146,
+          "label": 1,
+          "name": "background",
+          "precision": 0.963595,
+          "recall": 1.0,
+          "support": 847
+        },
+        {
+          "f1": 0.779706,
+          "label": 2,
+          "name": "debris",
+          "precision": 0.712195,
+          "recall": 0.861357,
+          "support": 339
+        },
+        {
+          "f1": 0.972506,
+          "label": 3,
+          "name": "lymphocytes",
+          "precision": 0.968701,
+          "recall": 0.976341,
+          "support": 634
+        },
+        {
+          "f1": 0.932515,
+          "label": 4,
+          "name": "mucus",
+          "precision": 0.990228,
+          "recall": 0.881159,
+          "support": 1035
+        },
+        {
+          "f1": 0.730007,
+          "label": 5,
+          "name": "smooth muscle",
+          "precision": 0.613088,
+          "recall": 0.902027,
+          "support": 592
+        },
+        {
+          "f1": 0.90813,
+          "label": 6,
+          "name": "normal colon mucosa",
+          "precision": 0.889896,
+          "recall": 0.927126,
+          "support": 741
+        },
+        {
+          "f1": 0.640805,
+          "label": 7,
+          "name": "cancer-associated stroma",
+          "precision": 0.810909,
+          "recall": 0.529691,
+          "support": 421
+        },
+        {
+          "f1": 0.948923,
+          "label": 8,
+          "name": "colorectal adenocarcinoma epithelium",
+          "precision": 0.934014,
+          "recall": 0.964315,
+          "support": 1233
+        }
+      ],
+      "primary_metric": "accuracy",
+      "roc_auc_ovr_macro": 0.982261,
+      "schema_version": "1.0",
+      "split": "test"
+    },
+    "prediction_artifact": {
+      "includes_logits": true,
+      "includes_probabilities": true,
+      "includes_targets": true,
+      "path": "blobs/predictions_v001.npz",
+      "schema_version": "1.0",
+      "sha256": "f6d34d1102143392525d9a86f8e068d8326a04d3b69af9ab1123303cdd7c3a8a",
+      "test_samples": 7180,
+      "validation_samples": 10004
+    },
+    "reporting_status": {
+      "artefact_versions": 32,
+      "complete_through_stage": "comparison",
+      "decision_events": 85,
+      "dossier_path": "dossier.json",
+      "schema_version": "1.0"
+    },
+    "representation_plan": {
+      "augmentation_factor": 3,
+      "augmentations": [
+        "hflip",
+        "vflip"
+      ],
+      "normalization": "standardize",
+      "rationale": "Widens the proven residual_cnn from hidden=32 to 48 at the same depth=3, with a small dropout bump to 0.25 to regularize the extra parameters. All other hyperparameters (adamw, cosine, lr=3e-4, wd=1e-4, class_weighting, label_smoothing=0.05, hflip+vflip, standardize) are held at the round-1 optimum to isolate the capacity effect.",
+      "schema_version": "1.0",
+      "source": "agentic_search:selected:qwen3.8",
+      "stats_source": "train",
+      "train_channel_mean_unit": [
+        0.740545,
+        0.53298219,
+        0.70582885
+      ],
+      "train_channel_std_unit": [
+        0.12368222,
+        0.17676253,
+        0.12443067
+      ]
+    },
+    "run_manifest": {
+      "code_sha256": "02e5d460b569623f8fc6d4487f13b69d33ffc43273b70f07d0c2e07f42d5a5fd",
+      "created_at": "2026-09-08T21:09:53.317587+00:00",
+      "dataset": "pathmnist",
+      "deterministic_torch": true,
+      "lightning_cli": true,
+      "llm_mode": "ollama",
+      "llm_model": "qwen3.8",
+      "llm_model_digest": null,
+      "package_versions": {
+        "jsonargparse": "4.52.0",
+        "lightning": "2.6.5",
+        "medmnist": "3.0.2",
+        "numpy": "2.4.6",
+        "pydantic": "2.13.5",
+        "scikit-learn": "1.9.0",
+        "torch": "2.14.0+cu126"
+      },
+      "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.35",
+      "python_version": "3.11.15",
+      "run_id": "seed_42",
+      "schema_version": "1.0",
+      "seed": 42
+    },
+    "search_plan": {
+      "accuracy_tolerance": 0.005,
+      "final_epochs": 15,
+      "framework": "lightning.pytorch",
+      "max_trials": 4,
+      "objective": "validation_accuracy_then_macro_f1",
+      "rounds": 2,
+      "schema_version": "1.0",
+      "search_epochs": 2,
+      "test_locked": true
+    },
+    "search_report": {
+      "completed_trials": 4,
+      "failed_trials": 0,
+      "schema_version": "1.0",
+      "selected_candidate_id": "res_cnn_wider_d3",
+      "selected_config_hash": "584c2d8c09f24f2965f222246dfc628ef542e32ee50f66b4f662ceaa2e0e3716",
+      "selected_validation_accuracy": 0.970812,
+      "selected_validation_macro_f1": 0.970627,
+      "selection_rule": "accuracy_tolerance_then_macro_f1",
+      "test_metrics_used": false,
+      "trial_artefacts": [
+        "trial_res_cnn_std_adamw_c428a8eb",
+        "trial_tiny_cnn_sgd_plateau_f592b079",
+        "trial_res_cnn_wider_d3_584c2d8c",
+        "trial_resnet18_deep_d4_6d0f785c"
+      ]
+    },
+    "split_manifest": {
+      "augmented_train_size": 269988,
+      "dataset": "pathmnist",
+      "official_test_separate_center": true,
+      "schema_version": "1.0",
+      "seed": 42,
+      "selected_index_sha256": {
+        "test": "27ab586ecd9b4ac7278c6a91cf0b336a2ba742afe742d13eff51f702635791e8",
+        "train": "1478a96c1d8ad06d0a600d6c9b8d5c8dddd83fbda22307ab449764f013683b51",
+        "val": "a13f875ade8e54f5aee16ff205c36aa628396dddec09a33a175fcf9cbbb9d402"
+      },
+      "strategy": "official",
+      "test_size": 7180,
+      "train_size": 89996,
+      "train_stats_only": true,
+      "val_size": 10004
+    },
+    "train_config": {
+      "batch_size": 128,
+      "class_weighting": true,
+      "depth": 3,
+      "device": "cuda",
+      "dropout": 0.25,
+      "early_stopping_patience": 3,
+      "epochs": 15,
+      "gradient_clip_val": 1.0,
+      "hidden": 48,
+      "label_smoothing": 0.05,
+      "lr": 0.0003,
+      "model_family": "residual_cnn",
+      "optimizer": "adamw",
+      "rationale": "Selected from 4 validation-only trials. Widens the proven residual_cnn from hidden=32 to 48 at the same depth=3, with a small dropout bump to 0.25 to regularize the extra parameters. All other hyperparameters (adamw, cosine, lr=3e-4, wd=1e-4, class_weighting, label_smoothing=0.05, hflip+vflip, standardize) are held at the round-1 optimum to isolate the capacity effect.",
+      "scheduler": "cosine",
+      "schema_version": "1.0",
+      "seed": 42,
+      "source": "agentic_search:selected:qwen3.8",
+      "weight_decay": 0.0001
+    },
+    "train_result": {
+      "best_epoch": 15,
+      "best_val_accuracy": 0.994902,
+      "checkpoint_path": "blobs/agentic_model_v001.ckpt",
+      "checkpoint_sha256": "4eb9346ace893836bd8239a573047a6aecffd3c7d522ca397293aa0d54cd4743",
+      "device": "cuda",
+      "epochs_completed": 15,
+      "final_train_loss": 0.300989,
+      "final_val_accuracy": 0.994902,
+      "framework": "lightning.pytorch",
+      "history": [
+        {
+          "epoch": 1,
+          "learning_rate": 0.0002967221,
+          "train_loss": 0.572766,
+          "val_accuracy": 0.916733,
+          "val_loss": 0.50692,
+          "val_macro_f1": 0.917434
+        },
+        {
+          "epoch": 2,
+          "learning_rate": 0.0002870318,
+          "train_loss": 0.42111,
+          "val_accuracy": 0.959716,
+          "val_loss": 0.396968,
+          "val_macro_f1": 0.960053
+        },
+        {
+          "epoch": 3,
+          "learning_rate": 0.0002713525,
+          "train_loss": 0.381844,
+          "val_accuracy": 0.97561,
+          "val_loss": 0.362998,
+          "val_macro_f1": 0.975795
+        },
+        {
+          "epoch": 4,
+          "learning_rate": 0.0002503696,
+          "train_loss": 0.361147,
+          "val_accuracy": 0.967913,
+          "val_loss": 0.381597,
+          "val_macro_f1": 0.968331
+        },
+        {
+          "epoch": 5,
+          "learning_rate": 0.000225,
+          "train_loss": 0.346518,
+          "val_accuracy": 0.985206,
+          "val_loss": 0.33489,
+          "val_macro_f1": 0.985424
+        },
+        {
+          "epoch": 6,
+          "learning_rate": 0.0001963525,
+          "train_loss": 0.336151,
+          "val_accuracy": 0.987705,
+          "val_loss": 0.329713,
+          "val_macro_f1": 0.987506
+        },
+        {
+          "epoch": 7,
+          "learning_rate": 0.0001656793,
+          "train_loss": 0.327648,
+          "val_accuracy": 0.988705,
+          "val_loss": 0.323569,
+          "val_macro_f1": 0.988536
+        },
+        {
+          "epoch": 8,
+          "learning_rate": 0.0001343207,
+          "train_loss": 0.321187,
+          "val_accuracy": 0.989404,
+          "val_loss": 0.320858,
+          "val_macro_f1": 0.989418
+        },
+        {
+          "epoch": 9,
+          "learning_rate": 0.0001036475,
+          "train_loss": 0.315689,
+          "val_accuracy": 0.991304,
+          "val_loss": 0.314577,
+          "val_macro_f1": 0.991127
+        },
+        {
+          "epoch": 10,
+          "learning_rate": 7.5e-05,
+          "train_loss": 0.311001,
+          "val_accuracy": 0.992603,
+          "val_loss": 0.31029,
+          "val_macro_f1": 0.992553
+        },
+        {
+          "epoch": 11,
+          "learning_rate": 4.96304e-05,
+          "train_loss": 0.307448,
+          "val_accuracy": 0.992603,
+          "val_loss": 0.309618,
+          "val_macro_f1": 0.992601
+        },
+        {
+          "epoch": 12,
+          "learning_rate": 2.86475e-05,
+          "train_loss": 0.304681,
+          "val_accuracy": 0.994202,
+          "val_loss": 0.306181,
+          "val_macro_f1": 0.994128
+        },
+        {
+          "epoch": 13,
+          "learning_rate": 1.29682e-05,
+          "train_loss": 0.302801,
+          "val_accuracy": 0.994502,
+          "val_loss": 0.30416,
+          "val_macro_f1": 0.994496
+        },
+        {
+          "epoch": 14,
+          "learning_rate": 3.2779e-06,
+          "train_loss": 0.30155,
+          "val_accuracy": 0.994402,
+          "val_loss": 0.304192,
+          "val_macro_f1": 0.994429
+        },
+        {
+          "epoch": 15,
+          "learning_rate": 0.0,
+          "train_loss": 0.300989,
+          "val_accuracy": 0.994902,
+          "val_loss": 0.303495,
+          "val_macro_f1": 0.994914
+        }
+      ],
+      "lightning_config_path": "best_config.yaml",
+      "lightning_csv_path": "blobs/lightning_logs/agentic_model_v001/version_0/metrics.csv",
+      "schema_version": "1.0",
+      "seed": 42,
+      "training_log_path": "blobs/agentic_model_v001.training.jsonl"
+    },
+    "trial_res_cnn_std_adamw_c428a8eb": {
+      "best_epoch": 2,
+      "candidate_id": "res_cnn_std_adamw",
+      "checkpoint_path": "blobs/search/trial_res_cnn_std_adamw_c428a8eb.ckpt",
+      "checkpoint_sha256": "4d6af348e4596607d84c1713662b39d7a2573a0935aff98c531f43ee3e9e0605",
+      "config": {
+        "batch_size": 128,
+        "class_weighting": true,
+        "depth": 3,
+        "device": "cuda",
+        "dropout": 0.2,
+        "early_stopping_patience": 1,
+        "epochs": 2,
+        "gradient_clip_val": 1.0,
+        "hidden": 32,
+        "label_smoothing": 0.05,
+        "lr": 0.0003,
+        "model_family": "residual_cnn",
+        "optimizer": "adamw",
+        "rationale": "Residual CNN with moderate capacity, standardization, AdamW, cosine decay, mild class weighting and label smoothing for mild imbalance; hflip/vflip add spatial robustness without assuming orientation invariance.",
+        "scheduler": "cosine",
+        "schema_version": "1.0",
+        "seed": 42,
+        "source": "qwen3.8",
+        "weight_decay": 0.0001
+      },
+      "config_hash": "c428a8eb1cc447703f1d620a470095ef529fd5b441ea79b647c3603f5794eb5f",
+      "decision_source": "qwen3.8",
+      "duration_seconds": 25.2703,
+      "error": null,
+      "lightning_csv_path": "blobs/search/lightning_logs/trial_res_cnn_std_adamw_c428a8eb/version_0/metrics.csv",
+      "representation": {
+        "augmentations": [
+          "hflip",
+          "vflip"
+        ],
+        "normalization": "standardize",
+        "rationale": "Residual CNN with moderate capacity, standardization, AdamW, cosine decay, mild class weighting and label smoothing for mild imbalance; hflip/vflip add spatial robustness without assuming orientation invariance."
+      },
+      "round_index": 1,
+      "schema_version": "1.0",
+      "status": "completed",
+      "training_log_path": "blobs/search/trial_res_cnn_std_adamw_c428a8eb.training.jsonl",
+      "validation_accuracy": 0.959216,
+      "validation_balanced_accuracy": 0.960503,
+      "validation_macro_f1": 0.959158
+    },
+    "trial_res_cnn_wider_d3_584c2d8c": {
+      "best_epoch": 2,
+      "candidate_id": "res_cnn_wider_d3",
+      "checkpoint_path": "blobs/search/trial_res_cnn_wider_d3_584c2d8c.ckpt",
+      "checkpoint_sha256": "60c94e5aa2895d55b1f8cf58d5b120306bb06cebea54fa3eb0ba5685e2a201c8",
+      "config": {
+        "batch_size": 128,
+        "class_weighting": true,
+        "depth": 3,
+        "device": "cuda",
+        "dropout": 0.25,
+        "early_stopping_patience": 1,
+        "epochs": 2,
+        "gradient_clip_val": 1.0,
+        "hidden": 48,
+        "label_smoothing": 0.05,
+        "lr": 0.0003,
+        "model_family": "residual_cnn",
+        "optimizer": "adamw",
+        "rationale": "Widens the proven residual_cnn from hidden=32 to 48 at the same depth=3, with a small dropout bump to 0.25 to regularize the extra parameters. All other hyperparameters (adamw, cosine, lr=3e-4, wd=1e-4, class_weighting, label_smoothing=0.05, hflip+vflip, standardize) are held at the round-1 optimum to isolate the capacity effect.",
+        "scheduler": "cosine",
+        "schema_version": "1.0",
+        "seed": 42,
+        "source": "qwen3.8",
+        "weight_decay": 0.0001
+      },
+      "config_hash": "584c2d8c09f24f2965f222246dfc628ef542e32ee50f66b4f662ceaa2e0e3716",
+      "decision_source": "qwen3.8",
+      "duration_seconds": 25.8656,
+      "error": null,
+      "lightning_csv_path": "blobs/search/lightning_logs/trial_res_cnn_wider_d3_584c2d8c/version_0/metrics.csv",
+      "representation": {
+        "augmentations": [
+          "hflip",
+          "vflip"
+        ],
+        "normalization": "standardize",
+        "rationale": "Widens the proven residual_cnn from hidden=32 to 48 at the same depth=3, with a small dropout bump to 0.25 to regularize the extra parameters. All other hyperparameters (adamw, cosine, lr=3e-4, wd=1e-4, class_weighting, label_smoothing=0.05, hflip+vflip, standardize) are held at the round-1 optimum to isolate the capacity effect."
+      },
+      "round_index": 2,
+      "schema_version": "1.0",
+      "status": "completed",
+      "training_log_path": "blobs/search/trial_res_cnn_wider_d3_584c2d8c.training.jsonl",
+      "validation_accuracy": 0.970812,
+      "validation_balanced_accuracy": 0.971306,
+      "validation_macro_f1": 0.970627
+    },
+    "trial_resnet18_deep_d4_6d0f785c": {
+      "best_epoch": 2,
+      "candidate_id": "resnet18_deep_d4",
+      "checkpoint_path": "blobs/search/trial_resnet18_deep_d4_6d0f785c.ckpt",
+      "checkpoint_sha256": "a6da3db9f1ab6e81a61aed9968b785047b98b1ae604ca706f990d815e1150505",
+      "config": {
+        "batch_size": 128,
+        "class_weighting": true,
+        "depth": 4,
+        "device": "cuda",
+        "dropout": 0.2,
+        "early_stopping_patience": 1,
+        "epochs": 2,
+        "gradient_clip_val": 1.0,
+        "hidden": 32,
+        "label_smoothing": 0.05,
+        "lr": 0.0002,
+        "model_family": "resnet18",
+        "optimizer": "adamw",
+        "rationale": "Explores the resnet18 backbone at maximum depth=4 to test whether a richer residual architecture captures finer-grained pathology patterns. lr lowered to 2e-4 for the deeper network's stability. Retains the winning adamw/cosine/class_weighting/standardize/hflip+vflip recipe and minimal weight decay.",
+        "scheduler": "cosine",
+        "schema_version": "1.0",
+        "seed": 42,
+        "source": "qwen3.8",
+        "weight_decay": 0.0001
+      },
+      "config_hash": "6d0f785c9b2cd1d54adf329a716dfc8fc6da420b7eed6461654b856142d544f0",
+      "decision_source": "qwen3.8",
+      "duration_seconds": 32.2923,
+      "error": null,
+      "lightning_csv_path": "blobs/search/lightning_logs/trial_resnet18_deep_d4_6d0f785c/version_0/metrics.csv",
+      "representation": {
+        "augmentations": [
+          "hflip",
+          "vflip"
+        ],
+        "normalization": "standardize",
+        "rationale": "Explores the resnet18 backbone at maximum depth=4 to test whether a richer residual architecture captures finer-grained pathology patterns. lr lowered to 2e-4 for the deeper network's stability. Retains the winning adamw/cosine/class_weighting/standardize/hflip+vflip recipe and minimal weight decay."
+      },
+      "round_index": 2,
+      "schema_version": "1.0",
+      "status": "completed",
+      "training_log_path": "blobs/search/trial_resnet18_deep_d4_6d0f785c.training.jsonl",
+      "validation_accuracy": 0.960416,
+      "validation_balanced_accuracy": 0.961714,
+      "validation_macro_f1": 0.96071
+    },
+    "trial_tiny_cnn_sgd_plateau_f592b079": {
+      "best_epoch": 2,
+      "candidate_id": "tiny_cnn_sgd_plateau",
+      "checkpoint_path": "blobs/search/trial_tiny_cnn_sgd_plateau_f592b079.ckpt",
+      "checkpoint_sha256": "c3ae1c085682dcb958f7bcd089954bb98d56c6e54910aba06cac7eb8774ef76c",
+      "config": {
+        "batch_size": 256,
+        "class_weighting": false,
+        "depth": 2,
+        "device": "cuda",
+        "dropout": 0.15,
+        "early_stopping_patience": 1,
+        "epochs": 2,
+        "gradient_clip_val": 1.0,
+        "hidden": 48,
+        "label_smoothing": 0.0,
+        "lr": 0.001,
+        "model_family": "tiny_cnn",
+        "optimizer": "sgd",
+        "rationale": "Simpler tiny CNN baseline with SGD, plateau scheduling, larger batch, and no class weighting to test whether mild imbalance can be handled by standard loss; lower weight decay avoids excessive regularization.",
+        "scheduler": "reduce_on_plateau",
+        "schema_version": "1.0",
+        "seed": 42,
+        "source": "qwen3.8",
+        "weight_decay": 5e-05
+      },
+      "config_hash": "f592b0792a249960eb550e1ae8372e64fd361c989d9f1fb7feef32e2e0cd6f22",
+      "decision_source": "qwen3.8",
+      "duration_seconds": 10.324,
+      "error": null,
+      "lightning_csv_path": "blobs/search/lightning_logs/trial_tiny_cnn_sgd_plateau_f592b079/version_0/metrics.csv",
+      "representation": {
+        "augmentations": [
+          "hflip"
+        ],
+        "normalization": "standardize",
+        "rationale": "Simpler tiny CNN baseline with SGD, plateau scheduling, larger batch, and no class weighting to test whether mild imbalance can be handled by standard loss; lower weight decay avoids excessive regularization."
+      },
+      "round_index": 1,
+      "schema_version": "1.0",
+      "status": "completed",
+      "training_log_path": "blobs/search/trial_tiny_cnn_sgd_plateau_f592b079.training.jsonl",
+      "validation_accuracy": 0.735706,
+      "validation_balanced_accuracy": 0.726888,
+      "validation_macro_f1": 0.723932
+    }
+  },
+  "run_id": "seed_42",
+  "status": "completed_with_warning",
+  "updated_at": "2026-09-08T21:20:24.476652+00:00"
+}

@@ -1,0 +1,30 @@
+{
+  "artefact": "anomaly_profiling",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-09T04:35:07.308888+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "Profiling stage is structurally sound and substantially complete. Split sizes match the official PathMNIST manifest exactly (train=89996, val=10004, test=7180), no subsampling was applied (official_data_fraction=1.0, profiled_fraction=1.0), no duplicates or blank images were detected, and all integrity hashes are present. The 9-class label set, 28×28×3 image shape, and train/val/test class counts and proportions are all correctly reported. The test-domain provenance (CRC-VAL-HE-7K, different clinical center) is properly documented, and the substantial test-to-train prevalence shifts (adipose ×1.79, debris ×0.41, stroma ×0.56) are clearly flagged with appropriate ambiguity and domain-shift risk annotations.\n\nHowever, several gaps warrant attention before downstream stages proceed:\n\n1. **Missing per-split channel statistics.** Only train channel mean/std are reported (R=0.741, G=0.533, B=0.706). Given the documented domain shift from a different clinical center (different scanner, staining, slide preparation), val and test channel statistics are essential to quantify pixel-level intensity drift and to inform normalization strategy. Without them, downstream training may silently apply train-based normalization to a test distribution that could be meaningfully shifted.\n\n2. **Statistically fragile test subsets.** Debris (n=339), cancer-associated stroma (n=421), and smooth muscle (n=592) are small enough that per-class test metrics will be highly sensitive to a handful of misclassified patches. This is correctly noted but must be treated as a hard constraint on any per-class test reporting (e.g., report confidence intervals, avoid over-interpreting single-class F1 deltas).\n\n3. **LLM reproducibility gap.** The qwen3.8 model digest is null (ollama backend), meaning the exact weights used for LLM-assisted steps are not pinned. This limits full reproducibility of any LLM-dependent profiling or annotation decisions.\n\n4. **Truncated text fields.** Both the ingestion comment (ends with 'fu…') and the ambiguity note (ends with 'n…') appear truncated, preventing full verification of the documented caveats.\n\n5. **Resolution limitation.** 28×28 is the PathMNIST downsampled resolution; the profiling correctly notes that patch-level classification without multi-scale architectural context limits disambiguation of visually similar classes (stroma vs. smooth muscle, normal mucosa vs. adenocarcinoma epithelium), a limitation that is exacerbated under cross-center domain shift.\n\nNone of these issues are deterministic failures, and the core profiling data is internally consistent and complete for the dataset's scope. The missing test/val channel statistics are the most actionable gap and should be addressed before training begins, but they do not invalidate the current profiling. Recommend proceeding to the next stage with the above caveats carried forward as mandatory reporting constraints.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Val and test channel mean/std are not reported; only train statistics are provided, limiting quantification of pixel-level domain shift from the external clinical center",
+      "Test-to-train prevalence ratios show substantial distribution shift (adipose ×1.79, debris ×0.41, stroma ×0.56); this must be carried as a mandatory caveat in all downstream per-class evaluation reporting",
+      "Small per-class test counts (debris n=339, stroma n=421, smooth muscle n=592) make per-class test metrics statistically noisy and sensitive to a handful of mislabeled patches",
+      "llm_model_digest is null for qwen3.8 (ollama); exact model weights are not pinned, limiting reproducibility of LLM-dependent steps",
+      "Ambiguity note text appears truncated (ends with 'n…'), preventing full verification of documented label-ambiguity caveats",
+      "Ingestion stage comment appears truncated (ends with 'fu…'), preventing full verification of ingestion caveats",
+      "28×28 patch resolution without multi-scale architectural context limits disambiguation of visually similar classes (stroma vs smooth muscle, normal mucosa vs adenocarcinoma epithelium), a limitation exacerbated under cross-center domain shift",
+      "No evidence that the external center (CRC-VAL-HE-7K) used the same annotation guidelines or inter-annotator agreement process, so label semantics for ambiguous classes may differ across sites"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "profiling"
+  },
+  "payload_sha256": "12f98f88bf33038a8ce117c2747ae819a90e92e23dafef209e6de30884fe143f",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 5,
+  "version": 1
+}

@@ -1,0 +1,31 @@
+{
+  "artefact": "train_config",
+  "artefact_type": "TrainConfig",
+  "created_at": "2026-09-09T05:03:05.697976+00:00",
+  "payload": {
+    "batch_size": 128,
+    "class_weighting": true,
+    "depth": 4,
+    "device": "cuda",
+    "dropout": 0.25,
+    "early_stopping_patience": 3,
+    "epochs": 15,
+    "gradient_clip_val": 1.0,
+    "hidden": 64,
+    "label_smoothing": 0.1,
+    "lr": 0.001,
+    "model_family": "residual_cnn",
+    "optimizer": "adamw",
+    "rationale": "Selected from 4 validation-only trials. Direct capacity upgrade of the round-1 winner (hidden 48→64, depth 3→4). The 97.64% result left ~2.4% error; a wider, deeper residual stack should capture finer-grained pathology patterns. Dropout raised 0.2→0.25 and label_smoothing 0.05→0.1 to regularize the extra parameters. All other hyperparameters (adamw, cosine, lr=1e-3, wd=0.01, bs=128, standardize, 3 augmentations, class_weighting) are held constant to isolate the capacity effect.",
+    "scheduler": "cosine",
+    "schema_version": "1.0",
+    "seed": 72,
+    "source": "configuration_replay:f770eaa3c9c0",
+    "weight_decay": 0.01
+  },
+  "payload_sha256": "940b3f82657f41f9464fbb8e898ec2a7dc64e406ffb3fbd34067374b93b382ac",
+  "producer": "configuration_replay",
+  "run_id": "seed_72",
+  "sequence": 11,
+  "version": 1
+}

@@ -1,0 +1,964 @@
+{
+  "artefact_registry": [
+    {
+      "artefact": "run_manifest",
+      "path": "artefacts/0001_run_manifest_v001.json",
+      "producer": "run",
+      "sha256": "1c95a5446f1f56b2ef5e43535dd134472a99557da2abe41bb1da9293423e43bd",
+      "type": "RunManifest",
+      "version": 1
+    },
+    {
+      "artefact": "dataset_manifest",
+      "path": "artefacts/0002_dataset_manifest_v001.json",
+      "producer": "ingestion",
+      "sha256": "e749ae3162dd47c9dcc8013e796a1044c000c76f9277f25c9a348d24fcd1dd7b",
+      "type": "DatasetManifest",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_ingestion",
+      "path": "artefacts/0003_anomaly_ingestion_v001.json",
+      "producer": "reviewer",
+      "sha256": "f64411cd0137b0e408e55d4a9ef3e6c109abf05e368f4b262539a26bda64bcb3",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "data_profile",
+      "path": "artefacts/0004_data_profile_v001.json",
+      "producer": "profiling",
+      "sha256": "224b49f28e0eebac9602c26a6b8df9530051c1d6269e17f0268ca2f1d6768122",
+      "type": "DataProfile",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_profiling",
+      "path": "artefacts/0005_anomaly_profiling_v001.json",
+      "producer": "reviewer",
+      "sha256": "9cfe14983d5da179b4a0b1f65f153d009feb046a07db5544f7562d66733ae0f1",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "representation_plan",
+      "path": "artefacts/0006_representation_plan_v001.json",
+      "producer": "preprocessing",
+      "sha256": "1ba57fa369f6cd6c9fad65b2118c43451dfe6ed525a97675e5fed1290f17cd5e",
+      "type": "RepresentationPlan",
+      "version": 1
+    },
+    {
+      "artefact": "split_manifest",
+      "path": "artefacts/0007_split_manifest_v001.json",
+      "producer": "preprocessing",
+      "sha256": "065142a5213176386bd5005263b9f771a20c6106f2278221a53dd24dfa3aca83",
+      "type": "SplitManifest",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_preprocessing",
+      "path": "artefacts/0008_anomaly_preprocessing_v001.json",
+      "producer": "reviewer",
+      "sha256": "de6e7f4365fd597e9e1ca60e0608e3b543eb684882a53a2ccb3c47a2f1b9e08c",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "representation_plan",
+      "path": "artefacts/0009_representation_plan_v002.json",
+      "producer": "configuration_replay",
+      "sha256": "a3056bfa1e282194926dc8eded565a743e7eeba2f231c114dc629bef37140b90",
+      "type": "RepresentationPlan",
+      "version": 2
+    },
+    {
+      "artefact": "split_manifest",
+      "path": "artefacts/0010_split_manifest_v002.json",
+      "producer": "configuration_replay",
+      "sha256": "065142a5213176386bd5005263b9f771a20c6106f2278221a53dd24dfa3aca83",
+      "type": "SplitManifest",
+      "version": 2
+    },
+    {
+      "artefact": "train_config",
+      "path": "artefacts/0011_train_config_v001.json",
+      "producer": "configuration_replay",
+      "sha256": "940b3f82657f41f9464fbb8e898ec2a7dc64e406ffb3fbd34067374b93b382ac",
+      "type": "TrainConfig",
+      "version": 1
+    },
+    {
+      "artefact": "best_configuration",
+      "path": "artefacts/0012_best_configuration_v001.json",
+      "producer": "configuration_replay",
+      "sha256": "81cf3428840818a3e966d54fad02baddfe32552ec4ee459379baf60042172a26",
+      "type": "BestConfiguration",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_configuration_replay",
+      "path": "artefacts/0013_anomaly_configuration_replay_v001.json",
+      "producer": "reviewer",
+      "sha256": "f130c263686e65486f1438e30bd3f0fe0f4cbb72eed748eea8232e5067cf62f1",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "train_result",
+      "path": "artefacts/0014_train_result_v001.json",
+      "producer": "training",
+      "sha256": "2663eb41a4948130dd6b63f22ce849e81ecdcacd70d75b8ef5ffa76e9cc42a2a",
+      "type": "TrainResult",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_training",
+      "path": "artefacts/0015_anomaly_training_v001.json",
+      "producer": "reviewer",
+      "sha256": "416ccd09ac150c8827158599700e01e49c0bb50ea5dca22d5f527907009637f6",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "prediction_artifact",
+      "path": "artefacts/0016_prediction_artifact_v001.json",
+      "producer": "evaluation",
+      "sha256": "91a89007a7a2bac52ba785186ffee5ec2f925b907232067e37a8cce2e2d5ac6e",
+      "type": "PredictionArtifact",
+      "version": 1
+    },
+    {
+      "artefact": "evaluation_report",
+      "path": "artefacts/0017_evaluation_report_v001.json",
+      "producer": "evaluation",
+      "sha256": "7d1815300c15fd466bfadb904b488e845980aed8ac49717925dfd52746d73682",
+      "type": "EvalReport",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_evaluation",
+      "path": "artefacts/0018_anomaly_evaluation_v001.json",
+      "producer": "reviewer",
+      "sha256": "6f9e9f15d68da4114bb7ea0a1c4511f96bb04d743cb515ce9b8c84662a85a8f3",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "abstention_report",
+      "path": "artefacts/0019_abstention_report_v001.json",
+      "producer": "abstention",
+      "sha256": "d3d9f5403343e55ac0b07d569b964ae1d6ed0afab5cbb37fb21688667943170f",
+      "type": "AbstentionReport",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_abstention",
+      "path": "artefacts/0020_anomaly_abstention_v001.json",
+      "producer": "reviewer",
+      "sha256": "4ef37b202013e2ebfad23cb079d2df711b802f3e5639d004f86aaaa42ccf5e0c",
+      "type": "AnomalyReport",
+      "version": 1
+    }
+  ],
+  "decision_events": 62,
+  "decision_log": "decision_log.jsonl",
+  "latest_artefacts": {
+    "abstention_report": {
+      "abstain_rate": 0.502925,
+      "accuracy_on_covered": 0.972261,
+      "base_test_accuracy": 0.882312,
+      "calibrated_on": "validation",
+      "human_review_count": 3611,
+      "method": "max_softmax",
+      "ood_auroc": 0.305716,
+      "ood_corruption": "unit_scale_gaussian_noise_multi_severity",
+      "ood_evidence_path": "blobs/ood_probabilities.npz",
+      "ood_evidence_sha256": "42eab99d9d01a10c971edb99583b598e45e57f826a8421d211c433c0c2ac3ca6",
+      "ood_pass": false,
+      "ood_scenarios": [
+        {
+          "corruption": "unit_scale_gaussian_noise_sigma_0.15",
+          "score": "max_softmax",
+          "test_auroc": 0.700204,
+          "validation_auroc": 0.930929
+        },
+        {
+          "corruption": "unit_scale_gaussian_noise_sigma_0.15",
+          "score": "predictive_entropy",
+          "test_auroc": 0.636757,
+          "validation_auroc": 0.873157
+        },
+        {
+          "corruption": "unit_scale_gaussian_noise_sigma_0.25",
+          "score": "max_softmax",
+          "test_auroc": 0.186195,
+          "validation_auroc": 0.299109
+        },
+        {
+          "corruption": "unit_scale_gaussian_noise_sigma_0.25",
+          "score": "predictive_entropy",
+          "test_auroc": 0.127147,
+          "validation_auroc": 0.204016
+        },
+        {
+          "corruption": "unit_scale_gaussian_noise_sigma_0.4",
+          "score": "max_softmax",
+          "test_auroc": 0.030749,
+          "validation_auroc": 0.023187
+        },
+        {
+          "corruption": "unit_scale_gaussian_noise_sigma_0.4",
+          "score": "predictive_entropy",
+          "test_auroc": 0.025582,
+          "validation_auroc": 0.013986
+        }
+      ],
+      "ood_scope": "controlled_corruption_proxy",
+      "ood_validation_auroc": 0.417742,
+      "schema_version": "1.0",
+      "selective_risk": 0.027739,
+      "target_validation_coverage": 0.8,
+      "test_coverage": 0.497075,
+      "threshold": 0.88941497,
+      "validation_coverage": 0.80008
+    },
+    "anomaly_abstention": {
+      "action": "stop",
+      "attempt": 1,
+      "comment": "The deterministic finding of OOD AUROC below random chance (0.306 headline; as low as 0.026–0.031 at σ=0.4) is a fundamental failure of the abstention mechanism and cannot be dismissed. At σ≥0.25, max_softmax confidence is *inversely* correlated with OOD-ness: the model becomes more confident on corrupted inputs than on clean ones. This means the abstention router would actively accept OOD samples and reject in-distribution samples at moderate-to-high noise, which is the opposite of its intended function. The predictive_entropy score shows the same pattern (AUROC 0.127 at σ=0.25, 0.026 at σ=0.4), ruling out a single-score artifact.\n\nSecondary concerns:\n1. Coverage transfer gap: the threshold calibrated to 80% validation coverage yields only 49.7% test coverage (30 pp drop), consistent with the cross-center domain shift (official_test_separate_center=true). The selective-risk figure (0.028) and covered accuracy (0.972) look strong in isolation but are computed on a test subset that is disproportionately the model's most confident (and, per the OOD results, potentially most miscalibrated) predictions.\n2. The OOD evaluation uses a controlled Gaussian-noise proxy (ood_scope='controlled_corruption_proxy'), which is a reasonable stress test but does not cover semantic OOD (e.g., unstained tissue, foreign material). The failure on a simple corruption proxy suggests the model's confidence landscape is fundamentally miscalibrated under any distribution shift.\n3. Recurring cross-stage issues persist: (a) data_profile references '96×96 patch resolution' while image_shape_hwc is [28,28,3]; (b) representation_plan.rationale contains model-architecture upgrade text misattributed from train_config; (c) llm_model_digest is null for qwen3.8 across all artefacts; (d) rationale strings appear truncated with '…'.\n\nRequired revisions before this stage can pass:\n- Replace or augment max_softmax with a confidence measure that is OOD-aware (e.g., energy score, ensemble disagreement, Mahalanobis distance in feature space, or a dedicated OOD detector). Re-evaluate AUROC across all noise severities; all must exceed 0.5 with a meaningful margin.\n- Re-calibrate the abstention threshold using a method robust to the val→test domain shift (e.g., quantile matching on a held-out OOD set, or conformal prediction with finite-sample guarantees).\n- Report OOD AUROC per severity level as a first-class metric in the abstention report, not buried in a sub-list.\n- Resolve the recurring factual contradictions (96×96 vs 28×28), fix the misattributed rationale text, pin the LLM model digest, and verify full rationale strings are stored.\n- Add a note in the abstention report explicitly acknowledging that the 97.2% covered accuracy is conditional on the model's (demonstrably unreliable) confidence ranking under distribution shift.",
+      "deterministic_issues": [
+        "warning:OOD AUROC is below random chance"
+      ],
+      "llm_issues": [
+        "OOD AUROC is below random chance (0.306 headline; 0.031 max_softmax and 0.026 predictive_entropy at σ=0.4) — the abstention confidence score is inversely correlated with OOD-ness, making the router actively harmful for out-of-distribution inputs",
+        "At σ=0.25, both max_softmax (0.186) and predictive_entropy (0.127) AUROC are far below 0.5, confirming the failure is not score-specific but reflects a fundamental miscalibration of the model's confidence landscape under distribution shift",
+        "Coverage transfer gap: 80% validation coverage collapses to 49.7% test coverage (30 pp drop), indicating the threshold calibrated on validation is poorly transferable under the cross-center domain shift",
+        "The 97.2% accuracy_on_covered and 0.028 selective_risk are computed on a test subset selected by a confidence score that is demonstrably anti-correlated with OOD-ness, making these figures unreliable indicators of real-world selective performance",
+        "OOD evaluation is limited to a controlled Gaussian-noise proxy (ood_scope='controlled_corruption_proxy'); no semantic OOD scenarios (unstained tissue, foreign material, different staining protocol) are tested",
+        "Recurring factual contradiction: data_profile.ambiguity_risks references '96×96 patch resolution' but image_shape_hwc is [28,28,3] — persists across preprocessing, profiling, configuration_replay, training, and evaluation stages",
+        "representation_plan.rationale contains model-architecture upgrade text ('hidden 48→64, depth 3→4') instead of justification for standardize normalization and hflip/vflip/rotate90 augmentation; content misattributed from train_config/best_configuration",
+        "llm_model_digest is null for qwen3.8 (ollama) in run_manifest and all prior stage artefacts; LLM-generated narrative lacks a pinned model fingerprint, creating a reproducibility and auditability gap",
+        "Rationale strings in best_configuration, train_config, and representation_plan appear truncated (end with '…'); full text not verifiable in stored artefacts",
+        "The abstention report does not explicitly flag that the OOD failure invalidates the confidence-based routing; ood_pass=false is present but the headline metrics (accuracy_on_covered, selective_risk) are presented without this critical caveat"
+      ],
+      "schema_version": "1.0",
+      "severity": "critical",
+      "source": "qwen3.8",
+      "stage": "abstention"
+    },
+    "anomaly_configuration_replay": {
+      "action": "revise",
+      "attempt": 1,
+      "comment": "The configuration_replay stage is structurally sound: the frozen best configuration (res_cnn_wider_deep, depth=4, hidden=64, dropout=0.25, label_smoothing=0.1, adamw/cosine, lr=1e-3, bs=128, class_weighting, seed=72) is internally consistent, test_metrics_used=false, the selection rule explicitly locks the test set, all integrity hashes (config SHA-256, split index SHA-256, code SHA-256) are present, and the split sizes (89996/10004/7180) match the official PathMNIST partition. Validation metrics (acc=0.9827, macro-F1=0.9827) are reported without test contamination. However, two factual/content errors in LLM-generated narrative must be corrected before the replayed configuration is consumed by downstream training or reporting stages:\n\n1. **Factual contradiction (deterministic):** data_profile.ambiguity_risks[3] states '96×96 patch resolution' while image_shape_hwc in the same artifact is [28,28,3]. PathMNIST patches are 28×28. This error was flagged in both the preprocessing and profiling stages but persists here. Any downstream stage that parses ambiguity_risks for spatial-context reasoning will inherit an incorrect resolution assumption.\n\n2. **Wrong rationale content (deterministic):** representation_plan.rationale contains the model-architecture upgrade narrative ('Direct capacity upgrade of the round-1 winner (hidden 48→64, depth 3→4)…') rather than a justification for the data-representation choices (standardize normalization, hflip/vflip/rotate90 augmentation, train-only stats). The same text is duplicated verbatim in best_configuration.rationale and train_config.rationale, indicating a copy-propagation error. A reader of representation_plan will find no explanation for why standardization or the chosen augmentations are appropriate for 28×28 H&E patches.\n\n3. **Reproducibility gap (recurring):** llm_model_digest is null for qwen3.8 (ollama) across all three prior stage artefacts and the run manifest. The exact model weights are unpinned, so any LLM-authored narrative (ambiguity_risks, rationale text) cannot be reproduced or audited against a specific checkpoint. This is a process-level warning, not a configuration error.\n\n4. **Minor:** The rationale strings in best_configuration, train_config, and representation_plan are truncated (end with '…'), which may hide the full justification. If this is a display artefact rather than actual truncation in the stored YAML, no action is needed; if the stored value is truncated, the full rationale should be restored.\n\nNone of these issues affect the numerical training configuration or the integrity of the frozen replay. They are narrative/documentation corrections that should be applied so that downstream stages (training, evaluation, reporting) do not propagate the 96×96 error or misattribute the representation rationale. Recommend a single revision pass to fix the two factual/content errors and, if feasible, pin the ollama model digest, then re-emit the artefacts.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "data_profile.ambiguity_risks[3] references '96×96 patch resolution' but image_shape_hwc is [28,28,3]; factual contradiction must be corrected to 28×28 (recurring from preprocessing and profiling stages)",
+        "representation_plan.rationale contains model-architecture upgrade text ('hidden 48→64, depth 3→4') instead of a justification for standardize normalization and hflip/vflip/rotate90 augmentation; content is misattributed from train_config/best_configuration",
+        "llm_model_digest is null for qwen3.8 (ollama) in run_manifest and all prior stage artefacts; LLM-generated narrative lacks a pinned model fingerprint, creating a reproducibility and auditability gap",
+        "Rationale strings in best_configuration, train_config, and representation_plan appear truncated (end with '…'); verify the stored YAML contains the full text to avoid loss of justification downstream"
+      ],
+      "schema_version": "1.0",
+      "severity": "warning",
+      "source": "qwen3.8",
+      "stage": "configuration_replay"
+    },
+    "anomaly_evaluation": {
+      "action": "revise",
+      "attempt": 1,
+      "comment": "The evaluation report is numerically consistent: all per-class precision/recall/F1 values, macro-averages, balanced accuracy, and overall accuracy (6335/7180 = 0.88231) are correctly derived from the confusion matrix. The prediction artifact (7180 test samples, logits+probabilities+targets) is coherent. No deterministic findings were raised.\n\nHowever, several reporting and consistency gaps warrant revision before the evaluation is accepted as final:\n\n1. **Domain shift not acknowledged in the evaluation report.** The split_manifest explicitly states `official_test_separate_center: true`, and the training-stage review flagged an imbalance-ratio shift (3.95 vs 1.63). The ~11.5 pp val→test accuracy drop (0.9974 → 0.8823) is almost certainly driven by this cross-center domain shift, yet the evaluation_report contains no note, caveat, or reference to it. A reader comparing val and test numbers without context would misattribute the gap to overfitting.\n\n2. **No confidence intervals or variance estimates for small-sample per-class metrics.** Debris (n=339), cancer-associated stroma (n=421), and smooth muscle (n=592) have per-class F1 values of 0.79, 0.65, and 0.67 respectively. With these sample sizes, the 95 % CI on per-class recall spans roughly ±5–7 pp. Reporting point estimates without CIs (or at minimum a note on effective sample size) overstates precision. The training-stage review already flagged this; it should be addressed in the evaluation report.\n\n3. **Recurring factual contradiction (96×96 vs 28×28).** The data_profile.ambiguity_risks still reference '96×96 patch resolution' while image_shape_hwc is [28,28,3]. This error has persisted through preprocessing, profiling, configuration_replay, and training stages. It must be corrected in the data_profile before the evaluation is finalised, as it undermines trust in the data description.\n\n4. **representation_plan.rationale misattribution.** The rationale text in representation_plan (and best_configuration, train_config) contains model-architecture upgrade language ('hidden 48→64, depth 3→4') rather than a justification for the standardize normalization and hflip/vflip/rotate90 augmentation choices. This is a content-attribution error that has recurred across stages.\n\n5. **llm_model_digest is null.** The qwen3.8 (ollama) model fingerprint is absent from the run_manifest and all stage artefacts. LLM-generated narrative text (rationales, anomaly comments) therefore lacks a pinned model version, creating a reproducibility and auditability gap.\n\n6. **Truncated rationale strings.** Rationale fields in best_configuration, train_config, and representation_plan end with '…'. Verify the stored YAML contains the full text; if truncation is in the source, the justification is incomplete.\n\n7. **Primary metric choice.** The report designates 'accuracy' as primary_metric. In the presence of 9-class imbalance and cross-center domain shift, accuracy (0.882) is less informative than macro-F1 (0.855) or balanced accuracy (0.866). While the selection rule ('accuracy within tolerance, then macro-F1') is defensible for model selection, the evaluation report should present macro-F1 or balanced accuracy as the headline metric for interpretability.\n\nNone of these are computational errors—the numbers are correct—but they are reporting and consistency gaps that should be resolved before the evaluation artefact is considered final.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "Domain shift (official_test_separate_center=true, imbalance ratio 3.95 vs 1.63) is not explicitly acknowledged in the evaluation_report; the 11.5 pp val→test gap is unexplained",
+        "No confidence intervals or variance estimates for per-class metrics on small-sample classes (debris n=339, stroma n=421, smooth muscle n=592)",
+        "Recurring factual contradiction: data_profile.ambiguity_risks references '96×96 patch resolution' but image_shape_hwc is [28,28,3]",
+        "representation_plan.rationale contains model-architecture upgrade text instead of justification for standardize normalization and augmentation choices; content misattributed from train_config/best_configuration",
+        "llm_model_digest is null for qwen3.8 (ollama) across run_manifest and all stage artefacts; LLM narrative lacks a pinned model fingerprint",
+        "Rationale strings in best_configuration, train_config, and representation_plan appear truncated (end with '…'); full text not verifiable",
+        "Primary metric is 'accuracy' (0.882) despite 9-class imbalance and cross-center domain shift; macro-F1 (0.855) or balanced accuracy (0.866) would be more informative headline metrics"
+      ],
+      "schema_version": "1.0",
+      "severity": "warning",
+      "source": "qwen3.8",
+      "stage": "evaluation"
+    },
+    "anomaly_ingestion": {
+      "action": "revise",
+      "attempt": 1,
+      "comment": "Ingestion stage is structurally sound. Dataset manifest and run manifest are internally consistent: split sizes (train=89996, val=10004, test=7180) match the official PathMNIST partition, subsampled=false, 9 classes / 3 channels, CC BY 4.0 license, and all integrity hashes (archive MD5, per-split index SHA-256, code SHA-256) are present. No deterministic findings were raised and no artifacts were omitted. One reproducibility gap: llm_model_digest is null for the 'qwen3.8' Ollama model. Without a pinned digest the exact LLM weights used in downstream stages cannot be verified, weakening end-to-end reproducibility. This does not block ingestion but should be resolved before any stage that invokes the LLM. The test-domain note (CRC-VAL-HE-7K from a different clinical center) is correctly documented and is a known PathMNIST characteristic; it should be carried forward into any evaluation reporting. All package versions, Python version, and platform string are recorded. Proceed to the next stage.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "llm_model_digest is null for model 'qwen3.8' (ollama); exact model weights are not pinned, creating a reproducibility gap for any downstream LLM-dependent stage",
+        "Test split originates from a different clinical center (CRC-VAL-HE-7K); this domain shift is documented but must be explicitly acknowledged in all downstream evaluation and reporting to avoid over-interpretation of test metrics"
+      ],
+      "schema_version": "1.0",
+      "severity": "warning",
+      "source": "qwen3.8",
+      "stage": "ingestion"
+    },
+    "anomaly_preprocessing": {
+      "action": "revise",
+      "attempt": 1,
+      "comment": "Preprocessing stage is structurally sound: split sizes match official PathMNIST partitions, integrity hashes are present, augmentation plan (4× via hflip/vflip/rotate90) is appropriate for 28×28 patches, and standardization is well-justified by the channel statistics. However, one factual inconsistency must be corrected before proceeding.\n\n**Primary issue (must fix):** The data_profile.ambiguity_risks text states classes are \"inherently ambiguous at 96×96 patch resolution,\" yet the same artifact's structured field image_shape_hwc is [28, 28, 3]. PathMNIST images are 28×28×3; the 96×96 figure is a hallucinated value. The profiling anomaly already flagged this as an llm_issue, but the erroneous text persists in the data_profile artifact. Any downstream consumer reading the ambiguity_risks narrative will inherit an incorrect spatial-resolution assumption. Correct the reference to 28×28.\n\n**Secondary issues (noted, lower priority):**\n1. llm_model_digest is null for qwen3.8 (ollama). All LLM-authored narrative (profiling comment, data_profile ambiguity text, representation_plan rationale) lacks a pinned model fingerprint. This is a reproducibility gap: a different qwen3.8 build could produce different narrative text. Recommend recording the ollama model digest or at minimum the exact model tag/version.\n2. The representation_plan rationale attributes \"lower mean, higher std\" to the \"eosin channel.\" In the channel statistics (means [0.741, 0.533, 0.706], stds [0.124, 0.177, 0.124]), the channel with lower mean and higher std is index 1 (green), not index 0 (red, the typical eosin-associated channel). The mislabeling does not affect the normalization computation but is a factual inaccuracy in the rationale.\n3. Test-set domain shift (CRC-VAL-HE-7K) is properly documented in both the dataset_manifest and data_profile. Small per-class test counts (debris n=339, stroma n=421, smooth muscle n=592) will yield high-variance per-class metrics; downstream evaluation should report confidence intervals or use macro-averaged metrics. This is correctly flagged and does not block preprocessing.\n\nNo deterministic computation errors were found. The structured data fields (class counts, proportions, channel statistics, split sizes, hashes) are internally consistent. The required revision is limited to correcting the 96×96 → 28×28 reference in the data_profile narrative and optionally fixing the channel-label misattribution in the representation_plan rationale.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "data_profile.ambiguity_risks references '96×96 patch resolution' but image_shape_hwc in the same artifact is [28,28,3]; factual contradiction must be corrected to 28×28",
+        "llm_model_digest is null for qwen3.8 (ollama); all LLM-generated narrative lacks a pinned model fingerprint, creating a reproducibility gap",
+        "representation_plan rationale misidentifies the 'eosin channel' as the one with lower mean/higher std; that description matches channel index 1 (green), not index 0 (red) which is the typical eosin-associated channel",
+        "Test-set per-class counts for debris (n=339), stroma (n=421), and smooth muscle (n=592) are small enough to produce high-variance per-class metrics; downstream evaluation should use confidence intervals or macro-averaged reporting"
+      ],
+      "schema_version": "1.0",
+      "severity": "warning",
+      "source": "qwen3.8",
+      "stage": "preprocessing"
+    },
+    "anomaly_profiling": {
+      "action": "revise",
+      "attempt": 1,
+      "comment": "Profiling stage is structurally complete and internally consistent. Class counts sum correctly across all splits (train=89996, val=10004, test=7180), no duplicates, no blank images, and all integrity hashes are present. The data profile correctly identifies the significant test-domain shift (test imbalance ratio 3.95 vs train 1.63; debris prevalence drops to 0.41×, stroma to 0.56×) and documents label-ambiguity risks for non-standard classes (debris, background, stroma vs smooth muscle). Train/val near-identical proportions confirm a single-site random split, making the CRC-VAL-HE-7K test set the sole external generalization probe.\n\nCarry-forward warnings (non-blocking):\n1. llm_model_digest is null for qwen3.8 (ollama). The profiling decision_source is this unpinned model. While the structured profiling metrics (counts, proportions, channel stats) are deterministic, the narrative ambiguity notes and risk assessments are LLM-generated without a reproducible model fingerprint. This should be flagged in the run manifest for any downstream stage that relies on LLM-generated text.\n2. The ambiguity_risks text references '96×96 patch resolution' but the actual image_shape_hwc is [28,28,3] (PathMNIST is a downsampled derivative of the original 96×96 TCGA patches). This is a minor narrative inaccuracy in the LLM-generated text; the structured data is correct. Downstream stages should reference the actual 28×28 resolution when discussing spatial context limitations.\n3. Small per-class test counts (debris n=339, stroma n=421, smooth muscle n=592) will yield high-variance per-class metrics. Downstream evaluation should report confidence intervals or use macro-averaged metrics with explicit caveats.\n\nNo deterministic findings were raised. The profiling artefacts are sufficient to proceed to the next stage. All warnings are documentation/reproducibility concerns that should be propagated but do not invalidate the profiling results.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "llm_model_digest is null for qwen3.8 (ollama); profiling narrative is LLM-generated without a pinned model fingerprint, creating a reproducibility gap for any downstream stage consuming LLM-authored text",
+        "Ambiguity-risk narrative references '96×96 patch resolution' but actual image_shape_hwc is [28,28,3]; minor factual inconsistency in LLM-generated text that could mislead downstream interpretation of spatial-context limitations",
+        "Test-set class distribution deviates substantially from train/val (adipose ×1.79, debris ×0.41, stroma ×0.56); small per-class test counts (debris n=339, stroma n=421, smooth muscle n=592) will produce high-variance per-class metrics requiring confidence intervals or macro-averaged reporting in downstream evaluation"
+      ],
+      "schema_version": "1.0",
+      "severity": "warning",
+      "source": "qwen3.8",
+      "stage": "profiling"
+    },
+    "anomaly_training": {
+      "action": "revise",
+      "attempt": 1,
+      "comment": "Training stage is structurally sound and internally consistent. Key validations pass: (1) Early stopping logic is correct — best epoch 11, patience 3, stopped at epoch 14; (2) Cosine LR schedule values in history match the expected 15-epoch cosine curve starting at 1e-3; (3) Train loss decreases monotonically (0.7047→0.4993) with no divergence; (4) Val accuracy converges to 0.997401 with no overfitting signal; (5) augmented_train_size 359984 = 89996×4 matches augmentation_factor; (6) All integrity hashes (checkpoint SHA-256, config SHA-256, split index SHA-256) are present; (7) train_stats_only=true ensures no test/val leakage into normalization; (8) test_metrics_used=false and selection_rule explicitly locks the test set. No deterministic findings were raised.\n\nCarried-forward documentation issues (non-blocking but should be corrected before final reporting): (a) data_profile.ambiguity_risks references '96×96 patch resolution' while image_shape_hwc is [28,28,3] — factual error recurring across preprocessing, profiling, and configuration_replay stages; (b) representation_plan.rationale contains model-architecture upgrade text ('hidden 48→64, depth 3→4') rather than a justification for standardize normalization and hflip/vflip/rotate90 augmentation — content misattributed from train_config; (c) llm_model_digest is null for qwen3.8 (ollama) across all stage artefacts, leaving LLM-generated narrative without a pinned model fingerprint; (d) Multiple rationale strings in best_configuration, train_config, and representation_plan appear truncated (ending with '…'), risking loss of justification text in downstream audit; (e) Test split originates from a different clinical center (CRC-VAL-HE-7K) with domain shift (imbalance ratio 3.95 vs 1.63; debris ×0.41, stroma ×0.56) — must be explicitly acknowledged in all downstream evaluation reporting; (f) Small per-class test counts (debris n=339, stroma n=421, smooth muscle n=592) will yield high-variance per-class metrics — downstream evaluation should report confidence intervals or macro-averaged metrics.\n\nNone of these issues affect the validity of the trained checkpoint or the training process itself. The model, hyperparameters, and convergence behavior are consistent and reproducible given the pinned seed (72) and frozen configuration. Proceed to evaluation with the above documentation corrections applied to the reporting artefacts.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "data_profile.ambiguity_risks references '96×96 patch resolution' but image_shape_hwc is [28,28,3]; factual contradiction recurring across preprocessing, profiling, and configuration_replay stages",
+        "representation_plan.rationale contains model-architecture upgrade text ('hidden 48→64, depth 3→4') instead of a justification for standardize normalization and hflip/vflip/rotate90 augmentation; content misattributed from train_config/best_configuration",
+        "llm_model_digest is null for qwen3.8 (ollama) in run_manifest and all prior stage artefacts; LLM-generated narrative lacks a pinned model fingerprint, creating a reproducibility and auditability gap",
+        "Rationale strings in best_configuration, train_config, and representation_plan appear truncated (end with '…'); verify stored YAML contains full text to avoid loss of justification downstream",
+        "Test split originates from a different clinical center (CRC-VAL-HE-7K); domain shift (imbalance ratio 3.95 vs 1.63) must be explicitly acknowledged in all downstream evaluation and reporting",
+        "Small per-class test counts (debris n=339, stroma n=421, smooth muscle n=592) will produce high-variance per-class metrics; downstream evaluation should use confidence intervals or macro-averaged reporting"
+      ],
+      "schema_version": "1.0",
+      "severity": "warning",
+      "source": "qwen3.8",
+      "stage": "training"
+    },
+    "best_configuration": {
+      "lightning_config_path": "best_config.yaml",
+      "lightning_config_sha256": "ef9589ac9023b8ff347f92ef379b1f739e6bd6f9692fb6e0edb1be764f20291f",
+      "representation": {
+        "augmentations": [
+          "hflip",
+          "vflip",
+          "rotate90"
+        ],
+        "normalization": "standardize",
+        "rationale": "Direct capacity upgrade of the round-1 winner (hidden 48→64, depth 3→4). The 97.64% result left ~2.4% error; a wider, deeper residual stack should capture finer-grained pathology patterns. Dropout raised 0.2→0.25 and label_smoothing 0.05→0.1 to regularize the extra parameters. All other hyperparameters (adamw, cosine, lr=1e-3, wd=0.01, bs=128, standardize, 3 augmentations, class_weighting) are held constant to isolate the capacity effect."
+      },
+      "schema_version": "1.0",
+      "selected_candidate_id": "res_cnn_wider_deep",
+      "selected_config_hash": "f770eaa3c9c009dc1bdf577474aafe0dfd8fb3ce311ac8d4b4e19239d0b2550d",
+      "selection_rule": "accuracy within tolerance, then macro-F1; test locked; frozen and replayed without test-dependent adaptation",
+      "test_metrics_used": false,
+      "train_config": {
+        "batch_size": 128,
+        "class_weighting": true,
+        "depth": 4,
+        "device": "cuda",
+        "dropout": 0.25,
+        "early_stopping_patience": 3,
+        "epochs": 15,
+        "gradient_clip_val": 1.0,
+        "hidden": 64,
+        "label_smoothing": 0.1,
+        "lr": 0.001,
+        "model_family": "residual_cnn",
+        "optimizer": "adamw",
+        "rationale": "Selected from 4 validation-only trials. Direct capacity upgrade of the round-1 winner (hidden 48→64, depth 3→4). The 97.64% result left ~2.4% error; a wider, deeper residual stack should capture finer-grained pathology patterns. Dropout raised 0.2→0.25 and label_smoothing 0.05→0.1 to regularize the extra parameters. All other hyperparameters (adamw, cosine, lr=1e-3, wd=0.01, bs=128, standardize, 3 augmentations, class_weighting) are held constant to isolate the capacity effect.",
+        "scheduler": "cosine",
+        "schema_version": "1.0",
+        "seed": 72,
+        "source": "configuration_replay:f770eaa3c9c0",
+        "weight_decay": 0.01
+      },
+      "validation_accuracy": 0.982707,
+      "validation_macro_f1": 0.982735
+    },
+    "data_profile": {
+      "ambiguity_note": "Several concrete ambiguities and dataset-shift risks are present. (1) Label ambiguity: 'debris' is not a standard histological entity and overlaps heavily with 'mucus' and 'background' in H&E appearance; 'background' is a catch-all for non-tissue or artifact regions; 'cancer-associated stroma' and 'smooth muscle' can be visually indistinguishable at patch level without architectural context; 'normal colon mucosa' vs. 'colorectal adenocarcinoma epithelium' has a dysplastic transition zone that is inherently ambiguous at the 96×96 patch resolution used in PathMNIST. (2) Distribution shift: train and val class proportions are nearly identical (max |Δ| < 0.001), but the test set (CRC-VAL-HE-7K, different clinical center) deviates substantially—adipose prevalence nearly doubles (10.4%→18.6%, ratio 1.79), mucus rises (8.9%→14.4%, ratio 1.62), while debris drops sharply (11.5%→4.7%, ratio 0.41), cancer-associated stroma drops (10.4%→5.9%, ratio 0.56), and smooth muscle drops (13.5%→8.2%, ratio 0.61). This is not a random sampling artifact; it reflects a different tissue-sampling or slide-preparation protocol at the external center. (3) Domain shift: the test set explicitly originates from a different clinical center, introducing uncontrolled variation in H&E staining intensity/hue, scanner color calibration, slide thickness, and fixation quality. The 'debris' class collapse (ratio 0.41) is consistent with different slide-preparation or scanning artifacts at the new site, meaning the model's learned 'debris' features may not transfer. (4) The test set is also smaller (7,180 vs. 89,996 train), amplifying the statistical impact of the skewed distribution and reducing per-class test samples for the under-represented classes (debris n=339, cancer-associated stroma n=421, smooth muscle n=592), making per-class test metrics noisy and less reliable. (5) No information is provided about whether the external center used the same annotation protocol, inter-annotator agreement, or whether 'debris' and 'background' were defined identically, compounding the label-ambiguity risk under domain shift.",
+      "ambiguity_risks": [
+        "Test-set class distribution deviates substantially from train/val (adipose ×1.79, debris ×0.41, stroma ×0.56), indicating non-random sampling or different tissue-sampling protocol at the external center.",
+        "External clinical center (CRC-VAL-HE-7K) introduces uncontrolled H&E staining, scanner, and slide-preparation variability that can shift pixel-level features for all classes.",
+        "'Debris' is a non-standard, poorly defined histological label that overlaps with 'mucus' and 'background'; its 59% prevalence drop in test suggests the external site's artifact profile differs, undermining label transferability.",
+        "'Cancer-associated stroma' vs. 'smooth muscle' and 'normal colon mucosa' vs. 'adenocarcinoma epithelium' are inherently ambiguous at 96×96 patch resolution without multi-scale architectural context, increasing misclassification risk under domain shift.",
+        "Small per-class test counts for debris (n=339), stroma (n=421), and smooth muscle (n=592) make per-class test metrics statistically noisy and sensitive to a handful of mislabeled patches.",
+        "No evidence that the external center used the same annotation guidelines or inter-annotator agreement process, so label semantics for ambiguous classes (debris, background, stroma) may differ across sites.",
+        "The near-identical train/val split (max proportion difference <0.001) suggests a random split of a single-site dataset, meaning the only true external generalization test is the skewed CRC-VAL-HE-7K set, which conflates distribution shift with domain shift.",
+        "Patch-level classification without spatial context means the model cannot leverage tissue architecture to disambiguate stroma from smooth muscle or dysplastic from normal epithelium, a limitation that is exacerbated when staining appearance shifts across centers."
+      ],
+      "blank_image_fraction": 0.0,
+      "class_counts": {
+        "test": [
+          1338,
+          847,
+          339,
+          634,
+          1035,
+          592,
+          741,
+          421,
+          1233
+        ],
+        "train": [
+          9366,
+          9509,
+          10360,
+          10401,
+          8006,
+          12182,
+          7886,
+          9401,
+          12885
+        ],
+        "val": [
+          1041,
+          1057,
+          1152,
+          1156,
+          890,
+          1354,
+          877,
+          1045,
+          1432
+        ]
+      },
+      "class_proportions": {
+        "test": [
+          0.18635097,
+          0.11796657,
+          0.04721448,
+          0.08830084,
+          0.14415042,
+          0.08245125,
+          0.10320334,
+          0.0586351,
+          0.17172702
+        ],
+        "train": [
+          0.10407129,
+          0.10566025,
+          0.11511623,
+          0.1155718,
+          0.08895951,
+          0.13536157,
+          0.08762612,
+          0.1044602,
+          0.14317303
+        ],
+        "val": [
+          0.10405838,
+          0.10565774,
+          0.11515394,
+          0.11555378,
+          0.08896441,
+          0.13534586,
+          0.08766493,
+          0.10445822,
+          0.14314274
+        ]
+      },
+      "dataset": "pathmnist",
+      "decision_source": "qwen3.8",
+      "duplicate_train_samples": 0,
+      "image_shape_hwc": [
+        28,
+        28,
+        3
+      ],
+      "imbalance_ratio": 1.633908,
+      "n_channels": 3,
+      "n_classes": 9,
+      "official_data_fraction": 1.0,
+      "profiled_fraction": 1.0,
+      "samples_profiled": 107180,
+      "schema_version": "1.0",
+      "test_imbalance_ratio": 3.946903,
+      "test_to_train_prevalence_ratio": [
+        1.79060883,
+        1.11647069,
+        0.41014621,
+        0.76403442,
+        1.62040482,
+        0.60911862,
+        1.17776921,
+        0.5613152,
+        1.19943693
+      ],
+      "train_channel_mean_unit": [
+        0.740545,
+        0.53298219,
+        0.70582885
+      ],
+      "train_channel_std_unit": [
+        0.12368222,
+        0.17676253,
+        0.12443067
+      ]
+    },
+    "dataset_manifest": {
+      "archive_md5": "a8b06965200029087d5bd730944a56c1",
+      "data_reference": "https://zenodo.org/records/10519652/files/pathmnist.npz?download=1",
+      "dataset": "pathmnist",
+      "labels": [
+        "adipose",
+        "background",
+        "debris",
+        "lymphocytes",
+        "mucus",
+        "smooth muscle",
+        "normal colon mucosa",
+        "cancer-associated stroma",
+        "colorectal adenocarcinoma epithelium"
+      ],
+      "license": "CC BY 4.0",
+      "loaded_split_sizes": {
+        "test": 7180,
+        "train": 89996,
+        "val": 10004
+      },
+      "n_channels": 3,
+      "n_classes": 9,
+      "official_split_sizes": {
+        "test": 7180,
+        "train": 89996,
+        "val": 10004
+      },
+      "schema_version": "1.0",
+      "selected_index_sha256": {
+        "test": "27ab586ecd9b4ac7278c6a91cf0b336a2ba742afe742d13eff51f702635791e8",
+        "train": "1478a96c1d8ad06d0a600d6c9b8d5c8dddd83fbda22307ab449764f013683b51",
+        "val": "a13f875ade8e54f5aee16ff205c36aa628396dddec09a33a175fcf9cbbb9d402"
+      },
+      "subsampled": false,
+      "task": "multi-class",
+      "test_domain_note": "CRC-VAL-HE-7K test images originate from a different clinical center."
+    },
+    "evaluation_report": {
+      "accuracy": 0.882312,
+      "balanced_accuracy": 0.865697,
+      "confusion_matrix": [
+        [
+          1121,
+          0,
+          0,
+          0,
+          1,
+          213,
+          0,
+          0,
+          3
+        ],
+        [
+          0,
+          847,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          9,
+          308,
+          0,
+          0,
+          21,
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          4,
+          629,
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          22,
+          64,
+          1,
+          0,
+          894,
+          0,
+          34,
+          1,
+          19
+        ],
+        [
+          0,
+          62,
+          36,
+          0,
+          11,
+          448,
+          1,
+          33,
+          1
+        ],
+        [
+          0,
+          0,
+          8,
+          10,
+          0,
+          0,
+          701,
+          11,
+          11
+        ],
+        [
+          0,
+          6,
+          79,
+          0,
+          0,
+          60,
+          7,
+          231,
+          38
+        ],
+        [
+          0,
+          0,
+          5,
+          24,
+          0,
+          0,
+          40,
+          8,
+          1156
+        ]
+      ],
+      "macro_f1": 0.85475,
+      "macro_precision": 0.858011,
+      "macro_recall": 0.865697,
+      "n_samples": 7180,
+      "per_class": [
+        {
+          "f1": 0.903668,
+          "label": 0,
+          "name": "adipose",
+          "precision": 0.980752,
+          "recall": 0.837818,
+          "support": 1338
+        },
+        {
+          "f1": 0.923161,
+          "label": 1,
+          "name": "background",
+          "precision": 0.857287,
+          "recall": 1.0,
+          "support": 847
+        },
+        {
+          "f1": 0.789744,
+          "label": 2,
+          "name": "debris",
+          "precision": 0.698413,
+          "recall": 0.908555,
+          "support": 339
+        },
+        {
+          "f1": 0.969931,
+          "label": 3,
+          "name": "lymphocytes",
+          "precision": 0.948718,
+          "recall": 0.992114,
+          "support": 634
+        },
+        {
+          "f1": 0.921175,
+          "label": 4,
+          "name": "mucus",
+          "precision": 0.986755,
+          "recall": 0.863768,
+          "support": 1035
+        },
+        {
+          "f1": 0.671664,
+          "label": 5,
+          "name": "smooth muscle",
+          "precision": 0.603774,
+          "recall": 0.756757,
+          "support": 592
+        },
+        {
+          "f1": 0.919948,
+          "label": 6,
+          "name": "normal colon mucosa",
+          "precision": 0.895275,
+          "recall": 0.946019,
+          "support": 741
+        },
+        {
+          "f1": 0.654391,
+          "label": 7,
+          "name": "cancer-associated stroma",
+          "precision": 0.810526,
+          "recall": 0.548694,
+          "support": 421
+        },
+        {
+          "f1": 0.939074,
+          "label": 8,
+          "name": "colorectal adenocarcinoma epithelium",
+          "precision": 0.940602,
+          "recall": 0.937551,
+          "support": 1233
+        }
+      ],
+      "primary_metric": "accuracy",
+      "roc_auc_ovr_macro": 0.981612,
+      "schema_version": "1.0",
+      "split": "test"
+    },
+    "prediction_artifact": {
+      "includes_logits": true,
+      "includes_probabilities": true,
+      "includes_targets": true,
+      "path": "blobs/predictions_v001.npz",
+      "schema_version": "1.0",
+      "sha256": "27e5bbd21e89ff70a65f8409a1677fa27c21b4a44e755cdf77d523c973c62aa9",
+      "test_samples": 7180,
+      "validation_samples": 10004
+    },
+    "representation_plan": {
+      "augmentation_factor": 4,
+      "augmentations": [
+        "hflip",
+        "vflip",
+        "rotate90"
+      ],
+      "normalization": "standardize",
+      "rationale": "Direct capacity upgrade of the round-1 winner (hidden 48→64, depth 3→4). The 97.64% result left ~2.4% error; a wider, deeper residual stack should capture finer-grained pathology patterns. Dropout raised 0.2→0.25 and label_smoothing 0.05→0.1 to regularize the extra parameters. All other hyperparameters (adamw, cosine, lr=1e-3, wd=0.01, bs=128, standardize, 3 augmentations, class_weighting) are held constant to isolate the capacity effect.",
+      "schema_version": "1.0",
+      "source": "configuration_replay:f770eaa3c9c0",
+      "stats_source": "train",
+      "train_channel_mean_unit": [
+        0.740545,
+        0.53298219,
+        0.70582885
+      ],
+      "train_channel_std_unit": [
+        0.12368222,
+        0.17676253,
+        0.12443067
+      ]
+    },
+    "run_manifest": {
+      "code_sha256": "17a278575427489fc0f39715fbccab4e5b095405f886368663cc299853748468",
+      "created_at": "2026-09-09T05:01:24.919640+00:00",
+      "dataset": "pathmnist",
+      "deterministic_torch": true,
+      "lightning_cli": true,
+      "llm_mode": "ollama",
+      "llm_model": "qwen3.8",
+      "llm_model_digest": null,
+      "package_versions": {
+        "jsonargparse": "4.52.0",
+        "lightning": "2.6.5",
+        "medmnist": "3.0.2",
+        "numpy": "2.4.6",
+        "pydantic": "2.13.5",
+        "scikit-learn": "1.9.0",
+        "torch": "2.14.0+cu126"
+      },
+      "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.35",
+      "python_version": "3.11.15",
+      "run_id": "seed_72",
+      "schema_version": "1.0",
+      "seed": 72
+    },
+    "split_manifest": {
+      "augmented_train_size": 359984,
+      "dataset": "pathmnist",
+      "official_test_separate_center": true,
+      "schema_version": "1.0",
+      "seed": 72,
+      "selected_index_sha256": {
+        "test": "27ab586ecd9b4ac7278c6a91cf0b336a2ba742afe742d13eff51f702635791e8",
+        "train": "1478a96c1d8ad06d0a600d6c9b8d5c8dddd83fbda22307ab449764f013683b51",
+        "val": "a13f875ade8e54f5aee16ff205c36aa628396dddec09a33a175fcf9cbbb9d402"
+      },
+      "strategy": "official",
+      "test_size": 7180,
+      "train_size": 89996,
+      "train_stats_only": true,
+      "val_size": 10004
+    },
+    "train_config": {
+      "batch_size": 128,
+      "class_weighting": true,
+      "depth": 4,
+      "device": "cuda",
+      "dropout": 0.25,
+      "early_stopping_patience": 3,
+      "epochs": 15,
+      "gradient_clip_val": 1.0,
+      "hidden": 64,
+      "label_smoothing": 0.1,
+      "lr": 0.001,
+      "model_family": "residual_cnn",
+      "optimizer": "adamw",
+      "rationale": "Selected from 4 validation-only trials. Direct capacity upgrade of the round-1 winner (hidden 48→64, depth 3→4). The 97.64% result left ~2.4% error; a wider, deeper residual stack should capture finer-grained pathology patterns. Dropout raised 0.2→0.25 and label_smoothing 0.05→0.1 to regularize the extra parameters. All other hyperparameters (adamw, cosine, lr=1e-3, wd=0.01, bs=128, standardize, 3 augmentations, class_weighting) are held constant to isolate the capacity effect.",
+      "scheduler": "cosine",
+      "schema_version": "1.0",
+      "seed": 72,
+      "source": "configuration_replay:f770eaa3c9c0",
+      "weight_decay": 0.01
+    },
+    "train_result": {
+      "best_epoch": 11,
+      "best_val_accuracy": 0.997401,
+      "checkpoint_path": "blobs/agentic_model_v001.ckpt",
+      "checkpoint_sha256": "6c5b7a66fc66a0f4dd974be33d164566ff7f8472f650aac37e29003f6c4b69eb",
+      "device": "cuda",
+      "epochs_completed": 14,
+      "final_train_loss": 0.499251,
+      "final_val_accuracy": 0.997401,
+      "framework": "lightning.pytorch",
+      "history": [
+        {
+          "epoch": 1,
+          "learning_rate": 0.0009890738,
+          "train_loss": 0.704659,
+          "val_accuracy": 0.948721,
+          "val_loss": 0.623117,
+          "val_macro_f1": 0.949699
+        },
+        {
+          "epoch": 2,
+          "learning_rate": 0.0009567727,
+          "train_loss": 0.579191,
+          "val_accuracy": 0.972711,
+          "val_loss": 0.562004,
+          "val_macro_f1": 0.973017
+        },
+        {
+          "epoch": 3,
+          "learning_rate": 0.0009045085,
+          "train_loss": 0.548603,
+          "val_accuracy": 0.985106,
+          "val_loss": 0.538955,
+          "val_macro_f1": 0.985211
+        },
+        {
+          "epoch": 4,
+          "learning_rate": 0.0008345653,
+          "train_loss": 0.533923,
+          "val_accuracy": 0.982107,
+          "val_loss": 0.536145,
+          "val_macro_f1": 0.982012
+        },
+        {
+          "epoch": 5,
+          "learning_rate": 0.00075,
+          "train_loss": 0.523788,
+          "val_accuracy": 0.983607,
+          "val_loss": 0.534422,
+          "val_macro_f1": 0.982766
+        },
+        {
+          "epoch": 6,
+          "learning_rate": 0.0006545085,
+          "train_loss": 0.517202,
+          "val_accuracy": 0.992103,
+          "val_loss": 0.515679,
+          "val_macro_f1": 0.992097
+        },
+        {
+          "epoch": 7,
+          "learning_rate": 0.0005522642,
+          "train_loss": 0.512001,
+          "val_accuracy": 0.995502,
+          "val_loss": 0.507826,
+          "val_macro_f1": 0.995552
+        },
+        {
+          "epoch": 8,
+          "learning_rate": 0.0004477358,
+          "train_loss": 0.50866,
+          "val_accuracy": 0.993802,
+          "val_loss": 0.509223,
+          "val_macro_f1": 0.993726
+        },
+        {
+          "epoch": 9,
+          "learning_rate": 0.0003454915,
+          "train_loss": 0.505481,
+          "val_accuracy": 0.995902,
+          "val_loss": 0.50516,
+          "val_macro_f1": 0.995747
+        },
+        {
+          "epoch": 10,
+          "learning_rate": 0.00025,
+          "train_loss": 0.502826,
+          "val_accuracy": 0.995902,
+          "val_loss": 0.504931,
+          "val_macro_f1": 0.995881
+        },
+        {
+          "epoch": 11,
+          "learning_rate": 0.0001654347,
+          "train_loss": 0.501441,
+          "val_accuracy": 0.997401,
+          "val_loss": 0.501703,
+          "val_macro_f1": 0.997387
+        },
+        {
+          "epoch": 12,
+          "learning_rate": 9.54915e-05,
+          "train_loss": 0.500234,
+          "val_accuracy": 0.997201,
+          "val_loss": 0.50128,
+          "val_macro_f1": 0.997215
+        },
+        {
+          "epoch": 13,
+          "learning_rate": 4.32273e-05,
+          "train_loss": 0.499696,
+          "val_accuracy": 0.997101,
+          "val_loss": 0.5009,
+          "val_macro_f1": 0.997054
+        },
+        {
+          "epoch": 14,
+          "learning_rate": 1.09262e-05,
+          "train_loss": 0.499251,
+          "val_accuracy": 0.997401,
+          "val_loss": 0.500371,
+          "val_macro_f1": 0.997374
+        }
+      ],
+      "lightning_config_path": "best_config.yaml",
+      "lightning_csv_path": "blobs/lightning_logs/agentic_model_v001/version_0/metrics.csv",
+      "schema_version": "1.0",
+      "seed": 72,
+      "training_log_path": "blobs/agentic_model_v001.training.jsonl"
+    }
+  },
+  "run_id": "seed_72",
+  "status": "vetoed:abstention",
+  "updated_at": "2026-09-09T05:10:30.048041+00:00"
+}

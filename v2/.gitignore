@@ -1,11 +1,3 @@
 __pycache__/
-*.py[cod]
-.pytest_cache/
 .idea/
 .venv/
-torchinductor_root/
-runs/
-data/
-*.ckpt
-*.pt
-*.npz

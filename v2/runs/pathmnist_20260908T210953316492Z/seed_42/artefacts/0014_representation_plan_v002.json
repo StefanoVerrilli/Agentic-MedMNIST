@@ -1,0 +1,32 @@
+{
+  "artefact": "representation_plan",
+  "artefact_type": "RepresentationPlan",
+  "created_at": "2026-09-08T21:13:42.949052+00:00",
+  "payload": {
+    "augmentation_factor": 3,
+    "augmentations": [
+      "hflip",
+      "vflip"
+    ],
+    "normalization": "standardize",
+    "rationale": "Widens the proven residual_cnn from hidden=32 to 48 at the same depth=3, with a small dropout bump to 0.25 to regularize the extra parameters. All other hyperparameters (adamw, cosine, lr=3e-4, wd=1e-4, class_weighting, label_smoothing=0.05, hflip+vflip, standardize) are held at the round-1 optimum to isolate the capacity effect.",
+    "schema_version": "1.0",
+    "source": "agentic_search:selected:qwen3.8",
+    "stats_source": "train",
+    "train_channel_mean_unit": [
+      0.740545,
+      0.53298219,
+      0.70582885
+    ],
+    "train_channel_std_unit": [
+      0.12368222,
+      0.17676253,
+      0.12443067
+    ]
+  },
+  "payload_sha256": "bc798ec3acf1fc9f43d76843a19585ee7e25be0118ffdcdff5ee55ff17104f2c",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 14,
+  "version": 2
+}

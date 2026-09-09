@@ -1,0 +1,23 @@
+{
+  "artefact": "anomaly_model_search",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T21:14:12.617801+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "Model search is internally consistent: 4/4 trials completed across 2 rounds as planned; selection of res_cnn_wider_d3 (val_acc 0.9708, macro-F1 0.9706) is correct under the accuracy-then-macro-F1 rule with 0.005 tolerance (next-best resnet18_deep_d4 at 0.9604 is outside tolerance); test_metrics_used=false confirmed; config_hash matches between trial and best_config; final config correctly escalates epochs 2→15 and patience 1→3 per search_plan.final_epochs. One cross-artefact discrepancy: the preprocessing review comment states 'augmented_train_size 359984 = 89996×4', but the authoritative split_manifest records augmented_train_size 269988 (= 89996×3). This is a 1×-factor mismatch in the augmentation multiplier between the two documents. It does not affect the search results (which operate",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Cross-artefact inconsistency: preprocessing review comment asserts augmented_train_size 359984 (89996×4) while split_manifest records 269988 (89996×3); the augmentation multiplier is off by one between the two documents."
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "model_search"
+  },
+  "payload_sha256": "549f44d14fc8fd13e332053354adeddf9e35bb398289592a0f4473b6eb297776",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 19,
+  "version": 1
+}

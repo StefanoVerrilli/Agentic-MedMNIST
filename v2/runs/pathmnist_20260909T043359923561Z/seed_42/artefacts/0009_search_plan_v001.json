@@ -1,0 +1,21 @@
+{
+  "artefact": "search_plan",
+  "artefact_type": "SearchPlan",
+  "created_at": "2026-09-09T04:35:52.907869+00:00",
+  "payload": {
+    "accuracy_tolerance": 0.005,
+    "final_epochs": 15,
+    "framework": "lightning.pytorch",
+    "max_trials": 4,
+    "objective": "validation_accuracy_then_macro_f1",
+    "rounds": 2,
+    "schema_version": "1.0",
+    "search_epochs": 2,
+    "test_locked": true
+  },
+  "payload_sha256": "34f06b2af59b098d6d74a482b8031b198f7163ecb4cb9920e83fe8c734c32b84",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 9,
+  "version": 1
+}

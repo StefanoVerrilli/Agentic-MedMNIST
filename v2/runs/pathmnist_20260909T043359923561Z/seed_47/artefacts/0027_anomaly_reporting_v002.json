@@ -1,0 +1,32 @@
+{
+  "artefact": "anomaly_reporting",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-09T05:01:24.914404+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "All structured data in the reporting-stage artefacts is numerically consistent and internally verified. Key cross-checks all pass: (1) confusion-matrix row sums equal per-class supports (total 7180); (2) accuracy 6462/7180 = 0.9000; (3) every per-class precision, recall, and F1 reproduces exactly from the confusion matrix; (4) macro metrics (precision 0.879297, recall 0.878031, F1 0.870039) are correct unweighted means; (5) balanced_accuracy 0.878031 correctly equals macro recall; (6) abstention cross-checks: abstain_rate + test_coverage = 1.0, human_review_count 3326 = 7180 × 0.463231, selective_risk = 1 − 0.988324 = 0.011676, base_test_accuracy matches evaluation accuracy; (7) comparison arithmetic: 0.9 − 0.840251 = 0.059749, seed 47 and split fingerprint match baseline; (8) OOD aggregate AUROC 0.9758 is the mean of the three predictive-entropy test AUROCs (0.993076+0.983952+0.950373)/3 = 0.975800; (9) prediction artifact test_samples 7180 matches evaluation n_samples. No deterministic findings are present, consistent with all checks passing.\n\nHowever, the four anomaly reports (abstention, comparison, evaluation, reporting) uniformly flag a set of completeness and documentation gaps that should be resolved before the dossier is considered final: (a) the ~9.7 pp validation-to-test accuracy gap and ~26 pp coverage gap (80.0% → 53.7%) are not explicitly flagged as caveats in the evaluation or abstention reports; (b) the OOD evaluation is limited to Gaussian-noise corruptions (σ 0.15/0.25/0.4) with no true distributional-shift test, and the 'controlled_corruption_proxy' scope label should be more prominently stated; (c) no per-class abstention rates are reported, leaving unclear whether the abstention mechanism preferentially covers weak classes (cancer-associated stroma recall 0.485, smooth muscle 0.823); (d) per-class test metrics for debris (n=339) and cancer-associated stroma (n=421) lack confidence intervals or power notes; (e) the comparison report omits macro-F1 delta (0.0859) and per-class deltas, and does not frame the capacity asymmetry between the tiny_cnn baseline and the agentic architecture; (f) the recurring LLM prose error ('96×96 patch resolution' vs actual 28×28×3) and null llm_model_digest for qwen3.8 persist across narrative artefacts, limiting reproducibility of prose; (g) the provenance distinction between best_configuration.validation_accuracy (0.982707, selection trial) and train_result.best_val_accuracy (0.997001, final replay) is not documented. These are documentation and completeness issues, not numerical errors, but they collectively reduce the report's utility for downstream consumers and should be addressed in a revision pass.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Val-test accuracy gap (~9.7 pp, 0.997→0.900) and val-test coverage gap (~26 pp, 80.0%→53.7%) are not explicitly flagged as caveats in the evaluation or abstention reports; downstream users may over-expect generalization.",
+      "OOD evaluation is limited to unit-scale Gaussian-noise corruptions (σ 0.15/0.25/0.4); no true distributional-shift or domain-shift OOD test is included; the 'controlled_corruption_proxy' scope label should be more prominently stated in the final report.",
+      "No per-class abstention rates are reported; given low recall for cancer-associated stroma (0.485) and smooth muscle (0.823), it is unclear whether the abstention mechanism preferentially covers these weak classes.",
+      "Per-class test metrics for debris (n=339) and cancer-associated stroma (n=421) have wide confidence intervals given small support and distribution shift; no CI or power note is included.",
+      "Comparison report omits macro-F1 delta (0.0859), per-class deltas, and does not frame the capacity asymmetry between the tiny_cnn baseline (depth=2, hidden=16) and the agentic architecture.",
+      "No statistical significance test or confidence interval reported on the 5.97 pp accuracy delta; with n=7180 this should be trivially significant but must be stated.",
+      "Recurring LLM prose error: '96×96 patch resolution' appears in multiple narrative artefacts but actual image_shape_hwc is [28,28,3]; structured data is correct, prose is wrong.",
+      "llm_model_digest is null for qwen3.8 (ollama); LLM-generated narrative steps lack content-hash pinning, limiting full reproducibility of prose artefacts.",
+      "Provenance distinction between best_configuration.validation_accuracy (0.982707, selection trial) and train_result.best_val_accuracy (0.997001, final replay) is not documented in the evaluation report.",
+      "reporting_status.complete_through_stage is 'comparison' while the current stage is 'reporting'; the status should be updated to reflect reporting-stage completion once the revision pass is done."
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "reporting"
+  },
+  "payload_sha256": "b3d8f094113c899e2e8e730270a413cb5fcc1cbd40f9efc542c7e91e1511c7ac",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 27,
+  "version": 2
+}

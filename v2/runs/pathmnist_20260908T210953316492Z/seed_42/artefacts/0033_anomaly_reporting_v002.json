@@ -1,0 +1,21 @@
+{
+  "artefact": "anomaly_reporting",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T21:20:24.473443+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "All computational results verify correctly: confusion matrix row sums match per-class supports (total 7180), diagonal 6392/7180 = 0.890251 matches reported accuracy, per-class and macro metrics are arithmetically consistent, abstention arithmetic (coverage + abstain = 1.0, selective_risk = 1 − accuracy_on_covered, human_review_count = 7180 × 0.594568 = 4269) checks out, OOD headline AUROCs equal the mean of per-scenario values, training history shows a valid cosine LR schedule over 15 epochs, and the comparison delta (0.068942) is correct. One cross-artefact documentation inconsistency persists: the preprocessing review comment asserts augmented_train_size = 359984 (89996×4), while the split_manifest records 269988 (89996×3). With augmentations [hflip, vflip], the ×3 multiplier (original +",
+    "deterministic_issues": [],
+    "llm_issues": [],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "reporting"
+  },
+  "payload_sha256": "0be1a230096d3528814f5c6796beab9fd63958be8eb72c42adcb599ca317679a",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 33,
+  "version": 2
+}

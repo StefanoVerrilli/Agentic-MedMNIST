@@ -1,0 +1,23 @@
+{
+  "artefact": "anomaly_training",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-08T21:17:42.608684+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "Training stage is internally consistent: 15/15 epochs completed, best checkpoint at epoch 15 (val_acc 0.994902), cosine LR schedule decays correctly to 0, config hashes match between best_configuration and the selected trial, selection rule (accuracy-then-macro-F1, 0.005 tolerance) correctly picks res_cnn_wider_d3 over resnet18_deep_d4 (gap 0.0104 > 0.005), test_metrics_used=false confirmed. One cross-artefact inconsistency persists: the preprocessing review comment states augmented_train_size 359984 (89996×4) while split_manifest records 269988 (89996×3). With augmentations [hflip, vflip], 3 copies (original + 2) = 269988 is the arithmetically consistent value, making the ×4 claim in the preprocessing comment erroneous. This is a documentation discrepancy, not a training-correctness fault",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Cross-artefact inconsistency: preprocessing review comment asserts augmented_train_size 359984 (89996×4) while split_manifest records 269988 (89996×3); with augmentations [hflip, vflip] the ×3 multiplier (original + 2 augmented copies) is the consistent value, so the preprocessing comment's ×4 is incorrect"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "training"
+  },
+  "payload_sha256": "e39d7bceaf89d6614c97d661d80023d60efe67676b6d1605f2ed1bd1e4becc47",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 21,
+  "version": 1
+}

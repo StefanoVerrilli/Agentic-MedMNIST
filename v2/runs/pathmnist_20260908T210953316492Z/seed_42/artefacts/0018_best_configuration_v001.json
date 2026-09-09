@@ -1,0 +1,50 @@
+{
+  "artefact": "best_configuration",
+  "artefact_type": "BestConfiguration",
+  "created_at": "2026-09-08T21:13:42.986399+00:00",
+  "payload": {
+    "lightning_config_path": "best_config.yaml",
+    "lightning_config_sha256": "a88b0dc16a76bc1fbf34eff6900a59eeffda7318a2fecb7861bfa3d85ba63e97",
+    "representation": {
+      "augmentations": [
+        "hflip",
+        "vflip"
+      ],
+      "normalization": "standardize",
+      "rationale": "Widens the proven residual_cnn from hidden=32 to 48 at the same depth=3, with a small dropout bump to 0.25 to regularize the extra parameters. All other hyperparameters (adamw, cosine, lr=3e-4, wd=1e-4, class_weighting, label_smoothing=0.05, hflip+vflip, standardize) are held at the round-1 optimum to isolate the capacity effect."
+    },
+    "schema_version": "1.0",
+    "selected_candidate_id": "res_cnn_wider_d3",
+    "selected_config_hash": "584c2d8c09f24f2965f222246dfc628ef542e32ee50f66b4f662ceaa2e0e3716",
+    "selection_rule": "accuracy within tolerance, then macro-F1; test locked",
+    "test_metrics_used": false,
+    "train_config": {
+      "batch_size": 128,
+      "class_weighting": true,
+      "depth": 3,
+      "device": "cuda",
+      "dropout": 0.25,
+      "early_stopping_patience": 3,
+      "epochs": 15,
+      "gradient_clip_val": 1.0,
+      "hidden": 48,
+      "label_smoothing": 0.05,
+      "lr": 0.0003,
+      "model_family": "residual_cnn",
+      "optimizer": "adamw",
+      "rationale": "Selected from 4 validation-only trials. Widens the proven residual_cnn from hidden=32 to 48 at the same depth=3, with a small dropout bump to 0.25 to regularize the extra parameters. All other hyperparameters (adamw, cosine, lr=3e-4, wd=1e-4, class_weighting, label_smoothing=0.05, hflip+vflip, standardize) are held at the round-1 optimum to isolate the capacity effect.",
+      "scheduler": "cosine",
+      "schema_version": "1.0",
+      "seed": 42,
+      "source": "agentic_search:selected:qwen3.8",
+      "weight_decay": 0.0001
+    },
+    "validation_accuracy": 0.970812,
+    "validation_macro_f1": 0.970627
+  },
+  "payload_sha256": "461a673447e4e55351ff27fb7ca548649d037c95fd31a8f1a961ba79dddefa5c",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 18,
+  "version": 1
+}

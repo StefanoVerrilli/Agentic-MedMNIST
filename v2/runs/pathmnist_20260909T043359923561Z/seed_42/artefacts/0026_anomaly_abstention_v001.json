@@ -1,0 +1,25 @@
+{
+  "artefact": "anomaly_abstention",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-09T04:46:14.242820+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "The abstention stage is internally consistent and all arithmetic checks pass. Verification: (1) test_coverage (0.560724) = 1 − abstain_rate (0.439276) ✓; (2) selective_risk (0.026826) = 1 − accuracy_on_covered (0.973174) ✓; (3) base_test_accuracy (0.887883) matches the evaluation report ✓; (4) human_review_count (3154) = 7180 × 0.439276 ≈ 3154 ✓; (5) ood_auroc (0.979091) = mean of predictive_entropy test AUROCs across 3 sigma levels: (0.97835+0.983618+0.975304)/3 = 0.979091 ✓; (6) ood_validation_auroc (0.999483) = mean of predictive_entropy validation AUROCs: (0.999435+0.999646+0.999368)/3 = 0.999483 ✓; (7) validation_coverage (0.80008) is within tolerance of target (0.8) ✓; (8) OOD scope is honestly labeled 'controlled_corruption_proxy' with evidence path and SHA provided ✓. The method (predictive_entropy) is standard and appropriate. The threshold was correctly calibrated on validation only. No deterministic errors. However, a notable concern: the coverage generalization gap is substantial — validation coverage 80.0% vs. test coverage 56.1% (≈24 pp drop). This is a direct consequence of the broader model generalization gap already flagged in the evaluation stage (val_acc 0.9972 → test_acc 0.8879) and is not a computation error in the abstention pipeline. The abstention mechanism itself is functioning correctly: on the 56% of test samples it does cover, accuracy rises from 88.8% to 97.3% (+8.5 pp), demonstrating effective selective prediction. The OOD evaluation, while limited to Gaussian noise corruption (a narrow proxy), shows strong AUROCs (≥0.95 test, ≥0.997 validation) and is appropriately scoped. No action required beyond documenting the coverage gap as an inherited property of the model's generalization behavior.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Coverage generalization gap: validation coverage 80.0% vs. test coverage 56.1% (~24 pp drop), inherited from the model's broader val→test generalization gap; not a computation error but a significant operational concern for deployment reliability",
+      "OOD evaluation limited to unit-scale Gaussian noise at 3 severity levels; while appropriately scoped as 'controlled_corruption_proxy', it does not cover semantic OOD shifts (e.g., different tissue types, imaging artifacts, domain shift) that may be more relevant in practice",
+      "The 43.9% abstention rate on test (vs. 20% on validation) means nearly half of test predictions are deferred to human review, which may be operationally costly and inconsistent with the 80% coverage target set during calibration"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "abstention"
+  },
+  "payload_sha256": "17722824624854685577ef4a6d08bb899600db18ccc2e0e3197f00a1032c35c6",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 26,
+  "version": 1
+}
