@@ -1,0 +1,34 @@
+seed_everything: 42
+trainer:
+  accelerator: auto
+  devices: 1
+  max_epochs: 15
+  deterministic: true
+  gradient_clip_val: 1.0
+  logger: false
+  num_sanity_val_steps: 0
+model:
+  model_family: residual_cnn
+  in_channels: 3
+  n_classes: 9
+  hidden: 32
+  depth: 3
+  dropout: 0.1
+  optimizer: adamw
+  scheduler: cosine
+  lr: 0.001
+  weight_decay: 0.0001
+  label_smoothing: 0.05
+  class_weights: null
+data:
+  data_root: null
+  batch_size: 128
+  seed: 42
+  normalization: standardize
+  augmentations:
+    - hflip
+  train_limit: null
+  val_limit: null
+  test_limit: null
+  download: true
+  num_workers: 0

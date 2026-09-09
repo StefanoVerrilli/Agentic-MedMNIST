@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 540" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L7,3 L0,6 Z" fill="#475569"/>
+    </marker>
+    <marker id="ad" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L7,3 L0,6 Z" fill="#ea580c"/>
+    </marker>
+  </defs>
+
+  <text x="30" y="34" font-size="22" font-weight="700" fill="#0f172a">Hybrid Agentic MedMNIST — architecture</text>
+  <text x="30" y="56" font-size="13" fill="#475569">Maximum cohesion, minimum coupling · agents share only versioned artefacts</text>
+
+  <!-- Orchestrator -->
+  <rect x="30" y="80" width="1100" height="34" rx="6" fill="#0f172a"/>
+  <text x="580" y="102" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">Orchestrator — sequencing &amp; veto handling (no ML / no domain logic)</text>
+
+  <!-- Agent pipeline (8 boxes) -->
+  <!-- x: 30,170,310,450,590,730,870,1010 ; w120 h72 y150 -->
+  <g font-size="12.5" text-anchor="middle">
+    <!-- deterministic -->
+    <rect x="30"  y="150" width="120" height="72" rx="7" fill="#eef2f7" stroke="#64748b"/>
+    <text x="90"  y="182" fill="#0f172a" font-weight="600">1 · Ingestion</text>
+    <text x="90"  y="200" fill="#64748b" font-size="10.5">WP2</text>
+
+    <rect x="170" y="150" width="120" height="72" rx="7" fill="#e0ecff" stroke="#2563eb"/>
+    <text x="230" y="176" fill="#0f172a" font-weight="600">2 · Profiling /</text>
+    <text x="230" y="192" fill="#0f172a" font-weight="600">Ambiguity</text>
+    <text x="230" y="210" fill="#2563eb" font-size="10.5">hybrid · WP2</text>
+
+    <rect x="310" y="150" width="120" height="72" rx="7" fill="#e0ecff" stroke="#2563eb"/>
+    <text x="370" y="176" fill="#0f172a" font-weight="600">3 · Preproc /</text>
+    <text x="370" y="192" fill="#0f172a" font-weight="600">Representation</text>
+    <text x="370" y="210" fill="#2563eb" font-size="10.5">hybrid · WP2</text>
+
+    <rect x="450" y="150" width="120" height="72" rx="7" fill="#e0ecff" stroke="#2563eb"/>
+    <text x="510" y="176" fill="#0f172a" font-weight="600">4 · Model Search</text>
+    <text x="510" y="192" fill="#0f172a" font-weight="600">validation-only</text>
+    <text x="510" y="210" fill="#2563eb" font-size="10.5">hybrid · WP3</text>
+
+    <rect x="590" y="150" width="120" height="72" rx="7" fill="#eef2f7" stroke="#64748b"/>
+    <text x="650" y="182" fill="#0f172a" font-weight="600">5 · Lightning Train</text>
+    <text x="650" y="200" fill="#64748b" font-size="10.5">WP3</text>
+
+    <rect x="730" y="150" width="120" height="72" rx="7" fill="#eef2f7" stroke="#64748b"/>
+    <text x="790" y="182" fill="#0f172a" font-weight="600">6 · Evaluation</text>
+    <text x="790" y="200" fill="#64748b" font-size="10.5">WP4</text>
+
+    <rect x="870" y="150" width="120" height="72" rx="7" fill="#eef2f7" stroke="#64748b"/>
+    <text x="930" y="176" fill="#0f172a" font-weight="600">7 · Abstention</text>
+    <text x="930" y="192" fill="#0f172a" font-weight="600">/ OOD</text>
+    <text x="930" y="210" fill="#64748b" font-size="10.5">WP5</text>
+
+    <rect x="1010" y="150" width="120" height="72" rx="7" fill="#eef2f7" stroke="#64748b"/>
+    <text x="1070" y="182" fill="#0f172a" font-weight="600">8 · Reporting</text>
+    <text x="1070" y="200" fill="#64748b" font-size="10.5">WP5</text>
+  </g>
+
+  <!-- orchestrator -> agents (sequence) -->
+  <g stroke="#475569" stroke-width="1.3" marker-end="url(#a)">
+    <line x1="90"   y1="114" x2="90"   y2="148"/>
+    <line x1="230"  y1="114" x2="230"  y2="148"/>
+    <line x1="370"  y1="114" x2="370"  y2="148"/>
+    <line x1="510"  y1="114" x2="510"  y2="148"/>
+    <line x1="650"  y1="114" x2="650"  y2="148"/>
+    <line x1="790"  y1="114" x2="790"  y2="148"/>
+    <line x1="930"  y1="114" x2="930"  y2="148"/>
+    <line x1="1070" y1="114" x2="1070" y2="148"/>
+  </g>
+
+  <!-- agents <-> blackboard (read/write) -->
+  <g stroke="#475569" stroke-width="1.3" marker-end="url(#a)" marker-start="url(#a)">
+    <line x1="90"   y1="222" x2="90"   y2="298"/>
+    <line x1="230"  y1="222" x2="230"  y2="298"/>
+    <line x1="370"  y1="222" x2="370"  y2="298"/>
+    <line x1="510"  y1="222" x2="510"  y2="298"/>
+    <line x1="650"  y1="222" x2="650"  y2="298"/>
+    <line x1="790"  y1="222" x2="790"  y2="298"/>
+    <line x1="930"  y1="222" x2="930"  y2="298"/>
+    <line x1="1070" y1="222" x2="1070" y2="298"/>
+  </g>
+
+  <!-- Blackboard -->
+  <rect x="30" y="300" width="1100" height="44" rx="6" fill="#1f2937"/>
+  <text x="580" y="327" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">Blackboard — versioned, typed artefacts (the interfaces) + decision / audit log</text>
+
+  <!-- Reviewer (cross-cutting) -->
+  <rect x="30" y="392" width="1100" height="44" rx="6" fill="#fff7ed" stroke="#ea580c" stroke-dasharray="6 4"/>
+  <text x="580" y="419" font-size="14" font-weight="600" fill="#9a3412" text-anchor="middle">Reviewer / Consistency / Anomaly agent (WP6) — audits every stage · can veto promotion</text>
+
+  <!-- reviewer <-> blackboard -->
+  <line x1="580" y1="392" x2="580" y2="346" stroke="#ea580c" stroke-width="1.4" stroke-dasharray="6 4" marker-end="url(#ad)" marker-start="url(#ad)"/>
+  <!-- reviewer veto -> orchestrator (left elbow) -->
+  <path d="M30,414 L12,414 L12,97 L28,97" fill="none" stroke="#ea580c" stroke-width="1.4" stroke-dasharray="6 4" marker-end="url(#ad)"/>
+  <text x="18" y="250" font-size="11" fill="#9a3412" text-anchor="middle" transform="rotate(-90 18 250)">veto / stop</text>
+
+  <!-- Legend -->
+  <g font-size="12" fill="#334155">
+    <rect x="30" y="470" width="18" height="14" rx="3" fill="#eef2f7" stroke="#64748b"/>
+    <text x="56" y="482">deterministic (reproducible)</text>
+    <rect x="250" y="470" width="18" height="14" rx="3" fill="#e0ecff" stroke="#2563eb"/>
+    <text x="276" y="482">hybrid — open-model reasoning, heuristic fallback</text>
+    <rect x="640" y="470" width="18" height="14" rx="3" fill="#fff7ed" stroke="#ea580c" stroke-dasharray="4 3"/>
+    <text x="666" y="482">cross-cutting governance</text>
+  </g>
+</svg>
