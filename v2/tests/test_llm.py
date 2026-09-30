@@ -62,6 +62,27 @@ class OllamaReasonerTests(unittest.TestCase):
         self.assertEqual(result.value.lr, 0.001)
         self.assertEqual(result.attempts, 2)
 
+    def test_retry_receives_validation_feedback(self) -> None:
+        calls = 0
+
+        def transport(url, payload, timeout):
+            nonlocal calls
+            calls += 1
+            if calls == 1:
+                return {"message": {"content": json.dumps({**SAFE_CONFIG, "hidden": 18})}}
+            self.assertIn("validation errors", payload["messages"][-1]["content"])
+            return {"message": {"content": json.dumps(SAFE_CONFIG)}}
+
+        reasoner = OllamaReasoner(
+            "http://localhost:11434", transport=transport, retries=1, required=True
+        )
+        result = reasoner.decide(
+            stage="repair", system="test", user="test",
+            response_model=ExperimentDecision, fallback=SAFE_CONFIG,
+        )
+        self.assertEqual(result.attempts, 2)
+        self.assertFalse(result.used_fallback)
+
     def test_required_mode_raises_after_invalid_response(self) -> None:
         def transport(url, payload, timeout):
             return {"message": {"content": "not-json"}}

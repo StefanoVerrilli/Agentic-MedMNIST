@@ -156,6 +156,7 @@ class OllamaReasoner:
         }
 
         errors: list[str] = []
+        error_details: list[str] = []
         for attempt in range(1, self.retries + 2):
             started = time.monotonic()
             try:
@@ -186,6 +187,25 @@ class OllamaReasoner:
                 )
             except (KeyError, TypeError, ValueError, ValidationError, OSError) as exc:
                 errors.append(type(exc).__name__)
+                if isinstance(exc, ValidationError):
+                    detail = "; ".join(
+                        f"{'.'.join(map(str, row['loc']))}: {row['msg']}"
+                        for row in exc.errors(include_url=False)[:8]
+                    )
+                else:
+                    detail = str(exc)[:1000]
+                error_details.append(detail)
+                if attempt <= self.retries:
+                    messages.append(
+                        {
+                            "role": "user",
+                            "content": (
+                                "Your previous JSON was rejected. Correct these "
+                                "validation errors and return a complete replacement: "
+                                + detail
+                            ),
+                        }
+                    )
 
         error_summary = ",".join(errors)
         _audit(
@@ -198,6 +218,7 @@ class OllamaReasoner:
             attempts=self.retries + 1,
             request_id=request_id,
             error_types=error_summary,
+            error_details=error_details,
             decision=(
                 None if self.required else validated_fallback.model_dump(mode="json")
             ),
@@ -205,7 +226,8 @@ class OllamaReasoner:
         if self.required:
             raise OllamaDecisionError(
                 f"Ollama returned no valid {response_model.__name__} after "
-                f"{self.retries + 1} attempts ({error_summary})"
+                f"{self.retries + 1} attempts ({error_summary}): "
+                f"{error_details[-1] if error_details else 'unknown validation error'}"
             )
         return ReasonedDecision(
             validated_fallback,

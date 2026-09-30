@@ -36,8 +36,6 @@ PositionalEncodingName = Literal["learned", "sinusoidal"]
 
 
 def _validate_model_options(model: Any) -> None:
-    if model.hidden % 8 != 0:
-        raise ValueError("hidden must be a multiple of 8")
     if model.model_family in {"vision_transformer", "compact_transformer"}:
         if model.hidden % model.num_heads != 0:
             raise ValueError("hidden must be divisible by num_heads")
@@ -45,10 +43,14 @@ def _validate_model_options(model: Any) -> None:
         raise ValueError("resnet18 hidden cannot exceed 64")
     if model.model_family == "residual_cnn" and model.hidden > 96:
         raise ValueError("residual_cnn hidden cannot exceed 96")
-    if model.model_family == "compact_transformer" and model.patch_size != 4:
-        raise ValueError("patch_size is not used by compact_transformer")
-    if model.model_family == "vision_transformer" and model.tokenizer_layers != 2:
-        raise ValueError("tokenizer_layers is not used by vision_transformer")
+
+
+def _canonicalize_model_options(value: Any) -> Any:
+    """Reset architecture-irrelevant knobs instead of rejecting a proposal."""
+    if not isinstance(value, dict):
+        return value
+    data = dict(value)
+    family = data.get("model_family", "tiny_cnn")
     defaults = {
         "patch_size": 4,
         "num_heads": 4,
@@ -57,13 +59,13 @@ def _validate_model_options(model: Any) -> None:
         "positional_encoding": "learned",
         "tokenizer_layers": 2,
     }
-    if model.model_family not in {"vision_transformer", "compact_transformer"}:
-        changed = [name for name, value in defaults.items() if getattr(model, name) != value]
-        if changed:
-            raise ValueError(
-                "transformer-only options used by non-transformer model: "
-                + ", ".join(changed)
-            )
+    if family not in {"vision_transformer", "compact_transformer"}:
+        data.update(defaults)
+    elif family == "compact_transformer":
+        data["patch_size"] = 4
+    else:
+        data["tokenizer_layers"] = 2
+    return data
 
 
 def utc_now() -> str:
@@ -102,7 +104,7 @@ class ExperimentDecision(StrictModel):
     model_family: ModelFamily = "tiny_cnn"
     lr: float = Field(ge=1e-5, le=3e-2)
     epochs: int = Field(ge=1, le=50)
-    hidden: int = Field(ge=16, le=192)
+    hidden: int = Field(ge=16, le=192, multiple_of=8)
     depth: int = Field(default=2, ge=1, le=8)
     dropout: float = Field(default=0.0, ge=0.0, le=0.6)
     batch_size: Literal[16, 32, 64, 128, 256]
@@ -121,6 +123,11 @@ class ExperimentDecision(StrictModel):
     gradient_clip_val: float = Field(default=1.0, ge=0.0, le=5.0)
     rationale: str = Field(min_length=3, max_length=6000)
 
+    @model_validator(mode="before")
+    @classmethod
+    def canonicalize_model_options(cls, value: Any) -> Any:
+        return _canonicalize_model_options(value)
+
     @model_validator(mode="after")
     def valid_model_options(self) -> ExperimentDecision:
         _validate_model_options(self)
@@ -132,7 +139,7 @@ class CandidateProposal(StrictModel):
 
     candidate_id: str = Field(pattern=r"^[a-z][a-z0-9_]{2,31}$")
     model_family: ModelFamily
-    hidden: int = Field(ge=16, le=192)
+    hidden: int = Field(ge=16, le=192, multiple_of=8)
     depth: int = Field(ge=1, le=8)
     dropout: float = Field(ge=0.0, le=0.6)
     normalization: Literal["unit", "standardize"]
@@ -153,6 +160,11 @@ class CandidateProposal(StrictModel):
     early_stopping_patience: int = Field(default=2, ge=0, le=10)
     gradient_clip_val: float = Field(default=1.0, ge=0.0, le=5.0)
     rationale: str = Field(min_length=3, max_length=6000)
+
+    @model_validator(mode="before")
+    @classmethod
+    def canonicalize_model_options(cls, value: Any) -> Any:
+        return _canonicalize_model_options(value)
 
     @model_validator(mode="after")
     def unique_augmentations(self) -> CandidateProposal:
@@ -307,7 +319,7 @@ class TrainConfig(Artefact):
     model_family: ModelFamily = "tiny_cnn"
     lr: float = Field(ge=1e-5, le=3e-2)
     epochs: int = Field(ge=1, le=50)
-    hidden: int = Field(ge=16, le=192)
+    hidden: int = Field(ge=16, le=192, multiple_of=8)
     depth: int = Field(default=2, ge=1, le=8)
     dropout: float = Field(default=0.0, ge=0.0, le=0.6)
     batch_size: Literal[16, 32, 64, 128, 256]
@@ -328,6 +340,11 @@ class TrainConfig(Artefact):
     device: Literal["cpu", "cuda"]
     rationale: str
     source: str
+
+    @model_validator(mode="before")
+    @classmethod
+    def canonicalize_model_options(cls, value: Any) -> Any:
+        return _canonicalize_model_options(value)
 
     @model_validator(mode="after")
     def valid_model_options(self) -> TrainConfig:

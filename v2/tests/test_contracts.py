@@ -40,6 +40,13 @@ class ContractTests(unittest.TestCase):
         with self.assertRaises(ValidationError):
             CandidateProposal.model_validate(base)
 
+        cnn = CandidateProposal.model_validate(
+            {**base, "candidate_id": "canonical_cnn", "model_family": "tiny_cnn",
+             "hidden": 32, "num_heads": 3, "patch_size": 2}
+        )
+        self.assertEqual(cnn.patch_size, 4)
+        self.assertEqual(cnn.num_heads, 4)
+
     def test_invalid_llm_training_values_are_rejected(self) -> None:
         with self.assertRaises(ValidationError):
             ExperimentDecision(
