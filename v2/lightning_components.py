@@ -55,6 +55,48 @@ class ResidualBlock(nn.Module):
         return self.activation(self.body(inputs) + self.skip(inputs))
 
 
+class VisionTransformer(nn.Module):
+    """Small ViT/CCT for 28x28 inputs, trained without external weights."""
+
+    def __init__(self, *, in_channels: int, n_classes: int, hidden: int,
+                 depth: int, dropout: float, convolutional_tokenizer: bool):
+        super().__init__()
+        if convolutional_tokenizer:
+            mid = max(16, hidden // 2)
+            self.tokenizer = nn.Sequential(
+                nn.Conv2d(in_channels, mid, 3, stride=2, padding=1, bias=False),
+                nn.BatchNorm2d(mid), nn.GELU(),
+                nn.Conv2d(mid, hidden, 3, stride=2, padding=1, bias=False),
+                nn.BatchNorm2d(hidden), nn.GELU(),
+            )
+        else:
+            # 28 / 4 = 7: a compact 7x7 patch grid (49 visual tokens).
+            self.tokenizer = nn.Conv2d(in_channels, hidden, 4, stride=4)
+        self.class_token = nn.Parameter(torch.zeros(1, 1, hidden))
+        self.position = nn.Parameter(torch.zeros(1, 50, hidden))
+        layer = nn.TransformerEncoderLayer(
+            d_model=hidden,
+            nhead=4,
+            dim_feedforward=hidden * 4,
+            dropout=dropout,
+            activation="gelu",
+            batch_first=True,
+            norm_first=True,
+        )
+        self.encoder = nn.TransformerEncoder(layer, num_layers=depth)
+        self.norm = nn.LayerNorm(hidden)
+        self.head = nn.Sequential(nn.Dropout(dropout), nn.Linear(hidden, n_classes))
+        nn.init.trunc_normal_(self.class_token, std=0.02)
+        nn.init.trunc_normal_(self.position, std=0.02)
+
+    def forward(self, inputs: torch.Tensor) -> torch.Tensor:
+        tokens = self.tokenizer(inputs).flatten(2).transpose(1, 2)
+        cls = self.class_token.expand(inputs.shape[0], -1, -1)
+        tokens = torch.cat((cls, tokens), dim=1)
+        tokens = tokens + self.position[:, : tokens.shape[1]]
+        return self.head(self.norm(self.encoder(tokens)[:, 0]))
+
+
 def build_network(
     model_family: str,
     *,
@@ -118,6 +160,15 @@ def build_network(
             n_classes=n_classes,
             base_width=hidden,
             dropout=dropout,
+        )
+    if model_family in {"vision_transformer", "compact_transformer"}:
+        return VisionTransformer(
+            in_channels=in_channels,
+            n_classes=n_classes,
+            hidden=hidden,
+            depth=depth,
+            dropout=dropout,
+            convolutional_tokenizer=model_family == "compact_transformer",
         )
     raise ValueError(f"unknown model family: {model_family}")
 

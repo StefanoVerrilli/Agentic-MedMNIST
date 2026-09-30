@@ -36,12 +36,23 @@ class SearchTests(unittest.TestCase):
             for candidate in default_candidates(round_index)
         ]
         hashes = [candidate_hash(candidate) for candidate in candidates]
-        self.assertEqual(len(candidates), 16)
+        self.assertEqual(len(candidates), 18)
         self.assertEqual(len(set(hashes)), len(hashes))
 
         resnet = next(item for item in candidates if item.model_family == "resnet18")
         other_depth = resnet.model_copy(update={"depth": 4 if resnet.depth != 4 else 2})
         self.assertEqual(candidate_hash(resnet), candidate_hash(other_depth))
+
+    def test_transformer_families_accept_pathmnist_tensors(self) -> None:
+        import torch
+        from lightning_components import build_network
+
+        inputs = torch.randn(2, 3, 28, 28)
+        for family in ("vision_transformer", "compact_transformer"):
+            model = build_network(
+                family, in_channels=3, n_classes=9, hidden=32, depth=2, dropout=0.1
+            )
+            self.assertEqual(tuple(model(inputs).shape), (2, 9))
 
     def test_rank_uses_macro_f1_only_inside_accuracy_tolerance(self) -> None:
         candidate = default_candidates(1)[0]

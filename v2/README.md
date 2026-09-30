@@ -20,6 +20,7 @@ flowchart TD
     O --> I[Ingestion]
     O --> P[Profiling / ambiguity]
     O --> R[Representation]
+    O --> X[Cross-cutting architecture research]
     O --> E[Validation-only model search]
     O --> T[Training]
     O --> V[Evaluation]
@@ -27,7 +28,7 @@ flowchart TD
     O --> Q[Reporting]
     B[(Blackboard: typed immutable artefacts + JSONL log)]
     W[Reviewer: audit after every stage, retry or veto]
-    I & P & R & E & T & V & A & Q <--> B
+    I & P & R & X & E & T & V & A & Q <--> B
     W -.-> O
 ```
 
@@ -39,7 +40,7 @@ with a SHA-256 checksum; every stage, decision, retry and gate is appended to
 ## Ollama and the one-call-at-a-time rule
 
 Only declared judgement points use model reasoning: ambiguity, representation,
-bounded search proposals and review comments. Training, metrics, ranking and
+cross-cutting architecture research, bounded search proposals and review comments. Training, metrics, ranking and
 promotion rules remain deterministic. The
 shared `OllamaReasoner` calls Ollama's native `/api/chat` endpoint with a JSON
 Schema, temperature 0 and a global lock. Consequently, agents and retries are
@@ -47,8 +48,11 @@ always executed sequentially and at most one Ollama request is active in the
 process. Invalid output is rejected by the schema and replaced with a validated
 heuristic; use `--require-llm` to make such a failure fatal.
 
-The search agent can choose among `tiny_cnn`, `residual_cnn` and a CIFAR-style
-`resnet18`, and can vary width, depth, dropout, optimizer, scheduler, learning
+The research agent studies representation, parametrization and training
+architecture together and supplies an auditable brief to every search round.
+The search can choose among `tiny_cnn`, `residual_cnn`, a CIFAR-style
+`resnet18`, `vision_transformer` (4x4 patches) and `compact_transformer`
+(convolutional tokenizer), and can vary width, depth, dropout, optimizer, scheduler, learning
 rate, weight decay, class weighting, label smoothing, batch size and guarded
 representations. It cannot emit Python code or select values outside the typed
 contracts.

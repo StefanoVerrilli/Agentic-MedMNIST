@@ -96,6 +96,23 @@ def default_candidates(round_index: int) -> list[CandidateProposal]:
     pools: dict[int, list[dict[str, Any]]] = {
         1: [
             {
+                "candidate_id": "compact_transformer",
+                "model_family": "compact_transformer",
+                "hidden": 48,
+                "depth": 2,
+                "dropout": 0.10,
+                "normalization": "standardize",
+                "augmentations": ["hflip"],
+                "optimizer": "adamw",
+                "scheduler": "cosine",
+                "lr": 0.0005,
+                "weight_decay": 0.0001,
+                "class_weighting": False,
+                "label_smoothing": 0.05,
+                "batch_size": 128,
+                "rationale": "Convolutional tokenization adds a useful local-image prior before attention.",
+            },
+            {
                 "candidate_id": "residual_balanced",
                 "model_family": "residual_cnn",
                 "hidden": 32,
@@ -165,6 +182,23 @@ def default_candidates(round_index: int) -> list[CandidateProposal]:
             },
         ],
         2: [
+            {
+                "candidate_id": "vit_patch4",
+                "model_family": "vision_transformer",
+                "hidden": 64,
+                "depth": 3,
+                "dropout": 0.10,
+                "normalization": "standardize",
+                "augmentations": ["hflip", "vflip"],
+                "optimizer": "adamw",
+                "scheduler": "cosine",
+                "lr": 0.0003,
+                "weight_decay": 0.0001,
+                "class_weighting": False,
+                "label_smoothing": 0.05,
+                "batch_size": 128,
+                "rationale": "A compact patch-4 ViT tests global interactions over 49 tissue tokens.",
+            },
             {
                 "candidate_id": "residual_low_lr",
                 "model_family": "residual_cnn",

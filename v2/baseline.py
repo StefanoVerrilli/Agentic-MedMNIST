@@ -26,9 +26,9 @@ def _relative_to_root(path: str | Path, root: str | Path) -> str:
     candidate = Path(path)
     root_path = Path(root)
     try:
-        return str(candidate.resolve().relative_to(root_path.resolve()))
+        return candidate.resolve().relative_to(root_path.resolve()).as_posix()
     except ValueError:
-        return str(candidate)
+        return candidate.as_posix()
 
 
 def run_baseline(

@@ -20,7 +20,13 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 Severity = Literal["ok", "warning", "critical"]
 Action = Literal["continue", "revise", "stop"]
 Augmentation = Literal["hflip", "vflip", "rotate90"]
-ModelFamily = Literal["tiny_cnn", "residual_cnn", "resnet18"]
+ModelFamily = Literal[
+    "tiny_cnn",
+    "residual_cnn",
+    "resnet18",
+    "vision_transformer",
+    "compact_transformer",
+]
 OptimizerName = Literal["adam", "adamw", "sgd"]
 SchedulerName = Literal["none", "cosine", "reduce_on_plateau"]
 
@@ -105,6 +111,17 @@ class SearchDecision(StrictModel):
     analysis: str = Field(min_length=3, max_length=12000)
     candidates: list[CandidateProposal] = Field(min_length=1, max_length=4)
     stop: bool = False
+
+
+class ArchitectureResearchDecision(StrictModel):
+    """Cross-cutting guidance spanning representation, tuning and architecture."""
+
+    analysis: str = Field(min_length=3, max_length=12000)
+    representation_priorities: list[str] = Field(min_length=1, max_length=8)
+    parametrization_priorities: list[str] = Field(min_length=1, max_length=8)
+    architecture_priorities: list[ModelFamily] = Field(min_length=1, max_length=5)
+    transformer_guidance: str = Field(min_length=3, max_length=6000)
+    risks: list[str] = Field(default_factory=list, max_length=8)
 
 
 class ReviewDecision(StrictModel):
@@ -304,6 +321,20 @@ class SearchPlan(Artefact):
         if self.search_epochs > self.final_epochs:
             raise ValueError("search_epochs cannot exceed final_epochs")
         return self
+
+
+class ArchitectureResearch(Artefact):
+    """Auditable research brief consumed by design/search stages."""
+
+    analysis: str
+    representation_priorities: list[str] = Field(min_length=1, max_length=8)
+    parametrization_priorities: list[str] = Field(min_length=1, max_length=8)
+    architecture_priorities: list[ModelFamily] = Field(min_length=1, max_length=5)
+    transformer_guidance: str
+    risks: list[str] = Field(default_factory=list, max_length=8)
+    evidence_sources: list[str] = Field(min_length=1, max_length=8)
+    test_metrics_used: Literal[False] = False
+    source: str
 
 
 class TrialResult(Artefact):
@@ -619,12 +650,16 @@ class Blackboard:
             "ingestion": ["dataset_manifest", "run_manifest"],
             "profiling": ["data_profile", "dataset_manifest"],
             "preprocessing": ["representation_plan", "split_manifest", "data_profile"],
+            "architecture_research": ["architecture_research", "data_profile"],
             "experiment_design": [
                 "train_config",
                 "representation_plan",
                 "data_profile",
             ],
-            "model_search": ["search_report", "best_configuration", "search_plan"],
+            "model_search": [
+                "search_report", "best_configuration", "search_plan",
+                "architecture_research",
+            ],
             "configuration_replay": [
                 "best_configuration",
                 "train_config",

@@ -8,13 +8,14 @@ from pathlib import Path
 import numpy as np
 
 from agents import (
+    ArchitectureResearchAgent,
     IngestionAgent,
     PreprocessingAgent,
     ProfilingAmbiguityAgent,
     ReportingAgent,
     ReviewerConsistencyAgent,
 )
-from contracts import AnomalyReport, Blackboard, RunManifest
+from contracts import AnomalyReport, ArchitectureResearch, Blackboard, RunManifest
 from llm import OllamaReasoner
 from ml import evaluate_probabilities, stratified_indices
 from orchestrator import Orchestrator
@@ -23,6 +24,20 @@ from tests.helpers import make_bundle
 
 
 class PipelineTests(unittest.TestCase):
+    def test_cross_cutting_research_is_auditable_and_test_blind(self) -> None:
+        bundle = make_bundle()
+        with tempfile.TemporaryDirectory() as directory:
+            bb = Blackboard(directory)
+            reasoner = OllamaReasoner(base_url=None)
+            IngestionAgent(loader=lambda **kwargs: bundle).run(bb)
+            ProfilingAmbiguityAgent(reasoner).run(bb)
+            ArchitectureResearchAgent(reasoner).run(bb)
+            research = bb.get("architecture_research")
+            self.assertIsInstance(research, ArchitectureResearch)
+            self.assertFalse(research.test_metrics_used)
+            self.assertIn("compact_transformer", research.architecture_priorities)
+            self.assertGreaterEqual(len(research.evidence_sources), 3)
+
     def test_official_validation_split_is_preserved(self) -> None:
         bundle = make_bundle()
 

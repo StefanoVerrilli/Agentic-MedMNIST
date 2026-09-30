@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any
 
 from agents import (
+    ArchitectureResearchAgent,
     AbstentionOODAgent,
     EvaluationAgent,
     ExperimentDesignAgent,
@@ -270,6 +271,7 @@ def run_once(
         ),
         ProfilingAmbiguityAgent(reasoner),
         PreprocessingAgent(reasoner),
+        ArchitectureResearchAgent(reasoner),
     ]
     if args.no_search:
         pipeline.append(

@@ -13,6 +13,8 @@ from contracts import (
     AbstentionReport,
     AmbiguityDecision,
     AnomalyReport,
+    ArchitectureResearch,
+    ArchitectureResearchDecision,
     BestConfiguration,
     Blackboard,
     CandidateProposal,
@@ -452,6 +454,7 @@ class ModelSearchAgent:
         bundle = _bundle(bb)
         profile = _profile(bb)
         manifest = _manifest(bb)
+        research = bb.artefacts.get("architecture_research")
         plan = SearchPlan(
             max_trials=self.max_trials,
             rounds=self.rounds,
@@ -526,6 +529,8 @@ class ModelSearchAgent:
                     f"train_imbalance={profile.imbalance_ratio}; "
                     f"channel_mean={profile.train_channel_mean_unit}; "
                     f"channel_std={profile.train_channel_std_unit}; "
+                    f"cross_cutting_research="
+                    f"{json.dumps(research.model_dump(mode='json'), sort_keys=True) if isinstance(research, ArchitectureResearch) else 'unavailable'}; "
                     f"prior_validation_results={json.dumps(prior, sort_keys=True)}"
                 ),
                 response_model=SearchDecision,
@@ -750,6 +755,81 @@ class ModelSearchAgent:
         bb.put("train_config", final_config, producer=self.name)
         bb.put("search_report", report, producer=self.name)
         bb.put("best_configuration", best, producer=self.name)
+
+
+class ArchitectureResearchAgent:
+    """Research representation, parametrization and architecture as one system."""
+
+    name = "architecture_research"
+    EVIDENCE_SOURCES: ClassVar[list[str]] = [
+        "https://openreview.net/forum?id=YicbFdNTTy",
+        "https://arxiv.org/abs/2104.05704",
+        "https://doi.org/10.1038/s41597-022-01721-8",
+    ]
+
+    def __init__(self, reasoner: Reasoner):
+        self.reasoner = reasoner
+
+    def run(self, bb: Blackboard) -> None:
+        profile = _profile(bb)
+        manifest = _manifest(bb)
+        fallback = ArchitectureResearchDecision(
+            analysis=(
+                "PathMNIST has small 28x28 RGB tissue patches and a separate-centre "
+                "test set. Compare convolutional inductive biases with compact global "
+                "attention under identical validation-only budgets."
+            ),
+            representation_priorities=[
+                "compare train-statistic standardization with unit scaling",
+                "use only label-preserving orientation augmentations",
+            ],
+            parametrization_priorities=[
+                "use AdamW, moderate decay and cosine scheduling for transformers",
+                "control capacity, regularization and batch size across families",
+            ],
+            architecture_priorities=[
+                "compact_transformer", "vision_transformer", "residual_cnn", "resnet18"
+            ],
+            transformer_guidance=(
+                "Use 4x4 patches (49 tokens) for ViT and a two-stage convolutional "
+                "tokenizer for CCT; keep embedding widths and encoder depth bounded."
+            ),
+            risks=[
+                "pure ViT can be data-inefficient without pretraining",
+                "validation gains may not transfer to the external-centre test split",
+            ],
+        )
+        decision = self.reasoner.decide(
+            stage=self.name,
+            system=(
+                "You are the cross-cutting research architect for representation, "
+                "hyperparameterization and training architecture. Produce bounded, "
+                "actionable guidance for the downstream search. Never use test metrics. "
+                "The available architectures are tiny_cnn, residual_cnn, resnet18, "
+                "vision_transformer and compact_transformer."
+            ),
+            user=(
+                f"image_shape={profile.image_shape_hwc}; train_samples="
+                f"{manifest.loaded_split_sizes['train']}; val_samples="
+                f"{manifest.loaded_split_sizes['val']}; imbalance="
+                f"{profile.imbalance_ratio}; channel_mean="
+                f"{profile.train_channel_mean_unit}; channel_std="
+                f"{profile.train_channel_std_unit}; evidence={self.EVIDENCE_SOURCES}"
+            ),
+            response_model=ArchitectureResearchDecision,
+            fallback=fallback,
+            audit=bb.record_event,
+        )
+        value = decision.value
+        bb.put(
+            "architecture_research",
+            ArchitectureResearch(
+                **value.model_dump(),
+                evidence_sources=self.EVIDENCE_SOURCES,
+                source=decision.source,
+            ),
+            producer=self.name,
+        )
 
 
 class FrozenConfigurationAgent:
