@@ -19,7 +19,9 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 Severity = Literal["ok", "warning", "critical"]
 Action = Literal["continue", "revise", "stop"]
-Augmentation = Literal["hflip", "vflip", "rotate90"]
+Augmentation = Literal[
+    "hflip", "vflip", "rotate90", "rotate180", "brightness", "contrast"
+]
 ModelFamily = Literal[
     "tiny_cnn",
     "residual_cnn",
@@ -28,7 +30,40 @@ ModelFamily = Literal[
     "compact_transformer",
 ]
 OptimizerName = Literal["adam", "adamw", "sgd"]
-SchedulerName = Literal["none", "cosine", "reduce_on_plateau"]
+SchedulerName = Literal["none", "cosine", "one_cycle", "reduce_on_plateau"]
+PoolingName = Literal["cls", "mean", "attention"]
+PositionalEncodingName = Literal["learned", "sinusoidal"]
+
+
+def _validate_model_options(model: Any) -> None:
+    if model.hidden % 8 != 0:
+        raise ValueError("hidden must be a multiple of 8")
+    if model.model_family in {"vision_transformer", "compact_transformer"}:
+        if model.hidden % model.num_heads != 0:
+            raise ValueError("hidden must be divisible by num_heads")
+    if model.model_family == "resnet18" and model.hidden > 64:
+        raise ValueError("resnet18 hidden cannot exceed 64")
+    if model.model_family == "residual_cnn" and model.hidden > 96:
+        raise ValueError("residual_cnn hidden cannot exceed 96")
+    if model.model_family == "compact_transformer" and model.patch_size != 4:
+        raise ValueError("patch_size is not used by compact_transformer")
+    if model.model_family == "vision_transformer" and model.tokenizer_layers != 2:
+        raise ValueError("tokenizer_layers is not used by vision_transformer")
+    defaults = {
+        "patch_size": 4,
+        "num_heads": 4,
+        "mlp_ratio": 4,
+        "pooling": "cls",
+        "positional_encoding": "learned",
+        "tokenizer_layers": 2,
+    }
+    if model.model_family not in {"vision_transformer", "compact_transformer"}:
+        changed = [name for name, value in defaults.items() if getattr(model, name) != value]
+        if changed:
+            raise ValueError(
+                "transformer-only options used by non-transformer model: "
+                + ", ".join(changed)
+            )
 
 
 def utc_now() -> str:
@@ -65,18 +100,31 @@ class RepresentationDecision(StrictModel):
 
 class ExperimentDecision(StrictModel):
     model_family: ModelFamily = "tiny_cnn"
-    lr: float = Field(ge=1e-5, le=1e-2)
+    lr: float = Field(ge=1e-5, le=3e-2)
     epochs: int = Field(ge=1, le=50)
-    hidden: Literal[16, 24, 32, 48, 64]
-    depth: Literal[2, 3, 4] = 2
-    dropout: float = Field(default=0.0, ge=0.0, le=0.5)
-    batch_size: Literal[32, 64, 128, 256]
+    hidden: int = Field(ge=16, le=192)
+    depth: int = Field(default=2, ge=1, le=8)
+    dropout: float = Field(default=0.0, ge=0.0, le=0.6)
+    batch_size: Literal[16, 32, 64, 128, 256]
     weight_decay: float = Field(ge=0.0, le=0.1)
     class_weighting: bool
     optimizer: OptimizerName = "adamw"
     scheduler: SchedulerName = "none"
     label_smoothing: float = Field(default=0.0, ge=0.0, le=0.2)
+    patch_size: Literal[2, 4, 7] = 4
+    num_heads: Literal[2, 3, 4, 6, 8] = 4
+    mlp_ratio: Literal[2, 3, 4] = 4
+    pooling: PoolingName = "cls"
+    positional_encoding: PositionalEncodingName = "learned"
+    tokenizer_layers: int = Field(default=2, ge=1, le=3)
+    early_stopping_patience: int = Field(default=3, ge=0, le=10)
+    gradient_clip_val: float = Field(default=1.0, ge=0.0, le=5.0)
     rationale: str = Field(min_length=3, max_length=6000)
+
+    @model_validator(mode="after")
+    def valid_model_options(self) -> ExperimentDecision:
+        _validate_model_options(self)
+        return self
 
 
 class CandidateProposal(StrictModel):
@@ -84,24 +132,33 @@ class CandidateProposal(StrictModel):
 
     candidate_id: str = Field(pattern=r"^[a-z][a-z0-9_]{2,31}$")
     model_family: ModelFamily
-    hidden: Literal[16, 24, 32, 48, 64]
-    depth: Literal[2, 3, 4]
-    dropout: float = Field(ge=0.0, le=0.5)
+    hidden: int = Field(ge=16, le=192)
+    depth: int = Field(ge=1, le=8)
+    dropout: float = Field(ge=0.0, le=0.6)
     normalization: Literal["unit", "standardize"]
     augmentations: list[Augmentation] = Field(default_factory=list, max_length=3)
     optimizer: OptimizerName
     scheduler: SchedulerName
-    lr: float = Field(ge=1e-5, le=1e-2)
+    lr: float = Field(ge=1e-5, le=3e-2)
     weight_decay: float = Field(ge=0.0, le=0.1)
     class_weighting: bool
     label_smoothing: float = Field(ge=0.0, le=0.2)
-    batch_size: Literal[32, 64, 128, 256]
+    batch_size: Literal[16, 32, 64, 128, 256]
+    patch_size: Literal[2, 4, 7] = 4
+    num_heads: Literal[2, 3, 4, 6, 8] = 4
+    mlp_ratio: Literal[2, 3, 4] = 4
+    pooling: PoolingName = "cls"
+    positional_encoding: PositionalEncodingName = "learned"
+    tokenizer_layers: int = Field(default=2, ge=1, le=3)
+    early_stopping_patience: int = Field(default=2, ge=0, le=10)
+    gradient_clip_val: float = Field(default=1.0, ge=0.0, le=5.0)
     rationale: str = Field(min_length=3, max_length=6000)
 
     @model_validator(mode="after")
     def unique_augmentations(self) -> CandidateProposal:
         if len(set(self.augmentations)) != len(self.augmentations):
             raise ValueError("augmentations must be unique")
+        _validate_model_options(self)
         return self
 
 
@@ -248,23 +305,34 @@ class SplitManifest(Artefact):
 
 class TrainConfig(Artefact):
     model_family: ModelFamily = "tiny_cnn"
-    lr: float = Field(ge=1e-5, le=1e-2)
+    lr: float = Field(ge=1e-5, le=3e-2)
     epochs: int = Field(ge=1, le=50)
-    hidden: Literal[16, 24, 32, 48, 64]
-    depth: Literal[2, 3, 4] = 2
-    dropout: float = Field(default=0.0, ge=0.0, le=0.5)
-    batch_size: Literal[32, 64, 128, 256]
+    hidden: int = Field(ge=16, le=192)
+    depth: int = Field(default=2, ge=1, le=8)
+    dropout: float = Field(default=0.0, ge=0.0, le=0.6)
+    batch_size: Literal[16, 32, 64, 128, 256]
     weight_decay: float = Field(ge=0.0, le=0.1)
     class_weighting: bool
     optimizer: OptimizerName = "adamw"
     scheduler: SchedulerName = "none"
     label_smoothing: float = Field(default=0.0, ge=0.0, le=0.2)
+    patch_size: Literal[2, 4, 7] = 4
+    num_heads: Literal[2, 3, 4, 6, 8] = 4
+    mlp_ratio: Literal[2, 3, 4] = 4
+    pooling: PoolingName = "cls"
+    positional_encoding: PositionalEncodingName = "learned"
+    tokenizer_layers: int = Field(default=2, ge=1, le=3)
     early_stopping_patience: int = Field(default=3, ge=0, le=10)
-    gradient_clip_val: float = Field(default=1.0, ge=0.0, le=10.0)
+    gradient_clip_val: float = Field(default=1.0, ge=0.0, le=5.0)
     seed: int = Field(ge=0)
     device: Literal["cpu", "cuda"]
     rationale: str
     source: str
+
+    @model_validator(mode="after")
+    def valid_model_options(self) -> TrainConfig:
+        _validate_model_options(self)
+        return self
 
 
 class EpochMetrics(StrictModel):
@@ -335,7 +403,6 @@ class ArchitectureResearch(Artefact):
     evidence_sources: list[str] = Field(min_length=1, max_length=8)
     test_metrics_used: Literal[False] = False
     source: str
-
 
 class TrialResult(Artefact):
     candidate_id: str

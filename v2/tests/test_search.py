@@ -54,6 +54,13 @@ class SearchTests(unittest.TestCase):
             )
             self.assertEqual(tuple(model(inputs).shape), (2, 9))
 
+        flexible = build_network(
+            "vision_transformer", in_channels=3, n_classes=9, hidden=64,
+            depth=1, dropout=0.1, patch_size=2, num_heads=8, mlp_ratio=3,
+            pooling="mean", positional_encoding="sinusoidal",
+        )
+        self.assertEqual(tuple(flexible(inputs).shape), (2, 9))
+
     def test_rank_uses_macro_f1_only_inside_accuracy_tolerance(self) -> None:
         candidate = default_candidates(1)[0]
         config = proposal_to_config(

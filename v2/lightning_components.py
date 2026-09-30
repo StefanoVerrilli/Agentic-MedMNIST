@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 from typing import Literal
 
@@ -16,6 +17,8 @@ from contracts import (
     EpochMetrics,
     ModelFamily,
     OptimizerName,
+    PoolingName,
+    PositionalEncodingName,
     RepresentationDecision,
     SchedulerName,
 )
@@ -59,25 +62,39 @@ class VisionTransformer(nn.Module):
     """Small ViT/CCT for 28x28 inputs, trained without external weights."""
 
     def __init__(self, *, in_channels: int, n_classes: int, hidden: int,
-                 depth: int, dropout: float, convolutional_tokenizer: bool):
+                 depth: int, dropout: float, convolutional_tokenizer: bool,
+                 patch_size: int, num_heads: int, mlp_ratio: int,
+                 pooling: PoolingName, positional_encoding: PositionalEncodingName,
+                 tokenizer_layers: int):
         super().__init__()
         if convolutional_tokenizer:
-            mid = max(16, hidden // 2)
-            self.tokenizer = nn.Sequential(
-                nn.Conv2d(in_channels, mid, 3, stride=2, padding=1, bias=False),
-                nn.BatchNorm2d(mid), nn.GELU(),
-                nn.Conv2d(mid, hidden, 3, stride=2, padding=1, bias=False),
-                nn.BatchNorm2d(hidden), nn.GELU(),
-            )
+            layers: list[nn.Module] = []
+            channels = in_channels
+            for index in range(tokenizer_layers):
+                out_channels = hidden if index == tokenizer_layers - 1 else max(16, hidden // 2)
+                layers.extend([
+                    nn.Conv2d(channels, out_channels, 3, stride=2, padding=1, bias=False),
+                    nn.BatchNorm2d(out_channels), nn.GELU(),
+                ])
+                channels = out_channels
+            self.tokenizer = nn.Sequential(*layers)
+            grid = math.ceil(28 / (2 ** tokenizer_layers))
         else:
-            # 28 / 4 = 7: a compact 7x7 patch grid (49 visual tokens).
-            self.tokenizer = nn.Conv2d(in_channels, hidden, 4, stride=4)
+            self.tokenizer = nn.Conv2d(in_channels, hidden, patch_size, stride=patch_size)
+            grid = 28 // patch_size
+        self.pooling = pooling
         self.class_token = nn.Parameter(torch.zeros(1, 1, hidden))
-        self.position = nn.Parameter(torch.zeros(1, 50, hidden))
+        token_count = grid * grid + 1
+        position = _sinusoidal_position(token_count, hidden)
+        if positional_encoding == "learned":
+            self.position = nn.Parameter(torch.zeros(1, token_count, hidden))
+            nn.init.trunc_normal_(self.position, std=0.02)
+        else:
+            self.register_buffer("position", position, persistent=True)
         layer = nn.TransformerEncoderLayer(
             d_model=hidden,
-            nhead=4,
-            dim_feedforward=hidden * 4,
+            nhead=num_heads,
+            dim_feedforward=hidden * mlp_ratio,
             dropout=dropout,
             activation="gelu",
             batch_first=True,
@@ -85,16 +102,36 @@ class VisionTransformer(nn.Module):
         )
         self.encoder = nn.TransformerEncoder(layer, num_layers=depth)
         self.norm = nn.LayerNorm(hidden)
+        self.attention_pool = nn.Linear(hidden, 1) if pooling == "attention" else None
         self.head = nn.Sequential(nn.Dropout(dropout), nn.Linear(hidden, n_classes))
         nn.init.trunc_normal_(self.class_token, std=0.02)
-        nn.init.trunc_normal_(self.position, std=0.02)
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         tokens = self.tokenizer(inputs).flatten(2).transpose(1, 2)
         cls = self.class_token.expand(inputs.shape[0], -1, -1)
         tokens = torch.cat((cls, tokens), dim=1)
         tokens = tokens + self.position[:, : tokens.shape[1]]
-        return self.head(self.norm(self.encoder(tokens)[:, 0]))
+        encoded = self.norm(self.encoder(tokens))
+        if self.pooling == "cls":
+            pooled = encoded[:, 0]
+        elif self.pooling == "mean":
+            pooled = encoded[:, 1:].mean(dim=1)
+        else:
+            weights = torch.softmax(self.attention_pool(encoded[:, 1:]), dim=1)
+            pooled = (weights * encoded[:, 1:]).sum(dim=1)
+        return self.head(pooled)
+
+
+def _sinusoidal_position(tokens: int, hidden: int) -> torch.Tensor:
+    positions = torch.arange(tokens, dtype=torch.float32).unsqueeze(1)
+    frequencies = torch.exp(
+        torch.arange(0, hidden, 2, dtype=torch.float32)
+        * (-math.log(10000.0) / hidden)
+    )
+    encoding = torch.zeros(1, tokens, hidden)
+    encoding[0, :, 0::2] = torch.sin(positions * frequencies)
+    encoding[0, :, 1::2] = torch.cos(positions * frequencies)
+    return encoding
 
 
 def build_network(
@@ -105,6 +142,12 @@ def build_network(
     hidden: int,
     depth: int,
     dropout: float,
+    patch_size: int = 4,
+    num_heads: int = 4,
+    mlp_ratio: int = 4,
+    pooling: PoolingName = "cls",
+    positional_encoding: PositionalEncodingName = "learned",
+    tokenizer_layers: int = 2,
 ) -> nn.Module:
     if model_family == "tiny_cnn":
         layers: list[nn.Module] = []
@@ -169,6 +212,12 @@ def build_network(
             depth=depth,
             dropout=dropout,
             convolutional_tokenizer=model_family == "compact_transformer",
+            patch_size=patch_size,
+            num_heads=num_heads,
+            mlp_ratio=mlp_ratio,
+            pooling=pooling,
+            positional_encoding=positional_encoding,
+            tokenizer_layers=tokenizer_layers,
         )
     raise ValueError(f"unknown model family: {model_family}")
 
@@ -224,6 +273,12 @@ class PathMNISTLitModule(pl.LightningModule):
         hidden: int = 32,
         depth: int = 3,
         dropout: float = 0.1,
+        patch_size: int = 4,
+        num_heads: int = 4,
+        mlp_ratio: int = 4,
+        pooling: PoolingName = "cls",
+        positional_encoding: PositionalEncodingName = "learned",
+        tokenizer_layers: int = 2,
         optimizer: OptimizerName = "adamw",
         scheduler: SchedulerName = "cosine",
         lr: float = 1e-3,
@@ -234,14 +289,16 @@ class PathMNISTLitModule(pl.LightningModule):
         super().__init__()
         if in_channels < 1 or n_classes < 2:
             raise ValueError("in_channels must be positive and n_classes at least 2")
-        if hidden not in {16, 24, 32, 48, 64}:
-            raise ValueError("hidden must be one of 16, 24, 32, 48 or 64")
-        if depth not in {2, 3, 4}:
-            raise ValueError("depth must be one of 2, 3 or 4")
-        if not 0.0 <= dropout <= 0.5:
-            raise ValueError("dropout must be between 0.0 and 0.5")
-        if not 1e-5 <= lr <= 1e-2:
-            raise ValueError("lr must be between 1e-5 and 1e-2")
+        if not 16 <= hidden <= 192 or hidden % 8:
+            raise ValueError("hidden must be a multiple of 8 between 16 and 192")
+        if not 1 <= depth <= 8:
+            raise ValueError("depth must be between 1 and 8")
+        if not 0.0 <= dropout <= 0.6:
+            raise ValueError("dropout must be between 0.0 and 0.6")
+        if not 1e-5 <= lr <= 3e-2:
+            raise ValueError("lr must be between 1e-5 and 3e-2")
+        if model_family in {"vision_transformer", "compact_transformer"} and hidden % num_heads:
+            raise ValueError("hidden must be divisible by num_heads")
         if not 0.0 <= weight_decay <= 0.1:
             raise ValueError("weight_decay must be between 0.0 and 0.1")
         if not 0.0 <= label_smoothing <= 0.2:
@@ -258,6 +315,12 @@ class PathMNISTLitModule(pl.LightningModule):
             hidden=hidden,
             depth=depth,
             dropout=dropout,
+            patch_size=patch_size,
+            num_heads=num_heads,
+            mlp_ratio=mlp_ratio,
+            pooling=pooling,
+            positional_encoding=positional_encoding,
+            tokenizer_layers=tokenizer_layers,
         )
         weight = (
             torch.tensor(class_weights, dtype=torch.float32)
@@ -388,6 +451,17 @@ class PathMNISTLitModule(pl.LightningModule):
                 optimizer, T_max=max(1, int(self.trainer.max_epochs))
             )
             return {"optimizer": optimizer, "lr_scheduler": scheduler}
+        if scheduler_name == "one_cycle":
+            scheduler = torch.optim.lr_scheduler.OneCycleLR(
+                optimizer,
+                max_lr=float(self.hparams.lr),
+                total_steps=int(self.trainer.estimated_stepping_batches),
+                pct_start=0.1,
+            )
+            return {
+                "optimizer": optimizer,
+                "lr_scheduler": {"scheduler": scheduler, "interval": "step"},
+            }
         if scheduler_name == "reduce_on_plateau":
             scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
                 optimizer, mode="max", factor=0.5, patience=1
@@ -457,8 +531,8 @@ class PathMNISTDataModule(pl.LightningDataModule):
         num_workers: int = 0,
     ):
         super().__init__()
-        if batch_size not in {32, 64, 128, 256}:
-            raise ValueError("batch_size must be one of 32, 64, 128 or 256")
+        if batch_size not in {16, 32, 64, 128, 256}:
+            raise ValueError("batch_size must be one of 16, 32, 64, 128 or 256")
         if seed < 0:
             raise ValueError("seed must be non-negative")
         selected_augmentations = augmentations or []

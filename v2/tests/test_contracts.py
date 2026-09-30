@@ -25,6 +25,21 @@ def manifest(run_id: str = "test") -> RunManifest:
 
 
 class ContractTests(unittest.TestCase):
+    def test_conditional_architecture_options_are_enforced(self) -> None:
+        from contracts import CandidateProposal
+
+        base = {
+            "candidate_id": "bad_heads", "model_family": "vision_transformer",
+            "hidden": 40, "depth": 2, "dropout": 0.1,
+            "normalization": "standardize", "augmentations": ["hflip"],
+            "optimizer": "adamw", "scheduler": "one_cycle", "lr": 3e-4,
+            "weight_decay": 1e-4, "class_weighting": False,
+            "label_smoothing": 0.05, "batch_size": 64, "num_heads": 3,
+            "rationale": "invalid divisibility must be rejected",
+        }
+        with self.assertRaises(ValidationError):
+            CandidateProposal.model_validate(base)
+
     def test_invalid_llm_training_values_are_rejected(self) -> None:
         with self.assertRaises(ValidationError):
             ExperimentDecision(

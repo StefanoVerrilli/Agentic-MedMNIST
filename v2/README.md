@@ -51,11 +51,20 @@ heuristic; use `--require-llm` to make such a failure fatal.
 The research agent studies representation, parametrization and training
 architecture together and supplies an auditable brief to every search round.
 The search can choose among `tiny_cnn`, `residual_cnn`, a CIFAR-style
-`resnet18`, `vision_transformer` (4x4 patches) and `compact_transformer`
+`resnet18`, `vision_transformer` (configurable patches) and `compact_transformer`
 (convolutional tokenizer), and can vary width, depth, dropout, optimizer, scheduler, learning
 rate, weight decay, class weighting, label smoothing, batch size and guarded
 representations. It cannot emit Python code or select values outside the typed
 contracts.
+
+The widened search space accepts model widths from 16 to 192 (multiples of 8),
+depths from 1 to 8, batch sizes from 16 to 256, `one_cycle` scheduling and
+agent-selected early stopping and gradient clipping. Transformer candidates can
+also choose patch size, attention heads, MLP ratio, pooling, positional encoding
+and CCT tokenizer depth. Cross-field validators reject incompatible or ignored
+choices before training, and retain tighter capacity limits for ResNet families.
+The guarded representation space also includes 180-degree rotation and mild,
+deterministic brightness or contrast variants in addition to the original flips.
 
 Use Python 3.10 or newer. Ollama is optional for offline validation, but add
 `--require-llm` when an experiment must fail rather than fall back if the local

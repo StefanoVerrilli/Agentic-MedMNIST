@@ -280,6 +280,12 @@ def train_model(
         hidden=config.hidden,
         depth=config.depth,
         dropout=config.dropout,
+        patch_size=config.patch_size,
+        num_heads=config.num_heads,
+        mlp_ratio=config.mlp_ratio,
+        pooling=config.pooling,
+        positional_encoding=config.positional_encoding,
+        tokenizer_layers=config.tokenizer_layers,
         optimizer=config.optimizer,
         scheduler=config.scheduler,
         lr=config.lr,
@@ -480,6 +486,18 @@ def apply_augmentation(image: Any, augmentation: str) -> Any:
         return np.flip(image, axis=0)
     if augmentation == "rotate90":
         return np.rot90(image, k=1, axes=(0, 1))
+    if augmentation == "rotate180":
+        return np.rot90(image, k=2, axes=(0, 1))
+    if augmentation == "brightness":
+        return np.clip(np.asarray(image, dtype="float32") * 1.10, 0, 255).astype(
+            image.dtype
+        )
+    if augmentation == "contrast":
+        values = np.asarray(image, dtype="float32")
+        channel_mean = values.mean(axis=(0, 1), keepdims=True)
+        return np.clip((values - channel_mean) * 1.10 + channel_mean, 0, 255).astype(
+            image.dtype
+        )
     raise ValueError(f"augmentation is outside the guardrail set: {augmentation}")
 
 

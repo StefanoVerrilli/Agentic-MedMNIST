@@ -390,6 +390,14 @@ class ExperimentDesignAgent:
             optimizer=selected.optimizer,
             scheduler=selected.scheduler,
             label_smoothing=selected.label_smoothing,
+            patch_size=selected.patch_size,
+            num_heads=selected.num_heads,
+            mlp_ratio=selected.mlp_ratio,
+            pooling=selected.pooling,
+            positional_encoding=selected.positional_encoding,
+            tokenizer_layers=selected.tokenizer_layers,
+            early_stopping_patience=selected.early_stopping_patience,
+            gradient_clip_val=selected.gradient_clip_val,
             seed=self.seed,
             device=self.device,
             rationale=selected.rationale,
@@ -519,7 +527,10 @@ class ModelSearchAgent:
                     "diverse configurations only from the JSON schema. Use only "
                     "training metadata and prior validation results. The test set "
                     "is locked and must never influence a proposal. Avoid duplicate "
-                    "configurations and excessive weight decay."
+                    "configurations and excessive weight decay. Explore log-scale "
+                    "learning rates. Transformer-only fields may vary only for "
+                    "vision_transformer or compact_transformer; hidden must be a "
+                    "multiple of 8 and divisible by num_heads."
                 ),
                 user=(
                     f"round={round_index}/{self.rounds}; candidate_budget={round_cap}; "
@@ -791,8 +802,8 @@ class ArchitectureResearchAgent:
                 "compact_transformer", "vision_transformer", "residual_cnn", "resnet18"
             ],
             transformer_guidance=(
-                "Use 4x4 patches (49 tokens) for ViT and a two-stage convolutional "
-                "tokenizer for CCT; keep embedding widths and encoder depth bounded."
+                "Explore 2x2, 4x4 or 7x7 ViT patches, compatible head counts, pooling "
+                "and positional encodings; for CCT vary one to three tokenizer layers."
             ),
             risks=[
                 "pure ViT can be data-inefficient without pretraining",
@@ -1345,7 +1356,10 @@ class ReviewerConsistencyAgent:
                         ("critical", "normalization stats are not train-only")
                     )
             if representation is not None:
-                allowed = {"hflip", "vflip", "rotate90"}
+                allowed = {
+                    "hflip", "vflip", "rotate90", "rotate180",
+                    "brightness", "contrast",
+                }
                 bad = set(representation.augmentations) - allowed
                 if bad:
                     findings.append(
