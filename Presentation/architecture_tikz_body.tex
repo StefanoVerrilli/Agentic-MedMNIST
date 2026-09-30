@@ -1,0 +1,85 @@
+% Shared HAT-MedMNIST architecture diagram (clean "bars + row of boxes" layout,
+% matching docs/architecture.png, with the Prior-Art Scout added).
+% \input this inside \resizebox{\textwidth}{!}{...}. Requires in the preamble:
+%   \usepackage{tikz}\usetikzlibrary{arrows.meta,positioning,shadows,backgrounds}
+\definecolor{navy}{HTML}{16233A}
+\definecolor{gfill}{HTML}{EEF1F5}
+\definecolor{gline}{HTML}{C4CCD8}
+\definecolor{bfill}{HTML}{DCEBFB}
+\definecolor{bline}{HTML}{4C86D6}
+\definecolor{oline}{HTML}{E8792E}
+\definecolor{ofill}{HTML}{FDF3EA}
+\definecolor{ink}{HTML}{1B2430}
+\definecolor{rfill}{HTML}{ECE4FB}
+\definecolor{rline}{HTML}{7C5CBF}
+\begin{tikzpicture}[
+  font=\sffamily,
+  bar/.style={rectangle, rounded corners=2pt, fill=navy, text=white,
+              minimum height=0.8cm, align=center, inner sep=4pt},
+  box/.style={rectangle, rounded corners=3pt, minimum width=1.9cm,
+              minimum height=1.9cm, align=center, inner sep=2pt,
+              text width=1.7cm, font=\scriptsize, text=ink, line width=0.9pt,
+              drop shadow={shadow xshift=1pt, shadow yshift=-1pt, opacity=0.12}},
+  det/.style={box, fill=gfill, draw=gline},
+  hyb/.style={box, fill=bfill, draw=bline},
+  down/.style={-{Stealth[length=2.4mm]}, draw=navy!75, line width=0.9pt},
+  gov/.style={-{Stealth[length=2.4mm]}, draw=oline, line width=0.9pt, dashed},
+]
+\def\cA{1.45}\def\cB{3.61}\def\cC{5.77}\def\cD{7.93}\def\cE{10.09}%
+\def\cF{12.25}\def\cG{14.41}\def\cH{16.57}\def\cI{18.73}%
+\def\barL{0.5}\def\barW{19.18}
+% Symmetric bounding box centred on the bars (bars span x=0.5..19.68, centre 10.09),
+% so the left-hand "veto / stop" label does not push the figure off-centre.
+\useasboundingbox (-0.05,1.55) rectangle (20.23,11.85);
+
+\node[anchor=west, text=ink, font=\sffamily\bfseries\Large] at (\barL,11.35)
+  {Hybrid Agentic MedMNIST \textemdash\ architecture};
+\node[anchor=west, text=ink!60, font=\sffamily\small] at (\barL,10.78)
+  {Maximum cohesion, minimum coupling \textperiodcentered\ agents share only versioned artefacts};
+
+\node[bar, anchor=south west, minimum width=\barW cm, font=\bfseries] (orch)
+  at (\barL,9.8) {Orchestrator \textemdash\ sequencing \& veto handling (no ML / no domain logic)};
+
+\node[det, anchor=south] at (\cA,6.9) {\textbf{1 \textperiodcentered\ Ingestion}\\[2pt]{\tiny WP2}};
+\node[hyb, anchor=south] at (\cB,6.9) {\textbf{2 \textperiodcentered\ Profiling / Ambiguity}\\[2pt]{\tiny hybrid \textperiodcentered\ WP2}};
+\node[hyb, anchor=south] at (\cC,6.9) {\textbf{Prior-Art Scout}\\[2pt]{\tiny hybrid \textperiodcentered\ WP2}};
+\node[hyb, anchor=south] at (\cD,6.9) {\textbf{3 \textperiodcentered\ Preproc / Representation}\\[2pt]{\tiny hybrid \textperiodcentered\ WP2}};
+\node[hyb, anchor=south] at (\cE,6.9) {\textbf{4 \textperiodcentered\ Experiment Design}\\[2pt]{\tiny hybrid \textperiodcentered\ WP3}};
+\node[det, anchor=south] at (\cF,6.9) {\textbf{5 \textperiodcentered\ Training}\\[2pt]{\tiny WP3}};
+\node[det, anchor=south] at (\cG,6.9) {\textbf{6 \textperiodcentered\ Evaluation}\\[2pt]{\tiny WP4}};
+\node[det, anchor=south] at (\cH,6.9) {\textbf{7 \textperiodcentered\ Abstention / OOD}\\[2pt]{\tiny WP5}};
+\node[det, anchor=south] at (\cI,6.9) {\textbf{8 \textperiodcentered\ Reporting}\\[2pt]{\tiny WP5}};
+
+% ---- research-capabilities group (behind the three research / design agents) --
+\begin{scope}[on background layer]
+  \draw[rline, rounded corners=7pt, line width=1pt, fill=rfill]
+    (4.63,6.64) rectangle (11.23,9.00);
+\end{scope}
+
+\node[bar, anchor=south west, minimum width=\barW cm, font=\bfseries] (bb)
+  at (\barL,5.0) {Blackboard \textemdash\ versioned, typed artefacts (the interfaces) + decision / audit log};
+
+\node[rectangle, rounded corners=3pt, draw=oline, dashed, fill=ofill, line width=1pt,
+      text=oline, anchor=south west, minimum width=\barW cm, minimum height=0.95cm,
+      align=center, font=\bfseries] (rev) at (\barL,3.1)
+  {Reviewer / Consistency / Anomaly agent (WP6) \textemdash\ audits every stage \textperiodcentered\ can veto promotion};
+
+\foreach \x in {\cA,\cB,\cC,\cD,\cE,\cF,\cG,\cH,\cI}{
+  \draw[down] (\x,9.8) -- (\x,8.82);
+  \draw[down] (\x,6.88) -- (\x,5.82);
+}
+
+\draw[gov] (\cE,4.05) -- (\cE,4.98);
+\draw[gov] (0.30,3.55) -- (0.30,10.2) -- (\barL,10.2);
+\node[text=oline, font=\sffamily\scriptsize, rotate=90, anchor=south] at (0.15,6.6) {veto / stop};
+
+\def\ly{2.0}
+\node[det, minimum width=0.5cm, minimum height=0.42cm, text width=0.4cm, anchor=west] at (\barL,\ly){};
+\node[anchor=west, font=\sffamily\footnotesize, text=ink] at (1.05,\ly) {deterministic};
+\node[hyb, minimum width=0.5cm, minimum height=0.42cm, text width=0.4cm, anchor=west] at (3.6,\ly){};
+\node[anchor=west, font=\sffamily\footnotesize, text=ink] at (4.15,\ly) {hybrid (open-model + fallback)};
+\node[rectangle, rounded corners=3pt, draw=rline, fill=rfill, minimum width=0.5cm, minimum height=0.42cm, anchor=west] at (9.2,\ly){};
+\node[anchor=west, font=\sffamily\footnotesize, text=ink] at (9.75,\ly) {research \& design agents};
+\node[rectangle, rounded corners=2pt, draw=oline, dashed, fill=ofill, minimum width=0.5cm, minimum height=0.42cm, anchor=west] at (14.0,\ly){};
+\node[anchor=west, font=\sffamily\footnotesize, text=ink] at (14.55,\ly) {cross-cutting governance};
+\end{tikzpicture}

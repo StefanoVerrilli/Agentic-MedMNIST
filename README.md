@@ -32,18 +32,18 @@ coupling claim, made concrete.
 
 ## The agents
 
-| Agent                 | Duty                                    | Kind             | Innovation                |
-| --------------------- | --------------------------------------- | ---------------- | ------------------------- |
-| Orchestrator          | sequencing, veto handling               | deterministic    | —                        |
-| Ingestion             | load + subsample MedMNIST               | deterministic    | —                        |
-| Profiling / Ambiguity | profile data, flag ambiguity            | **hybrid** | data-ambiguity handling   |
-| Preprocessing         | architect best representation (normalization + label-preserving augmentation), then apply it | **hybrid** | representation architect  |
-| Experiment Design     | pick config from profile *and* representation | **hybrid** | data- & representation-driven tuning |
-| Training              | train tiny CNN                          | deterministic    | —                        |
-| Evaluation            | test metrics                            | deterministic    | —                        |
-| Abstention / OOD      | refuse when unconfident                 | deterministic    | "no clear finding" case   |
-| Reporting             | assemble dossier                        | deterministic    | —                        |
-| Reviewer (WP6)        | cross-cut consistency/anomaly, can veto | **hybrid** | independent auditor agent |
+| Agent                 | Duty                                                                                         | Kind             | Innovation                           |
+| --------------------- | -------------------------------------------------------------------------------------------- | ---------------- | ------------------------------------ |
+| Orchestrator          | sequencing, veto handling                                                                    | deterministic    | —                                   |
+| Ingestion             | load + subsample MedMNIST                                                                    | deterministic    | —                                   |
+| Profiling / Ambiguity | profile data, flag ambiguity                                                                 | **hybrid** | data-ambiguity handling              |
+| Preprocessing         | architect best representation (normalization + label-preserving augmentation), then apply it | **hybrid** | representation architect             |
+| Experiment Design     | pick config from profile*and* representation                                               | **hybrid** | data- & representation-driven tuning |
+| Training              | train tiny CNN                                                                               | deterministic    | —                                   |
+| Evaluation            | test metrics                                                                                 | deterministic    | —                                   |
+| Abstention / OOD      | refuse when unconfident                                                                      | deterministic    | "no clear finding" case              |
+| Reporting             | assemble dossier                                                                             | deterministic    | —                                   |
+| Reviewer (WP6)        | cross-cut consistency/anomaly, can veto                                                      | **hybrid** | independent auditor agent            |
 
 ## Hybrid approach
 
