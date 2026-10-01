@@ -1,0 +1,33 @@
+{
+  "artefact": "representation_plan",
+  "artefact_type": "RepresentationPlan",
+  "created_at": "2026-09-30T10:55:15.301378+00:00",
+  "payload": {
+    "augmentation_factor": 4,
+    "augmentations": [
+      "hflip",
+      "vflip",
+      "brightness"
+    ],
+    "normalization": "standardize",
+    "rationale": "The channel statistics (means ≈ 0.53–0.74, stds ≈ 0.12–0.18) indicate the 28×28 H&E patches are already in a [0,1] pixel range but are not zero-centered and have low, uneven variance across channels. Applying 'standardize' (zero-mean, unit-variance per channel) equalizes the scale of the three H&E channels and centers the distribution, which improves gradient conditioning for a small-resolution classifier and prevents the higher-mean channels (R, B) from dominating early training over the lower-mean G channel. 'unit' scaling would leave the data off-center and with unequal per-channel magnitudes, offering no numerical benefit over the raw [0,1] input.\n\nFor augmentations (train-only, per design_evidence), I selected three that address the two dominant sources of variability in H&E tissue-type classification at 28×28: (1) spatial orientation and (2) staining photometry. hflip and vflip are both orientation-safe for tissue-type labels (tissue micro-architecture has no inherent left-right or up-down axis) and together they generate four effective orientations, doubling the spatial diversity of the ~90k training patches without introducing unrealistic geometry. brightness is the single most impactful photometric augmentation for H&E because inter-lab and inter-slide staining intensity shifts primarily manifest as a global multiplicative/additive change in pixel values; modeling this invariance reduces the model's reliance on absolute color and improves generalization across the 9 tissue classes. I deliberately omitted rotate90 (redundant coverage already provided by the flip pair) and contrast (less dominant than brightness for H&E variability, and at 28×28 aggressive contrast shifts risk destroying the fine texture cues that distinguish the 9 classes). The moderate class imbalance (ratio 1.63) does not require additional augmentation to compensate, so the budget of 3 is best spent on the highest-leverage transforms above.",
+    "schema_version": "1.0",
+    "source": "qwen3.8",
+    "stats_source": "train",
+    "train_channel_mean_unit": [
+      0.740545,
+      0.53298219,
+      0.70582885
+    ],
+    "train_channel_std_unit": [
+      0.12368222,
+      0.17676253,
+      0.12443067
+    ]
+  },
+  "payload_sha256": "e7951422bd9cc29476f6c7a681ec35e2263be9b340c27e0ac605fe00dfeac2f0",
+  "producer": "preprocessing",
+  "run_id": "seed_42",
+  "sequence": 6,
+  "version": 1
+}

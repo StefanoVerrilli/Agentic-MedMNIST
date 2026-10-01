@@ -1,0 +1,31 @@
+{
+  "artefact": "search_report",
+  "artefact_type": "SearchReport",
+  "created_at": "2026-09-30T11:09:29.276208+00:00",
+  "payload": {
+    "completed_trials": 8,
+    "failed_trials": 0,
+    "schema_version": "1.0",
+    "selected_candidate_id": "res_cnn_wide_d5",
+    "selected_config_hash": "330343656398f5f90f05b14c9c8114aa18da4dbb4312f046aedd407edff7d720",
+    "selected_validation_accuracy": 0.987505,
+    "selected_validation_macro_f1": 0.98756,
+    "selection_rule": "accuracy_tolerance_then_macro_f1",
+    "test_metrics_used": false,
+    "trial_artefacts": [
+      "trial_res_cnn_base_0d5e7d9b",
+      "trial_compact_tf_p4_60062e38",
+      "trial_tiny_cnn_fast_e9884b95",
+      "trial_res_cnn_wide_d5_33034365",
+      "trial_compact_tf_d6_mean_bfb2575c",
+      "trial_vit_p2_196tok_249de520",
+      "trial_res_cnn_deep_d6_6b240cd8",
+      "trial_compact_tf_p2_d6_969bd03a"
+    ]
+  },
+  "payload_sha256": "141fcf525cb0c42268981fe297bd228e735f3008e63b6cd5576e09d02f397b81",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 23,
+  "version": 1
+}

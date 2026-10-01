@@ -1,0 +1,24 @@
+{
+  "artefact": "anomaly_preprocessing",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-30T11:22:44.986013+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Preprocessing stage is structurally sound and internally consistent. All deterministic checks pass: split sizes (train=89996, val=10004, test=7180) match official sizes exactly with no subsampling; no duplicates, no blank images, no omitted artifacts; n_classes=9 and n_channels=3 are correct; augmented_train_size (359984) equals 89996×4 as expected; normalization stats are computed from train only (train_stats_only=true), preventing leakage; selected_index_sha256 values are consistent across dataset_manifest and split_manifest. The representation plan (hflip, vflip, brightness; standardize normalization) is appropriate for 28×28 H&E patches with the observed channel statistics (means 0.53–0.74, stds 0.12–0.18).\n\nTwo minor issues are noted but do not block progression:\n\n1. Narrative factual error: The LLM-generated ambiguity_risks text in data_profile references '96×96 patch resolution' in two places, but the actual image_shape_hwc is [28,28,3]. The structured data is correct; only the free-text narrative is wrong. This was already self-flagged by the profiling LLM. It should be corrected in any downstream report to avoid confusion, but it does not affect the data pipeline.\n\n2. llm_model_digest is null for qwen3.8 (ollama) in both ingestion and profiling artefacts. The core ML pipeline (splitting, normalization, augmentation, training) is fully deterministic via code_sha256, seed=47, and pinned package versions, so this does not affect model reproducibility. It only limits bit-exact reproduction of LLM-generated narrative text, which is a documentation concern, not a data-integrity concern.\n\nThe test-set domain shift (CRC-VAL-HE-7K, different clinical center) and the resulting class-prevalence skew (adipose ×1.79, debris ×0.41, stroma ×0.56) are well-documented in test_domain_note, split_manifest, and ambiguity_risks. These are known PathMNIST properties and are properly accounted for. Small per-class test counts (debris n=339, stroma n=421) will make per-class test metrics noisy; this is inherent to the dataset and correctly flagged.\n\nNo critical or warning-level issues detected. Proceed to the next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Narrative text in data_profile.ambiguity_risks incorrectly states '96×96 patch resolution'; actual image_shape_hwc is [28,28,3]. Structured data is correct; only LLM-generated prose is wrong.",
+      "llm_model_digest is null for qwen3.8 (ollama) in both ingestion and profiling artefacts; LLM-assisted narrative steps are not bit-exactly reproducible, though the deterministic ML pipeline is fully pinned via code_sha256 and seed."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "preprocessing"
+  },
+  "payload_sha256": "72375ced1b7c297f650fc291409c9f7f604d5294cfa00d8835bdb177b2dc9639",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 8,
+  "version": 1
+}

@@ -1,0 +1,33 @@
+{
+  "artefact": "representation_plan",
+  "artefact_type": "RepresentationPlan",
+  "created_at": "2026-09-30T11:34:50.993055+00:00",
+  "payload": {
+    "augmentation_factor": 4,
+    "augmentations": [
+      "hflip",
+      "rotate90",
+      "contrast"
+    ],
+    "normalization": "standardize",
+    "rationale": "Refinement of the best prior config (res_cnn_base, 0.9875 val_acc). Key changes: (1) hidden 64→80 adds ~25% channel capacity without reaching the 96 that overfit at depth 6; (2) dropout 0.2→0.15 because all top configs converged by epoch 3, indicating the model is not overfitting and lighter regularization allows sharper features; (3) lr 0.001→0.0015 explores the log-scale neighborhood — the SGD/one_cycle variant at lr=0.01 achieved 0.9870, suggesting the adamw optimum may be slightly above 0.001; (4) label_smoothing 0.1→0.05 because the model already achieves 0.9875 balanced accuracy, and excessive smoothing may blunt the decision boundary on the 1.63× imbalanced classes; (5) adding 'contrast' augmentation directly targets the low channel variance (stds 0.12–0.18) by amplifying subtle inter-class differences in the G channel (highest std 0.177). Retains adamw+cosine+batch128+standardize+class_weighting as the proven backbone.",
+    "schema_version": "1.0",
+    "source": "agentic_search:selected:qwen3.8",
+    "stats_source": "train",
+    "train_channel_mean_unit": [
+      0.740545,
+      0.53298219,
+      0.70582885
+    ],
+    "train_channel_std_unit": [
+      0.12368222,
+      0.17676253,
+      0.12443067
+    ]
+  },
+  "payload_sha256": "d79debc9caff67c7cb4fc1aa98ab4547af9572ac29d3de6b63b3ca76eb6af3b0",
+  "producer": "model_search",
+  "run_id": "seed_47",
+  "sequence": 20,
+  "version": 2
+}

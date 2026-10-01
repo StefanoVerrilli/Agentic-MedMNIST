@@ -1,0 +1,32 @@
+{
+  "artefact": "representation_plan",
+  "artefact_type": "RepresentationPlan",
+  "created_at": "2026-09-30T11:09:29.264577+00:00",
+  "payload": {
+    "augmentation_factor": 3,
+    "augmentations": [
+      "hflip",
+      "rotate90"
+    ],
+    "normalization": "standardize",
+    "rationale": "Round-1 residual_cnn (hidden=64, depth=4) scored 98.7% val accuracy. This candidate widens hidden to the 96 cap for residual_cnn, adds one more residual block (depth=5) for richer feature hierarchy, slightly lowers LR (8e-4 vs 1e-3) to stabilise the wider network, and reduces label smoothing to 0.05 since the model is already well-calibrated. Dropout is trimmed to 0.15 to let the extra width carry more signal. Weight decay nudged to 2e-4 for mild L2 regularisation without suppressing the low-variance channel features.",
+    "schema_version": "1.0",
+    "source": "agentic_search:selected:qwen3.8",
+    "stats_source": "train",
+    "train_channel_mean_unit": [
+      0.740545,
+      0.53298219,
+      0.70582885
+    ],
+    "train_channel_std_unit": [
+      0.12368222,
+      0.17676253,
+      0.12443067
+    ]
+  },
+  "payload_sha256": "b0e52b8b5160c96326e8b1903df8f46073744debf1a7614459fa6a7b766cfa03",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 20,
+  "version": 2
+}

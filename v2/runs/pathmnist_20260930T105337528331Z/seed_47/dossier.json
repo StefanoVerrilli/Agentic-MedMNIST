@@ -1,0 +1,1743 @@
+{
+  "artefact_registry": [
+    {
+      "artefact": "run_manifest",
+      "path": "artefacts/0001_run_manifest_v001.json",
+      "producer": "run",
+      "sha256": "321f4a2cf8019eabacb7a2fac328e7acf162cae4b9713074991c834342f19f05",
+      "type": "RunManifest",
+      "version": 1
+    },
+    {
+      "artefact": "dataset_manifest",
+      "path": "artefacts/0002_dataset_manifest_v001.json",
+      "producer": "ingestion",
+      "sha256": "e749ae3162dd47c9dcc8013e796a1044c000c76f9277f25c9a348d24fcd1dd7b",
+      "type": "DatasetManifest",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_ingestion",
+      "path": "artefacts/0003_anomaly_ingestion_v001.json",
+      "producer": "reviewer",
+      "sha256": "37c516b0e8f764387d215acccadeef168621a0fce71493b292305736a64bc5ba",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "data_profile",
+      "path": "artefacts/0004_data_profile_v001.json",
+      "producer": "profiling",
+      "sha256": "224b49f28e0eebac9602c26a6b8df9530051c1d6269e17f0268ca2f1d6768122",
+      "type": "DataProfile",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_profiling",
+      "path": "artefacts/0005_anomaly_profiling_v001.json",
+      "producer": "reviewer",
+      "sha256": "ca7435ae0e39d26c729d1e5524f689f0968f6f5a668e6c516716740652891b52",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "representation_plan",
+      "path": "artefacts/0006_representation_plan_v001.json",
+      "producer": "preprocessing",
+      "sha256": "e7951422bd9cc29476f6c7a681ec35e2263be9b340c27e0ac605fe00dfeac2f0",
+      "type": "RepresentationPlan",
+      "version": 1
+    },
+    {
+      "artefact": "split_manifest",
+      "path": "artefacts/0007_split_manifest_v001.json",
+      "producer": "preprocessing",
+      "sha256": "f3df09b55572d7ce642130fca5d7af45fd32b75fa37253344b08636b5100a5ec",
+      "type": "SplitManifest",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_preprocessing",
+      "path": "artefacts/0008_anomaly_preprocessing_v001.json",
+      "producer": "reviewer",
+      "sha256": "72375ced1b7c297f650fc291409c9f7f604d5294cfa00d8835bdb177b2dc9639",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "architecture_research",
+      "path": "artefacts/0009_architecture_research_v001.json",
+      "producer": "architecture_research",
+      "sha256": "a7a6cab01d0c23d8493d2495b2748da28f16c5a95bf210d76a8679ba96dd360f",
+      "type": "ArchitectureResearch",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_architecture_research",
+      "path": "artefacts/0010_anomaly_architecture_research_v001.json",
+      "producer": "reviewer",
+      "sha256": "a46e0521f9ebae7346524991079d16dc5e411a289c6c4114e5a2307a5940941d",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "search_plan",
+      "path": "artefacts/0011_search_plan_v001.json",
+      "producer": "model_search",
+      "sha256": "d3ec4caa27e9b9114541e43f01a870dddc6d92144df05b155fec4bd6ff94c22a",
+      "type": "SearchPlan",
+      "version": 1
+    },
+    {
+      "artefact": "trial_res_cnn_base_0d5e7d9b",
+      "path": "artefacts/0012_trial_res_cnn_base_0d5e7d9b_v001.json",
+      "producer": "model_search",
+      "sha256": "0b20283cb7a05d13f92af91080c970185333be10c0fae761bf206ac8b7514d26",
+      "type": "TrialResult",
+      "version": 1
+    },
+    {
+      "artefact": "trial_compact_tf_p4_60062e38",
+      "path": "artefacts/0013_trial_compact_tf_p4_60062e38_v001.json",
+      "producer": "model_search",
+      "sha256": "2d8e80dfb4e05fe886b0771be9764dbcb9a06f123540c2f61f31e68f9589f2a0",
+      "type": "TrialResult",
+      "version": 1
+    },
+    {
+      "artefact": "trial_tiny_cnn_fast_e9884b95",
+      "path": "artefacts/0014_trial_tiny_cnn_fast_e9884b95_v001.json",
+      "producer": "model_search",
+      "sha256": "fca0ef3d0330c44210d93ad5fe96acce9cb70a7b6938c4bf12d2bfe334420e5f",
+      "type": "TrialResult",
+      "version": 1
+    },
+    {
+      "artefact": "trial_res_cnn_deep96_3347682f",
+      "path": "artefacts/0015_trial_res_cnn_deep96_3347682f_v001.json",
+      "producer": "model_search",
+      "sha256": "82b2459f9ef94d6b8438bdff5a54f34c3807f403762ad768871155e95f2b4f7c",
+      "type": "TrialResult",
+      "version": 1
+    },
+    {
+      "artefact": "trial_compact_tf_p2_mean_7dcd10fc",
+      "path": "artefacts/0016_trial_compact_tf_p2_mean_7dcd10fc_v001.json",
+      "producer": "model_search",
+      "sha256": "3dee868a59628110247afbe4cfcf9997aa038e5aa516bc67aacb26dffc329dc4",
+      "type": "TrialResult",
+      "version": 1
+    },
+    {
+      "artefact": "trial_res_cnn_sgd_1cyc_619a5d89",
+      "path": "artefacts/0017_trial_res_cnn_sgd_1cyc_619a5d89_v001.json",
+      "producer": "model_search",
+      "sha256": "b446c581be82c790f0c715efbeb69a1d2577df0f2963d3efc83406c53fb5c989",
+      "type": "TrialResult",
+      "version": 1
+    },
+    {
+      "artefact": "trial_res_cnn_refined_28563908",
+      "path": "artefacts/0018_trial_res_cnn_refined_28563908_v001.json",
+      "producer": "model_search",
+      "sha256": "7d1470df606abaf280d1f387b1761e5c17b3e29b0627a460810d1239162f4a04",
+      "type": "TrialResult",
+      "version": 1
+    },
+    {
+      "artefact": "trial_compact_tf_deep6_2c5e6d7a",
+      "path": "artefacts/0019_trial_compact_tf_deep6_2c5e6d7a_v001.json",
+      "producer": "model_search",
+      "sha256": "e1f89eef41e6086b327cd784970a60e854700149a87e057e23aeb0c2d7449c84",
+      "type": "TrialResult",
+      "version": 1
+    },
+    {
+      "artefact": "representation_plan",
+      "path": "artefacts/0020_representation_plan_v002.json",
+      "producer": "model_search",
+      "sha256": "d79debc9caff67c7cb4fc1aa98ab4547af9572ac29d3de6b63b3ca76eb6af3b0",
+      "type": "RepresentationPlan",
+      "version": 2
+    },
+    {
+      "artefact": "split_manifest",
+      "path": "artefacts/0021_split_manifest_v002.json",
+      "producer": "model_search",
+      "sha256": "f3df09b55572d7ce642130fca5d7af45fd32b75fa37253344b08636b5100a5ec",
+      "type": "SplitManifest",
+      "version": 2
+    },
+    {
+      "artefact": "train_config",
+      "path": "artefacts/0022_train_config_v001.json",
+      "producer": "model_search",
+      "sha256": "c2449979bf06c791a81fb7a875b9027129b54c57c6a84259e1416511d6145a65",
+      "type": "TrainConfig",
+      "version": 1
+    },
+    {
+      "artefact": "search_report",
+      "path": "artefacts/0023_search_report_v001.json",
+      "producer": "model_search",
+      "sha256": "6ea29c026732d228ee7863b007d5b1559db59026e0d8faf0530558461bc28277",
+      "type": "SearchReport",
+      "version": 1
+    },
+    {
+      "artefact": "best_configuration",
+      "path": "artefacts/0024_best_configuration_v001.json",
+      "producer": "model_search",
+      "sha256": "43c5757a987c9783d43626430c3817457806a0ff1049eb855b990a9ed56fb461",
+      "type": "BestConfiguration",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_model_search",
+      "path": "artefacts/0025_anomaly_model_search_v001.json",
+      "producer": "reviewer",
+      "sha256": "0cb730ff3717130af53eaffd28820a99d979bb0f30250a68331b0236bf03637f",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "train_result",
+      "path": "artefacts/0026_train_result_v001.json",
+      "producer": "training",
+      "sha256": "940c7240c1e3e33069b91cf9dc3d419e0e4acc6e33b0ca718c736eeeeb5b46a6",
+      "type": "TrainResult",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_training",
+      "path": "artefacts/0027_anomaly_training_v001.json",
+      "producer": "reviewer",
+      "sha256": "91532b14783ae6eb1d8de98ad803510dd315dddf4df9c6b91db0ab0587fd5d78",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "prediction_artifact",
+      "path": "artefacts/0028_prediction_artifact_v001.json",
+      "producer": "evaluation",
+      "sha256": "b2960ebb60c2f84159a9dfd64a155b1f3aac0bade2b7882c8517931d0d71a620",
+      "type": "PredictionArtifact",
+      "version": 1
+    },
+    {
+      "artefact": "evaluation_report",
+      "path": "artefacts/0029_evaluation_report_v001.json",
+      "producer": "evaluation",
+      "sha256": "958590be26c9db47e33a8325e1d197c6f71004d1d7aff80d2a8e07deaf5d48ff",
+      "type": "EvalReport",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_evaluation",
+      "path": "artefacts/0030_anomaly_evaluation_v001.json",
+      "producer": "reviewer",
+      "sha256": "159e8c7112d99124e6ffe02256467c51fefdfec13f896767e27e77b094143603",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "abstention_report",
+      "path": "artefacts/0031_abstention_report_v001.json",
+      "producer": "abstention",
+      "sha256": "3351c4c76f48a0b31e465eea7881f93226887b5d98e7877ecc17f692f65bf333",
+      "type": "AbstentionReport",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_abstention",
+      "path": "artefacts/0032_anomaly_abstention_v001.json",
+      "producer": "reviewer",
+      "sha256": "8a5244213a7b871a587b7347f74f0f453c732d5cfd6ebc2a8ca4f36dde102a5f",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "reporting_status",
+      "path": "artefacts/0033_reporting_status_v001.json",
+      "producer": "reporting",
+      "sha256": "a93030c48e1e3424197ff972dbf8053cd73d74886fadbd212c06d4f61d00f6ba",
+      "type": "ReportingStatus",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_reporting",
+      "path": "artefacts/0034_anomaly_reporting_v001.json",
+      "producer": "reviewer",
+      "sha256": "96f15b5503e81a08b0efa4b118888a8b72b2c6568ee01fa25acf085663b145da",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "baseline_report",
+      "path": "artefacts/0035_baseline_report_v001.json",
+      "producer": "baseline",
+      "sha256": "e662b3b41a8387e9ee4912abf1f85d635622cfb1011f429813793a435a1b874a",
+      "type": "BaselineReport",
+      "version": 1
+    },
+    {
+      "artefact": "comparison_report",
+      "path": "artefacts/0036_comparison_report_v001.json",
+      "producer": "run",
+      "sha256": "39e7b66f60bcc9f758f66fc2e145003ea893a1f84d26246bfd46280c5ffe51a5",
+      "type": "ComparisonReport",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_comparison",
+      "path": "artefacts/0037_anomaly_comparison_v001.json",
+      "producer": "reviewer",
+      "sha256": "a0b9ac9762f15fde3d47bfe3c3cca2b061aae6ea08196da35520445b5f5be4d7",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "reporting_status",
+      "path": "artefacts/0038_reporting_status_v002.json",
+      "producer": "reporting",
+      "sha256": "9a6ca2a474bf9da77ce31e0bb530b5082daab23e56deb6e1f763dfd5550d1d54",
+      "type": "ReportingStatus",
+      "version": 2
+    },
+    {
+      "artefact": "anomaly_reporting",
+      "path": "artefacts/0039_anomaly_reporting_v002.json",
+      "producer": "reviewer",
+      "sha256": "f7daabb6cdacfe7e6042f2e29582aadaeec3406e6edd1670177e73aaa9819fe8",
+      "type": "AnomalyReport",
+      "version": 2
+    }
+  ],
+  "decision_events": 108,
+  "decision_log": "decision_log.jsonl",
+  "latest_artefacts": {
+    "abstention_report": {
+      "abstain_rate": 0.47493,
+      "accuracy_on_covered": 0.980371,
+      "base_test_accuracy": 0.874513,
+      "calibrated_on": "validation",
+      "human_review_count": 3410,
+      "method": "predictive_entropy",
+      "ood_auroc": 0.88967,
+      "ood_corruption": "unit_scale_gaussian_noise_multi_severity",
+      "ood_evidence_path": "blobs/ood_probabilities.npz",
+      "ood_evidence_sha256": "b54a0e8d5dc7411f5227e60334a1fa9acb9dc7ed161bb273ab3374471aab9d73",
+      "ood_pass": true,
+      "ood_scenarios": [
+        {
+          "corruption": "unit_scale_gaussian_noise_sigma_0.15",
+          "score": "max_softmax",
+          "test_auroc": 0.870532,
+          "validation_auroc": 0.993723
+        },
+        {
+          "corruption": "unit_scale_gaussian_noise_sigma_0.15",
+          "score": "predictive_entropy",
+          "test_auroc": 0.892208,
+          "validation_auroc": 0.99539
+        },
+        {
+          "corruption": "unit_scale_gaussian_noise_sigma_0.25",
+          "score": "max_softmax",
+          "test_auroc": 0.87844,
+          "validation_auroc": 0.994132
+        },
+        {
+          "corruption": "unit_scale_gaussian_noise_sigma_0.25",
+          "score": "predictive_entropy",
+          "test_auroc": 0.903776,
+          "validation_auroc": 0.995942
+        },
+        {
+          "corruption": "unit_scale_gaussian_noise_sigma_0.4",
+          "score": "max_softmax",
+          "test_auroc": 0.854607,
+          "validation_auroc": 0.992142
+        },
+        {
+          "corruption": "unit_scale_gaussian_noise_sigma_0.4",
+          "score": "predictive_entropy",
+          "test_auroc": 0.873027,
+          "validation_auroc": 0.993752
+        }
+      ],
+      "ood_scope": "controlled_corruption_proxy",
+      "ood_validation_auroc": 0.995028,
+      "schema_version": "1.0",
+      "selective_risk": 0.019629,
+      "target_validation_coverage": 0.8,
+      "test_coverage": 0.52507,
+      "threshold": 0.8499926,
+      "validation_coverage": 0.80008
+    },
+    "anomaly_abstention": {
+      "action": "revise",
+      "attempt": 1,
+      "comment": "Abstention mechanism is arithmetically consistent and functionally correct. Verification: (1) abstain_rate 0.47493 × 7180 = 3410 = human_review_count ✓; (2) selective_risk 0.019629 = 1 − accuracy_on_covered 0.980371 ✓; (3) covered samples = 7180 − 3410 = 3770, errors on covered ≈ 74, errors on abstained ≈ 827, total errors = 901 = 7180 × (1−0.874513) ✓; (4) threshold 0.8499926 calibrated on validation to hit target 0.8 coverage, achieved 0.80008 ✓; (5) predictive_entropy consistently outperforms max_softmax across all three noise severities, as expected ✓; (6) OOD pass with test AUROCs 0.855–0.904 under controlled Gaussian corruption is reasonable ✓.\n\nPrimary concern: the validation-to-test coverage gap is 27.5 pp (80.0% → 52.5%). The threshold was set on validation to retain 80% of samples, but on test the model abstains on 47.5%. This is not a bug—the mechanism correctly flags harder test samples (abstained-set accuracy ≈ 75.8% vs covered-set 98.0%)—but it means the operational coverage guarantee derived from validation does not transfer. Downstream consumers expecting ~80% coverage will see only ~52.5% on test. This should be explicitly documented as a distribution-shift effect rather than a calibration failure.\n\nSecondary observations: (a) OOD validation AUROC (0.995) vs test AUROC (~0.89) gap mirrors the coverage gap and reinforces that test is substantially harder; (b) the OOD scope is limited to 'controlled_corruption_proxy' (Gaussian noise only), so real-world OOD robustness is unverified; (c) inherited minor items from prior stages (rotate90 augmentation, patience=3, per-channel normalization qualifier, transformer no-op params in CNN config) remain open documentation gaps but do not affect abstention correctness.\n\nNo deterministic findings were raised. The abstention stage is internally consistent and the selective-prediction trade-off is well-characterised. Recommend proceeding with a note that the 52.5% test coverage is the operative figure for deployment planning, not the 80% validation target.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "Validation-to-test coverage gap of 27.5 pp (80.0% → 52.5%) means the operational coverage guarantee does not transfer; downstream systems expecting ~80% coverage will see ~52.5% on test",
+        "OOD evaluation scope is limited to controlled Gaussian-noise corruption (sigma 0.15/0.25/0.4); real-world OOD robustness (domain shift, novel tissue types, imaging artefacts) is unverified",
+        "OOD validation AUROC (0.995) vs test AUROC (~0.89) gap of ~10 pp mirrors the coverage gap and indicates test distribution is substantially harder than validation",
+        "Inherited: augmentation 'rotate90' (90° discrete) deviates from research-recommended small-angle jitter; empirically validated but under-documented for reproducibility",
+        "Inherited: early_stopping_patience=3 is below the 5–8 range recommended in research notes; low risk given convergence but leaves little margin for slower re-runs",
+        "Inherited: normalization labeled 'standardize' without explicit 'per-channel' qualifier; confirm implementation applies per-channel statistics",
+        "Inherited: transformer-specific parameters (num_heads, mlp_ratio, pooling, positional_encoding, tokenizer_layers) present in residual_cnn config; likely shared-schema no-ops but unconfirmed"
+      ],
+      "schema_version": "1.0",
+      "severity": "warning",
+      "source": "qwen3.8",
+      "stage": "abstention"
+    },
+    "anomaly_architecture_research": {
+      "action": "continue",
+      "attempt": 1,
+      "comment": "The architecture_research artefact is well-structured, internally consistent, and appropriately calibrated to the 28×28×3 / 9-class / ~90k-sample regime. Key strengths: (1) The spatial-resolution constraint is correctly identified as the dominant design factor, with concrete guidance to limit downsampling to at most 28→14→7. (2) Transformer guidance is quantitatively grounded (patch_size=4 → 49 tokens; d_model ≤ 192; 4–6 layers for compact variant), and the token-starvation risk is explicitly flagged. (3) Parametrization priorities (LR, weight decay, batch size, dropout, class-weighted/focal loss) are specific, range-bounded, and differentiated between CNN and transformer families. (4) test_metrics_used is correctly false. (5) Evidence sources (ViT, DeiT, Nature Sci. Reports) are relevant and real. (6) All structured values (image shape, class counts, channel stats, split sizes, imbalance ratio) are consistent with the data_profile, split_manifest, and representation_plan artefacts. Minor observations (already flagged in upstream stages, not blocking): the data_profile.ambiguity_risks narrative contains a '96×96 patch resolution' reference that contradicts the correct [28,28,3] structured value; llm_model_digest is null for qwen3.8/ollama, limiting bit-exact reproducibility of LLM-assisted narrative steps. Neither issue affects the deterministic ML pipeline or the architectural recommendations. The representation_plan's inclusion of 'vflip' as an augmentation is worth a downstream sanity check (histopathology patches may have anatomical orientation), but this is outside the architecture_research scope. No deterministic findings. Proceed to the next stage.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "data_profile.ambiguity_risks narrative text references '96×96 patch resolution' while structured image_shape_hwc is [28,28,3]; narrative-only inconsistency, structured data is correct",
+        "llm_model_digest is null for qwen3.8 (ollama) across ingestion and profiling artefacts; LLM-assisted narrative steps lack bit-exact reproducibility, though the deterministic pipeline is fully pinned via code_sha256 and seed",
+        "representation_plan lists 'vflip' as an augmentation; for H&E histopathology patches, vertical flip may not preserve anatomical validity—worth verifying in the training stage"
+      ],
+      "schema_version": "1.0",
+      "severity": "ok",
+      "source": "qwen3.8",
+      "stage": "architecture_research"
+    },
+    "anomaly_comparison": {
+      "action": "revise",
+      "attempt": 1,
+      "comment": "Comparison stage is arithmetically correct and internally consistent. Verification: (1) accuracy_delta 0.874513 − 0.840251 = 0.034262 ✓; (2) baseline_met_or_exceeded = true since 0.874513 > 0.840251 ✓; (3) common_seed 47 matches both baseline_report.seed and the agentic run ✓; (4) common_split_fingerprint 9afc9ed… matches both reports ✓; (5) n_samples 7180 consistent across evaluation and prediction artifacts ✓. No deterministic findings.\n\nHowever, several completeness and context gaps warrant attention:\n\n1. Single-metric comparison: Only accuracy is reported as the delta. The agentic model's macro_f1 (0.840073) vs baseline macro_f1 (0.784172) yields a larger delta (+0.0559), and balanced_accuracy (0.852848) is unreported for the baseline. A multi-metric comparison would better characterise the improvement, especially given the severe per-class disparities (cancer-associated stroma recall 45.6%, smooth muscle F1 0.632).\n\n2. No statistical significance test: With 7180 test samples, a 3.4 pp accuracy delta is very likely significant, but no confidence interval, bootstrap, or paired test is reported. This is a standard expectation for a comparison stage.\n\n3. Model-capacity asymmetry unacknowledged: The baseline is a tiny_cnn (depth=2, hidden=16, dropout=0.0) while the agentic model is a residual_cnn (depth=4, hidden=80, dropout=0.15). The 3.4 pp gain may be attributable largely to capacity rather than the agentic search process. The comparison report does not discuss this confound.\n\n4. Validation-to-test gap not contextualised: The agentic model shows a 12.1 pp validation-to-test accuracy drop (0.9958 → 0.8745). The baseline's validation performance is absent from the comparison, making it impossible to assess whether the agentic model's generalisation gap is worse or better than the baseline's.\n\n5. Abstention coverage gap (80% val → 52.5% test) is not reflected in the comparison, meaning the operational benefit of the agentic pipeline is overstated if downstream systems rely on the 80% coverage guarantee.\n\nNone of these are arithmetic errors; they are analytical completeness gaps. The core finding (agentic > baseline on the shared test split) is valid and correctly stated.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "Comparison reports only accuracy delta; macro_f1 delta (+0.0559) and balanced_accuracy comparison are absent",
+        "No statistical significance test (CI, bootstrap, or paired test) on the 3.4 pp accuracy delta",
+        "Model-capacity asymmetry (tiny_cnn depth-2/hidden-16 vs residual_cnn depth-4/hidden-80) is not discussed as a confound on the delta",
+        "Baseline validation accuracy is not included, preventing assessment of relative generalisation gap (agentic 12.1 pp val→test drop)",
+        "Abstention coverage gap (80% val → 52.5% test) is not reflected in the comparison, overstating operational benefit",
+        "Per-class disparities (stroma recall 45.6%, smooth muscle F1 0.632) are not addressed in the comparison context"
+      ],
+      "schema_version": "1.0",
+      "severity": "warning",
+      "source": "qwen3.8",
+      "stage": "comparison"
+    },
+    "anomaly_evaluation": {
+      "action": "revise",
+      "attempt": 1,
+      "comment": "All deterministic checks pass: confusion matrix rows sum to per-class supports (total 7180), per-class precision/recall/F1 are arithmetically consistent with the matrix, macro-averages match the reported values, balanced accuracy equals macro-recall, and overall accuracy (6279/7180=0.874513) is correct. Test lock is enforced (test_locked=true, test_metrics_used=false in both search and selection). Search-to-training config is consistent across best_configuration, top-level train_config, and train_result. Early stopping logic is correct (best epoch 13, patience 3, max 15 → training completed all 15 epochs since 13+3=16>15). Prediction artifact sample counts match (7180 test, 10004 validation).\n\nPrimary concern (warning): The validation-to-test accuracy gap is 12.1 pp (best val 0.9958 → test 0.8745). This is unusually large and indicates the validation set substantially overestimated generalization. The gap is driven by specific class confusions on test that were not apparent in validation: adipose→smooth muscle (283 errors, 21% of adipose), stroma→debris (100 errors, 24% of stroma), and smooth muscle scattered across background/debris/stroma. Cancer-associated stroma recall drops to 45.6% and smooth muscle F1 to 0.632, both far below the near-perfect validation macro-F1 of 0.9958. This does not indicate a pipeline defect or leakage, but it means the model-selection signal (validation accuracy) was a poor proxy for true generalization. The evaluation report should explicitly flag this gap and the affected classes so downstream consumers are not misled by the 0.9958 validation figure.\n\nMinor notes carried forward from prior stages: (1) 'rotate90' augmentation is a 90° discrete rotation, not the small-angle jitter recommended in research notes; empirically validated but should be documented. (2) early_stopping_patience=3 is below the 5–8 range in research notes; low risk given observed convergence. (3) Normalization labeled 'standardize' without explicit 'per-channel' qualifier—confirm implementation. (4) Transformer-specific parameters (num_heads, mlp_ratio, pooling, positional_encoding, tokenizer_layers) present in a residual_cnn config; likely shared schema no-ops but worth confirming.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "Validation-to-test accuracy gap of 12.1 pp (0.9958 → 0.8745) is large; selection signal overestimated generalization",
+        "Cancer-associated stroma recall 45.6% and smooth muscle F1 0.632 on test are far below validation-level performance; these class confusions were not visible in validation metrics",
+        "Adipose→smooth muscle confusion (283/1338 = 21%) is the single largest error source on test",
+        "Augmentation 'rotate90' (90° discrete) deviates from research-recommended small-angle jitter; empirically validated but under-documented for reproducibility",
+        "early_stopping_patience=3 is below the 5–8 range recommended in research notes; low risk given convergence but leaves little margin for slower re-runs",
+        "Normalization labeled 'standardize' without explicit 'per-channel' qualifier; confirm implementation applies per-channel statistics",
+        "Transformer-specific parameters (num_heads, mlp_ratio, pooling, positional_encoding, tokenizer_layers) present in residual_cnn config; likely shared-schema no-ops but unconfirmed"
+      ],
+      "schema_version": "1.0",
+      "severity": "warning",
+      "source": "qwen3.8",
+      "stage": "evaluation"
+    },
+    "anomaly_ingestion": {
+      "action": "continue",
+      "attempt": 1,
+      "comment": "Ingestion stage is clean. All deterministic checks pass (deterministic_findings is empty, omitted_artefacts is empty). Specific verifications: (1) loaded_split_sizes exactly match official_split_sizes (train=89996, val=10004, test=7180) with subsampled=false — no silent resampling. (2) n_classes=9 matches the 9-entry labels list. (3) n_channels=3 is correct for RGB PathMNIST. (4) Both manifests carry schema_version 1.0 and are internally consistent. (5) created_at (11:21:09.6) is ~1.5 s before the authoritative current_utc (11:21:11.1), which is expected. (6) Archive MD5 and per-split index SHA-256 hashes are present, enabling provenance verification. (7) Package versions (torch 2.14.0+cu126, lightning 2.6.5, numpy 2.4.6, scikit-learn 1.9.0, Python 3.11.15) are mutually compatible and plausible for the 2026 timeframe. Two minor observations (neither blocking): (a) llm_model_digest is null for the qwen3.8 Ollama model, so exact weight provenance cannot be independently verified — this is a reproducibility gap worth tracking but not an ingestion error; (b) the test-domain note confirms the test split originates from a different clinical center (CRC-VAL-HE-7K), a known PathMNIST characteristic that should be carried into downstream evaluation interpretation. No issues require revision; proceed to the next stage.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "llm_model_digest is null for qwen3.8 (ollama); exact model weight provenance is not pinned, limiting full reproducibility of any LLM-assisted steps.",
+        "Test split (CRC-VAL-HE-7K) originates from a different clinical center than train/val; this domain shift is a known PathMNIST property but must be explicitly accounted for in any downstream performance reporting."
+      ],
+      "schema_version": "1.0",
+      "severity": "ok",
+      "source": "qwen3.8",
+      "stage": "ingestion"
+    },
+    "anomaly_model_search": {
+      "action": "continue",
+      "attempt": 1,
+      "comment": "Model search stage is internally consistent and well-executed. Key checks passed: (1) Test lock is enforced — test_locked=true in search_plan, test_metrics_used=false in both best_configuration and search_report; no test-set leakage. (2) Selection is justified: res_cnn_refined (val_acc 0.987705, macro-F1 0.988031) outperforms the next-best trial (compact_tf_deep6 at 0.966114) by ~2.2 pp, well outside the 0.005 tolerance. (3) Config hashes are consistent across best_configuration, search_report, and the trial artifact. (4) All 8 planned trials completed with 0 failures across 3 rounds. (5) Split manifest is coherent: 89,996 train / 10,004 val / 7,180 test with official strategy, separate test center, and SHA-256 integrity hashes for all index files. (6) Augmented train size (359,984) is exactly 4× the raw train size, consistent with the listed augmentations (hflip + rotate90 + contrast). (7) Hyperparameters align with the architecture research: residual_cnn family (top priority), hidden=80 within the 32→256 channel progression, lr=1.5e-3 near the recommended 1e-3, weight_decay=1e-4 within the 1e-4–5e-4 band, batch_size=128 within 128–256, AdamW optimizer, cosine scheduler. Minor justified deviations: dropout 0.15 vs recommended 0.2–0.3 (rationale: convergence by epoch 3), early_stopping_patience 3 vs 5–8 (same convergence rationale), rotate90 vs ±10° rotation (empirically validated). (8) The transformer trials (compact_tf_p4 at 0.9664, compact_tf_deep6 at 0.9661) confirm the research prediction that 49-token attention underperforms a well-tuned residual CNN at this resolution. No deterministic findings were raised. No issues warrant revision.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "Minor: augmentation 'rotate90' (90° discrete rotation) deviates from the research-recommended 'small rotation ±10°'; empirically validated but worth noting for reproducibility documentation",
+        "Minor: early_stopping_patience=3 is below the research-recommended 5–8; justified by observed convergence but leaves little margin if a future re-run shows slower convergence",
+        "Minor: normalization is labeled 'standardize' without explicitly stating 'per-channel'; the research specifically warns against global mean/std — confirm implementation applies per-channel statistics"
+      ],
+      "schema_version": "1.0",
+      "severity": "ok",
+      "source": "qwen3.8",
+      "stage": "model_search"
+    },
+    "anomaly_preprocessing": {
+      "action": "continue",
+      "attempt": 1,
+      "comment": "Preprocessing stage is structurally sound and internally consistent. All deterministic checks pass: split sizes (train=89996, val=10004, test=7180) match official sizes exactly with no subsampling; no duplicates, no blank images, no omitted artifacts; n_classes=9 and n_channels=3 are correct; augmented_train_size (359984) equals 89996×4 as expected; normalization stats are computed from train only (train_stats_only=true), preventing leakage; selected_index_sha256 values are consistent across dataset_manifest and split_manifest. The representation plan (hflip, vflip, brightness; standardize normalization) is appropriate for 28×28 H&E patches with the observed channel statistics (means 0.53–0.74, stds 0.12–0.18).\n\nTwo minor issues are noted but do not block progression:\n\n1. Narrative factual error: The LLM-generated ambiguity_risks text in data_profile references '96×96 patch resolution' in two places, but the actual image_shape_hwc is [28,28,3]. The structured data is correct; only the free-text narrative is wrong. This was already self-flagged by the profiling LLM. It should be corrected in any downstream report to avoid confusion, but it does not affect the data pipeline.\n\n2. llm_model_digest is null for qwen3.8 (ollama) in both ingestion and profiling artefacts. The core ML pipeline (splitting, normalization, augmentation, training) is fully deterministic via code_sha256, seed=47, and pinned package versions, so this does not affect model reproducibility. It only limits bit-exact reproduction of LLM-generated narrative text, which is a documentation concern, not a data-integrity concern.\n\nThe test-set domain shift (CRC-VAL-HE-7K, different clinical center) and the resulting class-prevalence skew (adipose ×1.79, debris ×0.41, stroma ×0.56) are well-documented in test_domain_note, split_manifest, and ambiguity_risks. These are known PathMNIST properties and are properly accounted for. Small per-class test counts (debris n=339, stroma n=421) will make per-class test metrics noisy; this is inherent to the dataset and correctly flagged.\n\nNo critical or warning-level issues detected. Proceed to the next stage.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "Narrative text in data_profile.ambiguity_risks incorrectly states '96×96 patch resolution'; actual image_shape_hwc is [28,28,3]. Structured data is correct; only LLM-generated prose is wrong.",
+        "llm_model_digest is null for qwen3.8 (ollama) in both ingestion and profiling artefacts; LLM-assisted narrative steps are not bit-exactly reproducible, though the deterministic ML pipeline is fully pinned via code_sha256 and seed."
+      ],
+      "schema_version": "1.0",
+      "severity": "ok",
+      "source": "qwen3.8",
+      "stage": "preprocessing"
+    },
+    "anomaly_profiling": {
+      "action": "continue",
+      "attempt": 1,
+      "comment": "Profiling stage is clean and complete. All deterministic checks pass: split sizes match official sizes exactly (train=89996, val=10004, test=7180), no subsampling, no duplicates, no blank images, no omitted artifacts, n_classes=9 and n_channels=3 are correct. The data profile correctly captures the known PathMNIST properties: (1) train/val are well-balanced (imbalance ratio 1.63) from a single-site random split; (2) the test set (CRC-VAL-HE-7K) from an external clinical center shows expected prevalence shifts (adipose ×1.79, debris ×0.41, stroma ×0.56) and higher imbalance (3.95); (3) label ambiguity for 'debris', 'background', and stroma-vs-smooth-muscle is a genuine dataset limitation, not a pipeline error. The llm_model_digest being null for qwen3.8 via ollama is a minor reproducibility gap (model weights not pinned by hash) but does not affect the deterministic profiling results. One minor text inconsistency: the LLM-generated ambiguity_risks narrative references '96×96 patch resolution' while the structured data correctly reports image_shape_hwc=[28,28,3]; this is a narrative error only and does not affect any computed metric. Run manifest is consistent (seed=47, torch 2.14.0+cu126, medmnist 3.0.2, deterministic_torch=true). No blockers identified. Proceed to next stage.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "Minor text inconsistency: LLM-generated ambiguity_risks narrative references '96×96 patch resolution' but actual image_shape_hwc is [28,28,3]; structured data is correct, narrative text is not.",
+        "llm_model_digest is null for qwen3.8 (ollama); exact model weight provenance is not pinned, limiting full reproducibility of any LLM-assisted steps downstream."
+      ],
+      "schema_version": "1.0",
+      "severity": "ok",
+      "source": "qwen3.8",
+      "stage": "profiling"
+    },
+    "anomaly_reporting": {
+      "action": "revise",
+      "attempt": 1,
+      "comment": "Reporting stage is arithmetically and structurally sound. All invariants verified: confusion-matrix row sums match per-class supports (total 7180); accuracy 6279/7180 = 0.874513; balanced_accuracy = macro_recall = 0.852848; selective_risk identity (1 − 0.980371 = 0.019629); abstain count 0.47493 × 7180 = 3410; total errors 901 = 7180 × (1 − 0.874513); accuracy_delta 0.874513 − 0.840251 = 0.034262; common seed 47 and split fingerprint 9afc9ed… consistent across baseline, agentic, and comparison reports; test lock enforced (test_metrics_used = false in search). No deterministic findings. The LLM-raised issues are valid observations about model behaviour and analysis scope, not reporting errors: (1) the 12.1 pp validation→test accuracy gap and the 27.5 pp abstention-coverage gap (80.0 % → 52.5 %) are real generalisation properties that downstream consumers must be aware of, but they are correctly reported, not misreported; (2) OOD evaluation is limited to controlled Gaussian-noise corruption (σ 0.15/0.25/0.4) with AUROC 0.89 test vs 0.995 validation—this scope limitation is transparently stated in the artefact; (3) per-class weaknesses (stroma recall 45.6 %, smooth-muscle F1 0.632, adipose→smooth-muscle confusion 21 %) are accurately reflected in the confusion matrix and per-class table; (4) minor documentation gaps (rotate90 augmentation, early_stopping_patience = 3, 'standardize' without per-channel qualifier, transformer params in CNN config) are inherited from upstream stages and do not affect reporting correctness. The comparison report omits macro-F1 delta and significance testing, which would strengthen the analysis but are not required for internal consistency. All 38 artefact versions are accounted for; 105 decision events logged. The reporting faithfully and accurately presents the evaluation results. No corrections required; proceed to finalisation.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "Validation-to-test accuracy gap of 12.1 pp (0.9958 → 0.8745) is a material generalisation risk that should be prominently flagged for downstream consumers",
+        "Abstention coverage guarantee does not transfer: 80.0 % validation → 52.5 % test (27.5 pp gap); operational systems expecting ~80 % coverage will see ~52.5 %",
+        "OOD evaluation scope limited to controlled Gaussian-noise corruption (σ 0.15/0.25/0.4); real-world domain shift, novel tissue types, and imaging artefacts unverified",
+        "Cancer-associated stroma recall 45.6 % and smooth-muscle F1 0.632 on test are substantially below validation-level performance; these confusions were not visible in validation metrics",
+        "Adipose→smooth-muscle confusion (283/1338 = 21 %) is the single largest error source on test",
+        "Comparison report omits macro-F1 delta (+0.0559), balanced-accuracy comparison, and any statistical significance test on the 3.4 pp accuracy delta",
+        "Model-capacity asymmetry (tiny_cnn depth-2/hidden-16 vs residual_cnn depth-4/hidden-80) not discussed as a potential confound on the comparison delta",
+        "Augmentation 'rotate90' (90° discrete) deviates from research-recommended small-angle jitter; empirically validated but under-documented for reproducibility",
+        "early_stopping_patience = 3 is below the 5–8 range recommended in research notes; low risk given convergence but limited margin for slower re-runs",
+        "Normalization labeled 'standardize' without explicit per-channel qualifier; implementation should be confirmed",
+        "Transformer-specific parameters (num_heads, mlp_ratio, pooling, positional_encoding, tokenizer_layers) present in residual_cnn config; likely shared-schema no-ops but unconfirmed"
+      ],
+      "schema_version": "1.0",
+      "severity": "warning",
+      "source": "qwen3.8",
+      "stage": "reporting"
+    },
+    "anomaly_training": {
+      "action": "continue",
+      "attempt": 1,
+      "comment": "Training stage is internally consistent and well-executed. Key checks: (1) Config consistency — best_configuration.train_config, top-level train_config, and train_result all agree on hyperparameters (batch_size=128, depth=4, hidden=80, dropout=0.15, lr=0.0015, seed=47, cosine scheduler). (2) Early stopping is correctly applied: best_epoch=13, patience=3, training halted at epoch 15 (13+3=16 > 15, so all 15 epochs ran and the last 2 were within patience window). (3) Training history shows monotonic train-loss decrease (0.510→0.282) and val-loss decrease (0.390→0.290) with no overfitting signal; val accuracy plateaus at ~0.9956–0.9958 from epoch 10 onward. (4) Cosine LR schedule decays from 0.0015 to 0.0 over 15 epochs as expected. (5) Checkpoint and config SHA-256 hashes are present and distinct from the search-trial checkpoint, confirming a separate full-training artifact. (6) The search trial (3 epochs, patience 2, val_acc 0.987705) and the full training run (15 epochs, patience 3, val_acc 0.995802) differ in epoch budget and patience, which is a valid two-stage workflow (short-trial selection → full training); the ~0.8 pp improvement is consistent with additional training. (7) No test-set metrics appear anywhere in the training artefacts. Minor carry-forward notes from the search stage remain: (a) 'rotate90' augmentation is a 90° discrete rotation rather than a small-angle jitter — empirically validated but should be documented for reproducibility; (b) early_stopping_patience=3 is below the 5–8 range suggested in the research notes, though the observed convergence (plateau by epoch 10) makes this low-risk; (c) normalization is labeled 'standardize' without explicitly stating per-channel statistics — confirm the implementation applies per-channel mean/std rather than global. None of these are blocking. No deterministic findings were raised. Proceed to the next stage.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "Minor: augmentation 'rotate90' is a 90° discrete rotation, not a small-angle jitter; empirically validated but should be explicitly documented for reproducibility",
+        "Minor: early_stopping_patience=3 is below the research-recommended 5–8; low risk given observed convergence but leaves little margin for slower-converging re-runs",
+        "Minor: normalization labeled 'standardize' without explicit 'per-channel' qualifier; confirm implementation uses per-channel statistics to avoid the global mean/std pitfall flagged in research notes",
+        "Informational: transformer-specific parameters (num_heads, mlp_ratio, pooling, positional_encoding, tokenizer_layers) are present in a residual_cnn config; likely a shared schema, but worth confirming they are no-ops for the CNN path"
+      ],
+      "schema_version": "1.0",
+      "severity": "ok",
+      "source": "qwen3.8",
+      "stage": "training"
+    },
+    "architecture_research": {
+      "analysis": "The task operates on 28×28×3 images with ~90k training samples and a moderate class imbalance (1.63×). Three architectural facts dominate the design space. (1) Spatial resolution is extremely small: a 7×7 stride-2 first convolution (as in resnet18) immediately collapses 28→14→7, leaving only 49 spatial positions after the first block, which wastes the deeper layers' capacity. (2) Channel statistics are highly asymmetric—means range from 0.53 to 0.74 and stds from 0.12 to 0.18—so per-channel normalisation is not optional; it is the single highest-leverage preprocessing step. The low overall variance (all stds < 0.18) implies that discriminative signal is subtle and concentrated, favouring architectures with strong local feature extraction and careful normalisation over architectures that rely on global context from the outset. (3) The dataset size (~90k) is comfortable for CNNs but tight for full-scale transformers, especially given the imbalance which effectively reduces the minority-class sample count. Architecture ranking: residual_cnn is the strongest default because 2–4 residual blocks with 32→64→128 channels exploit local structure at 28×28 without over-parameterisation, and skip connections stabilise training at this depth. tiny_cnn serves as a fast, low-risk baseline for hyperparameter sweeps. compact_transformer is the preferred transformer entry point: with patch_size=4 it yields 49 tokens, which is enough for meaningful self-attention while keeping the parameter count modest. vision_transformer is viable only if patch_size is reduced to 2 (196 tokens) and depth is capped at 4–6 layers; otherwise the token count is too small for the attention mechanism to learn useful relational structure. resnet18 is the least suitable: its stem is designed for 224×224 inputs and will destroy spatial information at 28×28 unless the first conv is replaced with a 3×3 stride-1 kernel. For the 1.63× imbalance, class-weighted cross-entropy or focal loss (γ=1–2) should be the default, and the validation set (10k) is large enough to monitor per-class recall without overfitting to the metric. The cited evidence (efficient transformer design, small-image representation learning) supports the conclusion that at this resolution, inductive bias from convolutional locality outperforms pure attention unless the transformer is explicitly compacted.",
+      "architecture_priorities": [
+        "residual_cnn",
+        "tiny_cnn",
+        "compact_transformer",
+        "vision_transformer",
+        "resnet18"
+      ],
+      "evidence_sources": [
+        "https://openreview.net/forum?id=YicbFdNTTy",
+        "https://arxiv.org/abs/2104.05704",
+        "https://doi.org/10.1038/s41597-022-01721-8"
+      ],
+      "parametrization_priorities": [
+        "Learning rate: start at 1e-3 for CNNs, 3e-4 for transformers; use cosine or step decay with warmup of 5–10 epochs",
+        "Weight decay: 1e-4 to 5e-4 for CNNs; 0.05 for transformer (AdamW decoupled)",
+        "Batch size: 128–256 for CNNs; 64–128 for transformers (smaller to stabilise attention gradients with few tokens)",
+        "Dropout: 0.2–0.3 on classifier head; stochastic depth 0.1–0.2 in residual blocks; avoid heavy dropout in early conv layers at 28×28",
+        "Class-weighted loss or focal loss (γ=1.5) to address the 1.63× imbalance; monitor per-class F1 on validation",
+        "For transformers: num_heads=4–8, MLP expansion ratio=2–4, num_layers=4–6 (compact) or 8–12 (full ViT); keep d_model ≤ 192 to match the small token count",
+        "For CNNs: channel progression 32→64→128→256 with 2–4 residual blocks; kernel size 3×3 throughout",
+        "Early stopping patience of 5–8 epochs on validation loss; track both accuracy and macro-F1"
+      ],
+      "representation_priorities": [
+        "Per-channel normalisation using the provided means [0.7405, 0.5330, 0.7058] and stds [0.1237, 0.1768, 0.1244] before any model input; do not use global mean/std",
+        "Preserve full 28×28 spatial resolution through at least the first two feature-extraction stages; avoid stride-2 downsampling before the second block",
+        "For transformer variants, use patch_size=4 (49 tokens) as the default; patch_size=2 (196 tokens) only if attention quality is insufficient",
+        "Add a lightweight spatial attention or channel-attention (SE-style) module after the second conv block to compensate for the low channel variance and subtle features",
+        "Use global average pooling (not max pooling) before the classifier to retain soft spatial information at 28×28",
+        "Consider a 1×1 conv 'bottleneck' before the classifier to mix channels without further spatial reduction",
+        "If using residual blocks, keep the number of spatial downsampling steps to at most 2 (28→14→7) to retain enough spatial context",
+        "Apply data augmentation (random horizontal flip, small rotation ±10°, mild colour jitter) to counteract the low channel variance and reduce overfitting on the 90k samples"
+      ],
+      "risks": [
+        "Over-parameterisation: resnet18 or a deep ViT on 28×28 images will have more parameters than useful spatial information, leading to overfitting on 90k samples",
+        "Token starvation: transformer attention with <50 tokens may degenerate to near-uniform mixing, providing no advantage over a fully-connected layer",
+        "Class imbalance masking: overall accuracy may look acceptable while minority-class recall is poor; always track macro-F1 and per-class confusion",
+        "Channel variance suppression: the low stds (0.12–0.18) mean that without per-channel normalisation, the model may latch onto the brighter channel (R, mean 0.74) and ignore the more informative G channel (std 0.18)",
+        "Premature spatial collapse: any architecture that downsamples below 7×7 before the final pooling loses the spatial detail that 28×28 images carry",
+        "Hyperparameter transfer failure: learning rates and weight decay tuned for 224×224 ImageNet-style training will be poorly calibrated for 28×28; re-sweep is mandatory",
+        "Validation set leakage risk: with only 10k validation samples and 1.63× imbalance, a few hundred misclassified minority samples can swing the metric; use stratified splits and report confidence intervals",
+        "Transformer training instability at low token counts: attention logits can become poorly conditioned with 49 tokens; use pre-norm, gradient clipping (1.0), and a lower peak LR than CNNs"
+      ],
+      "schema_version": "1.0",
+      "source": "qwen3.8",
+      "test_metrics_used": false,
+      "transformer_guidance": "At 28×28 the token budget is the binding constraint. With patch_size=4 the sequence length is 49, which is below the typical 196–576 tokens where self-attention learns rich relational structure. Therefore: (a) prefer compact_transformer over vision_transformer—its reduced d_model (64–128) and fewer layers (4–6) are better matched to 49 tokens and the 90k sample budget. (b) If using vision_transformer, set patch_size=2 to obtain 196 tokens, cap depth at 8 layers, d_model=192, heads=6, and add a learnable position embedding (not sinusoidal, since the grid is only 14×14). (c) Add a convolutional stem (2–3 layers of 3×3 conv with stride 2) before the patch embedding to inject local inductive bias; this hybrid 'conv-stem + transformer' pattern is well-supported by the cited efficient-transformer literature and is critical at this resolution. (d) Use LayerNorm (pre-norm) rather than PostNorm for training stability with few tokens. (e) Attention dropout of 0.1 and MLP dropout of 0.1 are sufficient; avoid heavier regularisation that would suppress the already-limited attention signal. (f) Do NOT use resnet18's 7×7 stride-2 stem as a transformer front-end—it destroys 75% of spatial information before the first attention layer. (g) If compute allows, run a small ablation: patch_size 2 vs 4, with and without conv stem, to confirm the token-count hypothesis before committing to a full search."
+    },
+    "baseline_report": {
+      "accuracy": 0.840251,
+      "checkpoint_path": "blobs/baseline_model.ckpt",
+      "checkpoint_sha256": "06a5e772f144c5960aebfb9aec4ef950b8124614a45e2bc519ab7b55f05ba3e3",
+      "config": {
+        "batch_size": 128,
+        "class_weighting": false,
+        "depth": 2,
+        "device": "cuda",
+        "dropout": 0.0,
+        "early_stopping_patience": 3,
+        "epochs": 15,
+        "gradient_clip_val": 1.0,
+        "hidden": 16,
+        "label_smoothing": 0.0,
+        "lr": 0.001,
+        "mlp_ratio": 4,
+        "model_family": "tiny_cnn",
+        "num_heads": 4,
+        "optimizer": "adamw",
+        "patch_size": 4,
+        "pooling": "cls",
+        "positional_encoding": "learned",
+        "rationale": "Fixed conventional control with the agentic run's epoch budget.",
+        "scheduler": "cosine",
+        "schema_version": "1.0",
+        "seed": 47,
+        "source": "baseline:fixed",
+        "tokenizer_layers": 2,
+        "weight_decay": 0.0001
+      },
+      "dataset": "pathmnist",
+      "lightning_csv_path": "blobs/lightning_logs/baseline_model/version_0/metrics.csv",
+      "macro_f1": 0.784172,
+      "schema_version": "1.0",
+      "seed": 47,
+      "split_fingerprint": "9afc9ed3c5a00c7391bcdd170372981b088ec7867c12f721313eda0b303c7505",
+      "training_log_path": "blobs/baseline_model.training.jsonl"
+    },
+    "best_configuration": {
+      "lightning_config_path": "best_config.yaml",
+      "lightning_config_sha256": "14bbdf447372e1772f0f7152b6973ef6e6698ae7122855c73795cb1ec1d4b656",
+      "representation": {
+        "augmentations": [
+          "hflip",
+          "rotate90",
+          "contrast"
+        ],
+        "normalization": "standardize",
+        "rationale": "Refinement of the best prior config (res_cnn_base, 0.9875 val_acc). Key changes: (1) hidden 64→80 adds ~25% channel capacity without reaching the 96 that overfit at depth 6; (2) dropout 0.2→0.15 because all top configs converged by epoch 3, indicating the model is not overfitting and lighter regularization allows sharper features; (3) lr 0.001→0.0015 explores the log-scale neighborhood — the SGD/one_cycle variant at lr=0.01 achieved 0.9870, suggesting the adamw optimum may be slightly above 0.001; (4) label_smoothing 0.1→0.05 because the model already achieves 0.9875 balanced accuracy, and excessive smoothing may blunt the decision boundary on the 1.63× imbalanced classes; (5) adding 'contrast' augmentation directly targets the low channel variance (stds 0.12–0.18) by amplifying subtle inter-class differences in the G channel (highest std 0.177). Retains adamw+cosine+batch128+standardize+class_weighting as the proven backbone."
+      },
+      "schema_version": "1.0",
+      "selected_candidate_id": "res_cnn_refined",
+      "selected_config_hash": "2856390885ddca0608c1ff63b542a8b81b5e4d14de57e15092bfea8b8a7285ba",
+      "selection_rule": "accuracy within tolerance, then macro-F1; test locked",
+      "test_metrics_used": false,
+      "train_config": {
+        "batch_size": 128,
+        "class_weighting": true,
+        "depth": 4,
+        "device": "cuda",
+        "dropout": 0.15,
+        "early_stopping_patience": 3,
+        "epochs": 15,
+        "gradient_clip_val": 1.0,
+        "hidden": 80,
+        "label_smoothing": 0.05,
+        "lr": 0.0015,
+        "mlp_ratio": 4,
+        "model_family": "residual_cnn",
+        "num_heads": 4,
+        "optimizer": "adamw",
+        "patch_size": 4,
+        "pooling": "cls",
+        "positional_encoding": "learned",
+        "rationale": "Selected from 8 validation-only trials. Refinement of the best prior config (res_cnn_base, 0.9875 val_acc). Key changes: (1) hidden 64→80 adds ~25% channel capacity without reaching the 96 that overfit at depth 6; (2) dropout 0.2→0.15 because all top configs converged by epoch 3, indicating the model is not overfitting and lighter regularization allows sharper features; (3) lr 0.001→0.0015 explores the log-scale neighborhood — the SGD/one_cycle variant at lr=0.01 achieved 0.9870, suggesting the adamw optimum may be slightly above 0.001; (4) label_smoothing 0.1→0.05 because the model already achieves 0.9875 balanced accuracy, and excessive smoothing may blunt the decision boundary on the 1.63× imbalanced classes; (5) adding 'contrast' augmentation directly targets the low channel variance (stds 0.12–0.18) by amplifying subtle inter-class differences in the G channel (highest std 0.177). Retains adamw+cosine+batch128+standardize+class_weighting as the proven backbone.",
+        "scheduler": "cosine",
+        "schema_version": "1.0",
+        "seed": 47,
+        "source": "agentic_search:selected:qwen3.8",
+        "tokenizer_layers": 2,
+        "weight_decay": 0.0001
+      },
+      "validation_accuracy": 0.987705,
+      "validation_macro_f1": 0.988031
+    },
+    "comparison_report": {
+      "accuracy_delta": 0.034262,
+      "agentic_accuracy": 0.874513,
+      "baseline_accuracy": 0.840251,
+      "baseline_met_or_exceeded": true,
+      "common_seed": 47,
+      "common_split_fingerprint": "9afc9ed3c5a00c7391bcdd170372981b088ec7867c12f721313eda0b303c7505",
+      "primary_metric": "accuracy",
+      "schema_version": "1.0"
+    },
+    "data_profile": {
+      "ambiguity_note": "Several concrete ambiguities and dataset-shift risks are present. (1) Label ambiguity: 'debris' is not a standard histological entity and overlaps heavily with 'mucus' and 'background' in H&E appearance; 'background' is a catch-all for non-tissue or artifact regions; 'cancer-associated stroma' and 'smooth muscle' can be visually indistinguishable at patch level without architectural context; 'normal colon mucosa' vs. 'colorectal adenocarcinoma epithelium' has a dysplastic transition zone that is inherently ambiguous at the 96×96 patch resolution used in PathMNIST. (2) Distribution shift: train and val class proportions are nearly identical (max |Δ| < 0.001), but the test set (CRC-VAL-HE-7K, different clinical center) deviates substantially—adipose prevalence nearly doubles (10.4%→18.6%, ratio 1.79), mucus rises (8.9%→14.4%, ratio 1.62), while debris drops sharply (11.5%→4.7%, ratio 0.41), cancer-associated stroma drops (10.4%→5.9%, ratio 0.56), and smooth muscle drops (13.5%→8.2%, ratio 0.61). This is not a random sampling artifact; it reflects a different tissue-sampling or slide-preparation protocol at the external center. (3) Domain shift: the test set explicitly originates from a different clinical center, introducing uncontrolled variation in H&E staining intensity/hue, scanner color calibration, slide thickness, and fixation quality. The 'debris' class collapse (ratio 0.41) is consistent with different slide-preparation or scanning artifacts at the new site, meaning the model's learned 'debris' features may not transfer. (4) The test set is also smaller (7,180 vs. 89,996 train), amplifying the statistical impact of the skewed distribution and reducing per-class test samples for the under-represented classes (debris n=339, cancer-associated stroma n=421, smooth muscle n=592), making per-class test metrics noisy and less reliable. (5) No information is provided about whether the external center used the same annotation protocol, inter-annotator agreement, or whether 'debris' and 'background' were defined identically, compounding the label-ambiguity risk under domain shift.",
+      "ambiguity_risks": [
+        "Test-set class distribution deviates substantially from train/val (adipose ×1.79, debris ×0.41, stroma ×0.56), indicating non-random sampling or different tissue-sampling protocol at the external center.",
+        "External clinical center (CRC-VAL-HE-7K) introduces uncontrolled H&E staining, scanner, and slide-preparation variability that can shift pixel-level features for all classes.",
+        "'Debris' is a non-standard, poorly defined histological label that overlaps with 'mucus' and 'background'; its 59% prevalence drop in test suggests the external site's artifact profile differs, undermining label transferability.",
+        "'Cancer-associated stroma' vs. 'smooth muscle' and 'normal colon mucosa' vs. 'adenocarcinoma epithelium' are inherently ambiguous at 96×96 patch resolution without multi-scale architectural context, increasing misclassification risk under domain shift.",
+        "Small per-class test counts for debris (n=339), stroma (n=421), and smooth muscle (n=592) make per-class test metrics statistically noisy and sensitive to a handful of mislabeled patches.",
+        "No evidence that the external center used the same annotation guidelines or inter-annotator agreement process, so label semantics for ambiguous classes (debris, background, stroma) may differ across sites.",
+        "The near-identical train/val split (max proportion difference <0.001) suggests a random split of a single-site dataset, meaning the only true external generalization test is the skewed CRC-VAL-HE-7K set, which conflates distribution shift with domain shift.",
+        "Patch-level classification without spatial context means the model cannot leverage tissue architecture to disambiguate stroma from smooth muscle or dysplastic from normal epithelium, a limitation that is exacerbated when staining appearance shifts across centers."
+      ],
+      "blank_image_fraction": 0.0,
+      "class_counts": {
+        "test": [
+          1338,
+          847,
+          339,
+          634,
+          1035,
+          592,
+          741,
+          421,
+          1233
+        ],
+        "train": [
+          9366,
+          9509,
+          10360,
+          10401,
+          8006,
+          12182,
+          7886,
+          9401,
+          12885
+        ],
+        "val": [
+          1041,
+          1057,
+          1152,
+          1156,
+          890,
+          1354,
+          877,
+          1045,
+          1432
+        ]
+      },
+      "class_proportions": {
+        "test": [
+          0.18635097,
+          0.11796657,
+          0.04721448,
+          0.08830084,
+          0.14415042,
+          0.08245125,
+          0.10320334,
+          0.0586351,
+          0.17172702
+        ],
+        "train": [
+          0.10407129,
+          0.10566025,
+          0.11511623,
+          0.1155718,
+          0.08895951,
+          0.13536157,
+          0.08762612,
+          0.1044602,
+          0.14317303
+        ],
+        "val": [
+          0.10405838,
+          0.10565774,
+          0.11515394,
+          0.11555378,
+          0.08896441,
+          0.13534586,
+          0.08766493,
+          0.10445822,
+          0.14314274
+        ]
+      },
+      "dataset": "pathmnist",
+      "decision_source": "qwen3.8",
+      "duplicate_train_samples": 0,
+      "image_shape_hwc": [
+        28,
+        28,
+        3
+      ],
+      "imbalance_ratio": 1.633908,
+      "n_channels": 3,
+      "n_classes": 9,
+      "official_data_fraction": 1.0,
+      "profiled_fraction": 1.0,
+      "samples_profiled": 107180,
+      "schema_version": "1.0",
+      "test_imbalance_ratio": 3.946903,
+      "test_to_train_prevalence_ratio": [
+        1.79060883,
+        1.11647069,
+        0.41014621,
+        0.76403442,
+        1.62040482,
+        0.60911862,
+        1.17776921,
+        0.5613152,
+        1.19943693
+      ],
+      "train_channel_mean_unit": [
+        0.740545,
+        0.53298219,
+        0.70582885
+      ],
+      "train_channel_std_unit": [
+        0.12368222,
+        0.17676253,
+        0.12443067
+      ]
+    },
+    "dataset_manifest": {
+      "archive_md5": "a8b06965200029087d5bd730944a56c1",
+      "data_reference": "https://zenodo.org/records/10519652/files/pathmnist.npz?download=1",
+      "dataset": "pathmnist",
+      "labels": [
+        "adipose",
+        "background",
+        "debris",
+        "lymphocytes",
+        "mucus",
+        "smooth muscle",
+        "normal colon mucosa",
+        "cancer-associated stroma",
+        "colorectal adenocarcinoma epithelium"
+      ],
+      "license": "CC BY 4.0",
+      "loaded_split_sizes": {
+        "test": 7180,
+        "train": 89996,
+        "val": 10004
+      },
+      "n_channels": 3,
+      "n_classes": 9,
+      "official_split_sizes": {
+        "test": 7180,
+        "train": 89996,
+        "val": 10004
+      },
+      "schema_version": "1.0",
+      "selected_index_sha256": {
+        "test": "27ab586ecd9b4ac7278c6a91cf0b336a2ba742afe742d13eff51f702635791e8",
+        "train": "1478a96c1d8ad06d0a600d6c9b8d5c8dddd83fbda22307ab449764f013683b51",
+        "val": "a13f875ade8e54f5aee16ff205c36aa628396dddec09a33a175fcf9cbbb9d402"
+      },
+      "subsampled": false,
+      "task": "multi-class",
+      "test_domain_note": "CRC-VAL-HE-7K test images originate from a different clinical center."
+    },
+    "evaluation_report": {
+      "accuracy": 0.874513,
+      "balanced_accuracy": 0.852848,
+      "confusion_matrix": [
+        [
+          1048,
+          0,
+          0,
+          0,
+          3,
+          283,
+          1,
+          0,
+          3
+        ],
+        [
+          0,
+          847,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          9,
+          298,
+          0,
+          0,
+          23,
+          0,
+          9,
+          0
+        ],
+        [
+          0,
+          0,
+          2,
+          631,
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          22,
+          33,
+          2,
+          0,
+          937,
+          6,
+          29,
+          1,
+          5
+        ],
+        [
+          0,
+          58,
+          48,
+          0,
+          0,
+          446,
+          0,
+          39,
+          1
+        ],
+        [
+          0,
+          0,
+          4,
+          9,
+          0,
+          0,
+          703,
+          10,
+          15
+        ],
+        [
+          0,
+          6,
+          100,
+          1,
+          1,
+          62,
+          4,
+          192,
+          55
+        ],
+        [
+          0,
+          0,
+          5,
+          23,
+          1,
+          0,
+          24,
+          3,
+          1177
+        ]
+      ],
+      "macro_f1": 0.840073,
+      "macro_precision": 0.846932,
+      "macro_recall": 0.852848,
+      "n_samples": 7180,
+      "per_class": [
+        {
+          "f1": 0.870432,
+          "label": 0,
+          "name": "adipose",
+          "precision": 0.979439,
+          "recall": 0.783259,
+          "support": 1338
+        },
+        {
+          "f1": 0.941111,
+          "label": 1,
+          "name": "background",
+          "precision": 0.888772,
+          "recall": 1.0,
+          "support": 847
+        },
+        {
+          "f1": 0.746867,
+          "label": 2,
+          "name": "debris",
+          "precision": 0.649237,
+          "recall": 0.879056,
+          "support": 339
+        },
+        {
+          "f1": 0.972265,
+          "label": 3,
+          "name": "lymphocytes",
+          "precision": 0.950301,
+          "recall": 0.995268,
+          "support": 634
+        },
+        {
+          "f1": 0.947901,
+          "label": 4,
+          "name": "mucus",
+          "precision": 0.994692,
+          "recall": 0.905314,
+          "support": 1035
+        },
+        {
+          "f1": 0.631728,
+          "label": 5,
+          "name": "smooth muscle",
+          "precision": 0.543902,
+          "recall": 0.753378,
+          "support": 592
+        },
+        {
+          "f1": 0.936085,
+          "label": 6,
+          "name": "normal colon mucosa",
+          "precision": 0.923784,
+          "recall": 0.948718,
+          "support": 741
+        },
+        {
+          "f1": 0.568889,
+          "label": 7,
+          "name": "cancer-associated stroma",
+          "precision": 0.755906,
+          "recall": 0.456057,
+          "support": 421
+        },
+        {
+          "f1": 0.945382,
+          "label": 8,
+          "name": "colorectal adenocarcinoma epithelium",
+          "precision": 0.936356,
+          "recall": 0.954582,
+          "support": 1233
+        }
+      ],
+      "primary_metric": "accuracy",
+      "roc_auc_ovr_macro": 0.979681,
+      "schema_version": "1.0",
+      "split": "test"
+    },
+    "prediction_artifact": {
+      "includes_logits": true,
+      "includes_probabilities": true,
+      "includes_targets": true,
+      "path": "blobs/predictions_v001.npz",
+      "schema_version": "1.0",
+      "sha256": "687dec91b4f2a9620a35ddce5ff8d9c0abbfc47eec21fa466e0f2947d96f79eb",
+      "test_samples": 7180,
+      "validation_samples": 10004
+    },
+    "reporting_status": {
+      "artefact_versions": 38,
+      "complete_through_stage": "comparison",
+      "decision_events": 105,
+      "dossier_path": "dossier.json",
+      "schema_version": "1.0"
+    },
+    "representation_plan": {
+      "augmentation_factor": 4,
+      "augmentations": [
+        "hflip",
+        "rotate90",
+        "contrast"
+      ],
+      "normalization": "standardize",
+      "rationale": "Refinement of the best prior config (res_cnn_base, 0.9875 val_acc). Key changes: (1) hidden 64→80 adds ~25% channel capacity without reaching the 96 that overfit at depth 6; (2) dropout 0.2→0.15 because all top configs converged by epoch 3, indicating the model is not overfitting and lighter regularization allows sharper features; (3) lr 0.001→0.0015 explores the log-scale neighborhood — the SGD/one_cycle variant at lr=0.01 achieved 0.9870, suggesting the adamw optimum may be slightly above 0.001; (4) label_smoothing 0.1→0.05 because the model already achieves 0.9875 balanced accuracy, and excessive smoothing may blunt the decision boundary on the 1.63× imbalanced classes; (5) adding 'contrast' augmentation directly targets the low channel variance (stds 0.12–0.18) by amplifying subtle inter-class differences in the G channel (highest std 0.177). Retains adamw+cosine+batch128+standardize+class_weighting as the proven backbone.",
+      "schema_version": "1.0",
+      "source": "agentic_search:selected:qwen3.8",
+      "stats_source": "train",
+      "train_channel_mean_unit": [
+        0.740545,
+        0.53298219,
+        0.70582885
+      ],
+      "train_channel_std_unit": [
+        0.12368222,
+        0.17676253,
+        0.12443067
+      ]
+    },
+    "run_manifest": {
+      "code_sha256": "03fe9a816b25eed3164944548c60aea70e82340870a42d9a29c4de4c1705d9c7",
+      "created_at": "2026-09-30T11:21:09.599326+00:00",
+      "dataset": "pathmnist",
+      "deterministic_torch": true,
+      "lightning_cli": true,
+      "llm_mode": "ollama",
+      "llm_model": "qwen3.8",
+      "llm_model_digest": null,
+      "package_versions": {
+        "jsonargparse": "4.52.0",
+        "lightning": "2.6.5",
+        "medmnist": "3.0.2",
+        "numpy": "2.4.6",
+        "pydantic": "2.13.5",
+        "scikit-learn": "1.9.0",
+        "torch": "2.14.0+cu126"
+      },
+      "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.35",
+      "python_version": "3.11.15",
+      "run_id": "seed_47",
+      "schema_version": "1.0",
+      "seed": 47
+    },
+    "search_plan": {
+      "accuracy_tolerance": 0.005,
+      "final_epochs": 15,
+      "framework": "lightning.pytorch",
+      "max_trials": 8,
+      "objective": "validation_accuracy_then_macro_f1",
+      "rounds": 3,
+      "schema_version": "1.0",
+      "search_epochs": 3,
+      "test_locked": true
+    },
+    "search_report": {
+      "completed_trials": 8,
+      "failed_trials": 0,
+      "schema_version": "1.0",
+      "selected_candidate_id": "res_cnn_refined",
+      "selected_config_hash": "2856390885ddca0608c1ff63b542a8b81b5e4d14de57e15092bfea8b8a7285ba",
+      "selected_validation_accuracy": 0.987705,
+      "selected_validation_macro_f1": 0.988031,
+      "selection_rule": "accuracy_tolerance_then_macro_f1",
+      "test_metrics_used": false,
+      "trial_artefacts": [
+        "trial_res_cnn_base_0d5e7d9b",
+        "trial_compact_tf_p4_60062e38",
+        "trial_tiny_cnn_fast_e9884b95",
+        "trial_res_cnn_deep96_3347682f",
+        "trial_compact_tf_p2_mean_7dcd10fc",
+        "trial_res_cnn_sgd_1cyc_619a5d89",
+        "trial_res_cnn_refined_28563908",
+        "trial_compact_tf_deep6_2c5e6d7a"
+      ]
+    },
+    "split_manifest": {
+      "augmented_train_size": 359984,
+      "dataset": "pathmnist",
+      "official_test_separate_center": true,
+      "schema_version": "1.0",
+      "seed": 47,
+      "selected_index_sha256": {
+        "test": "27ab586ecd9b4ac7278c6a91cf0b336a2ba742afe742d13eff51f702635791e8",
+        "train": "1478a96c1d8ad06d0a600d6c9b8d5c8dddd83fbda22307ab449764f013683b51",
+        "val": "a13f875ade8e54f5aee16ff205c36aa628396dddec09a33a175fcf9cbbb9d402"
+      },
+      "strategy": "official",
+      "test_size": 7180,
+      "train_size": 89996,
+      "train_stats_only": true,
+      "val_size": 10004
+    },
+    "train_config": {
+      "batch_size": 128,
+      "class_weighting": true,
+      "depth": 4,
+      "device": "cuda",
+      "dropout": 0.15,
+      "early_stopping_patience": 3,
+      "epochs": 15,
+      "gradient_clip_val": 1.0,
+      "hidden": 80,
+      "label_smoothing": 0.05,
+      "lr": 0.0015,
+      "mlp_ratio": 4,
+      "model_family": "residual_cnn",
+      "num_heads": 4,
+      "optimizer": "adamw",
+      "patch_size": 4,
+      "pooling": "cls",
+      "positional_encoding": "learned",
+      "rationale": "Selected from 8 validation-only trials. Refinement of the best prior config (res_cnn_base, 0.9875 val_acc). Key changes: (1) hidden 64→80 adds ~25% channel capacity without reaching the 96 that overfit at depth 6; (2) dropout 0.2→0.15 because all top configs converged by epoch 3, indicating the model is not overfitting and lighter regularization allows sharper features; (3) lr 0.001→0.0015 explores the log-scale neighborhood — the SGD/one_cycle variant at lr=0.01 achieved 0.9870, suggesting the adamw optimum may be slightly above 0.001; (4) label_smoothing 0.1→0.05 because the model already achieves 0.9875 balanced accuracy, and excessive smoothing may blunt the decision boundary on the 1.63× imbalanced classes; (5) adding 'contrast' augmentation directly targets the low channel variance (stds 0.12–0.18) by amplifying subtle inter-class differences in the G channel (highest std 0.177). Retains adamw+cosine+batch128+standardize+class_weighting as the proven backbone.",
+      "scheduler": "cosine",
+      "schema_version": "1.0",
+      "seed": 47,
+      "source": "agentic_search:selected:qwen3.8",
+      "tokenizer_layers": 2,
+      "weight_decay": 0.0001
+    },
+    "train_result": {
+      "best_epoch": 13,
+      "best_val_accuracy": 0.995802,
+      "checkpoint_path": "blobs/agentic_model_v001.ckpt",
+      "checkpoint_sha256": "37b82a84b3ac8bd270729d42c8702c83d23a9b4e3406d638e4f84b6eb995fa3d",
+      "device": "cuda",
+      "epochs_completed": 15,
+      "final_train_loss": 0.282322,
+      "final_val_accuracy": 0.995602,
+      "framework": "lightning.pytorch",
+      "history": [
+        {
+          "epoch": 1,
+          "learning_rate": 0.0014836107,
+          "train_loss": 0.50978,
+          "val_accuracy": 0.956417,
+          "val_loss": 0.389834,
+          "val_macro_f1": 0.956634
+        },
+        {
+          "epoch": 2,
+          "learning_rate": 0.0014351591,
+          "train_loss": 0.36125,
+          "val_accuracy": 0.968113,
+          "val_loss": 0.36585,
+          "val_macro_f1": 0.967947
+        },
+        {
+          "epoch": 3,
+          "learning_rate": 0.0013567627,
+          "train_loss": 0.331086,
+          "val_accuracy": 0.984406,
+          "val_loss": 0.32665,
+          "val_macro_f1": 0.984618
+        },
+        {
+          "epoch": 4,
+          "learning_rate": 0.001251848,
+          "train_loss": 0.315517,
+          "val_accuracy": 0.985106,
+          "val_loss": 0.32465,
+          "val_macro_f1": 0.984736
+        },
+        {
+          "epoch": 5,
+          "learning_rate": 0.001125,
+          "train_loss": 0.305098,
+          "val_accuracy": 0.989304,
+          "val_loss": 0.311732,
+          "val_macro_f1": 0.989119
+        },
+        {
+          "epoch": 6,
+          "learning_rate": 0.0009817627,
+          "train_loss": 0.29864,
+          "val_accuracy": 0.990904,
+          "val_loss": 0.303388,
+          "val_macro_f1": 0.990757
+        },
+        {
+          "epoch": 7,
+          "learning_rate": 0.0008283963,
+          "train_loss": 0.293779,
+          "val_accuracy": 0.990104,
+          "val_loss": 0.305672,
+          "val_macro_f1": 0.990006
+        },
+        {
+          "epoch": 8,
+          "learning_rate": 0.0006716037,
+          "train_loss": 0.289698,
+          "val_accuracy": 0.994702,
+          "val_loss": 0.296168,
+          "val_macro_f1": 0.994764
+        },
+        {
+          "epoch": 9,
+          "learning_rate": 0.0005182373,
+          "train_loss": 0.287473,
+          "val_accuracy": 0.994902,
+          "val_loss": 0.294629,
+          "val_macro_f1": 0.994813
+        },
+        {
+          "epoch": 10,
+          "learning_rate": 0.000375,
+          "train_loss": 0.285166,
+          "val_accuracy": 0.995702,
+          "val_loss": 0.292281,
+          "val_macro_f1": 0.995661
+        },
+        {
+          "epoch": 11,
+          "learning_rate": 0.000248152,
+          "train_loss": 0.284102,
+          "val_accuracy": 0.995402,
+          "val_loss": 0.292583,
+          "val_macro_f1": 0.995354
+        },
+        {
+          "epoch": 12,
+          "learning_rate": 0.0001432373,
+          "train_loss": 0.283355,
+          "val_accuracy": 0.995602,
+          "val_loss": 0.291471,
+          "val_macro_f1": 0.995564
+        },
+        {
+          "epoch": 13,
+          "learning_rate": 6.48409e-05,
+          "train_loss": 0.282728,
+          "val_accuracy": 0.995802,
+          "val_loss": 0.290696,
+          "val_macro_f1": 0.995795
+        },
+        {
+          "epoch": 14,
+          "learning_rate": 1.63893e-05,
+          "train_loss": 0.282487,
+          "val_accuracy": 0.995602,
+          "val_loss": 0.290492,
+          "val_macro_f1": 0.995575
+        },
+        {
+          "epoch": 15,
+          "learning_rate": 0.0,
+          "train_loss": 0.282322,
+          "val_accuracy": 0.995602,
+          "val_loss": 0.290088,
+          "val_macro_f1": 0.995558
+        }
+      ],
+      "lightning_config_path": "best_config.yaml",
+      "lightning_csv_path": "blobs/lightning_logs/agentic_model_v001/version_0/metrics.csv",
+      "schema_version": "1.0",
+      "seed": 47,
+      "training_log_path": "blobs/agentic_model_v001.training.jsonl"
+    },
+    "trial_compact_tf_deep6_2c5e6d7a": {
+      "best_epoch": 3,
+      "candidate_id": "compact_tf_deep6",
+      "checkpoint_path": "blobs/search/trial_compact_tf_deep6_2c5e6d7a.ckpt",
+      "checkpoint_sha256": "b2b72d662d596752e239a99209b53b6069d3774a922f6c717b3aa817c719a89e",
+      "config": {
+        "batch_size": 64,
+        "class_weighting": true,
+        "depth": 6,
+        "device": "cuda",
+        "dropout": 0.1,
+        "early_stopping_patience": 2,
+        "epochs": 3,
+        "gradient_clip_val": 1.0,
+        "hidden": 96,
+        "label_smoothing": 0.1,
+        "lr": 0.0005,
+        "mlp_ratio": 4,
+        "model_family": "compact_transformer",
+        "num_heads": 4,
+        "optimizer": "adamw",
+        "patch_size": 4,
+        "pooling": "cls",
+        "positional_encoding": "learned",
+        "rationale": "Second-chance transformer probe. The best compact_transformer (compact_tf_p4, 0.9664) used hidden=96, depth=4, cls pooling, hflip+rotate90. The worse variant (compact_tf_p2_mean, 0.9463) lost ~2% by switching to mean pooling and removing augmentations, confirming cls pooling and spatial aug are essential at 49 tokens. This candidate increases depth 4→6 to give the self-attention more sequential refinement passes over the 49 tokens, while keeping hidden=96 (the width that worked) and num_heads=4 (96/4=24, valid). lr raised 0.0003→0.0005 to maintain effective learning rate across the extra layers. Retains adamw with decoupled wd=0.05 (appropriate for transformer weight decay), cosine schedule, batch 64 (smaller batch stabilizes attention gradients with few tokens), and the proven augmentation set. If this still trails the residual_cnn by >1.5%, it confirms the architecture gap is structural (local inductive bias vs. global attention at 28×28) rather than a hyperparameter issue.",
+        "scheduler": "cosine",
+        "schema_version": "1.0",
+        "seed": 47,
+        "source": "qwen3.8",
+        "tokenizer_layers": 2,
+        "weight_decay": 0.05
+      },
+      "config_hash": "2c5e6d7a189c9ecaa853a3fe8b65acb2cf7f23d12c45d6db529e75c64e1b2eaf",
+      "decision_source": "qwen3.8",
+      "duration_seconds": 102.3146,
+      "error": null,
+      "lightning_csv_path": "blobs/search/lightning_logs/trial_compact_tf_deep6_2c5e6d7a/version_0/metrics.csv",
+      "representation": {
+        "augmentations": [
+          "hflip",
+          "rotate90"
+        ],
+        "normalization": "standardize",
+        "rationale": "Second-chance transformer probe. The best compact_transformer (compact_tf_p4, 0.9664) used hidden=96, depth=4, cls pooling, hflip+rotate90. The worse variant (compact_tf_p2_mean, 0.9463) lost ~2% by switching to mean pooling and removing augmentations, confirming cls pooling and spatial aug are essential at 49 tokens. This candidate increases depth 4→6 to give the self-attention more sequential refinement passes over the 49 tokens, while keeping hidden=96 (the width that worked) and num_heads=4 (96/4=24, valid). lr raised 0.0003→0.0005 to maintain effective learning rate across the extra layers. Retains adamw with decoupled wd=0.05 (appropriate for transformer weight decay), cosine schedule, batch 64 (smaller batch stabilizes attention gradients with few tokens), and the proven augmentation set. If this still trails the residual_cnn by >1.5%, it confirms the architecture gap is structural (local inductive bias vs. global attention at 28×28) rather than a hyperparameter issue."
+      },
+      "round_index": 3,
+      "schema_version": "1.0",
+      "status": "completed",
+      "training_log_path": "blobs/search/trial_compact_tf_deep6_2c5e6d7a.training.jsonl",
+      "validation_accuracy": 0.966114,
+      "validation_balanced_accuracy": 0.967613,
+      "validation_macro_f1": 0.966333
+    },
+    "trial_compact_tf_p2_mean_7dcd10fc": {
+      "best_epoch": 3,
+      "candidate_id": "compact_tf_p2_mean",
+      "checkpoint_path": "blobs/search/trial_compact_tf_p2_mean_7dcd10fc.ckpt",
+      "checkpoint_sha256": "8ecbc9cb174e1e1be552f28e4ec3cbde88047963b987106f3a16b65d22e92636",
+      "config": {
+        "batch_size": 64,
+        "class_weighting": true,
+        "depth": 4,
+        "device": "cuda",
+        "dropout": 0.1,
+        "early_stopping_patience": 2,
+        "epochs": 3,
+        "gradient_clip_val": 1.0,
+        "hidden": 128,
+        "label_smoothing": 0.1,
+        "lr": 0.0003,
+        "mlp_ratio": 4,
+        "model_family": "compact_transformer",
+        "num_heads": 4,
+        "optimizer": "adamw",
+        "patch_size": 4,
+        "pooling": "mean",
+        "positional_encoding": "learned",
+        "rationale": "Directly addresses the token-starvation hypothesis: round-1 compact_tf_p4 used patch_size=4 yielding only 49 tokens, which is below the threshold where self-attention learns meaningful relational structure. Switching to patch_size=2 produces 196 tokens (14×14 grid), giving attention 4× more pairwise interactions. Hidden increased to 128 (divisible by 4 heads, multiple of 8) to match the larger token budget and provide adequate per-token representation. Pooling switched from 'cls' to 'mean' to aggregate spatial information across all 196 tokens rather than relying on a single learned CLS token, which is more robust at this resolution. Depth kept at 4 to avoid overfitting with 90k samples. AdamW with wd=0.05 (decoupled weight decay) and cosine schedule retained from the round-1 transformer recipe. Batch size 64 keeps attention gradients stable with the larger token sequence. Dropout kept low (0.1) to preserve the already-limited attention signal.",
+        "scheduler": "cosine",
+        "schema_version": "1.0",
+        "seed": 47,
+        "source": "qwen3.8",
+        "tokenizer_layers": 2,
+        "weight_decay": 0.05
+      },
+      "config_hash": "7dcd10fc417746e8a49e8ed2ebc38a3d423e777b1997f9c061cdb244afa2980d",
+      "decision_source": "qwen3.8",
+      "duration_seconds": 33.0423,
+      "error": null,
+      "lightning_csv_path": "blobs/search/lightning_logs/trial_compact_tf_p2_mean_7dcd10fc/version_0/metrics.csv",
+      "representation": {
+        "augmentations": [],
+        "normalization": "standardize",
+        "rationale": "Directly addresses the token-starvation hypothesis: round-1 compact_tf_p4 used patch_size=4 yielding only 49 tokens, which is below the threshold where self-attention learns meaningful relational structure. Switching to patch_size=2 produces 196 tokens (14×14 grid), giving attention 4× more pairwise interactions. Hidden increased to 128 (divisible by 4 heads, multiple of 8) to match the larger token budget and provide adequate per-token representation. Pooling switched from 'cls' to 'mean' to aggregate spatial information across all 196 tokens rather than relying on a single learned CLS token, which is more robust at this resolution. Depth kept at 4 to avoid overfitting with 90k samples. AdamW with wd=0.05 (decoupled weight decay) and cosine schedule retained from the round-1 transformer recipe. Batch size 64 keeps attention gradients stable with the larger token sequence. Dropout kept low (0.1) to preserve the already-limited attention signal."
+      },
+      "round_index": 2,
+      "schema_version": "1.0",
+      "status": "completed",
+      "training_log_path": "blobs/search/trial_compact_tf_p2_mean_7dcd10fc.training.jsonl",
+      "validation_accuracy": 0.946321,
+      "validation_balanced_accuracy": 0.947181,
+      "validation_macro_f1": 0.946354
+    },
+    "trial_compact_tf_p4_60062e38": {
+      "best_epoch": 3,
+      "candidate_id": "compact_tf_p4",
+      "checkpoint_path": "blobs/search/trial_compact_tf_p4_60062e38.ckpt",
+      "checkpoint_sha256": "3d9969543037e8efbe7e4fa7c469380283df31e01f2c0c1d4c456d3d77abf705",
+      "config": {
+        "batch_size": 64,
+        "class_weighting": true,
+        "depth": 4,
+        "device": "cuda",
+        "dropout": 0.1,
+        "early_stopping_patience": 2,
+        "epochs": 3,
+        "gradient_clip_val": 1.0,
+        "hidden": 96,
+        "label_smoothing": 0.1,
+        "lr": 0.0003,
+        "mlp_ratio": 4,
+        "model_family": "compact_transformer",
+        "num_heads": 4,
+        "optimizer": "adamw",
+        "patch_size": 4,
+        "pooling": "cls",
+        "positional_encoding": "learned",
+        "rationale": "Best transformer option at 28×28 per research guidance. patch_size=4 yields 49 tokens—enough for meaningful self-attention while keeping parameters modest. hidden=96 (divisible by num_heads=4, multiple of 8) with 4 layers and mlp_ratio=4 gives a compact but expressive attention model. Lower lr (3e-4) and higher weight decay (0.05) with AdamW follow transformer-specific recommendations. Batch 64 stabilises attention gradients with few tokens. Dropout kept at 0.1 to avoid suppressing the limited attention signal. Learned positional encoding suits the small 7×7 grid. Gradient clipping at 1.0 prevents instability with low token counts.",
+        "scheduler": "cosine",
+        "schema_version": "1.0",
+        "seed": 47,
+        "source": "qwen3.8",
+        "tokenizer_layers": 2,
+        "weight_decay": 0.05
+      },
+      "config_hash": "60062e3805867238cf04b5ee5fe7f396512b6bef94c6213bdd765673c7784d81",
+      "decision_source": "qwen3.8",
+      "duration_seconds": 81.9517,
+      "error": null,
+      "lightning_csv_path": "blobs/search/lightning_logs/trial_compact_tf_p4_60062e38/version_0/metrics.csv",
+      "representation": {
+        "augmentations": [
+          "hflip",
+          "rotate90"
+        ],
+        "normalization": "standardize",
+        "rationale": "Best transformer option at 28×28 per research guidance. patch_size=4 yields 49 tokens—enough for meaningful self-attention while keeping parameters modest. hidden=96 (divisible by num_heads=4, multiple of 8) with 4 layers and mlp_ratio=4 gives a compact but expressive attention model. Lower lr (3e-4) and higher weight decay (0.05) with AdamW follow transformer-specific recommendations. Batch 64 stabilises attention gradients with few tokens. Dropout kept at 0.1 to avoid suppressing the limited attention signal. Learned positional encoding suits the small 7×7 grid. Gradient clipping at 1.0 prevents instability with low token counts."
+      },
+      "round_index": 1,
+      "schema_version": "1.0",
+      "status": "completed",
+      "training_log_path": "blobs/search/trial_compact_tf_p4_60062e38.training.jsonl",
+      "validation_accuracy": 0.966413,
+      "validation_balanced_accuracy": 0.96734,
+      "validation_macro_f1": 0.966566
+    },
+    "trial_res_cnn_base_0d5e7d9b": {
+      "best_epoch": 3,
+      "candidate_id": "res_cnn_base",
+      "checkpoint_path": "blobs/search/trial_res_cnn_base_0d5e7d9b.ckpt",
+      "checkpoint_sha256": "8d4b02f0d07f118d09c65a20f9235d9a960cafc67880def30eacb4dd8f7571e4",
+      "config": {
+        "batch_size": 128,
+        "class_weighting": true,
+        "depth": 4,
+        "device": "cuda",
+        "dropout": 0.2,
+        "early_stopping_patience": 2,
+        "epochs": 3,
+        "gradient_clip_val": 1.0,
+        "hidden": 64,
+        "label_smoothing": 0.1,
+        "lr": 0.001,
+        "mlp_ratio": 4,
+        "model_family": "residual_cnn",
+        "num_heads": 4,
+        "optimizer": "adamw",
+        "patch_size": 4,
+        "pooling": "cls",
+        "positional_encoding": "learned",
+        "rationale": "Primary architecture per research priorities. 4 residual blocks with hidden=64 exploit local structure at 28×28 without over-parameterisation. AdamW with cosine decay at lr=1e-3 follows the recommended CNN starting point. Low weight decay (1e-4) avoids over-regularising the subtle channel-variance signal. Class weighting addresses the 1.63× imbalance. Dropout 0.2 on the classifier head provides mild regularisation without suppressing features. Batch 128 balances gradient noise and throughput. Mild augmentations (hflip, rotate90) expand the effective dataset without destroying spatial detail.",
+        "scheduler": "cosine",
+        "schema_version": "1.0",
+        "seed": 47,
+        "source": "qwen3.8",
+        "tokenizer_layers": 2,
+        "weight_decay": 0.0001
+      },
+      "config_hash": "0d5e7d9befac9999ef1cb6c919eb4a953259489b579a8ed7ff20340f0e02d7ed",
+      "decision_source": "qwen3.8",
+      "duration_seconds": 52.4304,
+      "error": null,
+      "lightning_csv_path": "blobs/search/lightning_logs/trial_res_cnn_base_0d5e7d9b/version_0/metrics.csv",
+      "representation": {
+        "augmentations": [
+          "hflip",
+          "rotate90"
+        ],
+        "normalization": "standardize",
+        "rationale": "Primary architecture per research priorities. 4 residual blocks with hidden=64 exploit local structure at 28×28 without over-parameterisation. AdamW with cosine decay at lr=1e-3 follows the recommended CNN starting point. Low weight decay (1e-4) avoids over-regularising the subtle channel-variance signal. Class weighting addresses the 1.63× imbalance. Dropout 0.2 on the classifier head provides mild regularisation without suppressing features. Batch 128 balances gradient noise and throughput. Mild augmentations (hflip, rotate90) expand the effective dataset without destroying spatial detail."
+      },
+      "round_index": 1,
+      "schema_version": "1.0",
+      "status": "completed",
+      "training_log_path": "blobs/search/trial_res_cnn_base_0d5e7d9b.training.jsonl",
+      "validation_accuracy": 0.987505,
+      "validation_balanced_accuracy": 0.987148,
+      "validation_macro_f1": 0.987484
+    },
+    "trial_res_cnn_deep96_3347682f": {
+      "best_epoch": 3,
+      "candidate_id": "res_cnn_deep96",
+      "checkpoint_path": "blobs/search/trial_res_cnn_deep96_3347682f.ckpt",
+      "checkpoint_sha256": "d011f9986d04ed9536bc6fb6655b247c1ef1d47923483795da8b47f3e0f89cc4",
+      "config": {
+        "batch_size": 128,
+        "class_weighting": true,
+        "depth": 6,
+        "device": "cuda",
+        "dropout": 0.25,
+        "early_stopping_patience": 2,
+        "epochs": 3,
+        "gradient_clip_val": 1.0,
+        "hidden": 96,
+        "label_smoothing": 0.1,
+        "lr": 0.0008,
+        "mlp_ratio": 4,
+        "model_family": "residual_cnn",
+        "num_heads": 4,
+        "optimizer": "adamw",
+        "patch_size": 4,
+        "pooling": "cls",
+        "positional_encoding": "learned",
+        "rationale": "Extends the round-1 winner (res_cnn_base, 0.9875) by increasing depth 4→6 and hidden 64→96 to capture richer hierarchical local features at 28×28. The extra two residual blocks add capacity without over-parameterisation (96 channels × 6 blocks is still modest for 90k samples). LR reduced to 8e-4 for training stability at greater depth. Dropout raised to 0.25 to regularise the larger model. Brightness augmentation added (3rd augmentation) to counteract the very low channel stds (0.12–0.18) and expose the model to intensity variation. Weight decay nudged to 2e-4 for mild L2 regularisation. Cosine schedule and AdamW retained as the proven pair from round 1. Early stopping patience of 5 epochs gives the deeper network more room to converge before stopping.",
+        "scheduler": "cosine",
+        "schema_version": "1.0",
+        "seed": 47,
+        "source": "qwen3.8",
+        "tokenizer_layers": 2,
+        "weight_decay": 0.0002
+      },
+      "config_hash": "3347682fd66b4c876e756766d09b794d2c0ac6af70029088253c0a3a80a7f5e8",
+      "decision_source": "qwen3.8",
+      "duration_seconds": 112.4192,
+      "error": null,
+      "lightning_csv_path": "blobs/search/lightning_logs/trial_res_cnn_deep96_3347682f/version_0/metrics.csv",
+      "representation": {
+        "augmentations": [
+          "hflip",
+          "rotate90",
+          "brightness"
+        ],
+        "normalization": "standardize",
+        "rationale": "Extends the round-1 winner (res_cnn_base, 0.9875) by increasing depth 4→6 and hidden 64→96 to capture richer hierarchical local features at 28×28. The extra two residual blocks add capacity without over-parameterisation (96 channels × 6 blocks is still modest for 90k samples). LR reduced to 8e-4 for training stability at greater depth. Dropout raised to 0.25 to regularise the larger model. Brightness augmentation added (3rd augmentation) to counteract the very low channel stds (0.12–0.18) and expose the model to intensity variation. Weight decay nudged to 2e-4 for mild L2 regularisation. Cosine schedule and AdamW retained as the proven pair from round 1. Early stopping patience of 5 epochs gives the deeper network more room to converge before stopping."
+      },
+      "round_index": 2,
+      "schema_version": "1.0",
+      "status": "completed",
+      "training_log_path": "blobs/search/trial_res_cnn_deep96_3347682f.training.jsonl",
+      "validation_accuracy": 0.977509,
+      "validation_balanced_accuracy": 0.978553,
+      "validation_macro_f1": 0.977768
+    },
+    "trial_res_cnn_refined_28563908": {
+      "best_epoch": 3,
+      "candidate_id": "res_cnn_refined",
+      "checkpoint_path": "blobs/search/trial_res_cnn_refined_28563908.ckpt",
+      "checkpoint_sha256": "42fa79d7bb6eff69054c3a358dfae2907feeda687638afd50bdefe3085a6dd9c",
+      "config": {
+        "batch_size": 128,
+        "class_weighting": true,
+        "depth": 4,
+        "device": "cuda",
+        "dropout": 0.15,
+        "early_stopping_patience": 2,
+        "epochs": 3,
+        "gradient_clip_val": 1.0,
+        "hidden": 80,
+        "label_smoothing": 0.05,
+        "lr": 0.0015,
+        "mlp_ratio": 4,
+        "model_family": "residual_cnn",
+        "num_heads": 4,
+        "optimizer": "adamw",
+        "patch_size": 4,
+        "pooling": "cls",
+        "positional_encoding": "learned",
+        "rationale": "Refinement of the best prior config (res_cnn_base, 0.9875 val_acc). Key changes: (1) hidden 64→80 adds ~25% channel capacity without reaching the 96 that overfit at depth 6; (2) dropout 0.2→0.15 because all top configs converged by epoch 3, indicating the model is not overfitting and lighter regularization allows sharper features; (3) lr 0.001→0.0015 explores the log-scale neighborhood — the SGD/one_cycle variant at lr=0.01 achieved 0.9870, suggesting the adamw optimum may be slightly above 0.001; (4) label_smoothing 0.1→0.05 because the model already achieves 0.9875 balanced accuracy, and excessive smoothing may blunt the decision boundary on the 1.63× imbalanced classes; (5) adding 'contrast' augmentation directly targets the low channel variance (stds 0.12–0.18) by amplifying subtle inter-class differences in the G channel (highest std 0.177). Retains adamw+cosine+batch128+standardize+class_weighting as the proven backbone.",
+        "scheduler": "cosine",
+        "schema_version": "1.0",
+        "seed": 47,
+        "source": "qwen3.8",
+        "tokenizer_layers": 2,
+        "weight_decay": 0.0001
+      },
+      "config_hash": "2856390885ddca0608c1ff63b542a8b81b5e4d14de57e15092bfea8b8a7285ba",
+      "decision_source": "qwen3.8",
+      "duration_seconds": 93.0535,
+      "error": null,
+      "lightning_csv_path": "blobs/search/lightning_logs/trial_res_cnn_refined_28563908/version_0/metrics.csv",
+      "representation": {
+        "augmentations": [
+          "hflip",
+          "rotate90",
+          "contrast"
+        ],
+        "normalization": "standardize",
+        "rationale": "Refinement of the best prior config (res_cnn_base, 0.9875 val_acc). Key changes: (1) hidden 64→80 adds ~25% channel capacity without reaching the 96 that overfit at depth 6; (2) dropout 0.2→0.15 because all top configs converged by epoch 3, indicating the model is not overfitting and lighter regularization allows sharper features; (3) lr 0.001→0.0015 explores the log-scale neighborhood — the SGD/one_cycle variant at lr=0.01 achieved 0.9870, suggesting the adamw optimum may be slightly above 0.001; (4) label_smoothing 0.1→0.05 because the model already achieves 0.9875 balanced accuracy, and excessive smoothing may blunt the decision boundary on the 1.63× imbalanced classes; (5) adding 'contrast' augmentation directly targets the low channel variance (stds 0.12–0.18) by amplifying subtle inter-class differences in the G channel (highest std 0.177). Retains adamw+cosine+batch128+standardize+class_weighting as the proven backbone."
+      },
+      "round_index": 3,
+      "schema_version": "1.0",
+      "status": "completed",
+      "training_log_path": "blobs/search/trial_res_cnn_refined_28563908.training.jsonl",
+      "validation_accuracy": 0.987705,
+      "validation_balanced_accuracy": 0.987927,
+      "validation_macro_f1": 0.988031
+    },
+    "trial_res_cnn_sgd_1cyc_619a5d89": {
+      "best_epoch": 3,
+      "candidate_id": "res_cnn_sgd_1cyc",
+      "checkpoint_path": "blobs/search/trial_res_cnn_sgd_1cyc_619a5d89.ckpt",
+      "checkpoint_sha256": "d9f306ffaf646959b7786b79b9a1435984bfdf1605d1ee7761819f5a745bf176",
+      "config": {
+        "batch_size": 256,
+        "class_weighting": true,
+        "depth": 4,
+        "device": "cuda",
+        "dropout": 0.15,
+        "early_stopping_patience": 2,
+        "epochs": 3,
+        "gradient_clip_val": 2.0,
+        "hidden": 64,
+        "label_smoothing": 0.05,
+        "lr": 0.01,
+        "mlp_ratio": 4,
+        "model_family": "residual_cnn",
+        "num_heads": 4,
+        "optimizer": "sgd",
+        "patch_size": 4,
+        "pooling": "cls",
+        "positional_encoding": "learned",
+        "rationale": "Explores a fundamentally different optimization trajectory for the same residual_cnn architecture that won round 1. SGD with momentum and a one-cycle LR schedule (peak 0.01) tends to find flatter minima than Adam, which can improve generalization on the 10k validation set. The larger batch size (256) stabilizes SGD's noisier gradients. Label smoothing reduced to 0.05 since SGD's implicit regularization (from its larger effective step size and momentum) provides additional smoothing. Dropout lowered to 0.15 to avoid over-regularising in combination with SGD's natural regularisation. Weight decay at 5e-4 is modest and appropriate for SGD. Three augmentations (hflip, vflip, rotate90) provide geometric diversity. This candidate tests whether the round-1 AdamW optimum is a local optimum that SGD can escape, while keeping the architecture identical to isolate the optimizer/scheduler effect.",
+        "scheduler": "one_cycle",
+        "schema_version": "1.0",
+        "seed": 47,
+        "source": "qwen3.8",
+        "tokenizer_layers": 2,
+        "weight_decay": 0.0005
+      },
+      "config_hash": "619a5d89b157bb93ac868efd2372bc341a31edeb1860b6e45c4b2732ab50ee37",
+      "decision_source": "qwen3.8",
+      "duration_seconds": 69.3677,
+      "error": null,
+      "lightning_csv_path": "blobs/search/lightning_logs/trial_res_cnn_sgd_1cyc_619a5d89/version_0/metrics.csv",
+      "representation": {
+        "augmentations": [
+          "hflip",
+          "vflip",
+          "rotate90"
+        ],
+        "normalization": "standardize",
+        "rationale": "Explores a fundamentally different optimization trajectory for the same residual_cnn architecture that won round 1. SGD with momentum and a one-cycle LR schedule (peak 0.01) tends to find flatter minima than Adam, which can improve generalization on the 10k validation set. The larger batch size (256) stabilizes SGD's noisier gradients. Label smoothing reduced to 0.05 since SGD's implicit regularization (from its larger effective step size and momentum) provides additional smoothing. Dropout lowered to 0.15 to avoid over-regularising in combination with SGD's natural regularisation. Weight decay at 5e-4 is modest and appropriate for SGD. Three augmentations (hflip, vflip, rotate90) provide geometric diversity. This candidate tests whether the round-1 AdamW optimum is a local optimum that SGD can escape, while keeping the architecture identical to isolate the optimizer/scheduler effect."
+      },
+      "round_index": 2,
+      "schema_version": "1.0",
+      "status": "completed",
+      "training_log_path": "blobs/search/trial_res_cnn_sgd_1cyc_619a5d89.training.jsonl",
+      "validation_accuracy": 0.987005,
+      "validation_balanced_accuracy": 0.98773,
+      "validation_macro_f1": 0.987157
+    },
+    "trial_tiny_cnn_fast_e9884b95": {
+      "best_epoch": 3,
+      "candidate_id": "tiny_cnn_fast",
+      "checkpoint_path": "blobs/search/trial_tiny_cnn_fast_e9884b95.ckpt",
+      "checkpoint_sha256": "33f1542b6493ffb7a792c683cfb0e2b510925d8ee4820a7a09bf0151928ded68",
+      "config": {
+        "batch_size": 256,
+        "class_weighting": true,
+        "depth": 3,
+        "device": "cuda",
+        "dropout": 0.3,
+        "early_stopping_patience": 2,
+        "epochs": 3,
+        "gradient_clip_val": 1.0,
+        "hidden": 32,
+        "label_smoothing": 0.05,
+        "lr": 0.002,
+        "mlp_ratio": 4,
+        "model_family": "tiny_cnn",
+        "num_heads": 4,
+        "optimizer": "adam",
+        "patch_size": 4,
+        "pooling": "cls",
+        "positional_encoding": "learned",
+        "rationale": "Fast, low-risk baseline to establish a performance floor and validate hyperparameter choices. hidden=32 with 3 layers keeps the model small and fast to train, enabling quick iteration. Slightly higher lr (2e-3) compensates for the smaller capacity. Larger batch (256) reduces gradient noise for the simpler architecture. Dropout 0.3 provides stronger regularisation appropriate for the smaller model. Three augmentations (hflip, vflip, rotate90) maximise data diversity for the limited capacity. This candidate serves as a reference point: if residual_cnn or compact_transformer do not substantially outperform it, the added complexity is not justified.",
+        "scheduler": "cosine",
+        "schema_version": "1.0",
+        "seed": 47,
+        "source": "qwen3.8",
+        "tokenizer_layers": 2,
+        "weight_decay": 0.0001
+      },
+      "config_hash": "e9884b95a5f9357f1892e5b989a510828a343ec2feeb8241bd3c62cab9a038d7",
+      "decision_source": "qwen3.8",
+      "duration_seconds": 21.3281,
+      "error": null,
+      "lightning_csv_path": "blobs/search/lightning_logs/trial_tiny_cnn_fast_e9884b95/version_0/metrics.csv",
+      "representation": {
+        "augmentations": [
+          "hflip",
+          "vflip",
+          "rotate90"
+        ],
+        "normalization": "standardize",
+        "rationale": "Fast, low-risk baseline to establish a performance floor and validate hyperparameter choices. hidden=32 with 3 layers keeps the model small and fast to train, enabling quick iteration. Slightly higher lr (2e-3) compensates for the smaller capacity. Larger batch (256) reduces gradient noise for the simpler architecture. Dropout 0.3 provides stronger regularisation appropriate for the smaller model. Three augmentations (hflip, vflip, rotate90) maximise data diversity for the limited capacity. This candidate serves as a reference point: if residual_cnn or compact_transformer do not substantially outperform it, the added complexity is not justified."
+      },
+      "round_index": 1,
+      "schema_version": "1.0",
+      "status": "completed",
+      "training_log_path": "blobs/search/trial_tiny_cnn_fast_e9884b95.training.jsonl",
+      "validation_accuracy": 0.964814,
+      "validation_balanced_accuracy": 0.966167,
+      "validation_macro_f1": 0.965055
+    }
+  },
+  "run_id": "seed_47",
+  "status": "completed_with_warning",
+  "updated_at": "2026-09-30T11:48:31.098888+00:00"
+}

@@ -1,0 +1,63 @@
+{
+  "artefact": "trial_compact_tf_d6_mean_bfb2575c",
+  "artefact_type": "TrialResult",
+  "created_at": "2026-09-30T11:03:01.812338+00:00",
+  "payload": {
+    "best_epoch": 3,
+    "candidate_id": "compact_tf_d6_mean",
+    "checkpoint_path": "blobs/search/trial_compact_tf_d6_mean_bfb2575c.ckpt",
+    "checkpoint_sha256": "0cfeb93364084aec9b77e5410dff53700434ddb30c20e0a588e56334336d4e0a",
+    "config": {
+      "batch_size": 128,
+      "class_weighting": true,
+      "depth": 6,
+      "device": "cuda",
+      "dropout": 0.15,
+      "early_stopping_patience": 2,
+      "epochs": 3,
+      "gradient_clip_val": 1.0,
+      "hidden": 128,
+      "label_smoothing": 0.1,
+      "lr": 0.0005,
+      "mlp_ratio": 3,
+      "model_family": "compact_transformer",
+      "num_heads": 4,
+      "optimizer": "adamw",
+      "patch_size": 4,
+      "pooling": "mean",
+      "positional_encoding": "learned",
+      "rationale": "Round-1 compact_transformer (hidden=96, depth=4, cls pooling) reached 96.9%. This candidate increases hidden to 128 (divisible by 4 heads, multiple of 8), deepens to 6 layers for more sequential context mixing over the 49 tokens, reduces mlp_ratio to 3 to keep parameter count in check, and switches to mean pooling which is more robust than cls-token pooling when the sequence is short. LR raised to 5e-4 to compensate for the deeper network. Weight decay at 0.03 (AdamW decoupled) provides moderate regularisation. Batch size increased to 128 for more stable gradient estimates with the larger model.",
+      "scheduler": "cosine",
+      "schema_version": "1.0",
+      "seed": 42,
+      "source": "qwen3.8",
+      "tokenizer_layers": 2,
+      "weight_decay": 0.03
+    },
+    "config_hash": "bfb2575c03871d8174416b623b5dbe76906319abe204df8ec036abcef2c8b8ac",
+    "decision_source": "qwen3.8",
+    "duration_seconds": 55.9942,
+    "error": null,
+    "lightning_csv_path": "blobs/search/lightning_logs/trial_compact_tf_d6_mean_bfb2575c/version_0/metrics.csv",
+    "representation": {
+      "augmentations": [
+        "hflip",
+        "rotate90"
+      ],
+      "normalization": "standardize",
+      "rationale": "Round-1 compact_transformer (hidden=96, depth=4, cls pooling) reached 96.9%. This candidate increases hidden to 128 (divisible by 4 heads, multiple of 8), deepens to 6 layers for more sequential context mixing over the 49 tokens, reduces mlp_ratio to 3 to keep parameter count in check, and switches to mean pooling which is more robust than cls-token pooling when the sequence is short. LR raised to 5e-4 to compensate for the deeper network. Weight decay at 0.03 (AdamW decoupled) provides moderate regularisation. Batch size increased to 128 for more stable gradient estimates with the larger model."
+    },
+    "round_index": 2,
+    "schema_version": "1.0",
+    "status": "completed",
+    "training_log_path": "blobs/search/trial_compact_tf_d6_mean_bfb2575c.training.jsonl",
+    "validation_accuracy": 0.970912,
+    "validation_balanced_accuracy": 0.971453,
+    "validation_macro_f1": 0.971072
+  },
+  "payload_sha256": "6dbf57f46db7033c4138b3cf9b2ea0c409113aea22387d9762a7e80e46d4dcac",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 16,
+  "version": 1
+}

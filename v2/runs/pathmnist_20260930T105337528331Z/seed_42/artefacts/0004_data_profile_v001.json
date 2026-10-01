@@ -1,0 +1,131 @@
+{
+  "artefact": "data_profile",
+  "artefact_type": "DataProfile",
+  "created_at": "2026-09-30T10:54:34.878162+00:00",
+  "payload": {
+    "ambiguity_note": "Several concrete ambiguities and dataset-shift risks are present. (1) Label ambiguity: 'debris' is not a standard histological entity and overlaps heavily with 'mucus' and 'background' in H&E appearance; 'background' is a catch-all for non-tissue or artifact regions; 'cancer-associated stroma' and 'smooth muscle' can be visually indistinguishable at patch level without architectural context; 'normal colon mucosa' vs. 'colorectal adenocarcinoma epithelium' has a dysplastic transition zone that is inherently ambiguous at the 96×96 patch resolution used in PathMNIST. (2) Distribution shift: train and val class proportions are nearly identical (max |Δ| < 0.001), but the test set (CRC-VAL-HE-7K, different clinical center) deviates substantially—adipose prevalence nearly doubles (10.4%→18.6%, ratio 1.79), mucus rises (8.9%→14.4%, ratio 1.62), while debris drops sharply (11.5%→4.7%, ratio 0.41), cancer-associated stroma drops (10.4%→5.9%, ratio 0.56), and smooth muscle drops (13.5%→8.2%, ratio 0.61). This is not a random sampling artifact; it reflects a different tissue-sampling or slide-preparation protocol at the external center. (3) Domain shift: the test set explicitly originates from a different clinical center, introducing uncontrolled variation in H&E staining intensity/hue, scanner color calibration, slide thickness, and fixation quality. The 'debris' class collapse (ratio 0.41) is consistent with different slide-preparation or scanning artifacts at the new site, meaning the model's learned 'debris' features may not transfer. (4) The test set is also smaller (7,180 vs. 89,996 train), amplifying the statistical impact of the skewed distribution and reducing per-class test samples for the under-represented classes (debris n=339, cancer-associated stroma n=421, smooth muscle n=592), making per-class test metrics noisy and less reliable. (5) No information is provided about whether the external center used the same annotation protocol, inter-annotator agreement, or whether 'debris' and 'background' were defined identically, compounding the label-ambiguity risk under domain shift.",
+    "ambiguity_risks": [
+      "Test-set class distribution deviates substantially from train/val (adipose ×1.79, debris ×0.41, stroma ×0.56), indicating non-random sampling or different tissue-sampling protocol at the external center.",
+      "External clinical center (CRC-VAL-HE-7K) introduces uncontrolled H&E staining, scanner, and slide-preparation variability that can shift pixel-level features for all classes.",
+      "'Debris' is a non-standard, poorly defined histological label that overlaps with 'mucus' and 'background'; its 59% prevalence drop in test suggests the external site's artifact profile differs, undermining label transferability.",
+      "'Cancer-associated stroma' vs. 'smooth muscle' and 'normal colon mucosa' vs. 'adenocarcinoma epithelium' are inherently ambiguous at 96×96 patch resolution without multi-scale architectural context, increasing misclassification risk under domain shift.",
+      "Small per-class test counts for debris (n=339), stroma (n=421), and smooth muscle (n=592) make per-class test metrics statistically noisy and sensitive to a handful of mislabeled patches.",
+      "No evidence that the external center used the same annotation guidelines or inter-annotator agreement process, so label semantics for ambiguous classes (debris, background, stroma) may differ across sites.",
+      "The near-identical train/val split (max proportion difference <0.001) suggests a random split of a single-site dataset, meaning the only true external generalization test is the skewed CRC-VAL-HE-7K set, which conflates distribution shift with domain shift.",
+      "Patch-level classification without spatial context means the model cannot leverage tissue architecture to disambiguate stroma from smooth muscle or dysplastic from normal epithelium, a limitation that is exacerbated when staining appearance shifts across centers."
+    ],
+    "blank_image_fraction": 0.0,
+    "class_counts": {
+      "test": [
+        1338,
+        847,
+        339,
+        634,
+        1035,
+        592,
+        741,
+        421,
+        1233
+      ],
+      "train": [
+        9366,
+        9509,
+        10360,
+        10401,
+        8006,
+        12182,
+        7886,
+        9401,
+        12885
+      ],
+      "val": [
+        1041,
+        1057,
+        1152,
+        1156,
+        890,
+        1354,
+        877,
+        1045,
+        1432
+      ]
+    },
+    "class_proportions": {
+      "test": [
+        0.18635097,
+        0.11796657,
+        0.04721448,
+        0.08830084,
+        0.14415042,
+        0.08245125,
+        0.10320334,
+        0.0586351,
+        0.17172702
+      ],
+      "train": [
+        0.10407129,
+        0.10566025,
+        0.11511623,
+        0.1155718,
+        0.08895951,
+        0.13536157,
+        0.08762612,
+        0.1044602,
+        0.14317303
+      ],
+      "val": [
+        0.10405838,
+        0.10565774,
+        0.11515394,
+        0.11555378,
+        0.08896441,
+        0.13534586,
+        0.08766493,
+        0.10445822,
+        0.14314274
+      ]
+    },
+    "dataset": "pathmnist",
+    "decision_source": "qwen3.8",
+    "duplicate_train_samples": 0,
+    "image_shape_hwc": [
+      28,
+      28,
+      3
+    ],
+    "imbalance_ratio": 1.633908,
+    "n_channels": 3,
+    "n_classes": 9,
+    "official_data_fraction": 1.0,
+    "profiled_fraction": 1.0,
+    "samples_profiled": 107180,
+    "schema_version": "1.0",
+    "test_imbalance_ratio": 3.946903,
+    "test_to_train_prevalence_ratio": [
+      1.79060883,
+      1.11647069,
+      0.41014621,
+      0.76403442,
+      1.62040482,
+      0.60911862,
+      1.17776921,
+      0.5613152,
+      1.19943693
+    ],
+    "train_channel_mean_unit": [
+      0.740545,
+      0.53298219,
+      0.70582885
+    ],
+    "train_channel_std_unit": [
+      0.12368222,
+      0.17676253,
+      0.12443067
+    ]
+  },
+  "payload_sha256": "224b49f28e0eebac9602c26a6b8df9530051c1d6269e17f0268ca2f1d6768122",
+  "producer": "profiling",
+  "run_id": "seed_42",
+  "sequence": 4,
+  "version": 1
+}

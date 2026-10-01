@@ -1,0 +1,23 @@
+{
+  "artefact": "anomaly_ingestion",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-30T11:48:44.119887+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Ingestion stage is consistent and complete. All split sizes (train=89996, val=10004, test=7180) match the official PathMNIST splits exactly; no subsampling was applied. The dataset manifest records archive MD5, per-split index SHA-256 hashes, a Zenodo data reference, CC BY 4.0 license, 9 classes, 3 channels, and a multi-class task — all internally consistent. The run manifest pins code SHA-256, all package versions (torch 2.14.0+cu126, numpy 2.4.6, lightning 2.6.5, etc.), Python 3.11.15, seed 72, and deterministic_torch=true. Created_at (11:48:31) is 1.5 s before the authoritative UTC timestamp (11:48:32), which is expected. No omitted artifacts. Deterministic findings list is empty, confirming no hard errors. One minor reproducibility note: llm_model_digest is null for the qwen3.8 Ollama model, meaning the exact model weights are not pinned; if any downstream stage relies on LLM output, results could shift if the local model is updated. This does not block ingestion. The test-domain note (CRC-VAL-HE-7K from a different clinical center) is a known dataset characteristic and is properly documented. Proceed to the next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "llm_model_digest is null for qwen3.8 (ollama); model weights are not pinned, which could affect reproducibility of any LLM-assisted downstream steps"
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "ingestion"
+  },
+  "payload_sha256": "7a9607b4b17c75487777606bc0150699a0089633117cf8a147c6e64cc7b3c285",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 3,
+  "version": 1
+}

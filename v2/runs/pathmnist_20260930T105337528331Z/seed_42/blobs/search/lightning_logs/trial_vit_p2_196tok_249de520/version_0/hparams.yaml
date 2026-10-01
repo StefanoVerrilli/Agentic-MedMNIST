@@ -1,0 +1,27 @@
+class_weights:
+- 1.04177987575531
+- 1.0261131525039673
+- 0.9418253302574158
+- 0.938112735748291
+- 1.218749761581421
+- 0.8009613156318665
+- 1.2372952699661255
+- 1.0379012823104858
+- 0.7572612166404724
+depth: 4
+dropout: 0.1
+hidden: 128
+in_channels: 3
+label_smoothing: 0.1
+lr: 0.0003
+mlp_ratio: 4
+model_family: vision_transformer
+n_classes: 9
+num_heads: 4
+optimizer: adamw
+patch_size: 4
+pooling: cls
+positional_encoding: learned
+scheduler: cosine
+tokenizer_layers: 2
+weight_decay: 0.05

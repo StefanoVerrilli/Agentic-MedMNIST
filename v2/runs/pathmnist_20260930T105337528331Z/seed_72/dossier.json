@@ -1,0 +1,265 @@
+{
+  "artefact_registry": [
+    {
+      "artefact": "run_manifest",
+      "path": "artefacts/0001_run_manifest_v001.json",
+      "producer": "run",
+      "sha256": "ad906be53bf1a17df26454b720fb8d749326dd3f4dbbe87459f6d8a9cbfbb0f8",
+      "type": "RunManifest",
+      "version": 1
+    },
+    {
+      "artefact": "dataset_manifest",
+      "path": "artefacts/0002_dataset_manifest_v001.json",
+      "producer": "ingestion",
+      "sha256": "e749ae3162dd47c9dcc8013e796a1044c000c76f9277f25c9a348d24fcd1dd7b",
+      "type": "DatasetManifest",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_ingestion",
+      "path": "artefacts/0003_anomaly_ingestion_v001.json",
+      "producer": "reviewer",
+      "sha256": "7a9607b4b17c75487777606bc0150699a0089633117cf8a147c6e64cc7b3c285",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "data_profile",
+      "path": "artefacts/0004_data_profile_v001.json",
+      "producer": "profiling",
+      "sha256": "224b49f28e0eebac9602c26a6b8df9530051c1d6269e17f0268ca2f1d6768122",
+      "type": "DataProfile",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_profiling",
+      "path": "artefacts/0005_anomaly_profiling_v001.json",
+      "producer": "reviewer",
+      "sha256": "447e2e8aa4d6d7af925cd64fe678c5b675acd61d9a11d63234333e3ffb3b0610",
+      "type": "AnomalyReport",
+      "version": 1
+    }
+  ],
+  "decision_events": 15,
+  "decision_log": "decision_log.jsonl",
+  "latest_artefacts": {
+    "anomaly_ingestion": {
+      "action": "continue",
+      "attempt": 1,
+      "comment": "Ingestion stage is consistent and complete. All split sizes (train=89996, val=10004, test=7180) match the official PathMNIST splits exactly; no subsampling was applied. The dataset manifest records archive MD5, per-split index SHA-256 hashes, a Zenodo data reference, CC BY 4.0 license, 9 classes, 3 channels, and a multi-class task — all internally consistent. The run manifest pins code SHA-256, all package versions (torch 2.14.0+cu126, numpy 2.4.6, lightning 2.6.5, etc.), Python 3.11.15, seed 72, and deterministic_torch=true. Created_at (11:48:31) is 1.5 s before the authoritative UTC timestamp (11:48:32), which is expected. No omitted artifacts. Deterministic findings list is empty, confirming no hard errors. One minor reproducibility note: llm_model_digest is null for the qwen3.8 Ollama model, meaning the exact model weights are not pinned; if any downstream stage relies on LLM output, results could shift if the local model is updated. This does not block ingestion. The test-domain note (CRC-VAL-HE-7K from a different clinical center) is a known dataset characteristic and is properly documented. Proceed to the next stage.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "llm_model_digest is null for qwen3.8 (ollama); model weights are not pinned, which could affect reproducibility of any LLM-assisted downstream steps"
+      ],
+      "schema_version": "1.0",
+      "severity": "ok",
+      "source": "qwen3.8",
+      "stage": "ingestion"
+    },
+    "anomaly_profiling": {
+      "action": "stop",
+      "attempt": 1,
+      "comment": "CRITICAL: The profiled image shape is [28, 28, 3], which is inconsistent with PathMNIST. The official PathMNIST dataset (Ma et al., 2021; MedMNIST v3.0.2; Zenodo record 10519652) provides 96×96×3 H&E pathology patches. A 28×28×3 shape corresponds to MNIST/CIFAR-scale images and is not a valid PathMNIST resolution. This is further confirmed by an internal contradiction within the evidence: the LLM-generated ambiguity_risks explicitly reference '96×96 patch resolution' while the data_profile reports 28×28. Either (a) the profiling code misreported the shape (e.g., read a metadata field incorrectly, or the MedMNIST loader returned a downsampled preview), (b) the wrong dataset was loaded, or (c) the data was inadvertently resized during ingestion. Any of these would invalidate all downstream model architecture, augmentation, and evaluation decisions. The profiling stage must re-verify the actual tensor shape of the loaded npz arrays (X_train.shape, X_val.shape, X_test.shape) against the expected (N, 96, 96, 3) and reconcile the discrepancy before proceeding.\n\nSECONDARY ISSUES:\n1. llm_model_digest is null for qwen3.8 (ollama). While this does not affect the deterministic profiling computations, it means any LLM-assisted interpretation (ambiguity notes, risk assessment) is not reproducible. Pin the model digest or record the exact ollama model tag and build hash.\n2. Test-set class distribution deviates substantially from train/val (adipose ×1.79, debris ×0.41, stroma ×0.56, smooth muscle ×0.61). This is expected given the external CRC-VAL-HE-7K center, but the test imbalance ratio of 3.95 (vs. 1.63 for train) means per-class test metrics for debris (n=339), stroma (n=421), and smooth muscle (n=592) will be statistically noisy. Downstream evaluation should report confidence intervals and consider macro-averaged metrics alongside micro-averaged ones.\n3. The near-identical train/val proportions (max Δ < 0.001) confirm a random split of a single-site dataset. The only true external generalization signal is the skewed test set, which conflates label-distribution shift with domain shift (staining, scanner, slide prep). This should be explicitly documented in the final report.\n4. 'Debris' is a non-standard histological label with high overlap to 'mucus' and 'background'. Its 59% prevalence drop in test (0.41×) suggests the external site's artifact profile differs, undermining label transferability for this class specifically.\n\nRECOMMENDED REVISION: Re-run the shape verification step. Load the npz file, print X_train.shape / X_val.shape / X_test.shape explicitly, and confirm they are (N, 96, 96, 3). If they are 28×28, investigate the ingestion pipeline (MedMNIST loader, any resize/resize transform, or a wrong file). Update the data_profile.image_shape_hwc field to reflect the verified shape. Only after this is resolved should the pipeline proceed to model selection and training.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "CRITICAL: image_shape_hwc is [28,28,3] but PathMNIST (MedMNIST 3.0.2, Zenodo 10519652) provides 96×96×3 patches; internal contradiction with LLM ambiguity note referencing '96×96 patch resolution'",
+        "llm_model_digest is null for qwen3.8 (ollama); LLM-assisted profiling interpretations are not reproducible",
+        "Test imbalance ratio 3.95 (vs train 1.63); per-class test counts for debris (339), stroma (421), smooth muscle (592) are statistically noisy",
+        "Test-to-train prevalence ratios show substantial distribution shift (adipose ×1.79, debris ×0.41, stroma ×0.56) from external CRC-VAL-HE-7K center; conflates label-distribution shift with domain shift",
+        "'Debris' is a non-standard histological label overlapping 'mucus' and 'background'; 59% prevalence drop in test undermines label transferability",
+        "Train/val proportions near-identical (max Δ < 0.001) confirm single-site random split; only test set provides external generalization signal"
+      ],
+      "schema_version": "1.0",
+      "severity": "critical",
+      "source": "qwen3.8",
+      "stage": "profiling"
+    },
+    "data_profile": {
+      "ambiguity_note": "Several concrete ambiguities and dataset-shift risks are present. (1) Label ambiguity: 'debris' is not a standard histological entity and overlaps heavily with 'mucus' and 'background' in H&E appearance; 'background' is a catch-all for non-tissue or artifact regions; 'cancer-associated stroma' and 'smooth muscle' can be visually indistinguishable at patch level without architectural context; 'normal colon mucosa' vs. 'colorectal adenocarcinoma epithelium' has a dysplastic transition zone that is inherently ambiguous at the 96×96 patch resolution used in PathMNIST. (2) Distribution shift: train and val class proportions are nearly identical (max |Δ| < 0.001), but the test set (CRC-VAL-HE-7K, different clinical center) deviates substantially—adipose prevalence nearly doubles (10.4%→18.6%, ratio 1.79), mucus rises (8.9%→14.4%, ratio 1.62), while debris drops sharply (11.5%→4.7%, ratio 0.41), cancer-associated stroma drops (10.4%→5.9%, ratio 0.56), and smooth muscle drops (13.5%→8.2%, ratio 0.61). This is not a random sampling artifact; it reflects a different tissue-sampling or slide-preparation protocol at the external center. (3) Domain shift: the test set explicitly originates from a different clinical center, introducing uncontrolled variation in H&E staining intensity/hue, scanner color calibration, slide thickness, and fixation quality. The 'debris' class collapse (ratio 0.41) is consistent with different slide-preparation or scanning artifacts at the new site, meaning the model's learned 'debris' features may not transfer. (4) The test set is also smaller (7,180 vs. 89,996 train), amplifying the statistical impact of the skewed distribution and reducing per-class test samples for the under-represented classes (debris n=339, cancer-associated stroma n=421, smooth muscle n=592), making per-class test metrics noisy and less reliable. (5) No information is provided about whether the external center used the same annotation protocol, inter-annotator agreement, or whether 'debris' and 'background' were defined identically, compounding the label-ambiguity risk under domain shift.",
+      "ambiguity_risks": [
+        "Test-set class distribution deviates substantially from train/val (adipose ×1.79, debris ×0.41, stroma ×0.56), indicating non-random sampling or different tissue-sampling protocol at the external center.",
+        "External clinical center (CRC-VAL-HE-7K) introduces uncontrolled H&E staining, scanner, and slide-preparation variability that can shift pixel-level features for all classes.",
+        "'Debris' is a non-standard, poorly defined histological label that overlaps with 'mucus' and 'background'; its 59% prevalence drop in test suggests the external site's artifact profile differs, undermining label transferability.",
+        "'Cancer-associated stroma' vs. 'smooth muscle' and 'normal colon mucosa' vs. 'adenocarcinoma epithelium' are inherently ambiguous at 96×96 patch resolution without multi-scale architectural context, increasing misclassification risk under domain shift.",
+        "Small per-class test counts for debris (n=339), stroma (n=421), and smooth muscle (n=592) make per-class test metrics statistically noisy and sensitive to a handful of mislabeled patches.",
+        "No evidence that the external center used the same annotation guidelines or inter-annotator agreement process, so label semantics for ambiguous classes (debris, background, stroma) may differ across sites.",
+        "The near-identical train/val split (max proportion difference <0.001) suggests a random split of a single-site dataset, meaning the only true external generalization test is the skewed CRC-VAL-HE-7K set, which conflates distribution shift with domain shift.",
+        "Patch-level classification without spatial context means the model cannot leverage tissue architecture to disambiguate stroma from smooth muscle or dysplastic from normal epithelium, a limitation that is exacerbated when staining appearance shifts across centers."
+      ],
+      "blank_image_fraction": 0.0,
+      "class_counts": {
+        "test": [
+          1338,
+          847,
+          339,
+          634,
+          1035,
+          592,
+          741,
+          421,
+          1233
+        ],
+        "train": [
+          9366,
+          9509,
+          10360,
+          10401,
+          8006,
+          12182,
+          7886,
+          9401,
+          12885
+        ],
+        "val": [
+          1041,
+          1057,
+          1152,
+          1156,
+          890,
+          1354,
+          877,
+          1045,
+          1432
+        ]
+      },
+      "class_proportions": {
+        "test": [
+          0.18635097,
+          0.11796657,
+          0.04721448,
+          0.08830084,
+          0.14415042,
+          0.08245125,
+          0.10320334,
+          0.0586351,
+          0.17172702
+        ],
+        "train": [
+          0.10407129,
+          0.10566025,
+          0.11511623,
+          0.1155718,
+          0.08895951,
+          0.13536157,
+          0.08762612,
+          0.1044602,
+          0.14317303
+        ],
+        "val": [
+          0.10405838,
+          0.10565774,
+          0.11515394,
+          0.11555378,
+          0.08896441,
+          0.13534586,
+          0.08766493,
+          0.10445822,
+          0.14314274
+        ]
+      },
+      "dataset": "pathmnist",
+      "decision_source": "qwen3.8",
+      "duplicate_train_samples": 0,
+      "image_shape_hwc": [
+        28,
+        28,
+        3
+      ],
+      "imbalance_ratio": 1.633908,
+      "n_channels": 3,
+      "n_classes": 9,
+      "official_data_fraction": 1.0,
+      "profiled_fraction": 1.0,
+      "samples_profiled": 107180,
+      "schema_version": "1.0",
+      "test_imbalance_ratio": 3.946903,
+      "test_to_train_prevalence_ratio": [
+        1.79060883,
+        1.11647069,
+        0.41014621,
+        0.76403442,
+        1.62040482,
+        0.60911862,
+        1.17776921,
+        0.5613152,
+        1.19943693
+      ],
+      "train_channel_mean_unit": [
+        0.740545,
+        0.53298219,
+        0.70582885
+      ],
+      "train_channel_std_unit": [
+        0.12368222,
+        0.17676253,
+        0.12443067
+      ]
+    },
+    "dataset_manifest": {
+      "archive_md5": "a8b06965200029087d5bd730944a56c1",
+      "data_reference": "https://zenodo.org/records/10519652/files/pathmnist.npz?download=1",
+      "dataset": "pathmnist",
+      "labels": [
+        "adipose",
+        "background",
+        "debris",
+        "lymphocytes",
+        "mucus",
+        "smooth muscle",
+        "normal colon mucosa",
+        "cancer-associated stroma",
+        "colorectal adenocarcinoma epithelium"
+      ],
+      "license": "CC BY 4.0",
+      "loaded_split_sizes": {
+        "test": 7180,
+        "train": 89996,
+        "val": 10004
+      },
+      "n_channels": 3,
+      "n_classes": 9,
+      "official_split_sizes": {
+        "test": 7180,
+        "train": 89996,
+        "val": 10004
+      },
+      "schema_version": "1.0",
+      "selected_index_sha256": {
+        "test": "27ab586ecd9b4ac7278c6a91cf0b336a2ba742afe742d13eff51f702635791e8",
+        "train": "1478a96c1d8ad06d0a600d6c9b8d5c8dddd83fbda22307ab449764f013683b51",
+        "val": "a13f875ade8e54f5aee16ff205c36aa628396dddec09a33a175fcf9cbbb9d402"
+      },
+      "subsampled": false,
+      "task": "multi-class",
+      "test_domain_note": "CRC-VAL-HE-7K test images originate from a different clinical center."
+    },
+    "run_manifest": {
+      "code_sha256": "03fe9a816b25eed3164944548c60aea70e82340870a42d9a29c4de4c1705d9c7",
+      "created_at": "2026-09-30T11:48:31.102860+00:00",
+      "dataset": "pathmnist",
+      "deterministic_torch": true,
+      "lightning_cli": true,
+      "llm_mode": "ollama",
+      "llm_model": "qwen3.8",
+      "llm_model_digest": null,
+      "package_versions": {
+        "jsonargparse": "4.52.0",
+        "lightning": "2.6.5",
+        "medmnist": "3.0.2",
+        "numpy": "2.4.6",
+        "pydantic": "2.13.5",
+        "scikit-learn": "1.9.0",
+        "torch": "2.14.0+cu126"
+      },
+      "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.35",
+      "python_version": "3.11.15",
+      "run_id": "seed_72",
+      "schema_version": "1.0",
+      "seed": 72
+    }
+  },
+  "run_id": "seed_72",
+  "status": "vetoed:profiling",
+  "updated_at": "2026-09-30T11:49:36.037148+00:00"
+}

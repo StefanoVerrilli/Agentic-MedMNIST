@@ -1,0 +1,3 @@
+{"epoch": 1, "learning_rate": 0.0015, "train_loss": 0.632398, "val_accuracy": 0.921032, "val_loss": 0.506512, "val_macro_f1": 0.920883}
+{"epoch": 2, "learning_rate": 0.0005, "train_loss": 0.487738, "val_accuracy": 0.935526, "val_loss": 0.481558, "val_macro_f1": 0.9328}
+{"epoch": 3, "learning_rate": 0.0, "train_loss": 0.432272, "val_accuracy": 0.964814, "val_loss": 0.403289, "val_macro_f1": 0.965055}

@@ -1,0 +1,25 @@
+{
+  "artefact": "anomaly_architecture_research",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-30T10:56:39.554238+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "The architecture_research artefact is internally consistent, well-reasoned, and appropriately scoped for the 28×28×3 PathMNIST task with ~90k training samples and 9 classes. Key consistency checks pass: (1) spatial-resolution analysis correctly identifies the 28→14→7 collapse risk and recommends preserving resolution through at least two stages; (2) token-count arithmetic is correct (patch_size=4 → 49 tokens, patch_size=2 → 196 tokens); (3) channel statistics cited match the data_profile exactly (means [0.7405, 0.5330, 0.7058], stds [0.1237, 0.1768, 0.1244]); (4) imbalance ratio 1.63× matches data_profile; (5) the representation_plan's 'standardize' normalization with train-only stats is consistent with the architecture research's per-channel normalisation recommendation; (6) augmentation_factor=4 in the split_manifest (89996×4=359984) aligns with the augmentation suggestions. The architecture priority ordering (residual_cnn → tiny_cnn → compact_transformer → vision_transformer → resnet18) is well-justified for the resolution constraint. Parametrization ranges (LR, weight decay, batch size, dropout, channel progression) are standard and appropriate for this scale. The risk register correctly identifies over-parameterisation, token starvation, class-imbalance masking, channel-variance suppression, and premature spatial collapse. Minor observations (non-blocking): (a) the source identifier 'qwen3.8' and null llm_model_digest persist from preprocessing—these are provenance concerns, not correctness issues; (b) the risks section could more explicitly flag the external-center domain shift (CRC-VAL-HE-7K) as a design consideration (e.g., domain-adversarial training or stain-normalisation augmentation), though this is more an evaluation-protocol concern than an architecture concern; (c) the known label ambiguities (debris/background, stroma/smooth muscle) are acknowledged in the data_profile but not explicitly referenced in the architecture design rationale. None of these rise to a blocking issue. The artefact is ready to inform downstream model selection and training configuration.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Source identifier 'qwen3.8' is atypical for Qwen naming conventions (flagged in preprocessing); llm_model_digest is null, preventing exact model-revision verification—provenance gap only, not a correctness issue",
+      "Architecture risks section does not explicitly reference the external-center domain shift (CRC-VAL-HE-7K, different staining/scanner) as a design consideration; stain-normalisation augmentation or domain-robust regularisation could be recommended alongside the existing augmentation list",
+      "Known label ambiguities (debris vs background, stroma vs smooth muscle at 28×28) are documented in data_profile but not explicitly cited in the architecture design rationale or representation priorities as a factor influencing model capacity or loss-function choice"
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "architecture_research"
+  },
+  "payload_sha256": "db5f3c74a5761259d03f4405a4a0b48600364871e7f1c7583887447912e32ad6",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 10,
+  "version": 1
+}

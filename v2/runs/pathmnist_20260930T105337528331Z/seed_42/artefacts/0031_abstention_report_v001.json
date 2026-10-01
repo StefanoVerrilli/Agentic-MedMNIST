@@ -1,0 +1,69 @@
+{
+  "artefact": "abstention_report",
+  "artefact_type": "AbstentionReport",
+  "created_at": "2026-09-30T11:17:50.113353+00:00",
+  "payload": {
+    "abstain_rate": 0.418802,
+    "accuracy_on_covered": 0.97364,
+    "base_test_accuracy": 0.882173,
+    "calibrated_on": "validation",
+    "human_review_count": 3007,
+    "method": "predictive_entropy",
+    "ood_auroc": 0.915846,
+    "ood_corruption": "unit_scale_gaussian_noise_multi_severity",
+    "ood_evidence_path": "blobs/ood_probabilities.npz",
+    "ood_evidence_sha256": "8286dad4282686baf66c4df561b016c19d8ef0033c50af8897cfb1653ddef303",
+    "ood_pass": true,
+    "ood_scenarios": [
+      {
+        "corruption": "unit_scale_gaussian_noise_sigma_0.15",
+        "score": "max_softmax",
+        "test_auroc": 0.948634,
+        "validation_auroc": 0.997348
+      },
+      {
+        "corruption": "unit_scale_gaussian_noise_sigma_0.15",
+        "score": "predictive_entropy",
+        "test_auroc": 0.960289,
+        "validation_auroc": 0.998341
+      },
+      {
+        "corruption": "unit_scale_gaussian_noise_sigma_0.25",
+        "score": "max_softmax",
+        "test_auroc": 0.903154,
+        "validation_auroc": 0.993781
+      },
+      {
+        "corruption": "unit_scale_gaussian_noise_sigma_0.25",
+        "score": "predictive_entropy",
+        "test_auroc": 0.916761,
+        "validation_auroc": 0.994846
+      },
+      {
+        "corruption": "unit_scale_gaussian_noise_sigma_0.4",
+        "score": "max_softmax",
+        "test_auroc": 0.865387,
+        "validation_auroc": 0.990374
+      },
+      {
+        "corruption": "unit_scale_gaussian_noise_sigma_0.4",
+        "score": "predictive_entropy",
+        "test_auroc": 0.870489,
+        "validation_auroc": 0.990693
+      }
+    ],
+    "ood_scope": "controlled_corruption_proxy",
+    "ood_validation_auroc": 0.994627,
+    "schema_version": "1.0",
+    "selective_risk": 0.02636,
+    "target_validation_coverage": 0.8,
+    "test_coverage": 0.581198,
+    "threshold": 0.8477471,
+    "validation_coverage": 0.80008
+  },
+  "payload_sha256": "c72fa3e3832c27cc6cb135e532096397f450fc71cd9836d5c35d8f375ead4d55",
+  "producer": "abstention",
+  "run_id": "seed_42",
+  "sequence": 31,
+  "version": 1
+}

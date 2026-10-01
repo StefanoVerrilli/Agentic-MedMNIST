@@ -1,0 +1,26 @@
+{
+  "artefact": "anomaly_evaluation",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-30T11:17:43.377675+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Evaluation stage is internally consistent and correctly executed. Verification checks:\n\n1. **Split integrity**: Test n_samples (7180) matches prediction_artifact.test_samples and split_manifest.test_size. Validation samples (10004) match split_manifest.val_size. Confusion matrix is 9×9 and row sums total exactly 7180.\n\n2. **Test-lock compliance**: search_report confirms test_metrics_used=false and test_locked=true. Model selection was based solely on validation metrics (val_acc=0.9875, val_macro_f1=0.9876). No test leakage.\n\n3. **Metric completeness**: accuracy, balanced_accuracy, macro_f1, macro_precision, macro_recall, roc_auc_ovr_macro, per-class F1/precision/recall/support, and full confusion matrix are all present and numerically consistent (e.g., macro_recall 0.865663 = balanced_accuracy 0.865663, as expected for multi-class).\n\n4. **Performance gap (expected)**: Validation accuracy 99.62% vs test accuracy 88.22% (~11.4 pp drop). The split_manifest explicitly declares official_test_separate_center=true, so this is a cross-center domain-shift effect, not a pipeline defect. The weakest classes (cancer-associated stroma F1=0.635, smooth muscle F1=0.674) show the most cross-center confusion, consistent with histological appearance varying by imaging center.\n\n5. **Minor carry-over notes** (already flagged in prior stages, no new action needed): (a) Transformer-specific fields (num_heads, patch_size, mlp_ratio, positional_encoding, tokenizer_layers, pooling) are present in the residual_cnn train_config under the unified schema—harmless but should be explicitly ignored by the CNN path; (b) rationale strings are truncated with '…' in best_configuration and train_config, reducing auditability; (c) best_epoch=15 equals the epoch budget, indicating the model was still improving—worth noting for future budget increases.\n\n6. **No deterministic findings** were raised. All schema versions are 1.0. Checkpoint and prediction artifact SHA-256 hashes are present for reproducibility.\n\nThe evaluation is correctly scoped, metrics are consistent, and the observed performance characteristics are attributable to the declared cross-center test protocol rather than any pipeline error. No blocking issues.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Validation-to-test accuracy gap of ~11.4 pp (99.6% → 88.2%) is expected under the declared cross-center protocol (official_test_separate_center=true) but should be explicitly documented in any downstream summary to avoid misinterpretation as overfitting.",
+      "Transformer-specific config fields (num_heads, patch_size, mlp_ratio, positional_encoding, tokenizer_layers, pooling) remain in the residual_cnn train_config; harmless under the unified schema but should be explicitly ignored by the CNN training path to prevent confusion.",
+      "Rationale strings are truncated (end with '…') in best_configuration, train_config, and trial configs; cosmetic but reduces auditability.",
+      "best_epoch (15) equals the final epoch budget, indicating the model was still improving at the training limit; not an error but worth noting for potential future budget increases."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "evaluation"
+  },
+  "payload_sha256": "d4e7921ca90b97999adcf2241849870d8a5ed28c805b715b497e6f3f0357530a",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 30,
+  "version": 1
+}

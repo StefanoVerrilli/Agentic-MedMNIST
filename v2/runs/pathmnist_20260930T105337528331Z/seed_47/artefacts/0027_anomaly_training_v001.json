@@ -1,0 +1,26 @@
+{
+  "artefact": "anomaly_training",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-30T11:43:33.399268+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Training stage is internally consistent and well-executed. Key checks: (1) Config consistency — best_configuration.train_config, top-level train_config, and train_result all agree on hyperparameters (batch_size=128, depth=4, hidden=80, dropout=0.15, lr=0.0015, seed=47, cosine scheduler). (2) Early stopping is correctly applied: best_epoch=13, patience=3, training halted at epoch 15 (13+3=16 > 15, so all 15 epochs ran and the last 2 were within patience window). (3) Training history shows monotonic train-loss decrease (0.510→0.282) and val-loss decrease (0.390→0.290) with no overfitting signal; val accuracy plateaus at ~0.9956–0.9958 from epoch 10 onward. (4) Cosine LR schedule decays from 0.0015 to 0.0 over 15 epochs as expected. (5) Checkpoint and config SHA-256 hashes are present and distinct from the search-trial checkpoint, confirming a separate full-training artifact. (6) The search trial (3 epochs, patience 2, val_acc 0.987705) and the full training run (15 epochs, patience 3, val_acc 0.995802) differ in epoch budget and patience, which is a valid two-stage workflow (short-trial selection → full training); the ~0.8 pp improvement is consistent with additional training. (7) No test-set metrics appear anywhere in the training artefacts. Minor carry-forward notes from the search stage remain: (a) 'rotate90' augmentation is a 90° discrete rotation rather than a small-angle jitter — empirically validated but should be documented for reproducibility; (b) early_stopping_patience=3 is below the 5–8 range suggested in the research notes, though the observed convergence (plateau by epoch 10) makes this low-risk; (c) normalization is labeled 'standardize' without explicitly stating per-channel statistics — confirm the implementation applies per-channel mean/std rather than global. None of these are blocking. No deterministic findings were raised. Proceed to the next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Minor: augmentation 'rotate90' is a 90° discrete rotation, not a small-angle jitter; empirically validated but should be explicitly documented for reproducibility",
+      "Minor: early_stopping_patience=3 is below the research-recommended 5–8; low risk given observed convergence but leaves little margin for slower-converging re-runs",
+      "Minor: normalization labeled 'standardize' without explicit 'per-channel' qualifier; confirm implementation uses per-channel statistics to avoid the global mean/std pitfall flagged in research notes",
+      "Informational: transformer-specific parameters (num_heads, mlp_ratio, pooling, positional_encoding, tokenizer_layers) are present in a residual_cnn config; likely a shared schema, but worth confirming they are no-ops for the CNN path"
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "training"
+  },
+  "payload_sha256": "91532b14783ae6eb1d8de98ad803510dd315dddf4df9c6b91db0ab0587fd5d78",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 27,
+  "version": 1
+}

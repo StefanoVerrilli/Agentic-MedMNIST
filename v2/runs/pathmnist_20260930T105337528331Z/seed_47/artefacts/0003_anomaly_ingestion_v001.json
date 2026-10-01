@@ -1,0 +1,24 @@
+{
+  "artefact": "anomaly_ingestion",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-30T11:21:26.715808+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Ingestion stage is clean. All deterministic checks pass (deterministic_findings is empty, omitted_artefacts is empty). Specific verifications: (1) loaded_split_sizes exactly match official_split_sizes (train=89996, val=10004, test=7180) with subsampled=false — no silent resampling. (2) n_classes=9 matches the 9-entry labels list. (3) n_channels=3 is correct for RGB PathMNIST. (4) Both manifests carry schema_version 1.0 and are internally consistent. (5) created_at (11:21:09.6) is ~1.5 s before the authoritative current_utc (11:21:11.1), which is expected. (6) Archive MD5 and per-split index SHA-256 hashes are present, enabling provenance verification. (7) Package versions (torch 2.14.0+cu126, lightning 2.6.5, numpy 2.4.6, scikit-learn 1.9.0, Python 3.11.15) are mutually compatible and plausible for the 2026 timeframe. Two minor observations (neither blocking): (a) llm_model_digest is null for the qwen3.8 Ollama model, so exact weight provenance cannot be independently verified — this is a reproducibility gap worth tracking but not an ingestion error; (b) the test-domain note confirms the test split originates from a different clinical center (CRC-VAL-HE-7K), a known PathMNIST characteristic that should be carried into downstream evaluation interpretation. No issues require revision; proceed to the next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "llm_model_digest is null for qwen3.8 (ollama); exact model weight provenance is not pinned, limiting full reproducibility of any LLM-assisted steps.",
+      "Test split (CRC-VAL-HE-7K) originates from a different clinical center than train/val; this domain shift is a known PathMNIST property but must be explicitly accounted for in any downstream performance reporting."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "ingestion"
+  },
+  "payload_sha256": "37c516b0e8f764387d215acccadeef168621a0fce71493b292305736a64bc5ba",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 3,
+  "version": 1
+}

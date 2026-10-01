@@ -1,0 +1,63 @@
+{
+  "artefact": "trial_res_cnn_base_0d5e7d9b",
+  "artefact_type": "TrialResult",
+  "created_at": "2026-09-30T11:24:53.208334+00:00",
+  "payload": {
+    "best_epoch": 3,
+    "candidate_id": "res_cnn_base",
+    "checkpoint_path": "blobs/search/trial_res_cnn_base_0d5e7d9b.ckpt",
+    "checkpoint_sha256": "8d4b02f0d07f118d09c65a20f9235d9a960cafc67880def30eacb4dd8f7571e4",
+    "config": {
+      "batch_size": 128,
+      "class_weighting": true,
+      "depth": 4,
+      "device": "cuda",
+      "dropout": 0.2,
+      "early_stopping_patience": 2,
+      "epochs": 3,
+      "gradient_clip_val": 1.0,
+      "hidden": 64,
+      "label_smoothing": 0.1,
+      "lr": 0.001,
+      "mlp_ratio": 4,
+      "model_family": "residual_cnn",
+      "num_heads": 4,
+      "optimizer": "adamw",
+      "patch_size": 4,
+      "pooling": "cls",
+      "positional_encoding": "learned",
+      "rationale": "Primary architecture per research priorities. 4 residual blocks with hidden=64 exploit local structure at 28×28 without over-parameterisation. AdamW with cosine decay at lr=1e-3 follows the recommended CNN starting point. Low weight decay (1e-4) avoids over-regularising the subtle channel-variance signal. Class weighting addresses the 1.63× imbalance. Dropout 0.2 on the classifier head provides mild regularisation without suppressing features. Batch 128 balances gradient noise and throughput. Mild augmentations (hflip, rotate90) expand the effective dataset without destroying spatial detail.",
+      "scheduler": "cosine",
+      "schema_version": "1.0",
+      "seed": 47,
+      "source": "qwen3.8",
+      "tokenizer_layers": 2,
+      "weight_decay": 0.0001
+    },
+    "config_hash": "0d5e7d9befac9999ef1cb6c919eb4a953259489b579a8ed7ff20340f0e02d7ed",
+    "decision_source": "qwen3.8",
+    "duration_seconds": 52.4304,
+    "error": null,
+    "lightning_csv_path": "blobs/search/lightning_logs/trial_res_cnn_base_0d5e7d9b/version_0/metrics.csv",
+    "representation": {
+      "augmentations": [
+        "hflip",
+        "rotate90"
+      ],
+      "normalization": "standardize",
+      "rationale": "Primary architecture per research priorities. 4 residual blocks with hidden=64 exploit local structure at 28×28 without over-parameterisation. AdamW with cosine decay at lr=1e-3 follows the recommended CNN starting point. Low weight decay (1e-4) avoids over-regularising the subtle channel-variance signal. Class weighting addresses the 1.63× imbalance. Dropout 0.2 on the classifier head provides mild regularisation without suppressing features. Batch 128 balances gradient noise and throughput. Mild augmentations (hflip, rotate90) expand the effective dataset without destroying spatial detail."
+    },
+    "round_index": 1,
+    "schema_version": "1.0",
+    "status": "completed",
+    "training_log_path": "blobs/search/trial_res_cnn_base_0d5e7d9b.training.jsonl",
+    "validation_accuracy": 0.987505,
+    "validation_balanced_accuracy": 0.987148,
+    "validation_macro_f1": 0.987484
+  },
+  "payload_sha256": "0b20283cb7a05d13f92af91080c970185333be10c0fae761bf206ac8b7514d26",
+  "producer": "model_search",
+  "run_id": "seed_47",
+  "sequence": 12,
+  "version": 1
+}

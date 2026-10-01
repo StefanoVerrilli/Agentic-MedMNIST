@@ -1,0 +1,29 @@
+{
+  "artefact": "anomaly_evaluation",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-30T11:44:22.223313+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "All deterministic checks pass: confusion matrix rows sum to per-class supports (total 7180), per-class precision/recall/F1 are arithmetically consistent with the matrix, macro-averages match the reported values, balanced accuracy equals macro-recall, and overall accuracy (6279/7180=0.874513) is correct. Test lock is enforced (test_locked=true, test_metrics_used=false in both search and selection). Search-to-training config is consistent across best_configuration, top-level train_config, and train_result. Early stopping logic is correct (best epoch 13, patience 3, max 15 → training completed all 15 epochs since 13+3=16>15). Prediction artifact sample counts match (7180 test, 10004 validation).\n\nPrimary concern (warning): The validation-to-test accuracy gap is 12.1 pp (best val 0.9958 → test 0.8745). This is unusually large and indicates the validation set substantially overestimated generalization. The gap is driven by specific class confusions on test that were not apparent in validation: adipose→smooth muscle (283 errors, 21% of adipose), stroma→debris (100 errors, 24% of stroma), and smooth muscle scattered across background/debris/stroma. Cancer-associated stroma recall drops to 45.6% and smooth muscle F1 to 0.632, both far below the near-perfect validation macro-F1 of 0.9958. This does not indicate a pipeline defect or leakage, but it means the model-selection signal (validation accuracy) was a poor proxy for true generalization. The evaluation report should explicitly flag this gap and the affected classes so downstream consumers are not misled by the 0.9958 validation figure.\n\nMinor notes carried forward from prior stages: (1) 'rotate90' augmentation is a 90° discrete rotation, not the small-angle jitter recommended in research notes; empirically validated but should be documented. (2) early_stopping_patience=3 is below the 5–8 range in research notes; low risk given observed convergence. (3) Normalization labeled 'standardize' without explicit 'per-channel' qualifier—confirm implementation. (4) Transformer-specific parameters (num_heads, mlp_ratio, pooling, positional_encoding, tokenizer_layers) present in a residual_cnn config; likely shared schema no-ops but worth confirming.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Validation-to-test accuracy gap of 12.1 pp (0.9958 → 0.8745) is large; selection signal overestimated generalization",
+      "Cancer-associated stroma recall 45.6% and smooth muscle F1 0.632 on test are far below validation-level performance; these class confusions were not visible in validation metrics",
+      "Adipose→smooth muscle confusion (283/1338 = 21%) is the single largest error source on test",
+      "Augmentation 'rotate90' (90° discrete) deviates from research-recommended small-angle jitter; empirically validated but under-documented for reproducibility",
+      "early_stopping_patience=3 is below the 5–8 range recommended in research notes; low risk given convergence but leaves little margin for slower re-runs",
+      "Normalization labeled 'standardize' without explicit 'per-channel' qualifier; confirm implementation applies per-channel statistics",
+      "Transformer-specific parameters (num_heads, mlp_ratio, pooling, positional_encoding, tokenizer_layers) present in residual_cnn config; likely shared-schema no-ops but unconfirmed"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "evaluation"
+  },
+  "payload_sha256": "159e8c7112d99124e6ffe02256467c51fefdfec13f896767e27e77b094143603",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 30,
+  "version": 1
+}

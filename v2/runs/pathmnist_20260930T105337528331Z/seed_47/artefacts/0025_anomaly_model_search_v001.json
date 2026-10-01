@@ -1,0 +1,25 @@
+{
+  "artefact": "anomaly_model_search",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-30T11:35:22.091781+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Model search stage is internally consistent and well-executed. Key checks passed: (1) Test lock is enforced — test_locked=true in search_plan, test_metrics_used=false in both best_configuration and search_report; no test-set leakage. (2) Selection is justified: res_cnn_refined (val_acc 0.987705, macro-F1 0.988031) outperforms the next-best trial (compact_tf_deep6 at 0.966114) by ~2.2 pp, well outside the 0.005 tolerance. (3) Config hashes are consistent across best_configuration, search_report, and the trial artifact. (4) All 8 planned trials completed with 0 failures across 3 rounds. (5) Split manifest is coherent: 89,996 train / 10,004 val / 7,180 test with official strategy, separate test center, and SHA-256 integrity hashes for all index files. (6) Augmented train size (359,984) is exactly 4× the raw train size, consistent with the listed augmentations (hflip + rotate90 + contrast). (7) Hyperparameters align with the architecture research: residual_cnn family (top priority), hidden=80 within the 32→256 channel progression, lr=1.5e-3 near the recommended 1e-3, weight_decay=1e-4 within the 1e-4–5e-4 band, batch_size=128 within 128–256, AdamW optimizer, cosine scheduler. Minor justified deviations: dropout 0.15 vs recommended 0.2–0.3 (rationale: convergence by epoch 3), early_stopping_patience 3 vs 5–8 (same convergence rationale), rotate90 vs ±10° rotation (empirically validated). (8) The transformer trials (compact_tf_p4 at 0.9664, compact_tf_deep6 at 0.9661) confirm the research prediction that 49-token attention underperforms a well-tuned residual CNN at this resolution. No deterministic findings were raised. No issues warrant revision.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Minor: augmentation 'rotate90' (90° discrete rotation) deviates from the research-recommended 'small rotation ±10°'; empirically validated but worth noting for reproducibility documentation",
+      "Minor: early_stopping_patience=3 is below the research-recommended 5–8; justified by observed convergence but leaves little margin if a future re-run shows slower convergence",
+      "Minor: normalization is labeled 'standardize' without explicitly stating 'per-channel'; the research specifically warns against global mean/std — confirm implementation applies per-channel statistics"
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "model_search"
+  },
+  "payload_sha256": "0cb730ff3717130af53eaffd28820a99d979bb0f30250a68331b0236bf03637f",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 25,
+  "version": 1
+}

@@ -1,0 +1,25 @@
+{
+  "artefact": "anomaly_training",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-09-30T11:17:15.993745+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Training stage is internally consistent and well-executed. Key checks passed:\n\n1. **Config consistency**: The train_config matches the best_configuration selected during model search (res_cnn_wide_d5, hidden=96, depth=5, lr=8e-4, batch=128, dropout=0.15, label_smoothing=0.05). Seed 42 is consistent across search and training.\n\n2. **Learning-rate schedule**: Cosine decay from 8e-4 to 0 over 15 epochs verified numerically. Epoch-1 LR (7.91259e-4) and epoch-15 LR (0.0) match the expected CosineAnnealingLR formula with T_max=15. All intermediate values follow the cosine curve correctly.\n\n3. **Training dynamics**: Val accuracy improves monotonically from 0.9165 (ep 1) to 0.9962 (ep 15). Val loss decreases from 0.483 to 0.291. Train loss decreases from 0.540 to 0.282. The small train/val loss gap (~0.009) indicates no overfitting. Early stopping (patience=3) correctly did not trigger since the model was still improving.\n\n4. **Search-to-training continuity**: Search validation accuracy was 0.9875 (3-epoch budget, patience 2). Final training reaches 0.9962 over 15 epochs. The improvement is consistent with the longer training budget and is not anomalous.\n\n5. **No data leakage**: test_metrics_used=false. Selection was based solely on validation metrics.\n\n6. **Checkpoint integrity**: checkpoint_sha256 and lightning_config_sha256 are present and non-empty. Paths are well-formed.\n\n7. **Minor notes (non-blocking)**: (a) Transformer-specific fields (num_heads, patch_size, mlp_ratio, positional_encoding, tokenizer_layers, pooling) are present in the residual_cnn config under a unified schema — already flagged in the model_search stage as harmless but potentially confusing. (b) The rationale string is truncated with '...' in multiple places; cosmetic only. (c) best_epoch=15 (the final epoch) means the model was still improving; not an error, but a signal that the 15-epoch budget may be slightly tight. None of these affect correctness.\n\nNo deterministic findings were raised. All evidence is consistent. Proceed to the next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Transformer-specific config fields (num_heads, patch_size, mlp_ratio, positional_encoding, tokenizer_layers, pooling) are present in the residual_cnn train_config; harmless under the unified schema but should be explicitly ignored by the CNN training path.",
+      "Rationale strings are truncated (end with '...') in best_configuration, train_config, and trial configs; cosmetic but reduces auditability.",
+      "best_epoch equals the final epoch (15), indicating the model was still improving at the training budget limit; not an error but worth noting for potential future budget increases."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "training"
+  },
+  "payload_sha256": "1e836e4003075d1134f5a437c4b98347d5964eb1c27a9b812588959476f74e77",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 27,
+  "version": 1
+}
