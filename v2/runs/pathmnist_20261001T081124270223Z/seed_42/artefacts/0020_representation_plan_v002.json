@@ -1,0 +1,32 @@
+{
+  "artefact": "representation_plan",
+  "artefact_type": "RepresentationPlan",
+  "created_at": "2026-10-01T08:27:47.384975+00:00",
+  "payload": {
+    "augmentation_factor": 3,
+    "augmentations": [
+      "hflip",
+      "vflip"
+    ],
+    "normalization": "standardize",
+    "rationale": "Extends the best prior result (resnet18, 0.9908) by enabling class_weighting to address the 1.63x imbalance that was unexplored in all prior runs. Depth increases from 3 to 4 for additional residual capacity, compensated by raising dropout to 0.15 and lowering lr to 0.0003 for stability. Hidden stays at 32 (proven effective). hflip+vflip augmentation retained. AdamW with cosine decay and weight_decay=1e-4 match the winning recipe. The class weighting should particularly help the minority classes (7886, 8006 samples) without distorting the majority, potentially improving balanced accuracy beyond the 0.9907 already achieved.",
+    "schema_version": "1.0",
+    "source": "agentic_search:selected:qwen3.8",
+    "stats_source": "train",
+    "train_channel_mean_unit": [
+      0.740545,
+      0.53298219,
+      0.70582885
+    ],
+    "train_channel_std_unit": [
+      0.12368222,
+      0.17676253,
+      0.12443067
+    ]
+  },
+  "payload_sha256": "463668b7fcf94bb79f4791185b5f7c2ca59b8551d3db8498e4eaa21e0234c64e",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 20,
+  "version": 2
+}

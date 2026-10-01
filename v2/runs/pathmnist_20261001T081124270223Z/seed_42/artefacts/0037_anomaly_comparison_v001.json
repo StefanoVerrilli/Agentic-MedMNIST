@@ -1,0 +1,28 @@
+{
+  "artefact": "anomaly_comparison",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T08:35:50.337021+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "The comparison stage is internally consistent and correctly computed. The agentic model (resnet18_weighted_deep, depth 4, class-weighted, dropout 0.15) achieves 85.99% test accuracy versus the baseline tiny_cnn (depth 2, hidden 16, no regularization) at 82.13%, yielding a +3.86 pp delta. Both models share the same split fingerprint (9afc9ed3…c7505), the same seed (42), and the same 15-epoch budget, satisfying the fairness criteria for a controlled comparison. The baseline_met_or_exceeded flag is correctly set to true. No deterministic findings are present.\n\nWarning-level concerns carried forward from upstream stages that do not invalidate the comparison but should be noted in the final dossier:\n\n1. Validation-to-test accuracy gap: the agentic model shows 99.41% validation accuracy vs 85.99% test accuracy (≈13.4 pp). The split_manifest is in omitted_artefacts, so split integrity and potential data leakage cannot be independently verified. This gap is the single most important open question for the pipeline's credibility.\n\n2. OOD detection is scoped to a controlled_corruption_proxy (unit-scale Gaussian noise at σ ∈ {0.15, 0.25, 0.4}). Test AUROC drops to 0.534 (max_softmax) and 0.501 (predictive entropy) at σ=0.4, near chance. The OOD pass verdict does not generalize to real-world distribution shifts (different tissue types, scanner artifacts, staining variability).\n\n3. The 42.5% abstain rate (3,053 of 7,180 test samples routed to human review) is operationally high. At target validation coverage 0.8, test coverage is only 57.5%, and at target 0.9 it is 66.1%. The selective risk of 4.7% on covered test samples is acceptable, but the coverage gap between validation (80%) and test (57.5%) at the same target indicates the threshold is over-optimistic on the test distribution.\n\n4. Config hygiene: both the baseline (tiny_cnn) and the agentic (resnet18) configurations carry transformer-specific parameters (mlp_ratio, num_heads, patch_size, pooling, positional_encoding, tokenizer_layers) in a unified schema. Downstream code must correctly ignore inapplicable fields; this is a maintainability risk but not a correctness failure if the framework handles it.\n\n5. The baseline is intentionally a very weak control (2-layer CNN, 16 hidden units, no regularization). The 3.86 pp margin, while positive, is expected given the large capacity difference. A stronger baseline (e.g., a standard ResNet18 without class weighting or the agentic search) would provide a more informative comparison. This is a design choice, not a defect.\n\n6. 21 upstream artefacts (including split_manifest, data_profile, dataset_manifest, run_manifest, and all trial records) are omitted from the evidence set, limiting the depth of independent audit possible at this stage.\n\nNo deterministic findings justify a stop or revise action at the comparison stage. The comparison is valid, the arithmetic is correct, and the pass criterion is met. Proceed to final reporting with the above warnings documented.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Validation-to-test accuracy gap of ~13.4 pp (99.41% vs 85.99%) is unexplained; split_manifest is omitted, preventing verification of split integrity or exclusion of data leakage",
+      "OOD detection AUROC drops to 0.534/0.501 at σ=0.4 (near chance); the OOD pass verdict is limited to a narrow Gaussian-noise corruption proxy and does not generalize to real-world distribution shifts",
+      "42.5% abstain rate (3,053/7,180 test samples) is operationally high; test coverage at target 0.8 is only 57.5% vs 80% validation coverage, indicating threshold over-optimism on test",
+      "Unified config schema includes transformer-specific parameters (mlp_ratio, num_heads, patch_size, pooling, positional_encoding, tokenizer_layers) in both tiny_cnn and resnet18 configurations; downstream code must correctly ignore inapplicable fields",
+      "21 upstream artefacts including split_manifest, data_profile, dataset_manifest, and run_manifest are omitted, limiting independent audit of the full pipeline",
+      "Baseline is a very weak 2-layer CNN control; the 3.86 pp margin is expected given the large capacity difference and provides limited discriminative information about the agentic search's contribution"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "comparison"
+  },
+  "payload_sha256": "ba5ce8753bbd28b4bb56f00d9dd284d9056d393baf10587aa86f1896ee7dba7e",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 37,
+  "version": 1
+}

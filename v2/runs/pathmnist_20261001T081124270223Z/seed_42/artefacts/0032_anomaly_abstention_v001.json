@@ -1,0 +1,27 @@
+{
+  "artefact": "anomaly_abstention",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T08:34:02.799307+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "The abstention stage is internally consistent and correctly implemented. No deterministic findings are present. The max_softmax threshold (0.9446) calibrated on validation yields a 42.5% abstain rate, 95.3% accuracy on covered samples (vs 86.0% base), and a selective risk of 4.7% on test. The risk-coverage curve is monotonic and well-formed. OOD detection (controlled_corruption_proxy scope) passes with test AUROC 0.67 and validation AUROC 0.83; the near-chance AUROC at sigma=0.4 (0.50–0.53) is expected for high-noise corruption and does not indicate a defect.\n\n**Inherited calibration gap (warning, not a stage defect):** The validation-to-test gap that was flagged CRITICAL in the evaluation stage (val_acc 99.4% vs test_acc 86.0%) propagates into the abstention calibration. At target coverage 0.8, validation_risk is 0.0012 while test_risk is 0.047 — a ~38× discrepancy. Similarly, OOD AUROC drops from 0.83 (val) to 0.67 (test). This means the abstention threshold, while correctly computed, is over-optimistic for the test distribution. This is a data/distribution issue inherited from upstream, not an abstention-stage implementation error.\n\n**Minor observations:**\n- The 42.5% abstain rate is operationally high; at target coverage 0.9 the test coverage only reaches 66.1%, meaning 34% of test samples still require human review. This is a consequence of the calibration gap, not a mechanism failure.\n- ood_pass=true is appropriate given the stated 'controlled_corruption_proxy' scope; the evidence hash (0253d11a…) is present and verifiable.\n- The prediction artifact (7180 test, 10004 validation samples) and checkpoint hashes are present and consistent with the evaluation report.\n- No schema violations, no missing required fields, no NaN/inf values in the reported metrics.\n\n**Recommendation:** Proceed to the next stage. The abstention mechanism is correctly implemented and reported. The calibration gap should be addressed at the data/split level (investigate the 13.4-point val-test accuracy gap flagged in the evaluation anomaly) rather than at the abstention stage. If the split integrity is confirmed, the abstention results are valid within their stated scope.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Inherited validation-to-test calibration gap: at target coverage 0.8, validation_risk=0.0012 vs test_risk=0.047 (~38x); the abstention threshold calibrated on validation is over-optimistic for the test distribution",
+      "OOD AUROC gap: validation 0.834 vs test 0.670; within the stated controlled_corruption_proxy scope but limits generalizability of the OOD pass verdict",
+      "42.5% abstain rate is operationally high; at target coverage 0.9 test coverage is only 66.1%, meaning 34% of test samples still require human review",
+      "split_manifest, data_profile, and dataset_manifest are in omitted_artefacts; split integrity and the root cause of the val-test gap cannot be independently verified at this stage",
+      "OOD scope is limited to unit-scale Gaussian noise at three severity levels; real-world OOD distributions (e.g., different tissue types, scanner artifacts) are not covered"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "abstention"
+  },
+  "payload_sha256": "de4c5a2ff8de1a7c3319f9db6a9404456667355cd29e7aab085f511890876398",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 32,
+  "version": 1
+}

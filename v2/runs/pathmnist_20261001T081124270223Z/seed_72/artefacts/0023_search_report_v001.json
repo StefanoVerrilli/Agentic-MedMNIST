@@ -1,0 +1,39 @@
+{
+  "artefact": "search_report",
+  "artefact_type": "SearchReport",
+  "created_at": "2026-10-01T09:23:44.199821+00:00",
+  "payload": {
+    "completed_trials": 8,
+    "failed_trials": 0,
+    "families_evaluated": [
+      "compact_transformer",
+      "residual_cnn",
+      "resnet18",
+      "tiny_cnn",
+      "vision_transformer"
+    ],
+    "missing_families": [],
+    "schema_version": "1.0",
+    "selected_candidate_id": "resnet18_conservative",
+    "selected_config_hash": "a48f20ec5b39dcfa521be0fd90b99b200968d5e692ce83238014c1a5fa5d2c82",
+    "selected_validation_accuracy": 0.993802,
+    "selected_validation_macro_f1": 0.993768,
+    "selection_rule": "highest_budget_accuracy_tolerance_then_macro_f1",
+    "test_metrics_used": false,
+    "trial_artefacts": [
+      "trial_compact_transformer_e4bc0782_e3",
+      "trial_residual_balanced_be4afb0b_e3",
+      "trial_resnet18_conservative_a48f20ec_e3",
+      "trial_tiny_regularized_ee0112db_e6",
+      "trial_vit_patch4_2c7c1bdc_e6",
+      "trial_resnet18_conservative_a48f20ec_e6",
+      "trial_resnet18_conservative_a48f20ec_e9",
+      "trial_resnet18_wider_654a49ed_e9"
+    ]
+  },
+  "payload_sha256": "1d2f2c88845ad7ffb76ca953ab7627dac490c0eea71b1096bfc388727dc35643",
+  "producer": "model_search",
+  "run_id": "seed_72",
+  "sequence": 23,
+  "version": 1
+}

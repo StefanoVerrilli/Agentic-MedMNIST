@@ -1,0 +1,33 @@
+{
+  "artefact": "representation_plan",
+  "artefact_type": "RepresentationPlan",
+  "created_at": "2026-10-01T08:54:14.384405+00:00",
+  "payload": {
+    "augmentation_factor": 4,
+    "augmentations": [
+      "hflip",
+      "vflip",
+      "rotate90"
+    ],
+    "normalization": "standardize",
+    "rationale": "Builds directly on the best prior result (resnet18, 0.9924) by widening hidden 32→48 for ~2.25× more channel capacity, enabling class_weighting to counter the 1.63× imbalance (minority class has only 7886 samples vs 12885 for majority), and adding rotate90 augmentation to exploit tissue-pattern symmetry. LR is reduced to 3e-4 to stabilize the wider network, batch increased to 256 for smoother gradients, and weight decay raised to 5e-4 to regularize the extra parameters. Label smoothing bumped to 0.1 to further soften overconfident majority-class predictions. All other hyperparameters (depth=3, dropout=0.1, AdamW, cosine) are held at the values that produced the 0.9924 result.",
+    "schema_version": "1.0",
+    "source": "agentic_search:selected:qwen3.8",
+    "stats_source": "train",
+    "train_channel_mean_unit": [
+      0.740545,
+      0.53298219,
+      0.70582885
+    ],
+    "train_channel_std_unit": [
+      0.12368222,
+      0.17676253,
+      0.12443067
+    ]
+  },
+  "payload_sha256": "279a463d793e97ec17840c1d235b0c57e60d8b3db514bdc388b2374ceb6be8cf",
+  "producer": "model_search",
+  "run_id": "seed_47",
+  "sequence": 20,
+  "version": 2
+}

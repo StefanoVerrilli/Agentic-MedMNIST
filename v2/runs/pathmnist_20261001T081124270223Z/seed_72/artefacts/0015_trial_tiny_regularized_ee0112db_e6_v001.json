@@ -1,0 +1,62 @@
+{
+  "artefact": "trial_tiny_regularized_ee0112db_e6",
+  "artefact_type": "TrialResult",
+  "created_at": "2026-10-01T09:12:40.171984+00:00",
+  "payload": {
+    "best_epoch": 6,
+    "candidate_id": "tiny_regularized",
+    "checkpoint_path": "blobs/search/trial_tiny_regularized_ee0112db_e6.ckpt",
+    "checkpoint_sha256": "12f05d66851c7475c41ab8b089836a47d03558f4567b826ccf7e285226d10523",
+    "config": {
+      "batch_size": 128,
+      "class_weighting": false,
+      "depth": 2,
+      "device": "cuda",
+      "dropout": 0.15,
+      "early_stopping_patience": 2,
+      "epochs": 6,
+      "gradient_clip_val": 1.0,
+      "hidden": 32,
+      "label_smoothing": 0.0,
+      "lr": 0.001,
+      "mlp_ratio": 4,
+      "model_family": "tiny_cnn",
+      "num_heads": 4,
+      "optimizer": "adamw",
+      "patch_size": 4,
+      "pooling": "cls",
+      "positional_encoding": "learned",
+      "rationale": "Low-cost control close to the best representation ablation.",
+      "scheduler": "cosine",
+      "schema_version": "1.0",
+      "seed": 72,
+      "source": "heuristic:coverage",
+      "tokenizer_layers": 2,
+      "weight_decay": 0.0001
+    },
+    "config_hash": "ee0112dbd7f76abe21f15f2c67d751ad56cbb19cee14dbf628ff821faa1f242a",
+    "decision_source": "heuristic:coverage",
+    "duration_seconds": 32.4559,
+    "error": null,
+    "lightning_csv_path": "blobs/search/lightning_logs/trial_tiny_regularized_ee0112db_e6/version_0/metrics.csv",
+    "representation": {
+      "augmentations": [
+        "hflip"
+      ],
+      "normalization": "standardize",
+      "rationale": "Low-cost control close to the best representation ablation."
+    },
+    "round_index": 2,
+    "schema_version": "1.0",
+    "status": "completed",
+    "training_log_path": "blobs/search/trial_tiny_regularized_ee0112db_e6.training.jsonl",
+    "validation_accuracy": 0.931327,
+    "validation_balanced_accuracy": 0.92944,
+    "validation_macro_f1": 0.929682
+  },
+  "payload_sha256": "c70c92268853c00c4e1c0ff20e8db99c1355f779180449a5e64598f0893cd800",
+  "producer": "model_search",
+  "run_id": "seed_72",
+  "sequence": 15,
+  "version": 1
+}

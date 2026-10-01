@@ -1,0 +1,25 @@
+{
+  "artefact": "anomaly_comparison",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T09:06:03.472667+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Comparison stage verified. All cross-references are internally consistent: (1) accuracy_delta 0.033565 = 0.873816 − 0.840251 ✓; (2) baseline_met_or_exceeded=true is correct since 0.873816 > 0.840251; (3) common_seed 47 matches both baseline_report.seed and the evaluation context; (4) common_split_fingerprint 9afc9ed3… matches baseline_report.split_fingerprint exactly, confirming a fair same-split comparison; (5) primary_metric 'accuracy' is consistent with the evaluation_report. The baseline (tiny_cnn, depth=2, hidden=16, 15 epochs) is a deliberately minimal conventional control, and the 3.36 pp accuracy improvement is correctly attributed. No deterministic findings. Minor observations carried forward from prior stages (val-test gap ≈12.2 pp, OOD proxy scope, inert transformer config fields in both baseline and agentic configs, sample-count narrative, early_stopping_patience change) are documentation/hygiene items for the final report and do not invalidate the comparison. The comparison report could optionally include a macro_f1 delta (0.838984 − 0.784172 = 0.054812) for completeness, but this is not required since primary_metric is accuracy. No action-blocking issues identified at this stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Comparison report omits macro_f1 delta (agentic 0.838984 vs baseline 0.784172, Δ=0.054812); not required since primary_metric=accuracy, but would strengthen the report.",
+      "Inert transformer-specific config fields (num_heads, patch_size, pooling, positional_encoding, mlp_ratio, tokenizer_layers) present in the baseline tiny_cnn config; carried-forward hygiene item from prior stages.",
+      "Baseline is a minimal control (tiny_cnn depth=2, hidden=16); the 3.36 pp gain is meaningful but should be contextualized in the final report as improvement over a deliberately simple reference, not a strong model."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "comparison"
+  },
+  "payload_sha256": "818ef4c52593e682c9a9b6e8556b5ad840de52f5fec07183e033d34393681138",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 37,
+  "version": 1
+}

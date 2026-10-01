@@ -1,0 +1,28 @@
+{
+  "artefact": "anomaly_architecture_research",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T08:14:36.138997+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "The architecture_research stage is well-structured and internally consistent with the data profile, split manifest, and representation plan. The 28×28 RGB constraint is correctly identified as the dominant design driver, and the prioritization of compact_transformer over vision_transformer is well-justified. Parametrization ranges (LR, weight decay, batch size, epochs, dropout, class weighting, label smoothing) are appropriate for the ~90K-sample, 9-class, 1.63×-imbalance regime. No deterministic findings are present, so action=stop is not justified.\n\nMinor issues noted (none critical):\n\n1. ResNet18 spatial-dimension inaccuracy: The risk section states 'resnet18's four stages downsample to 2×2; the final 2×2 feature map has only 4 spatial positions.' Tracing the standard ResNet18 stem (7×7 s=2 → 14×14; maxpool s=2 → 7×7) through layers 1–4 (s=1, s=2, s=2, s=2) yields a final 1×1 feature map (1 spatial position), not 2×2. The overfitting risk is still valid, but the stated dimension is off by one downsampling step. Recommend correcting to 1×1 or clarifying that 2×2 is the penultimate resolution (layer3 output).\n\n2. Augmentation-set mismatch: The architecture_research recommends 'random horizontal flip, ±5° rotation, small translation ≤2 px,' while the representation_plan specifies ['hflip','vflip','brightness']. Rotation and translation are absent from the plan; vflip and brightness are absent from the recommendation. This is not a contradiction (the research is advisory, the plan is operative), but the discrepancy should be reconciled so the training configuration matches the intended augmentation strategy.\n\n3. Upstream data-integrity carry-over (flagged in preprocessing, not resolved): test_imbalance_ratio = 1.0 is mathematically impossible for 7 180 samples / 9 classes (7180/9 is not an integer). test_to_train_prevalence_ratio is an empty array. These do not block architecture design but must be corrected before any training or evaluation run that touches the test split.\n\n4. Reproducibility: llm_model_digest is null in every LLM-dependent artefact, and the identifier 'qwen3.8' does not match any publicly documented Qwen release name. This is a verification warning, not a deterministic failure; the exact checkpoint should be pinned and its SHA-256 recorded before downstream stages that depend on LLM-generated artefacts.\n\n5. The architecture_research correctly enforces patch-size ≤ 4 for any ViT configuration on 28×28 input, which prevents the 1-token or 16-token degeneracy. This guardrail should be carried into the search-space definition.\n\nOverall the stage output is sound, actionable, and consistent with the 28×28 RGB MedMNIST distribution. Proceed to the next stage after correcting the ResNet18 spatial-dimension note and reconciling the augmentation list.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "ResNet18 final spatial dimension misstated as 2×2 (4 positions); standard ResNet18 on 28×28 input yields 1×1 (1 position) after all four residual stages",
+      "Augmentation recommendations in architecture_research (rotation, translation) do not match the representation_plan (vflip, brightness); reconcile before training",
+      "Upstream: test_imbalance_ratio = 1.0 is mathematically impossible for 7180 samples / 9 classes; value is a placeholder or computation bug",
+      "Upstream: test_to_train_prevalence_ratio is an empty array; per-class test-set counts were never computed",
+      "llm_model_digest is null across all LLM-dependent artefacts; exact Qwen checkpoint cannot be verified for reproducibility",
+      "llm_model identifier 'qwen3.8' does not match any publicly documented Qwen release name; verify it resolves to the intended checkpoint on the Ollama instance"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "architecture_research"
+  },
+  "payload_sha256": "9d94fda517d2a7fff2f85ea4727ec6e4ca86d62b0c1d7118ac29249a0655ea9f",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 10,
+  "version": 1
+}

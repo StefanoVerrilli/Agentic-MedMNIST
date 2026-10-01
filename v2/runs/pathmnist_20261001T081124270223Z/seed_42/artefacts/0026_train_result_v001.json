@@ -1,0 +1,148 @@
+{
+  "artefact": "train_result",
+  "artefact_type": "TrainResult",
+  "created_at": "2026-10-01T08:32:17.605353+00:00",
+  "payload": {
+    "best_epoch": 15,
+    "best_val_accuracy": 0.994102,
+    "checkpoint_path": "blobs/agentic_model_v001.ckpt",
+    "checkpoint_sha256": "71f0cc0d0d0bd01775ed69d16531cbc2a962d58cf1929014afab995eb37b4b16",
+    "device": "cuda",
+    "epochs_completed": 15,
+    "final_train_loss": 0.283579,
+    "final_val_accuracy": 0.994102,
+    "framework": "lightning.pytorch",
+    "history": [
+      {
+        "epoch": 1,
+        "learning_rate": 0.0002967221,
+        "train_loss": 0.571119,
+        "val_accuracy": 0.928928,
+        "val_loss": 0.45267,
+        "val_macro_f1": 0.929697
+      },
+      {
+        "epoch": 2,
+        "learning_rate": 0.0002870318,
+        "train_loss": 0.416188,
+        "val_accuracy": 0.956018,
+        "val_loss": 0.389588,
+        "val_macro_f1": 0.957038
+      },
+      {
+        "epoch": 3,
+        "learning_rate": 0.0002713525,
+        "train_loss": 0.375055,
+        "val_accuracy": 0.966813,
+        "val_loss": 0.363417,
+        "val_macro_f1": 0.967801
+      },
+      {
+        "epoch": 4,
+        "learning_rate": 0.0002503696,
+        "train_loss": 0.35203,
+        "val_accuracy": 0.953019,
+        "val_loss": 0.394967,
+        "val_macro_f1": 0.954263
+      },
+      {
+        "epoch": 5,
+        "learning_rate": 0.000225,
+        "train_loss": 0.335704,
+        "val_accuracy": 0.977509,
+        "val_loss": 0.341342,
+        "val_macro_f1": 0.977773
+      },
+      {
+        "epoch": 6,
+        "learning_rate": 0.0001963525,
+        "train_loss": 0.323543,
+        "val_accuracy": 0.981207,
+        "val_loss": 0.328672,
+        "val_macro_f1": 0.981323
+      },
+      {
+        "epoch": 7,
+        "learning_rate": 0.0001656793,
+        "train_loss": 0.313354,
+        "val_accuracy": 0.97561,
+        "val_loss": 0.343215,
+        "val_macro_f1": 0.975049
+      },
+      {
+        "epoch": 8,
+        "learning_rate": 0.0001343207,
+        "train_loss": 0.305555,
+        "val_accuracy": 0.985306,
+        "val_loss": 0.31699,
+        "val_macro_f1": 0.985375
+      },
+      {
+        "epoch": 9,
+        "learning_rate": 0.0001036475,
+        "train_loss": 0.299056,
+        "val_accuracy": 0.991004,
+        "val_loss": 0.305795,
+        "val_macro_f1": 0.990971
+      },
+      {
+        "epoch": 10,
+        "learning_rate": 7.5e-05,
+        "train_loss": 0.293623,
+        "val_accuracy": 0.990804,
+        "val_loss": 0.304248,
+        "val_macro_f1": 0.990806
+      },
+      {
+        "epoch": 11,
+        "learning_rate": 4.96304e-05,
+        "train_loss": 0.289209,
+        "val_accuracy": 0.991803,
+        "val_loss": 0.301131,
+        "val_macro_f1": 0.991886
+      },
+      {
+        "epoch": 12,
+        "learning_rate": 2.86475e-05,
+        "train_loss": 0.286754,
+        "val_accuracy": 0.992603,
+        "val_loss": 0.29997,
+        "val_macro_f1": 0.992607
+      },
+      {
+        "epoch": 13,
+        "learning_rate": 1.29682e-05,
+        "train_loss": 0.284814,
+        "val_accuracy": 0.993003,
+        "val_loss": 0.297439,
+        "val_macro_f1": 0.99306
+      },
+      {
+        "epoch": 14,
+        "learning_rate": 3.2779e-06,
+        "train_loss": 0.283842,
+        "val_accuracy": 0.993902,
+        "val_loss": 0.297723,
+        "val_macro_f1": 0.99385
+      },
+      {
+        "epoch": 15,
+        "learning_rate": 0.0,
+        "train_loss": 0.283579,
+        "val_accuracy": 0.994102,
+        "val_loss": 0.296368,
+        "val_macro_f1": 0.994079
+      }
+    ],
+    "lightning_config_path": "best_config.yaml",
+    "lightning_csv_path": "blobs/lightning_logs/agentic_model_v001/version_0/metrics.csv",
+    "schema_version": "1.0",
+    "seed": 42,
+    "training_log_path": "blobs/agentic_model_v001.training.jsonl"
+  },
+  "payload_sha256": "b641dfc7aed21888924d25a4f06ffe470d6874bcc393bd6186af3291fc6a24e2",
+  "producer": "training",
+  "run_id": "seed_42",
+  "sequence": 26,
+  "version": 1
+}

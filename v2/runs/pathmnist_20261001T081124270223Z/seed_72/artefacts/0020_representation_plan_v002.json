@@ -1,0 +1,32 @@
+{
+  "artefact": "representation_plan",
+  "artefact_type": "RepresentationPlan",
+  "created_at": "2026-10-01T09:23:44.191675+00:00",
+  "payload": {
+    "augmentation_factor": 3,
+    "augmentations": [
+      "hflip",
+      "vflip"
+    ],
+    "normalization": "standardize",
+    "rationale": "A CIFAR-style ResNet-18 tests additional capacity without ImageNet assumptions.",
+    "schema_version": "1.0",
+    "source": "agentic_search:selected:promotion:incumbent",
+    "stats_source": "train",
+    "train_channel_mean_unit": [
+      0.740545,
+      0.53298219,
+      0.70582885
+    ],
+    "train_channel_std_unit": [
+      0.12368222,
+      0.17676253,
+      0.12443067
+    ]
+  },
+  "payload_sha256": "0e816830adeefdec85699a3af65cc92578a7a7b99572b6566cda90c878a6c929",
+  "producer": "model_search",
+  "run_id": "seed_72",
+  "sequence": 20,
+  "version": 2
+}

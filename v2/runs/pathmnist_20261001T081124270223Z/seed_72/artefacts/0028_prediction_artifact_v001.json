@@ -1,0 +1,20 @@
+{
+  "artefact": "prediction_artifact",
+  "artefact_type": "PredictionArtifact",
+  "created_at": "2026-10-01T09:28:20.961693+00:00",
+  "payload": {
+    "includes_logits": true,
+    "includes_probabilities": true,
+    "includes_targets": true,
+    "path": "blobs/predictions_v001.npz",
+    "schema_version": "1.0",
+    "sha256": "744d0bb18708267ea392fd6b00778587267390e6798b575a4d6cff484fe3fab5",
+    "test_samples": 7180,
+    "validation_samples": 10004
+  },
+  "payload_sha256": "c2abbcb172ca9ef1ee58365cd78ee3de80483bd35bb234c6b1f440598ef3ec1c",
+  "producer": "evaluation",
+  "run_id": "seed_72",
+  "sequence": 28,
+  "version": 1
+}

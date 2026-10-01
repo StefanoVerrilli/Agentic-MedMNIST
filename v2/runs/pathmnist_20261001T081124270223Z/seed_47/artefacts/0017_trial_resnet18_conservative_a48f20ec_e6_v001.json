@@ -1,0 +1,63 @@
+{
+  "artefact": "trial_resnet18_conservative_a48f20ec_e6",
+  "artefact_type": "TrialResult",
+  "created_at": "2026-10-01T08:46:50.437309+00:00",
+  "payload": {
+    "best_epoch": 6,
+    "candidate_id": "resnet18_conservative",
+    "checkpoint_path": "blobs/search/trial_resnet18_conservative_a48f20ec_e6.ckpt",
+    "checkpoint_sha256": "781c37fa5755b387ab42a0d4b67982080e6353cbcaf0d3d694a40a363863ea55",
+    "config": {
+      "batch_size": 128,
+      "class_weighting": false,
+      "depth": 3,
+      "device": "cuda",
+      "dropout": 0.1,
+      "early_stopping_patience": 2,
+      "epochs": 6,
+      "gradient_clip_val": 1.0,
+      "hidden": 32,
+      "label_smoothing": 0.05,
+      "lr": 0.0005,
+      "mlp_ratio": 4,
+      "model_family": "resnet18",
+      "num_heads": 4,
+      "optimizer": "adamw",
+      "patch_size": 4,
+      "pooling": "cls",
+      "positional_encoding": "learned",
+      "rationale": "A CIFAR-style ResNet-18 tests additional capacity without ImageNet assumptions.",
+      "scheduler": "cosine",
+      "schema_version": "1.0",
+      "seed": 47,
+      "source": "promotion:incumbent",
+      "tokenizer_layers": 2,
+      "weight_decay": 0.0001
+    },
+    "config_hash": "a48f20ec5b39dcfa521be0fd90b99b200968d5e692ce83238014c1a5fa5d2c82",
+    "decision_source": "promotion:incumbent",
+    "duration_seconds": 87.3456,
+    "error": null,
+    "lightning_csv_path": "blobs/search/lightning_logs/trial_resnet18_conservative_a48f20ec_e6/version_0/metrics.csv",
+    "representation": {
+      "augmentations": [
+        "hflip",
+        "vflip"
+      ],
+      "normalization": "standardize",
+      "rationale": "A CIFAR-style ResNet-18 tests additional capacity without ImageNet assumptions."
+    },
+    "round_index": 2,
+    "schema_version": "1.0",
+    "status": "completed",
+    "training_log_path": "blobs/search/trial_resnet18_conservative_a48f20ec_e6.training.jsonl",
+    "validation_accuracy": 0.992403,
+    "validation_balanced_accuracy": 0.99256,
+    "validation_macro_f1": 0.99231
+  },
+  "payload_sha256": "d94541000328430f8bc493e15b509d848702ac9a9eefd39b0730cef2bb576e86",
+  "producer": "model_search",
+  "run_id": "seed_47",
+  "sequence": 17,
+  "version": 1
+}

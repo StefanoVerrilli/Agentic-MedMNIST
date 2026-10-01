@@ -1,0 +1,25 @@
+{
+  "artefact": "anomaly_comparison",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T09:31:45.788442+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "The comparison stage is internally consistent and methodologically sound. All arithmetic verified: (1) accuracy_delta = 0.872841 − 0.828134 = 0.044707 ✓; (2) baseline_met_or_exceeded = true since 0.872841 > 0.828134 ✓; (3) common_seed 72 matches both baseline and agentic runs ✓; (4) common_split_fingerprint 9afc9ed3…c7505 is identical across both reports, confirming the same held-out test partition ✓; (5) dataset is pathmnist in both ✓. The agentic model's accuracy CI95 [0.8649, 0.8803] lies entirely above the baseline point estimate (0.8281), so the improvement is unambiguously significant at n=7180 without requiring an explicit paired test. The baseline is a fixed tiny_cnn (hidden=16, depth=2, 15 epochs) serving as a conventional control, which is a reasonable reference. Minor observations (non-blocking): (a) the comparison reports only the accuracy delta; the macro_f1 delta (0.846621 − 0.757331 = 0.089290) is larger and would strengthen the narrative if included in a downstream summary; (b) no explicit confidence interval on the delta or paired significance test is reported, though the non-overlapping CIs make this a formality; (c) the baseline config carries inert transformer fields (num_heads, patch_size, pooling, positional_encoding, tokenizer_layers, mlp_ratio) that are functionally irrelevant to a tiny_cnn but create minor schema ambiguity for downstream tooling—already flagged in prior anomaly reviews. No deterministic errors found. The comparison correctly demonstrates that the agentic search-and-train pipeline outperforms the fixed baseline on the primary metric under identical data and seed conditions.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Comparison reports only accuracy delta; macro_f1 delta (0.0893) is omitted and would provide a more complete picture of per-class improvement.",
+      "No explicit confidence interval on the accuracy delta or paired significance test is included; the non-overlapping CIs make the result clearly significant, but a formal test would strengthen reproducibility claims.",
+      "Baseline config contains inert transformer-specific fields (num_heads=4, patch_size=4, pooling='cls', positional_encoding='learned', tokenizer_layers=2, mlp_ratio=4) that are irrelevant to the tiny_cnn architecture; functionally harmless but creates schema ambiguity for downstream consumers."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "comparison"
+  },
+  "payload_sha256": "1b9b8dbb25c9d3dfba473cf40c3508b0ac8ca55dfcc144588eebaed30f69c369",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 37,
+  "version": 1
+}

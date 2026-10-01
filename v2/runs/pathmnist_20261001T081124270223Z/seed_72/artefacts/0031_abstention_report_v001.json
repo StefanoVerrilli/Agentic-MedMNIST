@@ -1,0 +1,111 @@
+{
+  "artefact": "abstention_report",
+  "artefact_type": "AbstentionReport",
+  "created_at": "2026-10-01T09:29:15.841190+00:00",
+  "payload": {
+    "abstain_rate": 0.385794,
+    "accuracy_on_covered": 0.968707,
+    "base_test_accuracy": 0.872841,
+    "calibrated_on": "validation",
+    "human_review_count": 2770,
+    "method": "predictive_entropy",
+    "ood_auroc": 0.935893,
+    "ood_corruption": "unit_scale_gaussian_noise_multi_severity",
+    "ood_evidence_path": "blobs/ood_probabilities.npz",
+    "ood_evidence_sha256": "4f461cece3a6e3ba885e85c050796bb390e72f4ee71ea54fe9240e6784c37579",
+    "ood_pass": true,
+    "ood_scenarios": [
+      {
+        "corruption": "unit_scale_gaussian_noise_sigma_0.15",
+        "score": "max_softmax",
+        "test_auroc": 0.876886,
+        "validation_auroc": 0.991195
+      },
+      {
+        "corruption": "unit_scale_gaussian_noise_sigma_0.15",
+        "score": "predictive_entropy",
+        "test_auroc": 0.889339,
+        "validation_auroc": 0.992618
+      },
+      {
+        "corruption": "unit_scale_gaussian_noise_sigma_0.25",
+        "score": "max_softmax",
+        "test_auroc": 0.96451,
+        "validation_auroc": 0.998196
+      },
+      {
+        "corruption": "unit_scale_gaussian_noise_sigma_0.25",
+        "score": "predictive_entropy",
+        "test_auroc": 0.973022,
+        "validation_auroc": 0.998778
+      },
+      {
+        "corruption": "unit_scale_gaussian_noise_sigma_0.4",
+        "score": "max_softmax",
+        "test_auroc": 0.953419,
+        "validation_auroc": 0.996426
+      },
+      {
+        "corruption": "unit_scale_gaussian_noise_sigma_0.4",
+        "score": "predictive_entropy",
+        "test_auroc": 0.94532,
+        "validation_auroc": 0.995878
+      }
+    ],
+    "ood_scope": "controlled_corruption_proxy",
+    "ood_validation_auroc": 0.995758,
+    "risk_coverage_curve": [
+      {
+        "target_validation_coverage": 0.5,
+        "test_coverage": 0.430501,
+        "test_risk": 0.037528,
+        "threshold": 0.87757288,
+        "validation_coverage": 0.5001,
+        "validation_risk": 0.0008
+      },
+      {
+        "target_validation_coverage": 0.6,
+        "test_coverage": 0.495682,
+        "test_risk": 0.034279,
+        "threshold": 0.87620158,
+        "validation_coverage": 0.60006,
+        "validation_risk": 0.000833
+      },
+      {
+        "target_validation_coverage": 0.7,
+        "test_coverage": 0.55585,
+        "test_risk": 0.032573,
+        "threshold": 0.87458217,
+        "validation_coverage": 0.70012,
+        "validation_risk": 0.000857
+      },
+      {
+        "target_validation_coverage": 0.8,
+        "test_coverage": 0.614206,
+        "test_risk": 0.031293,
+        "threshold": 0.87254079,
+        "validation_coverage": 0.80008,
+        "validation_risk": 0.00075
+      },
+      {
+        "target_validation_coverage": 0.9,
+        "test_coverage": 0.675209,
+        "test_risk": 0.032178,
+        "threshold": 0.86893947,
+        "validation_coverage": 0.90004,
+        "validation_risk": 0.000777
+      }
+    ],
+    "schema_version": "1.0",
+    "selective_risk": 0.031293,
+    "target_validation_coverage": 0.8,
+    "test_coverage": 0.614206,
+    "threshold": 0.87254079,
+    "validation_coverage": 0.80008
+  },
+  "payload_sha256": "2c8d23f992670be90ea6342835425ba8551b50eb2f26af657268c37613f21f3e",
+  "producer": "abstention",
+  "run_id": "seed_72",
+  "sequence": 31,
+  "version": 1
+}

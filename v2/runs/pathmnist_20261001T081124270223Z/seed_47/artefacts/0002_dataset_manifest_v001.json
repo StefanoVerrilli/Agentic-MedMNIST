@@ -1,0 +1,48 @@
+{
+  "artefact": "dataset_manifest",
+  "artefact_type": "DatasetManifest",
+  "created_at": "2026-10-01T08:36:15.147914+00:00",
+  "payload": {
+    "archive_md5": "a8b06965200029087d5bd730944a56c1",
+    "data_reference": "https://zenodo.org/records/10519652/files/pathmnist.npz?download=1",
+    "dataset": "pathmnist",
+    "labels": [
+      "adipose",
+      "background",
+      "debris",
+      "lymphocytes",
+      "mucus",
+      "smooth muscle",
+      "normal colon mucosa",
+      "cancer-associated stroma",
+      "colorectal adenocarcinoma epithelium"
+    ],
+    "license": "CC BY 4.0",
+    "loaded_split_sizes": {
+      "test": 7180,
+      "train": 89996,
+      "val": 10004
+    },
+    "n_channels": 3,
+    "n_classes": 9,
+    "official_split_sizes": {
+      "test": 7180,
+      "train": 89996,
+      "val": 10004
+    },
+    "schema_version": "1.0",
+    "selected_index_sha256": {
+      "test": "27ab586ecd9b4ac7278c6a91cf0b336a2ba742afe742d13eff51f702635791e8",
+      "train": "1478a96c1d8ad06d0a600d6c9b8d5c8dddd83fbda22307ab449764f013683b51",
+      "val": "a13f875ade8e54f5aee16ff205c36aa628396dddec09a33a175fcf9cbbb9d402"
+    },
+    "subsampled": false,
+    "task": "multi-class",
+    "test_domain_note": "CRC-VAL-HE-7K test images originate from a different clinical center."
+  },
+  "payload_sha256": "e749ae3162dd47c9dcc8013e796a1044c000c76f9277f25c9a348d24fcd1dd7b",
+  "producer": "ingestion",
+  "run_id": "seed_47",
+  "sequence": 2,
+  "version": 1
+}

@@ -1,0 +1,27 @@
+{
+  "artefact": "anomaly_abstention",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T09:29:51.005500+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "The abstention stage is internally consistent and methodologically sound. All arithmetic checks pass: abstain_rate (0.385794) + test_coverage (0.614206) = 1.0; human_review_count (2770) = 7180 × 0.385794; selective_risk (0.031293) = 1 − accuracy_on_covered (0.968707); the risk-coverage curve entry at target 0.8 matches the top-level fields (threshold, coverage, risk) exactly. The OOD evaluation is properly scoped as a controlled-corruption proxy with six scenarios across three noise severities and two scoring functions; all test AUROCs exceed 0.87 and the pooled ood_auroc (0.935893) is consistent with the individual scenario values. ood_pass=true is justified. The predictive_entropy method is appropriate for 9-class multi-class selective prediction.\n\nWarnings (non-blocking):\n1. Validation–test coverage gap: the threshold calibrated to 80% validation coverage yields only 61.4% test coverage, and validation risk (0.00075) is ~40× lower than test risk (0.0313). This indicates the uncertainty estimates are not transferable across the val/test split, likely due to distribution shift. The selective-promise (96.9% accuracy on covered) is therefore less reliable on truly novel data than the validation numbers suggest.\n2. OOD scope is limited to additive Gaussian noise at three σ levels. Real-world OOD for histopathology (different staining, scanner artifacts, rare morphologies) is not exercised. The ood_pass flag should be interpreted narrowly.\n3. The 38.6% abstention rate (2 770 samples routed to human review) is a substantial operational cost. The risk-coverage curve shows diminishing returns above 70% target coverage (test risk plateaus near 0.031–0.033), so the chosen 80% target is reasonable, but downstream deployment planning should budget for this review volume.\n4. The threshold (0.8725) is a single global max-probability cutoff. Given the class imbalance (1.63×) and the poor recall on class 7 (0.489) and class 0 (0.764) flagged in the evaluation anomaly, a per-class or class-aware abstention threshold could reduce the most clinically impactful errors at the same coverage level.\n\nNo deterministic findings were raised. The evaluation-stage anomaly (action=revise, severity=warning) and training-stage anomaly (action=continue, severity=ok) are noted as context but do not introduce new deterministic failures in the abstention artefact. All SHA-256 hashes and file paths are present and well-formed. Schema version 1.0 is consistent across all artefacts. Proceeding to the next stage is appropriate.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Validation–test coverage gap (80% val → 61.4% test) and ~40× risk gap (0.00075 vs 0.0313) indicate uncertainty estimates do not transfer well across splits; selective-prediction guarantees are weaker on test than validation suggests.",
+      "OOD evaluation is limited to additive Gaussian noise (σ ∈ {0.15, 0.25, 0.4}); real-world histopathology OOD (staining variation, scanner artifacts, rare morphologies) is not covered. ood_pass should be interpreted as a narrow corruption-robustness check only.",
+      "38.6% abstention rate (2 770 samples) represents a significant human-review burden; risk-coverage curve shows diminishing returns above 70% target coverage, so the 80% target is defensible but deployment planning must account for this volume.",
+      "Single global max-probability threshold (0.8725) does not account for per-class difficulty; classes 7 (recall 0.489) and 0 (recall 0.764) may benefit from class-aware abstention thresholds to reduce high-impact errors at equivalent coverage.",
+      "Inert transformer config fields (num_heads, patch_size, etc.) in the resnet18 train_config persist from earlier stages; functionally harmless but create schema ambiguity for downstream tooling consuming the checkpoint config."
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "abstention"
+  },
+  "payload_sha256": "864807ad8cd54266013a62104280407db556d0a7bcb5809d18e04e1646a8d544",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 32,
+  "version": 1
+}

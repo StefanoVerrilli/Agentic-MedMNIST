@@ -1,0 +1,27 @@
+{
+  "artefact": "anomaly_training",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T09:28:18.989635+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Training stage is clean and internally consistent. All 15 epochs completed with no failures. Validation accuracy improved monotonically from 0.9152 (epoch 1) to 0.9957 (epoch 14/15), with no overfitting signal (train loss 0.546→0.277, val loss 0.483→0.287, both decreasing). Cosine LR schedule verified numerically against the logged per-epoch values (epochs 1, 5, 10, 15 all match the analytic formula). Config hash a48f20ec… is consistent across best_configuration, the e9 search trial, and the training result. Checkpoint and lightning-config SHA-256 digests are present. test_metrics_used=false confirms no test-set leakage. Seed 72 is consistent between search and training. The 28×28 RGB MedMNIST resolution is correctly matched to the CIFAR-style ResNet-18 architecture.\n\nMinor observations (none deterministic, none blocking):\n1. Inert transformer-specific fields (num_heads, patch_size, pooling, positional_encoding, tokenizer_layers, mlp_ratio) are present in the resnet18 train_config. They are functionally harmless but create schema ambiguity for downstream consumers; a schema-level cleanup or explicit nulling would improve clarity.\n2. early_stopping_patience=3 is conservative relative to the research-recommended 8–12, but it did not trigger (val accuracy improved through epoch 14 and plateaued at 15), so no practical impact in this run.\n3. class_weighting=false with a 1.63× class imbalance is a documented choice; the near-identical macro-F1 (0.995698) and accuracy (0.995702) indicate no class is being sacrificed, so the risk is minimal.\n4. hidden=32 is below the research-suggested 64–128 range for 28×28 CNNs, but the search empirically confirmed this width outperforms the wider variant (0.9938 vs 0.9911), so the deviation is justified.\n5. vflip augmentation may produce anatomically implausible orientations for pathology images; given the strong per-class metrics this is low-risk, but a per-class confusion-matrix sanity check at evaluation time is advisable.\n\nNo deterministic findings were raised. All LLM-flagged items are warnings or cosmetic. The training artefacts (checkpoint, metrics CSV, training log JSONL) are all present with integrity hashes. Proceed to the next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Inert transformer config fields (num_heads, patch_size, pooling, positional_encoding, tokenizer_layers, mlp_ratio) present in resnet18 train_config; functionally harmless but create schema ambiguity for downstream tooling.",
+      "early_stopping_patience=3 is below the research-recommended 8–12; did not trigger in this run but could cause premature stopping in a re-run with a different seed.",
+      "class_weighting disabled despite 1.63× class imbalance; macro-F1≈accuracy mitigates the risk, but per-class recall is not explicitly reported in the training evidence.",
+      "hidden=32 channels is below the research-recommended 64–128 range for 28×28 CNNs; empirically justified by search results but is a documented deviation.",
+      "vflip augmentation may produce anatomically implausible orientations for pathology images; low risk given strong metrics but a per-class sanity check at evaluation is advisable."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "training"
+  },
+  "payload_sha256": "5c2a9ec0f83ad531d18c3140946b21efa608520d02301b77d566d91f4e73cfa0",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 27,
+  "version": 1
+}

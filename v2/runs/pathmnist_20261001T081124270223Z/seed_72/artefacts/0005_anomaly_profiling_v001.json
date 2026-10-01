@@ -1,0 +1,23 @@
+{
+  "artefact": "anomaly_profiling",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T09:07:12.931555+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Profiling stage is internally consistent and complete. All deterministic checks pass: split sizes (train 89996, val 10004, test 7180) match the official PathMNIST distribution; class counts sum correctly to split totals; 28×28×3 RGB resolution and 9 classes align with the standard MedMNIST PathMNIST specification; no blank images, no duplicate train samples; channel statistics (R/B means > G mean, G std > R/B std) are consistent with H&E-stained histology. Train and validation class proportions are nearly identical (max Δ < 0.001), confirming no split-level distribution shift. Imbalance ratio of 1.63 is modest. Archive MD5, per-split index SHA-256, and code SHA-256 are all present. The documented ambiguity risks (background/debris/mucus overlap, adipose vs. background, smooth muscle vs. stroma, etc.) are expected at 28×28 resolution and are appropriately flagged for downstream attention. The test-domain note (different clinical center) is a known PathMNIST design feature for generalization evaluation. One minor reproducibility note: the LLM model identifier 'qwen3.8' does not match a widely recognized Qwen release name and llm_model_digest is null, so exact model-weight provenance cannot be independently verified; this does not affect the profiling data integrity but should be confirmed for full reproducibility. No deterministic findings; no blocking issues. Proceed to next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "LLM model identifier 'qwen3.8' does not match a standard Qwen release naming convention and llm_model_digest is null; request confirmation of the exact deployed model and, if possible, a weight digest for reproducibility."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "profiling"
+  },
+  "payload_sha256": "201a01a46abc3b11a2724c9146addb6bd6b801073621659916214700759ae162",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 5,
+  "version": 1
+}

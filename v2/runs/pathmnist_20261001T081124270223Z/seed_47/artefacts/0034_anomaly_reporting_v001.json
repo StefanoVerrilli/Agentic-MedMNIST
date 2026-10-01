@@ -1,0 +1,27 @@
+{
+  "artefact": "anomaly_reporting",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T09:04:44.673683+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "Reporting-stage review: all deterministic cross-references verify cleanly. (1) base_test_accuracy 0.873816 matches evaluation_report.accuracy; (2) abstain_rate 0.376184 × 7180 = 2701 = human_review_count; (3) test_coverage 0.623816 = 1 − abstain_rate; (4) OOD aggregate AUROC 0.945372 = mean of three predictive_entropy test AUROCs (0.950252, 0.942915, 0.942951); (5) confusion-matrix row sums equal per-class supports and total 7180; diagonal/7180 = 0.87381; (6) spot-checked precision/recall for labels 0 and 7 match reported values; (7) prediction_artifact.test_samples = 7180 = evaluation n_samples; (8) search_report.test_metrics_used = false. No deterministic findings. However, three warning-level items must be prominently documented in the final report narrative: (a) the validation-to-test accuracy gap of ≈12.2 pp (0.9957 → 0.8738) and the corresponding coverage shortfall (test 0.624 vs. target 0.800) and selective-risk inflation (test 0.0627 vs. validation 0.001) are split-representativeness artefacts, not methodology errors, but they materially limit the practical utility of the abstention mechanism and must be stated explicitly; (b) the OOD evaluation is a controlled Gaussian-noise corruption proxy (σ = 0.15/0.25/0.4), not a genuine distributional-shift test—downstream consumers must not interpret ood_pass = true as evidence of robustness to real-world OOD; (c) minor documentation hygiene: sample-count narrative inconsistency (~90 K vs. ~20.8 K, likely total vs. train-split), inert transformer-specific fields in the resnet18 config, and the undocumented early_stopping_patience change (8 → 3). None of these constitute reporting errors; they are emphasis and clarity items for the final deliverable. Proceed to finalise the report with these caveats surfaced.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Val-test accuracy gap ≈12.2 pp (0.9957→0.8738) and macro-F1 gap ≈15.7 pp (0.9957→0.8390) concentrated in confusable tissue pairs (adipose↔smooth muscle, stroma↔debris); test coverage 0.624 falls well below target 0.800; selective risk on test (0.0627) is ~60× validation risk (0.001). Must be prominently documented as a split-representativeness limitation.",
+      "OOD evaluation is scoped as 'controlled_corruption_proxy' (Gaussian noise σ=0.15/0.25/0.4); ood_pass=true does not constitute evidence of robustness to genuine distributional shift. Downstream consumers must be explicitly cautioned.",
+      "Sample-count narrative inconsistency: architecture research cites ~90 K samples while selection rationale reports ~20.8 K (7 886+12 885); likely total vs. train-split but must be disambiguated in the run manifest.",
+      "Inert transformer-specific config fields (num_heads, patch_size, pooling, positional_encoding, mlp_ratio, tokenizer_layers) present in resnet18 train_config; recommend stripping or marking N/A.",
+      "early_stopping_patience changed from 8 (search trial) to 3 (final config) without documented rationale; no practical impact since validation improved every epoch, but should be noted in config changelog."
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "reporting"
+  },
+  "payload_sha256": "b63397ee97d20d85bec2d8837141c6b8e81b43e0639050aaafd4375473a977bb",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 34,
+  "version": 1
+}

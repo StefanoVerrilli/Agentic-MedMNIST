@@ -1,0 +1,32 @@
+{
+  "artefact": "anomaly_evaluation",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T08:33:31.328103+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "The evaluation stage executed without code or schema errors, but the results reveal a critical performance discrepancy that must be investigated before the results can be accepted.\n\n**Primary concern – Validation-to-Test gap:** Validation accuracy is 99.41% (macro-F1 99.22%) while test accuracy is 85.99% (macro-F1 82.85%). This 13.4-point accuracy gap (16.4-point macro-F1 gap) is far outside the 2–5 point range expected from normal distributional variance between validation and test splits of the same dataset. The training trajectory is clean (monotonic loss decrease, no NaN/inf, model still improving at epoch 15), which rules out simple overfitting. The most likely explanations are (a) data leakage between training/validation and test splits, (b) a non-representative validation split (e.g., stratification error, duplicate or near-duplicate samples), or (c) a systematic distribution shift in the test partition. The split_manifest and data_profile are listed in omitted_artefacts and are not available for cross-checking. This gap must be resolved before the evaluation is considered valid.\n\n**Secondary observations (carried forward from earlier stages, not new defects):**\n- vflip augmentation may be semantically inappropriate for histopathology images with inherent vertical tissue orientation; flagged at search and training stages.\n- The unified config schema carries transformer-specific fields (mlp_ratio, num_heads, patch_size, pooling, positional_encoding, tokenizer_layers) in a resnet18 configuration; downstream code must correctly ignore inapplicable fields.\n- LR 3e-4 and hidden dim 32 are deliberate deviations from architecture-research recommendations, justified in the rationale.\n- Early-stopping patience of 3 on 15 epochs is proportionally aggressive relative to the 8–12 / 60–100 recommendation.\n\n**Test-set confusion patterns (factual, from the confusion matrix):**\n- Adipose (class 0) → Smooth muscle (class 5): 337 misclassifications; adipose recall is only 74.1%.\n- Cancer-associated stroma (class 7) has the lowest recall at 51.3% (216/421), with 117 misclassified as debris and 59 as smooth muscle.\n- Background (class 1) is perfectly separated (847/847), suggesting the model relies heavily on background vs. tissue discrimination.\n- The overall pattern indicates the model struggles with morphologically similar tissue classes (adipose/smooth muscle/stroma/debris), which is a domain-relevant limitation but does not by itself explain the val-test gap.\n\n**Required actions before the evaluation can be accepted:**\n1. Retrieve and inspect the split_manifest, data_profile, and dataset_manifest (currently omitted) to verify that no training/validation samples overlap with or are near-duplicates of test samples.\n2. Confirm that the validation and test splits were drawn from the same distribution (same patient/source partitioning, same preprocessing pipeline).\n3. If leakage or split inconsistency is confirmed, re-run the pipeline with corrected splits. If the gap is attributable to a legitimate distribution difference, document the finding and re-evaluate whether the validation-based selection rule is appropriate.\n4. Re-verify that the 10,004 validation samples and 7,180 test samples are disjoint and correctly stratified.\n\nNo deterministic code, schema, or pipeline-execution errors were found. The critical issue is the unexplained magnitude of the validation-to-test performance gap, which undermines confidence in the reported test metrics and the validity of the model-selection process.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "CRITICAL: 13.4-point gap between validation accuracy (99.41%) and test accuracy (85.99%) is far outside expected variance and strongly suggests data leakage, non-representative validation split, or systematic distribution shift; split_manifest and data_profile are omitted and cannot be cross-checked",
+      "Cancer-associated stroma (class 7) recall is only 51.3% (216/421), with 117 misclassified as debris and 59 as smooth muscle – the weakest class by a wide margin",
+      "Adipose (class 0) → Smooth muscle (class 5) confusion of 337 samples drives adipose recall down to 74.1%; these two morphologically similar classes are the primary source of test errors",
+      "vflip augmentation may be semantically inappropriate for histopathology images with inherent vertical tissue orientation (flagged at search and training stages, carried forward)",
+      "Unified config schema includes transformer-specific parameters (mlp_ratio, num_heads, patch_size, pooling, positional_encoding, tokenizer_layers) in a resnet18 configuration; downstream code must correctly ignore inapplicable fields",
+      "Model was still improving at epoch 15 (val_acc 0.9939→0.9941); the 15-epoch budget may be insufficient, though this is a budget constraint rather than a defect",
+      "LR 3e-4 is below the architecture-research recommended CNN range (1e-3 ± 0.5e-3); justified by depth increase but a deliberate deviation",
+      "Hidden dim 32 is below the recommended 64–128 for CNNs; justified by prior empirical results",
+      "Early-stopping patience 3 on 15 epochs is proportionally more aggressive than the 8–12 / 60–100 recommendation",
+      "split_manifest, data_profile, dataset_manifest, and other upstream artefacts are listed in omitted_artefacts and are unavailable for independent verification of split integrity"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "evaluation"
+  },
+  "payload_sha256": "27a1d10cadc82943aeab7bef734d3f137627d3f9045975dc8a34d4aff000f9ee",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 30,
+  "version": 1
+}

@@ -1,0 +1,25 @@
+{
+  "artefact": "anomaly_model_search",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T08:54:53.681269+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "The model_search stage is well-executed and internally consistent. Key observations:\n\n1. **Search completeness**: All 5 architecture families (resnet18, residual_cnn, compact_transformer, tiny_cnn, vision_transformer) were evaluated across 8 trials with 0 failures. Progressive epoch budgets [3, 6, 9] were applied correctly, and the final config targets 15 epochs.\n\n2. **Selection validity**: The selected candidate `resnet18_wide_weighted` (val_acc=0.994402, macro-F1=0.99432) was chosen from the highest-budget round (e9) per the stated rule. The comparison trial `resnet18_conservative` at e9 (val_acc=0.993303) is within the 0.005 accuracy tolerance, confirming the selection is justified. Test metrics were not used (test_locked=true, test_metrics_used=false throughout).\n\n3. **Configuration sanity**: patch_size=4 on 28×28 yields 49 tokens (within the recommended range; the research explicitly warns against patch_size 7 or 16). depth=3 aligns with the research recommendation to truncate resnet18 to three stages. Class weighting is enabled for the 1.63× imbalance. LR=3e-4 is below the 1e-3±0.5e-3 CNN range but is justified by the rationale (wider hidden 32→48). Weight decay 5e-4 and label smoothing 0.1 are at the upper bounds of recommended ranges—acceptable.\n\n4. **Minor observations (non-blocking)**:\n   - The shared train_config schema includes transformer-specific fields (num_heads, patch_size, pooling, positional_encoding, mlp_ratio, tokenizer_layers) alongside the resnet18 model_family. These are presumably ignored by the CNN implementation, but a family-specific config schema would reduce ambiguity.\n   - The architecture research cites \"~90K training samples\" while the selection rationale reports class counts of 7886 + 12885 ≈ 20.8K. This is likely a difference between total dataset size and the training split, but the narrative could be clearer.\n   - early_stopping_patience=3 with 15 epochs is more aggressive than the research-recommended 8–12. With 90K+ samples and a moderate-capacity CNN this is unlikely to cause premature stopping, but it is worth monitoring in the final training run.\n\n5. **No deterministic findings** were raised. No test-set leakage, no schema violations, no failed trials, and no contradictory evidence. The pipeline is ready to proceed to the next stage (final training / evaluation).",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Shared config schema includes transformer-specific fields (num_heads, patch_size, pooling, positional_encoding, mlp_ratio, tokenizer_layers) for a resnet18 model_family; these are presumably inert but could cause confusion or unintended side-effects if the implementation does not strictly ignore unknown keys.",
+      "Narrative inconsistency: architecture research cites ~90K training samples while the selection rationale reports class counts summing to ~20.8K; likely a train-split vs. total-dataset distinction but should be clarified.",
+      "early_stopping_patience=3 is below the research-recommended 8–12 range; with 15 total epochs the model could stop as early as epoch 4. Low risk given the data volume, but worth monitoring."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "model_search"
+  },
+  "payload_sha256": "b23d2f1f6f5a6233d1475e76833f69473a1d8ce29979758775dac5792e88635a",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 25,
+  "version": 1
+}
