@@ -60,7 +60,7 @@ class PipelineTests(unittest.TestCase):
             self.assertEqual(split.train_size, 27)
             self.assertEqual(split.val_size, 18)
             self.assertEqual(split.test_size, 18)
-            self.assertIs(prepared.bundle.images["val"], bundle.images["val"])
+            np.testing.assert_array_equal(prepared.bundle.images["val"], bundle.images["val"])
             findings = ReviewerConsistencyAgent(reasoner)._deterministic_findings(
                 bb, "preprocessing"
             )
@@ -168,9 +168,10 @@ class PipelineTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as directory:
             orchestrator = Orchestrator([Dummy()], Reviewer(), max_stage_retries=1)
-            orchestrator.run(Blackboard(directory))
+            bb = Blackboard(directory)
+            orchestrator.run(bb)
             self.assertEqual(calls, ["run", "remediate", "run"])
-            self.assertEqual(orchestrator.status, "completed")
+            self.assertEqual(bb.get("execution_status").status, "completed")
 
     def test_orchestrator_does_not_blindly_retry_without_remediation(self) -> None:
         calls: list[str] = []

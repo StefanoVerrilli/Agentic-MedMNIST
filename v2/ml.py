@@ -35,6 +35,8 @@ class DatasetBundle:
     archive_md5: str
     license: str
     test_domain_note: str
+    verified_archive_md5: str | None = None
+    archive_sha256: str | None = None
 
 
 @dataclass(frozen=True)
@@ -84,6 +86,14 @@ def load_pathmnist(
     datasets = {
         split: data_class(split=split, **kwargs) for split in ("train", "val", "test")
     }
+    archive = Path(datasets["train"].root) / "pathmnist.npz"
+    archive_digest = hashlib.md5()
+    with archive.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            archive_digest.update(chunk)
+    verified_md5 = archive_digest.hexdigest()
+    if verified_md5 != str(info["MD5"]):
+        raise ValueError("PathMNIST archive checksum does not match the official release")
     limits = {"train": train_limit, "val": val_limit, "test": test_limit}
     images: dict[str, Any] = {}
     targets: dict[str, Any] = {}
@@ -113,6 +123,8 @@ def load_pathmnist(
         selected_index_sha256=hashes,
         data_reference=str(info["url"]),
         archive_md5=str(info["MD5"]),
+        verified_archive_md5=verified_md5,
+        archive_sha256=sha256_file(archive),
         license=str(info["license"]),
         test_domain_note=(
             "CRC-VAL-HE-7K test images originate from a different clinical center."
@@ -222,6 +234,9 @@ def prepare_data(
     bundle: DatasetBundle,
     decision: RepresentationDecision,
 ) -> PreparedData:
+    from extensions import validate_representation
+
+    validate_representation(tuple(decision.augmentations))
     mean, std = channel_statistics(bundle.images["train"])
     safe_std = [max(value, 1e-6) for value in std]
     return PreparedData(
@@ -471,7 +486,7 @@ def make_loader(
         ArrayDataset(),
         batch_size=batch_size,
         shuffle=shuffle,
-        num_workers=31,
+        num_workers=0,
         generator=generator,
         drop_last=False,
     )
@@ -479,6 +494,12 @@ def make_loader(
 
 def apply_augmentation(image: Any, augmentation: str) -> Any:
     import numpy as np
+
+    if augmentation.startswith("approved_"):
+        from extensions import recipe
+        for operation in recipe(augmentation):
+            image = apply_augmentation(image, operation)
+        return image
 
     if augmentation == "hflip":
         return np.flip(image, axis=1)

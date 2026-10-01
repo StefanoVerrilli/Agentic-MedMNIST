@@ -17,6 +17,8 @@ from typing import Any
 
 from agents import (
     ArchitectureResearchAgent,
+    PriorArtScoutAgent,
+    DataAuditAgent,
     AbstentionOODAgent,
     EvaluationAgent,
     ExperimentDesignAgent,
@@ -36,11 +38,14 @@ from contracts import (
     Blackboard,
     ComparisonReport,
     RunManifest,
+    RunConfiguration,
     utc_now,
 )
 from llm import OllamaReasoner, ollama_model_digest
 from ml import common_split_fingerprint
 from orchestrator import Orchestrator
+from replay import CachedReasoner
+from research import DEFAULT_QUERY, LiteratureStore, canonical_hash
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -51,6 +56,15 @@ def build_parser() -> argparse.ArgumentParser:
         )
     )
     parser.add_argument("--output-root", default="runs", help="experiment output root")
+    parser.add_argument("--research-online", action="store_true", help="search arXiv and snapshot abstracts on a fresh cache")
+    parser.add_argument("--require-research", action="store_true", help="reject curated excerpt fallback")
+    parser.add_argument("--literature-cache", default=None, help="immutable literature cache; existing snapshots are replayed")
+    parser.add_argument("--research-query", default=DEFAULT_QUERY)
+    parser.add_argument("--research-limit", type=int, default=6)
+    parser.add_argument("--extension-approvals", default=None, help="hash-bound reviewed extension manifest")
+    parser.add_argument("--replay-run", default=None, help="replay a seed directory with zero LLM/retrieval requests")
+    parser.add_argument("--validation-evidence", default=None, help="checksummed fault-injection and test evidence")
+    parser.add_argument("--acceptance-evidence", default=None, help="independent demonstration, risk mitigation and sign-off evidence")
     parser.add_argument("--data-root", default=None, help="MedMNIST cache directory")
     parser.add_argument(
         "--seeds",
@@ -135,6 +149,29 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    from extensions import clear_registry, restore_registry
+    clear_registry()
+    replay_frozen = None
+    if args.replay_run:
+        from governance import read_artefact
+        replay_root = Path(args.replay_run).resolve()
+        original = read_artefact(replay_root, "run_configuration")
+        manifest = read_artefact(replay_root, "run_manifest")
+        if manifest["code_sha256"] != code_tree_sha256(Path(__file__).resolve().parent):
+            parser.error("replay requires the original source tree; use the recorded code revision")
+        # Restore the actual run settings; a replay is not a new experiment.
+        output_root = args.output_root
+        vars(args).update(original["parameters"])
+        args.output_root, args.replay_run = output_root, str(replay_root)
+        args.seeds = str(manifest["seed"])
+        args.research_online = False
+        args.ollama_base = None
+        args.require_llm = False
+        restore_registry(original.get("extension_registry", []))
+        if original["frozen_best"]:
+            replay_frozen = BestConfiguration.model_validate(original["frozen_best"])
+        approval = replay_root / "blobs" / "extension_approvals.json"
+        args.extension_approvals = str(approval) if approval.exists() else None
     try:
         seeds = parse_seeds(args.seeds)
         validate_args(args)
@@ -153,7 +190,7 @@ def main(argv: list[str] | None = None) -> int:
     experiment_root.mkdir(parents=True, exist_ok=False)
     limits = resolve_limits(args)
     summaries: list[dict[str, Any]] = []
-    frozen_best: BestConfiguration | None = None
+    frozen_best: BestConfiguration | None = replay_frozen
 
     for seed in seeds:
         run_root = experiment_root / f"seed_{seed}"
@@ -232,6 +269,14 @@ def main(argv: list[str] | None = None) -> int:
         json.dumps(experiment_summary, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
+    # Seed-stability evidence exists only after the whole experiment completes.
+    from governance import write_acceptance
+    for item in summaries:
+        seed_root = Path(item["run_root"])
+        if (seed_root / "dossier.json").exists():
+            write_acceptance(Blackboard.open(seed_root),
+                validation_path=Path(args.validation_evidence) if args.validation_evidence else None,
+                independent_path=Path(args.acceptance_evidence) if args.acceptance_evidence else None)
     print(f"\nExperiment summary: {summary_path}")
     return 0 if len(successful) == len(seeds) else 2
 
@@ -254,9 +299,13 @@ def run_once(
         keep_alive=args.keep_alive,
         seed=seed,
     )
-    bb.put(
-        "run_manifest",
-        RunManifest(
+    reasoner = CachedReasoner(reasoner, bb.root,
+                              replay_root=Path(args.replay_run) if args.replay_run else None)
+    from extensions import registry_entries
+    bb.put("run_configuration", RunConfiguration(parameters=vars(args),
+        frozen_best=frozen_best.model_dump(mode="json") if frozen_best else None,
+        extension_registry=registry_entries()), producer="run")
+    manifest = RunManifest(
             run_id=bb.run_id,
             dataset="pathmnist",
             seed=seed,
@@ -268,25 +317,41 @@ def run_once(
             llm_model=reasoner.model if reasoner.enabled else "none",
             llm_model_digest=ollama_model_digest(
                 args.ollama_base if reasoner.enabled else None,
-                reasoner.model,
-                timeout=min(args.llm_timeout, 5.0),
-            ),
-            code_sha256=code_tree_sha256(Path(__file__).resolve().parent),
-        ),
+                reasoner.model, timeout=min(args.llm_timeout, 5.0)),
+            code_sha256=code_tree_sha256(Path(__file__).resolve().parent))
+    if args.replay_run:
+        from governance import read_artefact
+        original_manifest = read_artefact(Path(args.replay_run), "run_manifest")
+        # Preserve decision-provider identity without contacting its server.
+        manifest = manifest.model_copy(update={key: original_manifest[key]
+            for key in ("llm_mode", "llm_model", "llm_model_digest")})
+    bb.put(
+        "run_manifest",
+        manifest,
         producer="run",
     )
     reviewer = ReviewerConsistencyAgent(reasoner)
+    ingestion_options = dict(seed=seed, train_limit=limits["train"],
+        val_limit=limits["val"], test_limit=limits["test"], data_root=args.data_root,
+        download=not args.no_download)
+    if args.replay_run:
+        from blobio import load_blob
+        from contracts import BlobReference
+        from governance import read_artefact
+        source_root = Path(args.replay_run)
+        reference = BlobReference.model_validate(read_artefact(source_root, "blob_raw_dataset"))
+        ingestion_options["loader"] = lambda **kwargs: load_blob(source_root, reference)
     pipeline = [
-        IngestionAgent(
-            seed=seed,
-            train_limit=limits["train"],
-            val_limit=limits["val"],
-            test_limit=limits["test"],
-            data_root=args.data_root,
-            download=not args.no_download,
-        ),
+        IngestionAgent(**ingestion_options),
         ProfilingAmbiguityAgent(reasoner),
+        PriorArtScoutAgent(reasoner, LiteratureStore(
+            Path(args.literature_cache) if args.literature_cache else run_root.parent / "literature_cache",
+            online=args.research_online and not args.offline, require_live=args.require_research,
+            query=args.research_query, limit=args.research_limit),
+            approvals_path=Path(args.extension_approvals) if args.extension_approvals else None,
+            replay_root=Path(args.replay_run) if args.replay_run else None),
         PreprocessingAgent(reasoner),
+        DataAuditAgent(),
         ArchitectureResearchAgent(reasoner),
     ]
     if args.no_search:
@@ -342,10 +407,11 @@ def run_once(
     )
     print(f"\n=== Agentic PathMNIST pipeline | seed={seed} ===")
     orchestrator.run(bb)
-    if orchestrator.status != "completed":
+    execution_status = bb.get("execution_status").status
+    if execution_status != "completed":
         return {
             "seed": seed,
-            "status": orchestrator.status,
+            "status": execution_status,
             "run_root": str(run_root),
             "agentic_accuracy": None,
             "baseline_accuracy": None,
@@ -412,6 +478,13 @@ def run_once(
             else "completed"
         )
     bb.write_dossier(status=final_status)
+    reasoner.assert_replay_complete()
+    from governance import write_acceptance, compare_replay
+    if args.replay_run:
+        compare_replay(Path(args.replay_run), bb.root)
+    write_acceptance(bb,
+        validation_path=Path(args.validation_evidence) if args.validation_evidence else None,
+        independent_path=Path(args.acceptance_evidence) if args.acceptance_evidence else None)
     abstention = bb.get("abstention_report")
     print(f"agentic accuracy : {evaluation.accuracy:.4f}")
     print(f"baseline accuracy: {baseline.accuracy:.4f}")
@@ -493,6 +566,10 @@ def parse_seeds(value: str) -> list[int]:
 
 
 def validate_args(args: argparse.Namespace) -> None:
+    if not 3 <= args.research_limit <= 8:
+        raise ValueError("--research-limit must be between 3 and 8")
+    if not args.research_query.strip() or len(args.research_query) > 1000:
+        raise ValueError("--research-query must contain 1 to 1000 characters")
     if not 1 <= args.max_epochs <= 50:
         raise ValueError("--max-epochs must be between 1 and 50")
     if not 1 <= args.search_trials <= 24:

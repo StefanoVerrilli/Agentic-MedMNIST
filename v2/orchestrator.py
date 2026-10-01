@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from agents import Agent, ReviewerConsistencyAgent
-from contracts import Blackboard
+from contracts import Blackboard, ExecutionState
 
 
 class Orchestrator:
@@ -21,10 +21,12 @@ class Orchestrator:
         self.pipeline = pipeline
         self.reviewer = reviewer
         self.max_stage_retries = max_stage_retries
-        self.status = "not_started"
 
     def run(self, bb: Blackboard) -> Blackboard:
-        self.status = "running"
+        def status(value: str, stage: str | None = None) -> None:
+            bb.put("execution_status", ExecutionState(status=value, stage=stage), producer="orchestrator")
+
+        status("running")
         for agent in self.pipeline:
             promoted = False
             for attempt in range(1, self.max_stage_retries + 2):
@@ -47,8 +49,9 @@ class Orchestrator:
                             reason="exception",
                         )
                         continue
-                    self.status = f"failed:{agent.name}"
-                    bb.write_dossier(status=self.status)
+                    failure = f"failed:{agent.name}"
+                    status(failure, agent.name)
+                    bb.write_dossier(status=failure)
                     raise
 
                 report = self.reviewer.review(bb, agent.name, attempt=attempt)
@@ -67,13 +70,14 @@ class Orchestrator:
                     action=report.action,
                 )
                 if report.action == "stop":
-                    self.status = f"vetoed:{agent.name}"
+                    failure = f"vetoed:{agent.name}"
+                    status(failure, agent.name)
                     bb.record_event(
                         "stage_vetoed",
                         stage=agent.name,
                         issues=report.deterministic_issues + report.llm_issues,
                     )
-                    bb.write_dossier(status=self.status)
+                    bb.write_dossier(status=failure)
                     return bb
                 if report.action == "revise" and attempt <= self.max_stage_retries:
                     remediation = getattr(agent, "revise", None)
@@ -108,10 +112,11 @@ class Orchestrator:
                 break
 
             if not promoted:
-                self.status = f"failed_to_promote:{agent.name}"
-                bb.write_dossier(status=self.status)
+                failure = f"failed_to_promote:{agent.name}"
+                status(failure, agent.name)
+                bb.write_dossier(status=failure)
                 return bb
 
-        self.status = "completed"
-        bb.write_dossier(status=self.status)
+        status("completed")
+        bb.write_dossier(status="completed")
         return bb

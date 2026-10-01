@@ -140,13 +140,15 @@ class SearchTests(unittest.TestCase):
             return probabilities, targets
 
         with tempfile.TemporaryDirectory() as directory:
-            from agents import IngestionAgent, ProfilingAmbiguityAgent
+            from agents import IngestionAgent, ProfilingAmbiguityAgent, PreprocessingAgent, DataAuditAgent
 
             # Use real lightweight stages to populate validated manifests/profile.
             bb = Blackboard(Path(directory) / "run")
             IngestionAgent(loader=lambda **kwargs: bundle).run(bb)
             reasoner = OllamaReasoner(base_url=None)
             ProfilingAmbiguityAgent(reasoner).run(bb)
+            PreprocessingAgent(reasoner).run(bb)
+            DataAuditAgent().run(bb)
             ModelSearchAgent(
                 reasoner,
                 max_trials=2,

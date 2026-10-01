@@ -13,15 +13,13 @@ import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 Severity = Literal["ok", "warning", "critical"]
 Action = Literal["continue", "revise", "stop"]
-Augmentation = Literal[
-    "hflip", "vflip", "rotate90", "rotate180", "brightness", "contrast"
-]
+Augmentation = Annotated[str, Field(pattern=r"^(hflip|vflip|rotate90|rotate180|brightness|contrast|approved_[a-z][a-z0-9_]{2,31})$")]
 ModelFamily = Literal[
     "tiny_cnn",
     "residual_cnn",
@@ -36,6 +34,8 @@ PositionalEncodingName = Literal["learned", "sinusoidal"]
 
 
 def _validate_model_options(model: Any) -> None:
+    if model.model_family == "tiny_cnn" and model.depth > 4:
+        raise ValueError("tiny_cnn depth cannot exceed four pooling blocks for 28x28 input")
     if model.model_family in {"vision_transformer", "compact_transformer"}:
         if model.hidden % model.num_heads != 0:
             raise ValueError("hidden must be divisible by num_heads")
@@ -84,6 +84,8 @@ class Artefact(StrictModel):
     """Base for persisted agent hand-offs."""
 
     schema_version: str = "1.0"
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True,
+                              allow_inf_nan=False, frozen=True)
 
 
 # --- Strict schemas for the four hybrid judgement points --------------------
@@ -98,6 +100,12 @@ class RepresentationDecision(StrictModel):
     normalization: Literal["unit", "standardize"]
     augmentations: list[Augmentation] = Field(default_factory=list, max_length=3)
     rationale: str = Field(min_length=3, max_length=6000)
+
+    @model_validator(mode="after")
+    def approved_augmentations_only(self) -> RepresentationDecision:
+        from extensions import validate_representation
+        validate_representation(self.augmentations)
+        return self
 
 
 class ExperimentDecision(StrictModel):
@@ -168,6 +176,8 @@ class CandidateProposal(StrictModel):
 
     @model_validator(mode="after")
     def unique_augmentations(self) -> CandidateProposal:
+        from extensions import validate_representation
+        validate_representation(self.augmentations)
         if len(set(self.augmentations)) != len(self.augmentations):
             raise ValueError("augmentations must be unique")
         _validate_model_options(self)
@@ -191,6 +201,143 @@ class ArchitectureResearchDecision(StrictModel):
     architecture_priorities: list[ModelFamily] = Field(min_length=1, max_length=5)
     transformer_guidance: str = Field(min_length=3, max_length=6000)
     risks: list[str] = Field(default_factory=list, max_length=8)
+
+
+class SourceRecord(StrictModel):
+    source_id: str = Field(pattern=r"^[a-z][a-z0-9_]{2,63}$")
+    title: str = Field(min_length=3, max_length=1000)
+    url: str = Field(pattern=r"^https://arxiv\.org/abs/[0-9.]+(v[0-9]+)?$")
+    text: str = Field(min_length=10, max_length=20000)
+    origin: Literal["arxiv_api", "curated_excerpt"]
+    retrieved_at: str
+    snapshot_path: str
+    snapshot_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+
+
+class CitedIdea(StrictModel):
+    idea_id: str = Field(pattern=r"^[a-z][a-z0-9_]{2,31}$")
+    target: Literal["representation", "architecture", "training"]
+    hypothesis: str = Field(min_length=3, max_length=2000)
+    source_id: str
+    evidence_quote: str = Field(min_length=10, max_length=600)
+    # A quoted observation is evidence; its transfer to PathMNIST is a hypothesis.
+    status: Literal["hypothesis_to_validate"] = "hypothesis_to_validate"
+
+
+class ExtensionProposal(StrictModel):
+    proposal_id: str = Field(pattern=r"^[a-z][a-z0-9_]{2,31}$")
+    kind: Literal["augmentation", "architecture"]
+    description: str = Field(min_length=10, max_length=3000)
+    source_ids: list[str] = Field(min_length=1, max_length=8)
+    operations: list[Literal["hflip", "vflip", "rotate90", "rotate180"]] = Field(default_factory=list, max_length=3)
+    label_preservation_rationale: str = Field(default="", max_length=2000)
+    implementation_requirements: list[str] = Field(default_factory=list, max_length=10)
+
+
+class LiteratureDecision(StrictModel):
+    ideas: list[CitedIdea] = Field(min_length=1, max_length=12)
+    proposals: list[ExtensionProposal] = Field(default_factory=list, max_length=4)
+
+
+class PriorArtBrief(Artefact):
+    query: str
+    sources: list[SourceRecord] = Field(min_length=1, max_length=8)
+    ideas: list[CitedIdea] = Field(min_length=1, max_length=12)
+    proposals: list[ExtensionProposal] = Field(default_factory=list, max_length=4)
+    source: str
+    retrieval_mode: Literal["online", "cache", "bundled"]
+    retrieval_errors: list[str] = Field(default_factory=list)
+    test_metrics_used: Literal[False] = False
+
+
+class ExtensionGateEntry(StrictModel):
+    proposal_id: str
+    spec_sha256: str
+    status: Literal["pending_review", "approved", "reviewed_spec", "rejected"]
+    reason: str
+    registry_name: str | None = None
+    reviewer: str | None = None
+
+
+class ExtensionGateReport(Artefact):
+    entries: list[ExtensionGateEntry] = Field(default_factory=list)
+    approvals_sha256: str | None = None
+
+
+class ApprovedExtension(StrictModel):
+    proposal: ExtensionProposal
+    spec_sha256: str
+    reviewer: str = Field(min_length=2)
+    rationale: str = Field(min_length=3)
+
+
+class ExtensionRegistry(Artefact):
+    entries: list[ApprovedExtension] = Field(default_factory=list)
+
+
+class BlobReference(Artefact):
+    kind: Literal["dataset", "prepared", "model", "arrays"]
+    path: str
+    sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class DataAuditReport(Artefact):
+    passed: bool
+    checks: dict[str, bool]
+    issues: list[str]
+    train_validation_overlap: int = Field(ge=0)
+    test_inspected: Literal[False] = False
+
+
+class HumanReviewQueue(Artefact):
+    path: str
+    sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    count: int = Field(ge=0)
+    split: Literal["test"] = "test"
+    purpose: Literal["benchmark_review"] = "benchmark_review"
+
+
+class HumanReviewDecision(StrictModel):
+    case_id: str
+    reviewer: str = Field(min_length=2, max_length=200)
+    decision: Literal["confirm", "correct", "defer"]
+    label: int | None = Field(default=None, ge=0, le=8)
+    comment: str = Field(min_length=3, max_length=2000)
+
+    @model_validator(mode="after")
+    def correction_requires_label(self) -> HumanReviewDecision:
+        if (self.decision == "correct") != (self.label is not None):
+            raise ValueError("only a correction must provide a label")
+        return self
+
+
+class HumanReviewResolution(Artefact):
+    queue_sha256: str
+    decisions: list[HumanReviewDecision]
+    pending_count: int = Field(ge=0)
+    created_at: str
+
+
+class AcceptanceCriterion(StrictModel):
+    requirement: str
+    status: Literal["passed", "failed", "pending"]
+    evidence: list[str]
+    detail: str
+
+
+class AcceptanceReport(Artefact):
+    criteria: list[AcceptanceCriterion]
+    kpis: dict[str, Any]
+    technical_complete: bool
+    acceptance_ready: bool
+    trl7_evidence_complete: bool = False
+    independent_signoff: str | None = None
+
+
+class ExecutionState(Artefact):
+    status: str
+    stage: str | None = None
 
 
 class ReviewDecision(StrictModel):
@@ -219,6 +366,12 @@ class RunManifest(Artefact):
     deterministic_torch: bool = True
 
 
+class RunConfiguration(Artefact):
+    parameters: dict[str, Any]
+    frozen_best: dict[str, Any] | None = None
+    extension_registry: list[ApprovedExtension] = Field(default_factory=list)
+
+
 class DatasetManifest(Artefact):
     dataset: Literal["pathmnist"]
     task: Literal["multi-class"]
@@ -230,6 +383,8 @@ class DatasetManifest(Artefact):
     selected_index_sha256: dict[str, str]
     data_reference: str
     archive_md5: str = Field(min_length=32, max_length=32)
+    verified_archive_md5: str | None = Field(default=None, min_length=32, max_length=32)
+    archive_sha256: str | None = Field(default=None, min_length=64, max_length=64)
     license: str
     test_domain_note: str
     subsampled: bool
@@ -641,12 +796,12 @@ class AnomalyReport(Artefact):
 
 
 class Blackboard:
-    """Append-only artefact store plus in-memory heavy-object exchange."""
+    """Append-only typed store; heavy objects have persisted references too."""
 
     _VALID_NAME = re.compile(r"^[a-z][a-z0-9_]*$")
 
     def __init__(self, root: str | Path, run_id: str | None = None):
-        self.root = Path(root)
+        self.root = Path(root).resolve()
         self.run_id = run_id or self.root.name
         self.artefact_dir = self.root / "artefacts"
         self.blob_dir = self.root / "blobs"
@@ -659,7 +814,6 @@ class Blackboard:
         self.artefact_dir.mkdir(parents=True, exist_ok=True)
         self.blob_dir.mkdir(parents=True, exist_ok=True)
         self.artefacts: dict[str, Artefact] = {}
-        self.blobs: dict[str, Any] = {}
         self.registry: list[dict[str, Any]] = []
         self.log: list[dict[str, Any]] = []
         self._versions: dict[str, int] = {}
@@ -691,7 +845,7 @@ class Blackboard:
             "payload": payload,
         }
         _atomic_write_json(path, envelope)
-        self.artefacts[name] = artefact
+        self.artefacts[name] = artefact.model_copy(deep=True)
         entry = {
             "artefact": name,
             "type": type(artefact).__name__,
@@ -704,24 +858,67 @@ class Blackboard:
         self.record_event("artefact_written", **entry)
         return path
 
+    @classmethod
+    def open(cls, root: str | Path) -> Blackboard:
+        """Reopen an existing store without overwriting any artefact versions."""
+        bb = cls.__new__(cls)
+        bb.root = Path(root).resolve()
+        bb.artefact_dir, bb.blob_dir = bb.root / "artefacts", bb.root / "blobs"
+        bb.decision_log_path = bb.root / "decision_log.jsonl"
+        bb.artefacts, bb.registry, bb._versions = {}, [], {}
+        bb._artefact_sequence = 0
+        bb.log = [json.loads(line) for line in bb.decision_log_path.read_text(encoding="utf-8").splitlines()]
+        if [row["sequence"] for row in bb.log] != list(range(1, len(bb.log) + 1)):
+            raise ValueError("decision log sequence is inconsistent")
+        bb._event_sequence = len(bb.log)
+        types = {item.__name__: item for item in Artefact.__subclasses__()}
+        for path in sorted(bb.artefact_dir.glob("*.json")):
+            envelope = json.loads(path.read_text(encoding="utf-8"))
+            if _sha256_json(envelope["payload"]) != envelope["payload_sha256"]:
+                raise ValueError(f"artefact checksum mismatch: {path.name}")
+            name = envelope["artefact"]
+            if envelope["version"] != bb._versions.get(name, 0) + 1:
+                raise ValueError("artefact versions are not contiguous")
+            if envelope["sequence"] != bb._artefact_sequence + 1:
+                raise ValueError("artefact sequence is not contiguous")
+            bb.run_id = envelope["run_id"]
+            bb._versions[name] = envelope["version"]
+            bb._artefact_sequence = envelope["sequence"]
+            bb.artefacts[name] = types[envelope["artefact_type"]].model_validate(envelope["payload"])
+            if name in {"approved_extensions", "run_configuration"}:
+                from extensions import restore_registry
+                data = envelope["payload"]
+                restore_registry(data.get("entries", data.get("extension_registry", [])))
+            bb.registry.append({"artefact": name, "type": envelope["artefact_type"],
+                "version": envelope["version"], "path": path.relative_to(bb.root).as_posix(),
+                "sha256": envelope["payload_sha256"], "producer": envelope["producer"]})
+        if not bb.registry:
+            raise ValueError("cannot reopen an empty Blackboard")
+        return bb
+
     def get(self, name: str) -> Artefact:
-        return self.artefacts[name]
+        value = self.artefacts[name]
+        return value.model_copy(deep=True) if isinstance(value, Artefact) else value
 
     def get_optional(self, name: str) -> Artefact | None:
-        return self.artefacts.get(name)
+        return self.get(name) if name in self.artefacts else None
 
     def put_blob(self, name: str, obj: Any, *, producer: str) -> None:
+        from blobio import save_blob
+
         self._check_name(name)
-        self.blobs[name] = obj
-        self.record_event(
-            "blob_registered",
-            blob=name,
-            producer=producer,
-            python_type=type(obj).__name__,
-        )
+        reference_name = f"blob_{name}"
+        version = self._versions.get(reference_name, 0) + 1
+        reference = save_blob(self, name, obj, version)
+        self.put(reference_name, reference, producer=producer)
 
     def get_blob(self, name: str) -> Any:
-        return self.blobs[name]
+        from blobio import load_blob
+
+        reference = self.get(f"blob_{name}")
+        if not isinstance(reference, BlobReference):
+            raise TypeError("blob hand-off requires a BlobReference")
+        return load_blob(self.root, reference)
 
     def record_event(self, event: str, **details: Any) -> dict[str, Any]:
         self._event_sequence += 1
@@ -754,6 +951,8 @@ class Blackboard:
         focus_by_stage = {
             "ingestion": ["dataset_manifest", "run_manifest"],
             "profiling": ["data_profile", "dataset_manifest"],
+            "prior_art": ["prior_art_brief", "extension_gate_report", "data_profile"],
+            "data_audit": ["data_audit_report", "split_manifest", "data_profile"],
             "preprocessing": ["representation_plan", "split_manifest", "data_profile"],
             "architecture_research": ["architecture_research", "data_profile"],
             "experiment_design": [
@@ -785,7 +984,11 @@ class Blackboard:
             ],
         }
         preferred = focus_by_stage.get(stage, [])
-        newest = list(reversed(self.artefacts))
+        # Execution configuration and transport descriptors are audited by
+        # deterministic checks, not sent as noisy inputs to domain reasoning.
+        newest = [name for name in reversed(self.artefacts)
+                  if name not in {"run_configuration", "execution_status", "acceptance_report"}
+                  and not name.startswith("blob_")]
         ordered = list(dict.fromkeys([*preferred, *newest]))
         selected: dict[str, Any] = {}
         omitted: list[str] = []
