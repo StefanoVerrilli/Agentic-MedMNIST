@@ -429,6 +429,36 @@ def default_candidates(round_index: int) -> list[CandidateProposal]:
     return [CandidateProposal.model_validate(item) for item in template]
 
 
+def coverage_candidates(
+    round_index: int, seen_families: set[str]
+) -> list[CandidateProposal]:
+    """Put unseen model families first, then retain round-specific diversity."""
+    portfolio = [
+        candidate
+        for index in range(1, 5)
+        for candidate in default_candidates(index)
+    ]
+    unseen: list[CandidateProposal] = []
+    added_families: set[str] = set()
+    for candidate in portfolio:
+        if (
+            candidate.model_family not in seen_families
+            and candidate.model_family not in added_families
+        ):
+            unseen.append(candidate)
+            added_families.add(candidate.model_family)
+    round_specific = default_candidates(round_index)
+    ordered = [*unseen, *round_specific]
+    unique: list[CandidateProposal] = []
+    hashes: set[str] = set()
+    for candidate in ordered:
+        digest = candidate_hash(candidate)
+        if digest not in hashes:
+            unique.append(candidate)
+            hashes.add(digest)
+    return unique
+
+
 def safe_trial_name(candidate_id: str, config_hash: str) -> str:
     clean = re.sub(r"[^a-z0-9_]", "_", candidate_id.lower()).strip("_")
     return f"trial_{clean}_{config_hash[:8]}"

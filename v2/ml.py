@@ -607,6 +607,9 @@ def evaluate_probabilities(
         )
     except ValueError:
         auc = None
+    correct = int((prediction == y).sum())
+    accuracy_low, accuracy_high = _wilson_interval(correct, len(y))
+    matrix = confusion_matrix(y, prediction, labels=labels).astype(int)
     return EvalReport(
         split=split,
         n_samples=len(y),
@@ -616,6 +619,8 @@ def evaluate_probabilities(
         macro_recall=round(float(macro_recall), 6),
         macro_f1=round(float(macro_f1), 6),
         roc_auc_ovr_macro=round(auc, 6) if auc is not None else None,
+        accuracy_ci95_low=round(accuracy_low, 6),
+        accuracy_ci95_high=round(accuracy_high, 6),
         per_class=[
             ClassMetrics(
                 label=index,
@@ -624,10 +629,31 @@ def evaluate_probabilities(
                 precision=round(float(precision[index]), 6),
                 recall=round(float(recall[index]), 6),
                 f1=round(float(f1[index]), 6),
+                recall_ci95_low=round(
+                    _wilson_interval(int(matrix[index, index]), int(support[index]))[0],
+                    6,
+                ),
+                recall_ci95_high=round(
+                    _wilson_interval(int(matrix[index, index]), int(support[index]))[1],
+                    6,
+                ),
             )
             for index in labels
         ],
-        confusion_matrix=confusion_matrix(y, prediction, labels=labels)
-        .astype(int)
-        .tolist(),
+        confusion_matrix=matrix.tolist(),
     )
+
+
+def _wilson_interval(successes: int, total: int, z: float = 1.959963984540054) -> tuple[float, float]:
+    """Two-sided Wilson score interval for a binomial proportion."""
+    if total <= 0:
+        return 0.0, 1.0
+    proportion = successes / total
+    denominator = 1.0 + (z * z / total)
+    centre = (proportion + z * z / (2.0 * total)) / denominator
+    margin = (
+        z
+        * ((proportion * (1.0 - proportion) / total + z * z / (4.0 * total * total)) ** 0.5)
+        / denominator
+    )
+    return max(0.0, centre - margin), min(1.0, centre + margin)

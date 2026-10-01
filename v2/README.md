@@ -105,8 +105,10 @@ restores the earlier one-decision design.
 The search loop never receives test metrics. Each round follows this sequence:
 
 1. Ollama proposes one to four schema-valid candidates.
-2. Lightning trains every candidate sequentially with the same declared search
-   budget, so results from different rounds remain comparable.
+2. Lightning trains candidates sequentially with progressive round budgets
+   (`search_epochs`, `2 * search_epochs`, ... capped at `max_epochs`). The
+   incumbent is promoted to later budgets, and final ranking compares only
+   completed trials at the highest budget.
 3. Deterministic code evaluates validation accuracy, balanced accuracy and
    macro-F1.
 4. The next Ollama call receives only prior validation results.
@@ -114,9 +116,11 @@ The search loop never receives test metrics. Each round follows this sequence:
    declared tolerance (default 0.5 percentage points) are ordered by macro-F1.
 6. The winner is retrained, frozen, and only then evaluated on test.
 
-Test-split counts are retained only in the independent data-audit artefact;
-representation and model-design prompts receive train evidence (plus prior
-validation scores) and never test labels, predictions or performance.
+When at least five trials are available, the deterministic portfolio reserves
+capacity for all five architecture families before adaptive refinements.
+Selection-time profiling contains only train and validation statistics;
+representation and model-design prompts never receive test labels,
+distributions, predictions or performance.
 
 The task-level winner is written to `best_task_config.yaml`, directly reusable
 with `lightning_cli.py`. Every per-seed winner is also stored as
@@ -124,14 +128,15 @@ with `lightning_cli.py`. Every per-seed winner is also stored as
 
 The dataset is downloaded by MedMNIST into its normal cache. Use
 `--data-root PATH` to choose another cache and `--no-download` to require an
-already-present archive. CPU is the default device; `--device cuda` is
-available when deterministic CUDA operations are supported.
+already-present archive. CUDA is the CLI default; use `--device cpu` when a
+compatible GPU is unavailable.
 
 ## What is measured
 
-- profiling covers every loaded sample and records class counts, channel
-  statistics, blank-image and duplicate checks, the official archive MD5 and
-  selected-index fingerprints;
+- selection-time profiling covers every loaded train/validation sample and
+  records class counts, channel statistics, blank-image and duplicate checks,
+  the official archive MD5 and selected-index fingerprints; test remains
+  sealed until final evaluation;
 - preprocessing computes normalization statistics on **train only**, applies
   augmentation only to train, and records the official split manifest;
 - training is seeded, runs through Lightning with a deterministic DataLoader,
@@ -143,15 +148,18 @@ available when deterministic CUDA operations are supported.
 - model search is budgeted, deduplicated by configuration hash and driven only
   by validation evidence; failed trials remain auditable artefacts;
 - evaluation reports accuracy, balanced accuracy, macro/per-class precision,
-  recall, F1, one-vs-rest ROC-AUC (when defined) and a confusion matrix;
+  recall, F1, one-vs-rest ROC-AUC (when defined), Wilson 95% intervals for
+  accuracy and per-class recall, and a confusion matrix;
 - abstention calibrates on validation and compares max-softmax with predictive
   entropy on three Gaussian-noise severities; score selection uses validation,
-  while test remains evaluation-only. OOD below chance is a deterministic
-  warning and never a clinical OOD claim;
+  while test remains evaluation-only. It also records validation-calibrated
+  risk/coverage points from 50% through 90% coverage. OOD below chance is a
+  deterministic warning and never a clinical OOD claim;
 - the conventional baseline uses the exact same selected split and seed; the
   optional ablation suite runs three representation scenarios;
 - `--seeds 42,43,44` produces a mean and population standard deviation for
-  repeated-run variance.
+  repeated-run variance only when every requested seed completes; otherwise
+  the summary is explicitly marked partial and invalid as an aggregate.
 
 ## Outputs
 

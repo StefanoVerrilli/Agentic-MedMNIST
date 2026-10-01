@@ -59,6 +59,24 @@ class FaultInjectionTests(unittest.TestCase):
             self.assertEqual(report.severity, "critical")
             self.assertEqual(report.action, "stop")
 
+    def test_llm_only_critical_cannot_veto_a_stage(self) -> None:
+        def transport(url, payload, timeout):
+            response = {
+                "severity": "critical",
+                "action": "stop",
+                "issues": ["unsupported external-memory claim"],
+                "comment": "claimed mismatch without a deterministic finding",
+            }
+            return {"message": {"content": json.dumps(response)}}
+
+        reviewer = ReviewerConsistencyAgent(
+            OllamaReasoner("http://localhost:11434", transport=transport, retries=0)
+        )
+        with tempfile.TemporaryDirectory() as path:
+            report = reviewer.review(Blackboard(path), "unknown_stage")
+            self.assertEqual(report.severity, "warning")
+            self.assertEqual(report.action, "revise")
+
     @staticmethod
     def _base_manifest(**changes):
         data = {
@@ -88,7 +106,8 @@ class FaultInjectionTests(unittest.TestCase):
     def _bad_profile_counts(self, bb):
         bb.artefacts["dataset_manifest"] = self._base_manifest()
         bb.artefacts["data_profile"] = SimpleNamespace(
-            class_counts={"train": [1] * 9, "val": [1] * 9, "test": [1] * 9},
+            class_counts={"train": [1] * 9, "val": [1] * 9},
+            samples_profiled=18,
             profiled_fraction=1.0,
             train_channel_std_unit=[0.1, 0.1, 0.1],
         )

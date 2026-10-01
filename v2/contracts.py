@@ -274,20 +274,17 @@ class DataProfile(Artefact):
 
     @model_validator(mode="after")
     def validate_counts(self) -> DataProfile:
-        if set(self.class_counts) != {"train", "val", "test"}:
-            raise ValueError("class_counts must contain train, val and test")
+        if set(self.class_counts) != {"train", "val"}:
+            raise ValueError("selection profile must contain train and val only")
         if any(len(v) != self.n_classes for v in self.class_counts.values()):
             raise ValueError("every class-count vector must match n_classes")
         if self.class_proportions and (
-            set(self.class_proportions) != {"train", "val", "test"}
+            set(self.class_proportions) != {"train", "val"}
             or any(len(v) != self.n_classes for v in self.class_proportions.values())
         ):
-            raise ValueError("class_proportions must contain three n-class vectors")
-        if (
-            self.test_to_train_prevalence_ratio
-            and len(self.test_to_train_prevalence_ratio) != self.n_classes
-        ):
-            raise ValueError("prevalence-ratio vector must match n_classes")
+            raise ValueError("class_proportions must contain train and val vectors")
+        if self.test_to_train_prevalence_ratio:
+            raise ValueError("selection profile must not contain test prevalence")
         return self
 
 
@@ -400,11 +397,19 @@ class SearchPlan(Artefact):
     )
     test_locked: Literal[True] = True
     framework: Literal["lightning.pytorch"] = "lightning.pytorch"
+    progressive_budget: Literal[True] = True
+    round_epoch_budgets: list[int] = Field(min_length=1, max_length=4)
 
     @model_validator(mode="after")
     def validate_epoch_budgets(self) -> SearchPlan:
         if self.search_epochs > self.final_epochs:
             raise ValueError("search_epochs cannot exceed final_epochs")
+        if len(self.round_epoch_budgets) != self.rounds:
+            raise ValueError("round_epoch_budgets must match rounds")
+        if self.round_epoch_budgets != sorted(self.round_epoch_budgets):
+            raise ValueError("round epoch budgets must be non-decreasing")
+        if any(value > self.final_epochs for value in self.round_epoch_budgets):
+            raise ValueError("round epoch budget cannot exceed final_epochs")
         return self
 
 
@@ -464,10 +469,12 @@ class SearchReport(Artefact):
     selected_config_hash: str = Field(min_length=64, max_length=64)
     selected_validation_accuracy: float = Field(ge=0.0, le=1.0)
     selected_validation_macro_f1: float = Field(ge=0.0, le=1.0)
-    selection_rule: Literal["accuracy_tolerance_then_macro_f1"] = (
-        "accuracy_tolerance_then_macro_f1"
+    selection_rule: Literal["highest_budget_accuracy_tolerance_then_macro_f1"] = (
+        "highest_budget_accuracy_tolerance_then_macro_f1"
     )
     test_metrics_used: Literal[False] = False
+    families_evaluated: list[ModelFamily] = Field(default_factory=list)
+    missing_families: list[ModelFamily] = Field(default_factory=list)
 
 
 class BestConfiguration(Artefact):
@@ -490,6 +497,8 @@ class ClassMetrics(StrictModel):
     precision: float = Field(ge=0.0, le=1.0)
     recall: float = Field(ge=0.0, le=1.0)
     f1: float = Field(ge=0.0, le=1.0)
+    recall_ci95_low: float | None = Field(default=None, ge=0.0, le=1.0)
+    recall_ci95_high: float | None = Field(default=None, ge=0.0, le=1.0)
 
 
 class EvalReport(Artefact):
@@ -504,6 +513,8 @@ class EvalReport(Artefact):
     per_class: list[ClassMetrics] = Field(min_length=9, max_length=9)
     confusion_matrix: list[list[int]] = Field(min_length=9, max_length=9)
     primary_metric: Literal["accuracy"] = "accuracy"
+    accuracy_ci95_low: float | None = Field(default=None, ge=0.0, le=1.0)
+    accuracy_ci95_high: float | None = Field(default=None, ge=0.0, le=1.0)
 
     @model_validator(mode="after")
     def validate_multiclass_evidence(self) -> EvalReport:
@@ -535,6 +546,15 @@ class OODScenario(StrictModel):
     test_auroc: float | None = Field(default=None, ge=0.0, le=1.0)
 
 
+class RiskCoveragePoint(StrictModel):
+    target_validation_coverage: float = Field(gt=0.0, le=1.0)
+    threshold: float = Field(ge=0.0, le=1.0)
+    validation_coverage: float = Field(ge=0.0, le=1.0)
+    validation_risk: float = Field(ge=0.0, le=1.0)
+    test_coverage: float = Field(ge=0.0, le=1.0)
+    test_risk: float = Field(ge=0.0, le=1.0)
+
+
 class AbstentionReport(Artefact):
     method: Literal["max_softmax", "predictive_entropy"] = "max_softmax"
     threshold: float = Field(ge=0.0, le=1.0)
@@ -555,6 +575,7 @@ class AbstentionReport(Artefact):
     ood_pass: bool = False
     ood_evidence_path: str = Field(min_length=1)
     ood_evidence_sha256: str = Field(min_length=64, max_length=64)
+    risk_coverage_curve: list[RiskCoveragePoint] = Field(default_factory=list)
 
 
 class BaselineReport(Artefact):

@@ -31,6 +31,10 @@ class PipelineTests(unittest.TestCase):
             reasoner = OllamaReasoner(base_url=None)
             IngestionAgent(loader=lambda **kwargs: bundle).run(bb)
             ProfilingAmbiguityAgent(reasoner).run(bb)
+            profile = bb.get("data_profile")
+            self.assertEqual(set(profile.class_counts), {"train", "val"})
+            self.assertEqual(profile.test_to_train_prevalence_ratio, [])
+            self.assertEqual(profile.samples_profiled, 45)
             ArchitectureResearchAgent(reasoner).run(bb)
             research = bb.get("architecture_research")
             self.assertIsInstance(research, ArchitectureResearch)
@@ -76,6 +80,10 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(report.accuracy, 1.0)
         self.assertEqual(report.macro_f1, 1.0)
         self.assertEqual(report.roc_auc_ovr_macro, 1.0)
+        self.assertIsNotNone(report.accuracy_ci95_low)
+        self.assertLessEqual(report.accuracy_ci95_low, report.accuracy)
+        self.assertGreaterEqual(report.accuracy_ci95_high, report.accuracy)
+        self.assertTrue(all(row.recall_ci95_low is not None for row in report.per_class))
         self.assertEqual(sum(sum(row) for row in report.confusion_matrix), 18)
 
     def test_task_configuration_selection_is_independent_of_test_status(self) -> None:

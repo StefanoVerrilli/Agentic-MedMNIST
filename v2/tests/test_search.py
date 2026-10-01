@@ -20,6 +20,7 @@ from contracts import (
 from llm import OllamaReasoner
 from search import (
     candidate_hash,
+    coverage_candidates,
     default_candidates,
     proposal_to_config,
     proposal_to_representation,
@@ -29,6 +30,17 @@ from tests.helpers import make_bundle
 
 
 class SearchTests(unittest.TestCase):
+    def test_coverage_portfolio_prioritizes_unseen_families(self) -> None:
+        first = coverage_candidates(1, set())[:5]
+        self.assertEqual(len({item.model_family for item in first}), 5)
+        remaining = coverage_candidates(
+            2, {"tiny_cnn", "residual_cnn", "resnet18"}
+        )[:2]
+        self.assertEqual(
+            {item.model_family for item in remaining},
+            {"vision_transformer", "compact_transformer"},
+        )
+
     def test_four_round_fallback_portfolio_is_executable_and_unique(self) -> None:
         candidates = [
             candidate
@@ -149,7 +161,11 @@ class SearchTests(unittest.TestCase):
             self.assertIsInstance(report, SearchReport)
             self.assertIsInstance(best, BestConfiguration)
             self.assertEqual(calls, ["val", "val"])
-            self.assertEqual(epoch_budgets, [1, 1])
+            self.assertEqual(epoch_budgets, [1, 2])
+            self.assertEqual(
+                bb.get("search_plan").round_epoch_budgets,
+                [1, 2],
+            )
             self.assertFalse(report.test_metrics_used)
             self.assertEqual(
                 sha256_file(Path(directory) / "run" / "best_config.yaml"),

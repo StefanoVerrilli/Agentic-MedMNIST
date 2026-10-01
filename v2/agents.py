@@ -26,6 +26,7 @@ from contracts import (
     ReportingStatus,
     RepresentationDecision,
     RepresentationPlan,
+    RiskCoveragePoint,
     ReviewDecision,
     SearchDecision,
     SearchPlan,
@@ -53,7 +54,7 @@ from ml import (
 )
 from search import (
     candidate_hash,
-    default_candidates,
+    coverage_candidates,
     lightning_config_payload,
     proposal_to_config,
     proposal_to_representation,
@@ -138,11 +139,14 @@ class ProfilingAmbiguityAgent:
 
         bundle = _bundle(bb)
         manifest = _manifest(bb)
+        # The selection profile is deliberately blind to the held-out test set.
+        # Test distributions are first inspected by EvaluationAgent after the
+        # configuration and checkpoint have been frozen.
         counts = {
             split: np.bincount(bundle.targets[split], minlength=bundle.n_classes)
             .astype(int)
             .tolist()
-            for split in ("train", "val", "test")
+            for split in ("train", "val")
         }
         positive = [value for value in counts["train"] if value > 0]
         imbalance = max(positive) / min(positive)
@@ -150,18 +154,10 @@ class ProfilingAmbiguityAgent:
             split: (np.asarray(values, dtype="float64") / sum(values)).tolist()
             for split, values in counts.items()
         }
-        prevalence_ratio = (
-            np.asarray(proportions["test"])
-            / np.maximum(np.asarray(proportions["train"]), 1e-12)
-        ).tolist()
-        test_positive = [value for value in counts["test"] if value > 0]
-        test_imbalance = max(test_positive) / min(test_positive)
         mean, std = channel_statistics(bundle.images["train"])
-        total_loaded = sum(manifest.loaded_split_sizes.values())
-        total_official = sum(manifest.official_split_sizes.values())
-        fallback_risks = [
-            "The official test set comes from a different clinical center."
-        ]
+        selection_loaded = sum(manifest.loaded_split_sizes[s] for s in ("train", "val"))
+        selection_official = sum(manifest.official_split_sizes[s] for s in ("train", "val"))
+        fallback_risks: list[str] = []
         if imbalance > 1.5:
             fallback_risks.append("Class imbalance can hide minority-class errors.")
         if manifest.subsampled:
@@ -180,16 +176,17 @@ class ProfilingAmbiguityAgent:
             stage="profiling.ambiguity",
             system=(
                 "You are an independent medical-image data auditor. Do not make "
-                "clinical claims. Identify concrete ambiguity and dataset-shift risks."
+                "clinical claims. Identify ambiguity risks using train and validation "
+                "only. The held-out test split is unavailable at this stage. PathMNIST "
+                "images in this run are intentionally 28x28 RGB."
             ),
             user=(
                 f"Dataset=PathMNIST; labels={list(bundle.labels)}; class_counts={counts}; "
                 f"class_proportions={proportions}; "
-                f"test_to_train_prevalence_ratio={prevalence_ratio}; "
                 f"train_imbalance={imbalance:.4f}; loaded_sizes="
-                f"{manifest.loaded_split_sizes}; official_sizes="
-                f"{manifest.official_split_sizes}; test_domain="
-                f"{manifest.test_domain_note}"
+                f"{{'train': {manifest.loaded_split_sizes['train']}, "
+                f"'val': {manifest.loaded_split_sizes['val']}}}; "
+                "held_out_test=locked"
             ),
             response_model=AmbiguityDecision,
             fallback=fallback,
@@ -202,19 +199,17 @@ class ProfilingAmbiguityAgent:
             dataset="pathmnist",
             n_channels=3,
             n_classes=9,
-            samples_profiled=total_loaded,
+            samples_profiled=selection_loaded,
             profiled_fraction=1.0,
-            official_data_fraction=round(total_loaded / total_official, 8),
+            official_data_fraction=round(selection_loaded / selection_official, 8),
             class_counts=counts,
             class_proportions={
                 split: [round(float(value), 8) for value in values]
                 for split, values in proportions.items()
             },
-            test_to_train_prevalence_ratio=[
-                round(float(value), 8) for value in prevalence_ratio
-            ],
+            test_to_train_prevalence_ratio=[],
             imbalance_ratio=round(float(imbalance), 6),
-            test_imbalance_ratio=round(float(test_imbalance), 6),
+            test_imbalance_ratio=1.0,
             image_shape_hwc=tuple(int(x) for x in shape),
             train_channel_mean_unit=[round(float(x), 8) for x in mean],
             train_channel_std_unit=[round(float(x), 8) for x in std],
@@ -469,20 +464,37 @@ class ModelSearchAgent:
             search_epochs=self.search_epochs,
             final_epochs=self.final_epochs,
             accuracy_tolerance=self.accuracy_tolerance,
+            round_epoch_budgets=[
+                min(self.final_epochs, self.search_epochs * index)
+                for index in range(1, self.rounds + 1)
+            ],
         )
         bb.put("search_plan", plan, producer=self.name)
 
         trials: list[TrialResult] = []
         proposals_by_hash: dict[str, CandidateProposal] = {}
-        seen: set[str] = set()
+        seen: set[tuple[str, int]] = set()
         trial_names: list[str] = []
+        evaluated_families: set[str] = set()
         for round_index in range(1, self.rounds + 1):
             remaining = self.max_trials - len(trials)
             if remaining <= 0:
                 break
             rounds_left = self.rounds - round_index + 1
             round_cap = min(4, max(1, (remaining + rounds_left - 1) // rounds_left))
-            fallback_candidates = default_candidates(round_index)[:round_cap]
+            trial_epochs = plan.round_epoch_budgets[round_index - 1]
+            portfolio_candidates = coverage_candidates(round_index, evaluated_families)
+            required_candidates: list[CandidateProposal] = []
+            required_families: set[str] = set()
+            for candidate in portfolio_candidates:
+                if (
+                    candidate.model_family not in evaluated_families
+                    and candidate.model_family not in required_families
+                ):
+                    required_candidates.append(candidate)
+                    required_families.add(candidate.model_family)
+            required_candidates = required_candidates[:round_cap]
+            fallback_candidates = portfolio_candidates[:round_cap]
             fallback = SearchDecision(
                 analysis=(
                     "Deterministic diverse candidate set; selection uses validation "
@@ -548,9 +560,22 @@ class ModelSearchAgent:
                 fallback=fallback,
                 audit=bb.record_event,
             )
+            # Reserve capacity for architecture coverage before adaptive refinements.
             candidate_entries = [
-                (candidate, decision.source) for candidate in decision.value.candidates
+                (candidate, "heuristic:coverage") for candidate in required_candidates
             ]
+            if trials:
+                completed_so_far = [item for item in trials if item.status == "completed"]
+                if completed_so_far:
+                    incumbent = rank_trials(
+                        completed_so_far, accuracy_tolerance=self.accuracy_tolerance
+                    )
+                    candidate_entries.append(
+                        (proposals_by_hash[incumbent.config_hash], "promotion:incumbent")
+                    )
+            candidate_entries.extend(
+                (candidate, decision.source) for candidate in decision.value.candidates
+            )
             candidate_entries.extend(
                 (candidate, "heuristic:portfolio") for candidate in fallback_candidates
             )
@@ -559,7 +584,8 @@ class ModelSearchAgent:
                 if accepted >= round_cap or len(trials) >= self.max_trials:
                     break
                 digest = candidate_hash(candidate)
-                if digest in seen:
+                trial_key = (digest, trial_epochs)
+                if trial_key in seen:
                     bb.record_event(
                         "search_candidate_skipped",
                         round_index=round_index,
@@ -568,12 +594,11 @@ class ModelSearchAgent:
                         config_hash=digest,
                     )
                     continue
-                seen.add(digest)
+                seen.add(trial_key)
                 proposals_by_hash[digest] = candidate
                 accepted += 1
-                # All candidates receive the same budget, so metrics from later
-                # agentic rounds remain directly comparable with earlier trials.
-                trial_epochs = self.search_epochs
+                # Trials are compared only within the same (highest) epoch budget;
+                # later rounds progressively increase the fidelity of evaluation.
                 config = proposal_to_config(
                     candidate,
                     seed=self.seed,
@@ -583,7 +608,7 @@ class ModelSearchAgent:
                 )
                 representation = proposal_to_representation(candidate)
                 prepared = prepare_data(bundle, representation)
-                artefact_name = safe_trial_name(candidate.candidate_id, digest)
+                artefact_name = f"{safe_trial_name(candidate.candidate_id, digest)}_e{trial_epochs}"
                 checkpoint = bb.blob_dir / "search" / f"{artefact_name}.ckpt"
                 started = time.monotonic()
                 bb.record_event(
@@ -656,6 +681,7 @@ class ModelSearchAgent:
                 bb.put(artefact_name, trial, producer=self.name)
                 trial_names.append(artefact_name)
                 trials.append(trial)
+                evaluated_families.add(candidate.model_family)
                 bb.record_event(
                     "search_trial_finished",
                     round_index=round_index,
@@ -685,7 +711,14 @@ class ModelSearchAgent:
                     minimum_trials=minimum_trials,
                 )
 
-        selected = rank_trials(trials, accuracy_tolerance=self.accuracy_tolerance)
+        completed_trials = [trial for trial in trials if trial.status == "completed"]
+        if not completed_trials:
+            raise RuntimeError("model search produced no successful trial")
+        highest_budget = max(trial.config.epochs for trial in completed_trials)
+        selected = rank_trials(
+            [trial for trial in completed_trials if trial.config.epochs == highest_budget],
+            accuracy_tolerance=self.accuracy_tolerance,
+        )
         candidate = proposals_by_hash[selected.config_hash]
         final_config = selected.config.model_copy(
             update={
@@ -748,6 +781,16 @@ class ModelSearchAgent:
             selected_config_hash=selected.config_hash,
             selected_validation_accuracy=float(selected.validation_accuracy),
             selected_validation_macro_f1=float(selected.validation_macro_f1),
+            families_evaluated=sorted(evaluated_families),
+            missing_families=sorted(
+                set(
+                    [
+                        "tiny_cnn", "residual_cnn", "resnet18",
+                        "vision_transformer", "compact_transformer",
+                    ]
+                )
+                - evaluated_families
+            ),
         )
         best = BestConfiguration(
             selected_candidate_id=selected.candidate_id,
@@ -756,7 +799,10 @@ class ModelSearchAgent:
             representation=representation,
             validation_accuracy=float(selected.validation_accuracy),
             validation_macro_f1=float(selected.validation_macro_f1),
-            selection_rule="accuracy within tolerance, then macro-F1; test locked",
+            selection_rule=(
+                "highest epoch budget, then accuracy within tolerance, then "
+                "macro-F1; test locked"
+            ),
             lightning_config_path=str(config_path.relative_to(bb.root)),
             lightning_config_sha256=config_sha,
         )
@@ -817,7 +863,11 @@ class ArchitectureResearchAgent:
                 "hyperparameterization and training architecture. Produce bounded, "
                 "actionable guidance for the downstream search. Never use test metrics. "
                 "The available architectures are tiny_cnn, residual_cnn, resnet18, "
-                "vision_transformer and compact_transformer."
+                "vision_transformer and compact_transformer. Implementation facts: "
+                "inputs are 28x28 RGB; resnet18 already uses a CIFAR-style 3x3, "
+                "stride-1 stem without max-pooling; compact_transformer uses a "
+                "configurable convolutional tokenizer. Do not infer an ImageNet "
+                "7x7 stride-2 stem."
             ),
             user=(
                 f"image_shape={profile.image_shape_hwc}; train_samples="
@@ -1153,6 +1203,42 @@ class AbstentionOODAgent:
             if covered.any()
             else 0.0
         )
+        val_prediction = probabilities["val"].argmax(axis=1)
+        val_targets = probabilities["val_targets"]
+        curve: list[RiskCoveragePoint] = []
+        coverage_targets = sorted(
+            set((0.50, 0.60, 0.70, 0.80, 0.90, self.target_validation_coverage))
+        )
+        for target_coverage in coverage_targets:
+            point_threshold = float(
+                np.quantile(
+                    val_confidence,
+                    max(0.0, 1.0 - target_coverage),
+                    method="lower",
+                )
+            )
+            val_mask = val_confidence >= point_threshold
+            test_mask = test_confidence >= point_threshold
+            val_accuracy = (
+                float((val_prediction[val_mask] == val_targets[val_mask]).mean())
+                if val_mask.any()
+                else 0.0
+            )
+            point_test_accuracy = (
+                float((prediction[test_mask] == test_targets[test_mask]).mean())
+                if test_mask.any()
+                else 0.0
+            )
+            curve.append(
+                RiskCoveragePoint(
+                    target_validation_coverage=round(float(target_coverage), 6),
+                    threshold=round(point_threshold, 8),
+                    validation_coverage=round(float(val_mask.mean()), 6),
+                    validation_risk=round(1.0 - val_accuracy, 6),
+                    test_coverage=round(float(test_mask.mean()), 6),
+                    test_risk=round(1.0 - point_test_accuracy, 6),
+                )
+            )
 
         validation_values = method_validation[selected_method]
         test_values = method_test[selected_method]
@@ -1188,6 +1274,7 @@ class AbstentionOODAgent:
             ood_pass=ood_pass,
             ood_evidence_path=str(ood_path.relative_to(bb.root)),
             ood_evidence_sha256=ood_sha,
+            risk_coverage_curve=curve,
         )
         bb.put("abstention_report", report, producer=self.name)
 
@@ -1253,7 +1340,11 @@ class ReviewerConsistencyAgent:
                 "You are an independent software and ML consistency reviewer. "
                 "Inspect only the supplied evidence. You may raise severity but "
                 "must never dismiss deterministic findings. No clinical claims. "
-                "The supplied current UTC timestamp is authoritative."
+                "The supplied current UTC timestamp is authoritative. This pipeline "
+                "uses the standard 28x28 RGB MedMNIST distribution; do not substitute "
+                "the source-dataset or MedMNIST+ resolution. Only deterministic "
+                "findings may justify action=stop; unsupported external-memory claims "
+                "must be warnings requesting verification."
             ),
             user=(
                 f"current_utc={utc_now()}; stage={stage}; "
@@ -1266,8 +1357,18 @@ class ReviewerConsistencyAgent:
         )
         llm_severity = decision.value.severity
         severity = max((deterministic_severity, llm_severity), key=self._RANK.get)
-        if decision.value.action == "stop":
+        if deterministic_severity == "critical":
             severity = "critical"
+        elif llm_severity == "critical" or decision.value.action == "stop":
+            # LLM-only critical findings are advisory. A veto must be anchored
+            # in a reproducible invariant, never in model memory or web claims.
+            severity = "warning"
+            bb.record_event(
+                "review_veto_downgraded",
+                stage=stage,
+                reason="no_deterministic_critical_finding",
+                proposed_action=decision.value.action,
+            )
         elif decision.value.action == "revise" and severity == "ok":
             severity = "warning"
         action = (
@@ -1314,7 +1415,7 @@ class ReviewerConsistencyAgent:
             manifest = require("dataset_manifest")
             profile = require("data_profile")
             if manifest is not None and profile is not None:
-                for split in ("train", "val", "test"):
+                for split in ("train", "val"):
                     if (
                         sum(profile.class_counts[split])
                         != manifest.loaded_split_sizes[split]
@@ -1323,9 +1424,12 @@ class ReviewerConsistencyAgent:
                             ("critical", f"{split} class counts do not sum")
                         )
                 profiled_samples = getattr(profile, "samples_profiled", None)
-                if profiled_samples != sum(manifest.loaded_split_sizes.values()):
+                expected_profiled = sum(
+                    manifest.loaded_split_sizes[split] for split in ("train", "val")
+                )
+                if profiled_samples != expected_profiled:
                     findings.append(
-                        ("critical", "not every loaded sample was profiled")
+                        ("critical", "not every selection sample was profiled")
                     )
                 if (
                     getattr(profile, "profiled_fraction", 0.0) < 0.99
@@ -1387,6 +1491,18 @@ class ReviewerConsistencyAgent:
                 if report.completed_trials < 1:
                     findings.append(
                         ("critical", "model search has no successful trial")
+                    )
+                if (
+                    plan is not None
+                    and plan.max_trials >= 5
+                    and report.missing_families
+                ):
+                    findings.append(
+                        (
+                            "warning",
+                            "architecture coverage is incomplete despite a budget "
+                            f"of at least five trials: {report.missing_families}",
+                        )
                     )
             if report is not None and best is not None:
                 if report.selected_config_hash != best.selected_config_hash:

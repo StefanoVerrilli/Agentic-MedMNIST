@@ -190,12 +190,28 @@ def main(argv: list[str] | None = None) -> int:
         for item in successful
         if item.get("baseline_accuracy") is not None
     ]
+    completed_seeds = [int(item["seed"]) for item in successful]
+    incomplete = [
+        {"seed": int(item["seed"]), "status": str(item.get("status", "unknown"))}
+        for item in summaries
+        if item not in successful
+    ]
+    aggregate_valid = len(successful) == len(seeds)
     experiment_summary = {
         "experiment_id": experiment_id,
         "dataset": "pathmnist",
         "created_at": utc_now(),
         "sequential_ollama_calls": True,
         "runs": summaries,
+        "requested_seeds": seeds,
+        "completed_seeds": completed_seeds,
+        "incomplete_seeds": incomplete,
+        "aggregate_valid": aggregate_valid,
+        "aggregate_note": (
+            "All requested seeds completed."
+            if aggregate_valid
+            else "Partial descriptive statistics only; do not treat as a complete multi-seed result."
+        ),
         "agentic_accuracy_mean": round(statistics.mean(accuracies), 6)
         if accuracies
         else None,
