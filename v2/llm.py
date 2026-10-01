@@ -14,6 +14,7 @@ import os
 import threading
 import time
 import urllib.request
+import urllib.error
 import uuid
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -29,6 +30,14 @@ _GLOBAL_OLLAMA_LOCK = threading.Lock()
 
 class OllamaDecisionError(RuntimeError):
     """Raised when Ollama is required and no validated response is obtained."""
+
+
+class OllamaHTTPError(OSError):
+    """Retain the bounded server error body, without logging the request."""
+
+    def __init__(self, code: int, detail: str):
+        self.code = code
+        super().__init__(f"HTTP {code}: {detail}")
 
 
 @dataclass(frozen=True)
@@ -157,13 +166,26 @@ class OllamaReasoner:
 
         errors: list[str] = []
         error_details: list[str] = []
+        format_negotiation: list[str] = []
         for attempt in range(1, self.retries + 2):
             started = time.monotonic()
             try:
                 with _GLOBAL_OLLAMA_LOCK:
-                    response = self._transport(
-                        f"{self.base_url}/api/chat", payload, self.timeout
-                    )
+                    try:
+                        response = self._transport(
+                            f"{self.base_url}/api/chat", payload, self.timeout
+                        )
+                    except OSError as exc:
+                        # Some Ollama backends cannot compile a nested schema.
+                        # JSON mode remains model reasoning: Pydantic still
+                        # enforces the complete original contract below.
+                        if getattr(exc, "code", None) != 400 or payload["format"] == "json":
+                            raise
+                        format_negotiation.append(_error_detail(exc))
+                        payload["format"] = "json"
+                        response = self._transport(
+                            f"{self.base_url}/api/chat", payload, self.timeout
+                        )
                 content = response["message"]["content"]
                 parsed = json.loads(content)
                 decision = response_model.model_validate(parsed)
@@ -180,6 +202,8 @@ class OllamaReasoner:
                     prompt_tokens=response.get("prompt_eval_count"),
                     completion_tokens=response.get("eval_count"),
                     total_duration_ns=response.get("total_duration"),
+                    output_format="json" if payload["format"] == "json" else "json_schema",
+                    format_negotiation=format_negotiation,
                     decision=decision.model_dump(mode="json"),
                 )
                 return ReasonedDecision(
@@ -193,9 +217,9 @@ class OllamaReasoner:
                         for row in exc.errors(include_url=False)[:8]
                     )
                 else:
-                    detail = str(exc)[:1000]
+                    detail = _error_detail(exc)
                 error_details.append(detail)
-                if attempt <= self.retries:
+                if attempt <= self.retries and isinstance(exc, (KeyError, TypeError, ValueError)):
                     messages.append(
                         {
                             "role": "user",
@@ -219,6 +243,8 @@ class OllamaReasoner:
             request_id=request_id,
             error_types=error_summary,
             error_details=error_details,
+            output_format="json" if payload["format"] == "json" else "json_schema",
+            format_negotiation=format_negotiation,
             decision=(
                 None if self.required else validated_fallback.model_dump(mode="json")
             ),
@@ -254,8 +280,29 @@ def _post_json(url: str, payload: dict[str, Any], timeout: float) -> dict[str, A
         headers={"Content-Type": "application/json"},
         method="POST",
     )
-    with urllib.request.urlopen(request, timeout=timeout) as response:
-        return json.load(response)
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            return json.load(response)
+    except urllib.error.HTTPError as exc:
+        raise OllamaHTTPError(exc.code, _error_detail(exc)) from exc
+
+
+def _error_detail(exc: BaseException) -> str:
+    if isinstance(exc, urllib.error.HTTPError):
+        try:
+            body = exc.read(8192).decode("utf-8", errors="replace")
+            if body:
+                try:
+                    document = json.loads(body)
+                    body = str(document.get("error", body)) if isinstance(document, dict) else body
+                except ValueError:
+                    pass
+                return f"HTTP {exc.code}: {body}"[:4000]
+        except OSError:
+            return str(exc)[:4000]
+        finally:
+            exc.close()
+    return str(exc)[:4000]
 
 
 def ollama_model_digest(
