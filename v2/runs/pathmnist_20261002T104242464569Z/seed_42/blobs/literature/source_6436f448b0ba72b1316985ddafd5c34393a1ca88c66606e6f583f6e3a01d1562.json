@@ -1,0 +1,7 @@
+{
+  "id": "2508.18509v1",
+  "origin": "arxiv_api",
+  "retrieved_at": "2026-10-02T10:43:34.991150+00:00",
+  "text": "Machine unlearning aims to remove private or sensitive data from a pre-trained model while preserving the model's robustness. Despite recent advances, this technique has not been explored in medical image classification. This work evaluates the SalUn unlearning model by conducting experiments on the PathMNIST, OrganAMNIST, and BloodMNIST datasets. We also analyse the impact of data augmentation on the quality of unlearning. Results show that SalUn achieves performance close to full retraining, indicating an efficient solution for use in medical applications.",
+  "title": "Analise de Desaprendizado de Maquina em Modelos de Classificacao de Imagens Medicas"
+}

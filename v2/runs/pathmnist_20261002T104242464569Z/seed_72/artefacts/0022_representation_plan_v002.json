@@ -1,0 +1,32 @@
+{
+  "artefact": "representation_plan",
+  "artefact_type": "RepresentationPlan",
+  "created_at": "2026-10-02T11:49:33.959046+00:00",
+  "payload": {
+    "augmentation_factor": 3,
+    "augmentations": [
+      "hflip",
+      "rotate180"
+    ],
+    "normalization": "standardize",
+    "rationale": "Building on the best prior result (ResNet18, 0.9908), this candidate widens the base channel width from 32 to 48 (a 50% increase in per-channel capacity while staying well within the 192 max), enabling the fixed two-residual-blocks-per-stage topology to extract richer features from the 28x28 pathology patches. The lower LR (0.0003 vs 0.0005) provides more stable convergence for the wider network, reducing the risk of overshooting minima that may have contributed to the variance between the two prior ResNet18 runs (0.979 vs 0.991). Dropout is increased to 0.15 for stronger regularization at the higher capacity. Class weighting is enabled for the first time to directly address the 1.63x imbalance (class counts range 7886-12885), which was unaddressed in all prior runs. Label smoothing is raised to 0.1 to further prevent overconfident predictions on the 9-class problem. The augmentation pair hflip+rotate180 replaces hflip+vflip, adding a 180-degree rotation that is biologically safe for tissue sections while providing a different spatial perturbation distribution. Depth is set to 3 (ignored for ResNet18's fixed topology) and all other hyperparameters (adamw, cosine, batch_size=128, weight_decay=0.0001, standardize) are held at the values that produced the best prior result.",
+    "schema_version": "1.0",
+    "source": "configuration_replay:daeeab259bf7",
+    "stats_source": "train",
+    "train_channel_mean_unit": [
+      0.740545,
+      0.53298219,
+      0.70582885
+    ],
+    "train_channel_std_unit": [
+      0.12368222,
+      0.17676253,
+      0.12443067
+    ]
+  },
+  "payload_sha256": "1ff5bb32b1fb94bc137b298e093d69db77d7ad9e38c9ac1b1dece7444225e774",
+  "producer": "configuration_replay",
+  "run_id": "seed_72",
+  "sequence": 22,
+  "version": 2
+}

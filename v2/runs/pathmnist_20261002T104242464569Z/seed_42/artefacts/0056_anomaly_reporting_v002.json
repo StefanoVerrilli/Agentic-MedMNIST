@@ -1,0 +1,26 @@
+{
+  "artefact": "anomaly_reporting",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T11:21:33.720444+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Reporting stage is internally consistent and all verifiable arithmetic checks pass. No deterministic findings were raised.\n\n**Arithmetic verification (all pass):**\n- OOD aggregate (max_softmax): (0.882472 + 0.949488 + 0.935087) / 3 = 0.922349 ✓ matches reported ood_auroc.\n- OOD validation aggregate: (0.988066 + 0.997323 + 0.996342) / 3 = 0.993910 ≈ 0.99391 ✓.\n- Abstention: 0.392061 × 7180 ≈ 2815 = human_review_count ✓; 1 − 0.607939 = 0.392061 = abstain_rate ✓; 1 − 0.954639 = 0.045361 = selective_risk ✓.\n- Comparison: 0.88273 − 0.821309 = 0.061421 ✓; baseline_met_or_exceeded = true ✓.\n\n**Cross-artefact consistency:**\n- Split fingerprint 9afc9ed3…c7505 and seed 42 are uniform across baseline, comparison, ablation, and search reports.\n- reporting_status.complete_through_stage = \"ablation\" is consistent with reporting being the terminal aggregation stage.\n- OOD scope is honestly labelled \"controlled_corruption_proxy\"; ood_pass=true is scoped to that proxy, not broad OOD robustness.\n- Built-in augmentations (hflip) used in ablation are primitives requiring no extension approval.\n- ResNet18 topology (hidden=48 base width, depth inactive) and inert transformer fields are correctly handled per fixed-topology rules.\n\n**Observations (informational, not protocol violations):**\n1. Val-test accuracy gap (~11.1 pp) causes abstention coverage to degrade from 80% (val target) to 60.8% (test). This is a distribution-shift consequence, correctly surfaced in the risk-coverage curve; not a reporting error.\n2. OOD evaluation covers a single corruption family (unit-scale Gaussian noise, 3 severities). The \"controlled_corruption_proxy\" label is transparent; downstream users should not extrapolate to arbitrary OOD.\n3. Three classes (smooth muscle F1=0.692, cancer-associated stroma F1=0.717, debris F1=0.809) fall below 0.85; adipose↔smooth-muscle confusion (374 samples) is the dominant error source. Performance observation, not a reporting defect.\n4. Ablation lacks a full-configuration scenario exactly matching the best-config hyperparameters, so the decomposition loop is not fully closed. Noted by the ablation-stage review; the omitted train_config artefact prevents further verification.\n\nNone of the above constitute deterministic errors or protocol violations. The reporting artefacts are arithmetically correct, internally consistent, and transparently scoped. The prior anomaly review's \"revise\" recommendation addressed performance observations rather than reporting defects; those observations are appropriately disclosed in the artefacts themselves. No revision of the reporting content is required.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Val-test coverage gap: 80% validation coverage target yields only 60.8% test coverage (abstain rate 39.2% vs expected ~20%), a distribution-shift consequence that degrades the practical selective-prediction guarantee.",
+      "OOD evaluation is limited to a single corruption family (unit-scale Gaussian noise at 3 severities); ood_pass=true is scoped to this proxy and should not be interpreted as broad OOD robustness.",
+      "Three classes fall below 0.85 macro-F1 (smooth muscle 0.692, cancer-associated stroma 0.717, debris 0.809); adipose↔smooth-muscle confusion (374 samples) is the largest single error source.",
+      "Ablation lacks a full-configuration scenario matching the exact best-config hyperparameters, leaving the decomposition loop unclosed; the omitted train_config artefact prevents further verification."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "reporting"
+  },
+  "payload_sha256": "e69e466e629870ef9f94579ab612ede7328d84c617e4d628b37aec22537e7dad",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 56,
+  "version": 2
+}

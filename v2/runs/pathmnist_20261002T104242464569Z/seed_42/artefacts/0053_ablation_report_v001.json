@@ -1,0 +1,54 @@
+{
+  "artefact": "ablation_report",
+  "artefact_type": "AblationReport",
+  "created_at": "2026-10-02T11:20:32.100293+00:00",
+  "payload": {
+    "common_split_fingerprint": "9afc9ed3c5a00c7391bcdd170372981b088ec7867c12f721313eda0b303c7505",
+    "scenarios": [
+      {
+        "accuracy": 0.884819,
+        "augmentations": [],
+        "checkpoint_path": "blobs/ablation_representation_off.ckpt",
+        "checkpoint_sha256": "4016655b2569dfde94e4a371dadb6bfaeed485891c04dfd20e4762c60ff58d24",
+        "lightning_csv_path": "blobs/lightning_logs/ablation_representation_off/version_0/metrics.csv",
+        "macro_f1": 0.850884,
+        "name": "representation_off",
+        "normalization": "unit",
+        "seed": 42,
+        "training_log_path": "blobs/ablation_representation_off.training.jsonl"
+      },
+      {
+        "accuracy": 0.887465,
+        "augmentations": [],
+        "checkpoint_path": "blobs/ablation_standardize_only.ckpt",
+        "checkpoint_sha256": "50f15ce689c2290dee4bfd106dff4db837396dd9c6935e9eacb4b5f09bfde85e",
+        "lightning_csv_path": "blobs/lightning_logs/ablation_standardize_only/version_0/metrics.csv",
+        "macro_f1": 0.855418,
+        "name": "standardize_only",
+        "normalization": "standardize",
+        "seed": 42,
+        "training_log_path": "blobs/ablation_standardize_only.training.jsonl"
+      },
+      {
+        "accuracy": 0.890808,
+        "augmentations": [
+          "hflip"
+        ],
+        "checkpoint_path": "blobs/ablation_standardize_hflip.ckpt",
+        "checkpoint_sha256": "7a5621261c7b27114264f9d1e62d5c0663d6f1b83f3e6dd616b212787786cef2",
+        "lightning_csv_path": "blobs/lightning_logs/ablation_standardize_hflip/version_0/metrics.csv",
+        "macro_f1": 0.87111,
+        "name": "standardize_hflip",
+        "normalization": "standardize",
+        "seed": 42,
+        "training_log_path": "blobs/ablation_standardize_hflip.training.jsonl"
+      }
+    ],
+    "schema_version": "1.0"
+  },
+  "payload_sha256": "7101cb7a9bbf95ef6d7d41d8bca74c318b917d0e46c9a228801d2c836c881b02",
+  "producer": "ablation",
+  "run_id": "seed_42",
+  "sequence": 53,
+  "version": 1
+}

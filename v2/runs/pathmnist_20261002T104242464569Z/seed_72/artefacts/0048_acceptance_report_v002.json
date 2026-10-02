@@ -1,0 +1,185 @@
+{
+  "artefact": "acceptance_report",
+  "artefact_type": "AcceptanceReport",
+  "created_at": "2026-10-02T12:08:27.214854+00:00",
+  "payload": {
+    "acceptance_ready": false,
+    "criteria": [
+      {
+        "detail": "Every persisted payload and referenced file is checksummed.",
+        "evidence": [
+          "artefacts/",
+          "blobs/"
+        ],
+        "requirement": "WP1_TYPED_VERSIONED_HANDOFFS",
+        "status": "passed"
+      },
+      {
+        "detail": "AST check of direct agent-class calls.",
+        "evidence": [
+          "agents.py"
+        ],
+        "requirement": "WP1_ZERO_DIRECT_AGENT_CALLS",
+        "status": "passed"
+      },
+      {
+        "detail": "Actual train/validation evidence audited before any training.",
+        "evidence": [
+          "data_audit_report",
+          "decision_log.jsonl"
+        ],
+        "requirement": "WP2_PRETRAINING_LEAKAGE_AUDIT",
+        "status": "passed"
+      },
+      {
+        "detail": "Exact supporting quotes resolve to checksummed snapshots; recommendations remain hypotheses.",
+        "evidence": [
+          "prior_art_brief",
+          "blobs/literature/"
+        ],
+        "requirement": "WP2_CITED_IDEAS",
+        "status": "passed"
+      },
+      {
+        "detail": "Curated excerpts alone do not demonstrate web retrieval.",
+        "evidence": [
+          "prior_art_brief"
+        ],
+        "requirement": "WP2_WEB_RETRIEVAL",
+        "status": "passed"
+      },
+      {
+        "detail": "Test metrics are excluded from search and configuration selection.",
+        "evidence": [
+          "best_configuration",
+          "search_report"
+        ],
+        "requirement": "WP3_VALIDATION_ONLY_SELECTION",
+        "status": "passed"
+      },
+      {
+        "detail": "Conventional baseline uses the same seed and selected splits; negative deltas are retained.",
+        "evidence": [
+          "comparison_report",
+          "baseline_report"
+        ],
+        "requirement": "WP4_BASELINE_COMPARISON",
+        "status": "passed"
+      },
+      {
+        "detail": "Three bounded representation scenarios.",
+        "evidence": [
+          "ablation_report"
+        ],
+        "requirement": "WP4_REPRESENTATION_ABLATIONS",
+        "status": "passed"
+      },
+      {
+        "detail": "At least three completed seeds, with a shared validation-selected configuration.",
+        "evidence": [
+          "../experiment_summary.json"
+        ],
+        "requirement": "WP4_FROZEN_CONFIGURATION_SEED_VARIANCE",
+        "status": "passed"
+      },
+      {
+        "detail": "Validation-calibrated abstention with a persistent benchmark review queue.",
+        "evidence": [
+          "abstention_report",
+          "human_review_queue"
+        ],
+        "requirement": "WP5_ABSTENTION_AND_HANDOFF",
+        "status": "passed"
+      },
+      {
+        "detail": "Every promoted stage has an independent reviewer report.",
+        "evidence": [
+          "anomaly_*",
+          "decision_log.jsonl"
+        ],
+        "requirement": "WP6_STAGE_REVIEWS",
+        "status": "passed"
+      },
+      {
+        "detail": "Decision source and stage are recorded; exact prompts/schema/results are retained.",
+        "evidence": [
+          "decision_log.jsonl",
+          "blobs/reasoning/"
+        ],
+        "requirement": "WP6_DECISION_PROVENANCE",
+        "status": "passed"
+      },
+      {
+        "detail": "Requires passing tests and measured fault injection for this exact source tree.",
+        "evidence": [],
+        "requirement": "WP6_FAULT_DETECTION_GE_90_PERCENT",
+        "status": "pending"
+      },
+      {
+        "detail": "A transcript alone is not proof that retraining reproduces predictions and metrics.",
+        "evidence": [],
+        "requirement": "WP5_FULL_RUN_REPLAY",
+        "status": "pending"
+      },
+      {
+        "detail": "completed_with_warning",
+        "evidence": [
+          "dossier.json"
+        ],
+        "requirement": "WP5_END_TO_END",
+        "status": "passed"
+      },
+      {
+        "detail": "Every unresolved reviewer issue requires an explicit approved mitigation.",
+        "evidence": [
+          "anomaly_*"
+        ],
+        "requirement": "WP6_APPROVED_RISK_MITIGATIONS",
+        "status": "failed"
+      },
+      {
+        "detail": "Requires named independent demonstrator/reviewer, bound predictions and checksummed environment evidence.",
+        "evidence": [],
+        "requirement": "TRL7_INDEPENDENT_DEMONSTRATION_AND_SIGNOFF",
+        "status": "pending"
+      }
+    ],
+    "independent_signoff": null,
+    "kpis": {
+      "cited_idea_fraction": 1.0,
+      "decision_provenance_fraction": 1.0,
+      "decisions_logged": 18,
+      "fault_detection_rate": null,
+      "live_source_fraction": 1.0,
+      "reasoning_snapshots": 18,
+      "unresolved_citation_issues": 0,
+      "unresolved_reviewer_issues": [
+        "Extension gate contains 'hflip_pathology_safe' as pending_review; hflip is a built-in primitive and does not require extension approval. Clarify whether this is a distinct variant or a redundant entry.",
+        "Extension gate entry 'hflip_pathology_safe' (pending_review) is redundant if it refers to the built-in hflip primitive; clarify whether it is a distinct variant.",
+        "Extension gate entry 'hflip_pathology_safe' (pending_review) is redundant; hflip is a built-in primitive and does not require extension approval. Clarify or remove.",
+        "Prior-art brief cites 82,763 as standard PathMNIST train split; verified data confirms 89,996. The 82,763 figure is an unsupported external-memory claim and should be corrected in the brief text.",
+        "Prior-art brief cites 82,763 as standard PathMNIST train split; verified data confirms 89,996. Unsupported external-memory claim must be corrected.",
+        "Prior-art brief cites 82,763 as standard PathMNIST train split; verified data confirms 89,996. Unsupported external-memory claim should be corrected.",
+        "Suggested ±10-degree random rotation is not a built-in augmentation primitive; if implemented, it requires a new extension proposal and approval.",
+        "Test set (CRC-VAL-HE-7K) originates from a different clinical center; OOD generalization should be monitored during evaluation.",
+        "Test set (CRC-VAL-HE-7K) originates from a different clinical center; OOD generalization should be monitored during evaluation. OOD aggregate is the arithmetic mean of per-severity AUROCs, not a pooled-sample AUROC.",
+        "Training sample count cited as ~90K in multiple locations; standard PathMNIST MedMNIST v2 training split is 82,763 images (~83K). Recommend correcting to avoid inflating data-efficiency arguments.",
+        "Transformer head-count range (4-6) with hidden-dim range (128-256) includes non-divisible combinations (e.g., 256/6); implementer must select head counts that evenly divide the hidden dimension.",
+        "augmentation_regularization evidence quote addresses unlearning quality, not classification regularization; inference to hflip regularization is not directly supported by the cited passage.",
+        "augmentation_regularization evidence quote addresses unlearning quality, not classification regularization; the inference to hflip regularization is an extrapolation not directly supported by the cited passage.",
+        "augmentation_regularization idea's evidence quote (arxiv_2508_18509v1) addresses augmentation's effect on unlearning quality, not classification regularization; the inference to PathMNIST hflip regularization is reasonable but not directly supported by the cited text.",
+        "compact_conv_token_transformer description field is truncated in the prior-art brief; restore for downstream readability.",
+        "compact_conv_token_transformer proposal description is truncated at '3...'; implementation_requirements are complete but the description field should be restored for downstream readability.",
+        "llm_model_digest is null for ollama/qwen3.8; exact model weights are not pinned for full reproducibility verification."
+      ]
+    },
+    "schema_version": "1.0",
+    "technical_complete": true,
+    "trl7_evidence_complete": false
+  },
+  "payload_sha256": "6eb2175fb0d3204297553bebbad7c5866b556c8757afff74c5d276f223f023f2",
+  "producer": "acceptance",
+  "run_id": "seed_72",
+  "sequence": 48,
+  "version": 2
+}

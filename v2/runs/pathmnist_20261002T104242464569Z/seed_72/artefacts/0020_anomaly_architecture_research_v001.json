@@ -1,0 +1,30 @@
+{
+  "artefact": "anomaly_architecture_research",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T11:49:30.904683+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "Architecture research is structurally sound and well-calibrated for the 28×28×3 PathMNIST task. No deterministic findings. Key strengths: (1) Architecture priorities (tiny_cnn, compact_transformer, residual_cnn, resnet18, vision_transformer) are appropriate for the dataset scale; resnet18 is correctly scoped as an upper-bound capacity check only, consistent with its fixed topology. (2) The convolutional tokenizer math is correct: 7×7 stride-7 on 28×28 yields 4×4=16 tokens; 14×14 stride-14 yields 2×2=4 tokens. (3) Parameter budgets (0.5–4M for primary candidates, ~11M for resnet18) are reasonable for ~90K samples across 9 classes. (4) Channel-wise normalization using the verified train statistics (mean [0.741, 0.533, 0.706], std [0.124, 0.177, 0.124]) correctly preserves the higher-variance green channel. (5) Risk identification is thorough, covering overfitting, class imbalance, spatial resolution loss, transformer training instability, and calibration. (6) Hflip is correctly identified as the primary spatial regularizer and is a built-in primitive requiring no extension approval.\n\nWarnings carried from prior stages (data_audit, preprocessing) that should be corrected before downstream stages but do not invalidate this architecture research: (a) The prior-art brief cites 82,763 as the standard PathMNIST train split; verified data confirms 89,996. This is an unsupported external-memory claim and must be corrected in the brief text. (b) The compact_conv_token_transformer description field is truncated in the prior-art brief; restore for downstream readability. (c) The augmentation_regularization evidence quote addresses unlearning quality, not classification regularization; the inference to hflip regularization is an extrapolation not directly supported by the cited passage. (d) llm_model_digest is null for ollama/qwen3.8; exact model weights are not pinned for full reproducibility. (e) The extension gate entry 'hflip_pathology_safe' (pending_review) is redundant since hflip is a built-in primitive; clarify or remove.\n\nMinor observations on this stage: (1) The suggestion of 'mild random rotation (±10 degrees)' as a secondary augmentation is not among the built-in primitives (which include rotate90 and rotate180 but not arbitrary-angle rotation). If this is to be implemented, it would require a new extension proposal and approval; as written it is listed as optional ('consider'), so this is not blocking. (2) The transformer parametrization range '4-6 attention heads' with 'hidden dim 128-256' includes combinations where the hidden dimension is not evenly divisible by the head count (e.g., 256/6≈42.7); the implementer should select head counts that divide the hidden dimension cleanly (e.g., 4 or 8 heads). (3) The OOD test set (CRC-VAL-HE-7K, different clinical center) should be monitored during evaluation as flagged in prior stages; the OOD aggregate is the arithmetic mean of per-severity AUROCs, not a pooled-sample AUROC.\n\nNo deterministic findings justify a stop. The architecture research is fit to proceed to implementation planning.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Prior-art brief cites 82,763 as standard PathMNIST train split; verified data confirms 89,996. Unsupported external-memory claim must be corrected.",
+      "compact_conv_token_transformer description field is truncated in the prior-art brief; restore for downstream readability.",
+      "augmentation_regularization evidence quote addresses unlearning quality, not classification regularization; inference to hflip regularization is not directly supported by the cited passage.",
+      "llm_model_digest is null for ollama/qwen3.8; exact model weights are not pinned for full reproducibility verification.",
+      "Extension gate entry 'hflip_pathology_safe' (pending_review) is redundant; hflip is a built-in primitive and does not require extension approval. Clarify or remove.",
+      "Suggested ±10-degree random rotation is not a built-in augmentation primitive; if implemented, it requires a new extension proposal and approval.",
+      "Transformer head-count range (4-6) with hidden-dim range (128-256) includes non-divisible combinations (e.g., 256/6); implementer must select head counts that evenly divide the hidden dimension.",
+      "Test set (CRC-VAL-HE-7K) originates from a different clinical center; OOD generalization should be monitored during evaluation. OOD aggregate is the arithmetic mean of per-severity AUROCs, not a pooled-sample AUROC."
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "architecture_research"
+  },
+  "payload_sha256": "dec679dde67e4b1397771140e287f43289043e6f35ff6e26e48f29a482760be3",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 20,
+  "version": 1
+}

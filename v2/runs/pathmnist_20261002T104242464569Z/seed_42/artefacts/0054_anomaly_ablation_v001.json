@@ -1,0 +1,25 @@
+{
+  "artefact": "anomaly_ablation",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T11:21:03.099262+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Ablation stage is internally consistent and well-structured. Verification summary:\n\n1. **Split & seed consistency**: common_split_fingerprint 9afc9ed3…c7505 matches baseline, comparison, and best-configuration records. All three scenarios use seed 42. ✓\n\n2. **Artifact integrity**: Each scenario has a unique checkpoint_path, checkpoint_sha256, lightning_csv_path, and training_log_path. No collisions or missing references. ✓\n\n3. **Ablation logic**: The three scenarios form a clean incremental decomposition — (a) unit-norm / no-aug → (b) standardize / no-aug → (c) standardize / hflip. Each step adds exactly one component, and accuracy and macro-F1 monotonically increase (0.8848 → 0.8875 → 0.8908; 0.8509 → 0.8554 → 0.8711), confirming both normalization and hflip contribute positively. ✓\n\n4. **Deterministic findings**: Empty array; no automated checks flagged violations. ✓\n\n5. **Schema**: schema_version 1.0, consistent with all other artefacts. ✓\n\nMinor observations (non-blocking):\n\n- **rotate180 not isolated**: The best configuration uses [hflip, rotate180], but the ablation only tests hflip. The marginal contribution of rotate180 is therefore not decomposed. This is a design-scope choice, not a protocol violation, but downstream readers should not infer that the full augmentation stack's effect is fully captured by the ablation.\n\n- **Ablation accuracies vs. agentic accuracy**: All three ablation scenarios (0.8848–0.8908) exceed the reported agentic test accuracy of 0.88273. This is plausibly explained by the full best-config training using additional regularizers (dropout 0.15, label_smoothing 0.1, class_weighting) that trade a small amount of test accuracy for better generalization, or by different epoch/early-stopping settings in the ablation runs. Without the ablation-specific training configs (in omitted artefacts) this cannot be confirmed or refuted, so it is noted as an observation rather than a finding.\n\n- **No 'full' ablation scenario**: There is no scenario matching the exact best configuration (standardize + hflip + rotate180 + full training hyperparameters). Adding one would close the decomposition loop, but its absence does not invalidate the existing three-scenario ablation.\n\nNo deterministic findings, no protocol violations, and the ablation provides a valid and interpretable decomposition of the representation components. Stage passes.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "rotate180 (present in best config) is not isolated in the ablation; its marginal contribution is unquantified.",
+      "Ablation scenario accuracies (0.8848–0.8908) all exceed the reported agentic test accuracy (0.88273); likely due to different training regularizers but not verifiable without the ablation-specific training configs (omitted artefacts).",
+      "No 'full-configuration' ablation scenario exists to close the decomposition loop against the exact best-config hyperparameters."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "ablation"
+  },
+  "payload_sha256": "cf7c6410bbd180dbae95aaa17b67c23d48d5e95e7eca10a91513bbacb885e077",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 54,
+  "version": 1
+}

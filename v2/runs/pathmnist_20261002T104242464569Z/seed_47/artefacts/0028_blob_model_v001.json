@@ -1,0 +1,20 @@
+{
+  "artefact": "blob_model",
+  "artefact_type": "BlobReference",
+  "created_at": "2026-10-02T11:32:27.467841+00:00",
+  "payload": {
+    "kind": "model",
+    "metadata": {
+      "device": "cuda",
+      "loader": "PathMNISTLitModule"
+    },
+    "path": "blobs/agentic_model_v001.ckpt",
+    "schema_version": "1.0",
+    "sha256": "953d2f479654c62109550a5177a561c230573ee377165716d4da4deecaad878e"
+  },
+  "payload_sha256": "8a47535566186dbd4c91ccf702b83d282d38d55f5430c608b9932dafc54f522a",
+  "producer": "training",
+  "run_id": "seed_47",
+  "sequence": 28,
+  "version": 1
+}

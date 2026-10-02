@@ -1,0 +1,28 @@
+{
+  "artefact": "anomaly_abstention",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T11:57:27.431506+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Abstention stage is internally consistent and free of deterministic findings. Verification summary:\n\n1. **OOD aggregate correctness**: The selected score is predictive_entropy (matching the abstention method). Arithmetic mean of test AUROCs across three severities: (0.991119 + 0.994331 + 0.983574) / 3 = 0.989675, matching the reported ood_auroc exactly. Validation mean: (0.999648 + 0.999857 + 0.999503) / 3 = 0.999669, matching ood_validation_auroc. OOD pass is justified.\n\n2. **Selective prediction consistency**: abstain_rate 0.378691 = 1 − test_coverage 0.621309. Human review count 2719 = 7180 × 0.378691 (rounded). Threshold 0.73839679 was calibrated on validation to hit target_validation_coverage 0.8 (achieved: 0.80008). Selective risk 0.042143 matches the test_risk at the 0.8 coverage row. Accuracy on covered (0.957857) exceeds base test accuracy (0.883426), as expected.\n\n3. **Training/evaluation cross-checks**: base_test_accuracy in the abstention report equals evaluation_report.accuracy (0.883426). n_samples 7180 matches prediction_artifact.test_samples. best_val_accuracy 0.996401 at epoch 14 is consistent with the training history. Data audit passed with zero overlap.\n\n4. **Configuration**: ResNet18 with hidden=48 sets base channel width; depth is inert per fixed-topology rule. Transformer fields are present but inactive for the CNN family. Built-in augmentations (hflip, rotate180, etc.) require no extension approval; the empty approved_extensions list is correct.\n\n5. **Non-blocking observations carried from prior stages** (documentation/recommendation only, no deterministic impact): (a) prior-art brief train-split count discrepancy (82,763 vs. verified 89,996); (b) llm_model_digest null for ollama/qwen3.8 limits full weight-level reproducibility; (c) best_configuration.validation_accuracy (0.994002) vs. train_result.best_val_accuracy (0.996401) reflects selection-trial vs. full-run variance; (d) redundant 'hflip_pathology_safe' extension-gate entry; (e) truncated compact_conv_token_transformer description; (f) class 7 recall 0.501 and class 5 precision 0.572 are the primary per-class weaknesses and should be highlighted in downstream summaries.\n\n6. **Coverage gap note**: test_coverage (0.621) is notably below validation_coverage (0.800) at the same threshold, indicating the test distribution is harder to cover. This is a distributional observation, not an error, but warrants monitoring if the abstention policy is deployed.\n\nNo deterministic findings. All arithmetic, cross-artifact references, and schema versions are consistent. Proceeding.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Prior-art brief cites 82,763 as PathMNIST train split; verified data confirms 89,996 (documentation correction, non-blocking).",
+      "llm_model_digest is null for ollama/qwen3.8; exact model weights not pinned, limiting full reproducibility verification.",
+      "best_configuration.validation_accuracy (0.994002) differs from train_result.best_val_accuracy (0.996401); consistent with selection-trial vs full-run variance but should be annotated.",
+      "Extension-gate entry 'hflip_pathology_safe' (pending_review) is redundant since hflip is a built-in augmentation primitive; recommend removing or clarifying.",
+      "Class 7 (cancer-associated stroma) recall 0.501 and class 5 (smooth muscle) precision 0.572 are primary per-class weaknesses; flag in downstream summaries.",
+      "Test coverage (0.621) is substantially below validation coverage (0.800) at the same threshold, indicating a distributional gap that should be monitored in deployment contexts."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "abstention"
+  },
+  "payload_sha256": "f6254dc5ba23133d9a626ab2c59d32db43dcd1d8acb086f263602856897c3d44",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 36,
+  "version": 1
+}

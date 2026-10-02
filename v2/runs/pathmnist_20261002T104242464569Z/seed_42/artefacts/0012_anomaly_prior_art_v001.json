@@ -1,0 +1,25 @@
+{
+  "artefact": "anomaly_prior_art",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T10:45:01.573131+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Prior-art brief is internally consistent and well-traced. All seven ideas cite verifiable evidence quotes from their respective arXiv sources, and the two proposals (hflip_pathology_safe, compact_conv_token_transformer) are properly scoped as hypotheses/specifications appropriate for the prior_art stage. Specific checks: (1) The 28×28×3 input shape, 9-class output, and ~90K training sample size are consistent with the MedMNIST v2 source (arxiv_2110_14795v2). (2) The convolutional tokenizer arithmetic in the compact transformer proposal is correct: 28→14→7 spatial, yielding 49 tokens of dim 64; 4 heads × 16 dim = 64 embedding dim; FFN 128 = 2×64. (3) The hflip proposal uses a built-in augmentation primitive and does not require extension approval per pipeline rules. (4) The calibration and framework-comparison ideas correctly reference PathMNIST-specific findings from their sources. Minor observations (non-blocking): (a) The hflip label_preservation_rationale includes anatomical reasoning about apical-basal polarity and tissue orientation; while this is in service of justifying augmentation safety rather than making a clinical diagnosis, it is worth flagging that the claim 'tissue sections do not have a strict left-right asymmetry' is a generalization that may not hold for every histological pattern and should be treated as a hypothesis to validate empirically rather than a settled fact. (b) The CCT idea references a 1–4M parameter budget while the compact transformer proposal caps at 3M; this is a conservative tightening and not a contradiction, but the discrepancy should be noted for downstream consistency. (c) The proposal description text appears truncated in the evidence (e.g., '3…', 'c…'); this is likely a serialization artifact and does not affect the implementation_requirements list, which is complete. No deterministic findings are present. test_metrics_used=false is appropriate for this stage. All source snapshots carry SHA-256 hashes and retrieval timestamps consistent with the current UTC. No action required beyond proceeding to the next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "hflip label_preservation_rationale contains a generalized anatomical claim (no left-right asymmetry in tissue) that should be treated as a hypothesis to validate empirically rather than a settled fact",
+      "Parameter budget stated as 1-4M in the CCT idea vs. hard cap of 3M in the compact transformer proposal; not contradictory but should be reconciled in downstream specs",
+      "Proposal description text appears truncated in the serialized evidence (e.g., '3…', 'c…'); implementation_requirements list is complete so this is likely a serialization artifact only"
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "prior_art"
+  },
+  "payload_sha256": "254e716e8c6d069200eb8300089692cced0b0d62cf0144aad7777ee34b48a30f",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 12,
+  "version": 1
+}

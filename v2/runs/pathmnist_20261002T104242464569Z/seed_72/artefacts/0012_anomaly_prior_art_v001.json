@@ -1,0 +1,25 @@
+{
+  "artefact": "anomaly_prior_art",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T11:46:58.509085+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "The prior art brief is well-structured with six properly cited arXiv sources, seven hypotheses, and two proposals. All evidence quotes are traceable to their respective sources, and the 28x28x3 RGB PathMNIST specification is consistently applied. No deterministic findings were raised.\n\nMinor issues noted:\n\n1. Training sample count: Multiple ideas and the compact_conv_token_transformer proposal reference '~90K training samples.' The standard MedMNIST v2 PathMNIST training split contains 82,763 images. The ~90K figure is a ~9% overestimate. While this does not invalidate the architectural reasoning, it slightly inflates the data-efficiency argument and could affect parameter-budget decisions (e.g., the 3M cap rationale). Recommend correcting to ~83K or citing the exact split size.\n\n2. Truncated proposal description: The compact_conv_token_transformer description field is cut off at '3...' (presumably '3 transformer layers'). The implementation_requirements array is complete and unambiguous, so this is a cosmetic formatting issue, but the description should be restored for downstream readability.\n\n3. Tangential evidence link (augmentation_regularization): The cited quote from arxiv_2508_18509v1 discusses augmentation's impact on *unlearning quality*, not on classification regularization per se. The inference to hflip as a general regularizer for PathMNIST is reasonable and consistent with standard practice, but the evidence quote does not directly support the specific claim. Per the traceability principle, the quote establishes provenance but the scientific inference (hflip doubles effective training signal for 7.8K–12.9K per-class samples) rests on general ML knowledge rather than the cited source. This is acceptable for a hypothesis but should be flagged if the idea is later promoted to a validated claim.\n\n4. The hflip_pathology_safe proposal correctly identifies hflip as a built-in augmentation primitive requiring no extension approval. The label-preservation rationale (morphological invariance under left-right mirroring) is domain-reasonable and consistent with standard histopathology practice. No issues.\n\n5. The compact_conv_token_transformer architecture spec is internally consistent: 28→14→7 spatial reduction yields 49 tokens of dim 64; 4 heads × 16 dim = 64 embedding; FFN 128 = 2×64; 9-class output. Parameter budget ≤3M is plausible for this configuration. The proposal is correctly marked non-executable for the prior-art stage.\n\nAll sources have valid snapshot paths and SHA-256 hashes. Retrieval mode is 'cache' with no errors. The brief is ready to proceed to the next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Training sample count cited as ~90K in multiple locations; standard PathMNIST MedMNIST v2 training split is 82,763 images (~83K). Recommend correcting to avoid inflating data-efficiency arguments.",
+      "compact_conv_token_transformer proposal description is truncated at '3...'; implementation_requirements are complete but the description field should be restored for downstream readability.",
+      "augmentation_regularization idea's evidence quote (arxiv_2508_18509v1) addresses augmentation's effect on unlearning quality, not classification regularization; the inference to PathMNIST hflip regularization is reasonable but not directly supported by the cited text."
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "prior_art"
+  },
+  "payload_sha256": "e6fb5310d9c70fb18b4034865cd07c157a5a506a083282b20f7e0668f3627828",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 12,
+  "version": 1
+}

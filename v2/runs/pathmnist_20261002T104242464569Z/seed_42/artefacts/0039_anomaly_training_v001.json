@@ -1,0 +1,21 @@
+{
+  "artefact": "anomaly_training",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T11:09:30.152445+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Training stage is internally consistent and well-executed. Key verifications:\n\n1. **ResNet18 topology**: hidden=48 (base width) with depth=3 correctly inactive per fixed two-residual-blocks-per-stage topology. Transformer fields (num_heads, mlp_ratio, patch_size, pooling, positional_encoding, tokenizer_layers) are present but inert for this CNN family — no hybrid concern.\n\n2. **Augmentations**: hflip and rotate180 are built-in primitives; no extension approval required.\n\n3. **Search plan compliance**: 8/8 trials completed, 0 failures, 3 rounds with budgets [3,6,9], final 15 epochs, test locked (test_metrics_used=false). Selection rule (highest budget → accuracy within 0.005 tolerance → macro-F1) correctly applied: resnet18_wide_cw (0.994002) vs conservative (0.991104), delta 0.0029 < 0.005.\n\n4. **Training dynamics**: Cosine LR schedule from 3e-4 to 0 over 15 epochs is correct. Val accuracy rises from 0.9508 to 0.9946 with minor non-monotonic dips (epochs 4, 8, 14) consistent with stochastic optimization. Train loss decreases monotonically (0.734→0.497). No overfitting signal — val accuracy still improving at epoch 15. Early stopping patience=3 was not triggered, consistent with the history.\n\n5. **Config consistency**: Final train_config matches the selected candidate's search-trial config (hidden=48, lr=3e-4, batch=128, adamw, cosine, seed=42). Checkpoint and config SHA-256 hashes are present for traceability.\n\n6. **No deterministic findings** raised. No unsupported external claims detected. All metrics are validation-only; test set remains locked.\n\nProceed to the next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "training"
+  },
+  "payload_sha256": "302d922d0b4012d752d7e1ecea1e6f68b9c8fcfe2ffe06db50b65f5a20e68c06",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 39,
+  "version": 1
+}

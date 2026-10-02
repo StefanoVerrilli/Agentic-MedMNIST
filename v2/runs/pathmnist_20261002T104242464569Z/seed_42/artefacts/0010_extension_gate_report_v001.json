@@ -1,0 +1,32 @@
+{
+  "artefact": "extension_gate_report",
+  "artefact_type": "ExtensionGateReport",
+  "created_at": "2026-10-02T10:44:31.469074+00:00",
+  "payload": {
+    "approvals_sha256": null,
+    "entries": [
+      {
+        "proposal_id": "hflip_pathology_safe",
+        "reason": "A hash-bound independent review is required.",
+        "registry_name": null,
+        "reviewer": null,
+        "spec_sha256": "08f37296d5c251af50d370af91c39564b2691686b92fa8af4329227a2e014b8b",
+        "status": "pending_review"
+      },
+      {
+        "proposal_id": "compact_conv_token_transformer",
+        "reason": "A hash-bound independent review is required.",
+        "registry_name": null,
+        "reviewer": null,
+        "spec_sha256": "7a9db7f9567d5826d28f0a76a1e5df74e74a394d9570a0f9baa3aa37b9a88be6",
+        "status": "pending_review"
+      }
+    ],
+    "schema_version": "1.0"
+  },
+  "payload_sha256": "5049e664f80c92184a155377c026b8cfb2dd848ce252b3b10d6913c828ee0444",
+  "producer": "prior_art",
+  "run_id": "seed_42",
+  "sequence": 10,
+  "version": 1
+}

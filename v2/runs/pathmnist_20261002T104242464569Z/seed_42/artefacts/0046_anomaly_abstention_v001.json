@@ -1,0 +1,24 @@
+{
+  "artefact": "anomaly_abstention",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T11:10:36.683317+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "The abstention stage is internally consistent and protocol-compliant. No deterministic findings were raised. Key verifications:\n\n1. **Abstain-rate / human-review consistency**: abstain_rate 0.392061 × 7180 test samples ≈ 2815, matching human_review_count exactly. The queue purpose is 'benchmark_review' on the test split, appropriate for this pipeline.\n\n2. **Selective-risk arithmetic**: 1 − accuracy_on_covered (0.954639) = 0.045361 = selective_risk. Consistent.\n\n3. **Calibration discipline**: threshold (0.88993478) was calibrated on validation (calibrated_on='validation'); test metrics are used only for reporting. No test-metric leakage into the abstention threshold.\n\n4. **OOD aggregate verification**: The OOD AUROC is the arithmetic mean of the selected score (max_softmax) test AUROCs across the three corruption severities: (0.882472 + 0.949488 + 0.935087) / 3 = 0.922349, matching the reported ood_auroc. Validation mean: (0.988066 + 0.997323 + 0.996342) / 3 ≈ 0.99391, matching ood_validation_auroc. ood_pass=true is supported.\n\n5. **OOD scope honesty**: ood_scope is explicitly 'controlled_corruption_proxy' with a single corruption family (unit-scale Gaussian noise at σ = 0.15, 0.25, 0.4). This is a limited robustness check, not a full OOD evaluation, and the labeling is transparent.\n\n6. **Risk-coverage curve**: Five target validation coverage levels (0.5–0.9) are reported with corresponding test coverage, risk, and thresholds. The curve is monotonically consistent (higher coverage → higher risk), as expected.\n\n7. **Prediction artifact**: Contains logits, probabilities, and targets for both test (7180) and validation (10004) samples, with SHA-256 for integrity. Sufficient for downstream selective-prediction analysis.\n\n**Observation (not a defect)**: The validation-to-test coverage gap is notable — the threshold calibrated to achieve 80.0% coverage on validation yields only 60.8% coverage on test (abstain rate 39.2% vs. the implied 20% on validation). This is a natural consequence of the val-test distribution shift already flagged in the evaluation stage (val accuracy 0.9946 vs. test 0.8827). It does not constitute a protocol violation; the system correctly calibrated on validation and reported test performance. However, in a deployment context the effective abstention rate would be roughly double the validation expectation, which should be communicated to downstream consumers.\n\nNo issues require revision or halt. The stage is complete and consistent.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Val-test coverage gap: threshold calibrated for 80% validation coverage achieves only 60.8% test coverage (abstain rate 39.2% vs. expected ~20%), a direct consequence of the val-test distribution shift noted in the evaluation stage. Not a protocol violation but should be surfaced to downstream users of the abstention mechanism.",
+      "OOD evaluation is limited to a single corruption family (unit-scale Gaussian noise at three severities). The 'controlled_corruption_proxy' label is honest, but the ood_pass=true flag should not be interpreted as broad OOD robustness."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "abstention"
+  },
+  "payload_sha256": "627113e444d21c4384f1d39e6aa871f92f814c53b67b41b76dbe07f9fb0b38d6",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 46,
+  "version": 1
+}

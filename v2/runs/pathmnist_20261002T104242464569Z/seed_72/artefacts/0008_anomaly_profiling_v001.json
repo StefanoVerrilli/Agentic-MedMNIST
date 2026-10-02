@@ -1,0 +1,24 @@
+{
+  "artefact": "anomaly_profiling",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T11:45:35.111594+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Profiling stage is clean and well-documented. PathMNIST (9-class, 28×28 RGB, standard MedMNIST distribution) is correctly loaded with full official splits (train=89996, val=10004, test=7180), no subsampling, and archive integrity verified via MD5/SHA256. Data profile confirms: zero blank images, zero duplicate train samples, modest class imbalance (ratio 1.63), and near-identical class proportions between train and validation (max absolute deviation < 0.0001), indicating no split-level distribution shift. Channel statistics (R≈0.74, G≈0.53, B≈0.71; stds 0.12–0.18) are consistent with H&E-stained histology patches. The eight identified ambiguity risks (e.g., background/debris/mucus overlap, adipose vs. background, smooth muscle vs. stroma) are inherent to 28×28 resolution and the histology domain; they are appropriately documented and do not constitute a data-quality defect. The test-domain note (CRC-VAL-HE-7K, different clinical center) is correctly flagged for OOD evaluation awareness. The only open item is the null llm_model_digest for ollama/qwen3.8, which is a reproducibility-verification gap (warning-level, non-blocking) already noted at ingestion. No deterministic findings are present. All evidence supports proceeding to the next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "llm_model_digest is null for ollama/qwen3.8; exact model weights are not pinned, limiting full reproducibility verification (warning, non-blocking).",
+      "Test set originates from a different clinical center (CRC-VAL-HE-7K); OOD generalization should be monitored during evaluation, but this is a documented domain characteristic, not a defect."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "profiling"
+  },
+  "payload_sha256": "4ebe90b14835438f185642edddfb62cac2534952b84d92b3422de0a0daae60d0",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 8,
+  "version": 1
+}

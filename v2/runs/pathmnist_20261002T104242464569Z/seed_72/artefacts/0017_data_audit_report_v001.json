@@ -1,0 +1,30 @@
+{
+  "artefact": "data_audit_report",
+  "artefact_type": "DataAuditReport",
+  "created_at": "2026-10-02T11:47:55.931879+00:00",
+  "payload": {
+    "checks": {
+      "official_split": true,
+      "train_indices": true,
+      "train_labels": true,
+      "train_only_statistics": true,
+      "train_pixels": true,
+      "train_shape": true,
+      "train_validation_disjoint_images": true,
+      "val_indices": true,
+      "val_labels": true,
+      "val_pixels": true,
+      "val_shape": true
+    },
+    "issues": [],
+    "passed": true,
+    "schema_version": "1.0",
+    "test_inspected": false,
+    "train_validation_overlap": 0
+  },
+  "payload_sha256": "dabe03193a815ad12968be0b79bbd210e487dbc0b32f2ecbb7af3915dfbc50e6",
+  "producer": "data_audit",
+  "run_id": "seed_72",
+  "sequence": 17,
+  "version": 1
+}

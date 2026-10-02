@@ -1,0 +1,27 @@
+{
+  "artefact": "anomaly_abstention",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T11:34:02.862109+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "The abstention stage is internally consistent with no deterministic findings. Verification summary:\n\n(1) OOD aggregate correctness: ood_auroc = 0.776469 equals the arithmetic mean of the selected score (max_softmax) AUROCs across the three corruption severities: (0.91225 + 0.859081 + 0.558075)/3 = 0.776469. The ood_validation_auroc = 0.846789 similarly equals (0.983162 + 0.967768 + 0.589439)/3 = 0.846790. Both are correctly computed per the arithmetic-mean rule.\n\n(2) Risk-coverage coherence: The selective_risk (0.043689) matches the test_risk at the target_validation_coverage = 0.8 row. The threshold (0.89294279) was calibrated on validation (calibrated_on: \"validation\"), which is appropriate. The human_review_count (2442) is consistent with abstain_rate × test_samples: 0.340111 × 7180 ≈ 2442.\n\n(3) Selective-prediction benefit: accuracy_on_covered (0.956311) exceeds base_test_accuracy (0.905571) by ~5 pp, confirming the abstention mechanism is functioning as intended.\n\n(4) OOD scope is explicitly labeled \"controlled_corruption_proxy\" with unit-scale Gaussian noise at three severities (σ = 0.15, 0.25, 0.4). The degradation at σ = 0.4 (max_softmax AUROC ≈ 0.558, predictive_entropy ≈ 0.492) is expected for high-severity corruption and does not indicate a pipeline defect.\n\n(5) Train config is consistent with ResNet18 fixed topology: hidden=48 sets base width; depth=3 is inert; generic transformer fields (mlp_ratio, num_heads, patch_size, pooling, positional_encoding, tokenizer_layers) are inactive for this CNN family. No topology violation.\n\nAdvisory observations (non-blocking):\n- Test coverage (0.6599) is ~14 pp below the target validation coverage (0.8001), indicating the abstention threshold generalizes conservatively. This is a generalization gap, not a pipeline error, but downstream consumers should be aware that the effective abstain rate on unseen data will be higher than the validation-calibrated rate.\n- Per-class weaknesses in cancer-associated stroma (recall 0.546, F1 0.659) and smooth muscle (F1 0.735) may interact with abstention behavior; these classes may be over-represented in the human-review queue.\n- The ~7 pp gap between ood_validation_auroc (0.847) and ood_auroc (0.776) is consistent with the validation-to-test generalization pattern seen elsewhere in the pipeline.\n- Prior-art quotes flagged in upstream stages (ghostnet_vgg_robustness, temp_scaling_calibration) remain unverified against full sources; this does not affect the abstention stage but should be resolved before any design decisions are encoded from those citations.\n\nNo deterministic findings exist. The stage is ready to proceed.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Advisory: Test coverage (0.6599) is ~14 pp below target validation coverage (0.8001); the abstention threshold generalizes conservatively, so effective abstain rate on new data will exceed the validation-calibrated rate.",
+      "Advisory: OOD AUROC at σ=0.4 drops to 0.558 (max_softmax) and 0.492 (predictive_entropy), near or below chance; the corruption proxy has limited discriminative power at high severity.",
+      "Advisory: Per-class weaknesses (cancer-associated stroma recall 0.546; smooth muscle F1 0.735) may cause disproportionate abstention on these classes; consider stratified abstention analysis in downstream stages.",
+      "Advisory: Prior-art quotes for ghostnet_vgg_robustness and temp_scaling_calibration extend beyond truncated source text; verify against full papers before encoding further design decisions.",
+      "Advisory: llm_model_digest is null for qwen3.8; exact LLM weights not pinned in run manifest (auxiliary, non-blocking)."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "abstention"
+  },
+  "payload_sha256": "8308dd6873afbe83ffd361a0c923722f37e531df1e81e2a1be00f971118dd95a",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 36,
+  "version": 1
+}

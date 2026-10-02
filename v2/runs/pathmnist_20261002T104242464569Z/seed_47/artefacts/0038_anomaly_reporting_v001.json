@@ -1,0 +1,28 @@
+{
+  "artefact": "anomaly_reporting",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T11:34:31.320985+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Reporting stage is internally consistent and complete. All cross-artefact references verified:\n\n(1) Accuracy consistency: base_test_accuracy (0.905571) in the abstention report matches evaluation_report.accuracy (0.905571). Confusion-matrix diagonal sum (6502) / n_samples (7180) = 0.905571, confirming the reported figure.\n\n(2) OOD aggregate correctness: ood_auroc = 0.776469 = (0.91225 + 0.859081 + 0.558075)/3 (arithmetic mean of max_softmax AUROCs across three severities). ood_validation_auroc = 0.846789 = (0.983162 + 0.967768 + 0.589439)/3. Both computed per the required protocol (mean of per-severity AUROCs, not pooled-sample AUROC).\n\n(3) Sample counts: prediction_artifact.test_samples (7180) = evaluation_report.n_samples (7180). human_review_queue.count (2442) = abstention_report.human_review_count (2442). Confusion-matrix row sums match per-class support values exactly.\n\n(4) Selective risk: selective_risk (0.043689) equals test_risk at target_validation_coverage 0.8 in the risk_coverage_curve. Threshold (0.89294279) is consistent across both fields.\n\n(5) Data integrity: data_audit_report passed all checks; train/validation overlap = 0; test_inspected = false. No leakage indicators.\n\n(6) All four anomaly reviews (training, evaluation, configuration_replay, abstention) returned action=continue, severity=ok, deterministic_issues=[]. No deterministic findings at the reporting stage either.\n\nAdvisory items carried forward (non-blocking, no action required at this stage):\n- Test coverage (0.6599) is ~14 pp below target validation coverage (0.8001); the abstention threshold generalizes conservatively, so effective abstain rate on unseen data will exceed the validation-calibrated 0.34.\n- OOD AUROC at σ=0.4 drops to 0.558 (max_softmax) / 0.492 (predictive_entropy), near or below chance; the corruption proxy has limited discriminative power at high severity. The ood_scope label 'controlled_corruption_proxy' appropriately scopes this.\n- Per-class weaknesses: cancer-associated stroma (recall 0.546, F1 0.659) and smooth muscle (F1 0.735) are the weakest classes and may drive disproportionate abstention.\n- ~9 pp gap between best validation accuracy (0.995) and test accuracy (0.906) is noted for downstream interpretation.\n- Prior-art quotes (ghostnet_vgg_robustness, temp_scaling_calibration) extend beyond truncated source text; verify against full papers before encoding further design decisions.\n- llm_model_digest is null for qwen3.8; exact LLM weights not pinned (auxiliary, non-blocking).\n\nNo deterministic findings. No schema violations. All artefact SHA-256 hashes are present. The dossier is complete through the abstention stage with 37 artefact versions and 83 decision events. Reporting is consistent and ready for final sign-off.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Advisory: Test coverage (0.6599) is ~14 pp below target validation coverage (0.8001); abstention threshold generalizes conservatively, so effective abstain rate on new data will exceed the validation-calibrated 0.34.",
+      "Advisory: OOD AUROC at σ=0.4 drops to 0.558 (max_softmax) and 0.492 (predictive_entropy), near or below chance; the corruption proxy has limited discriminative power at high severity.",
+      "Advisory: Per-class weaknesses (cancer-associated stroma recall 0.546, F1 0.659; smooth muscle F1 0.735) may cause disproportionate abstention on these classes; consider stratified abstention analysis in downstream stages.",
+      "Advisory: ~9 pp gap between best validation accuracy (0.995) and test accuracy (0.906) warrants downstream interpretation but is not a pipeline defect.",
+      "Advisory: Prior-art quotes for ghostnet_vgg_robustness and temp_scaling_calibration extend beyond truncated source text; verify against full papers before encoding further design decisions.",
+      "Advisory: llm_model_digest is null for qwen3.8; exact LLM weights not pinned in run manifest (auxiliary, non-blocking)."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "reporting"
+  },
+  "payload_sha256": "93d1e247b3141334d874ae25e1facd9bd63a77b0561633c1cf4522ab8ebb216b",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 38,
+  "version": 1
+}

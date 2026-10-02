@@ -1,0 +1,431 @@
+{
+  "payload": {
+    "decision": {
+      "analysis": "Round 1 established three baselines: ResNet18 (val_acc=0.9789, macro_f1=0.9791) leads, residual_cnn (0.9718) is second, and compact_transformer (0.9455) trails by ~3.3 points. All three converged by epoch 3 with identical training hyperparameters (bs=128, wd=1e-4, dropout=0.1, ls=0.05, cosine, adamw, standardize), so the differences are purely architectural.\n\nKey insights for Round 2:\n1. **ResNet18 capacity headroom**: hidden=32 (base channels) may be under-parameterized for 90K samples. Doubling to 64 roughly quadruples conv parameters while staying well under the 11M upper bound. The 1.63x class imbalance was unaddressed (class_weighting=false in all runs), so enabling it is a low-risk improvement.\n2. **Transformer gap diagnosis**: hidden=48 is very narrow; with 49 tokens (patch_size=4 \u2192 7\u00d77) and only 48-dim embeddings, each token carries limited information. The research guidance recommends 16 tokens (patch_size=7) with D=128-256. I'll test hidden=96, depth=3, patch_size=7 (16 tokens), mean pooling (simpler than attention pooling at 16 tokens), and a lower LR (3e-4) for stability.\n3. **Residual CNN depth/width trade-off**: depth=3, hidden=32 is modest. Pushing to depth=5, hidden=48 adds capacity while skip connections maintain gradient flow. Adding rotate90 and brightness augmentations broadens the data manifold.\n\nAll three candidates enable class_weighting (new variable vs. Round 1) and raise label_smoothing to 0.1 for better calibration. I keep weight_decay at 1e-4 (avoiding excessive regularization) and use cosine scheduling. The three candidates span the architecture spectrum (CNN upper-bound, CNN mid-depth, transformer) to maximize information per experiment.",
+      "candidates": [
+        {
+          "augmentations": [
+            "hflip",
+            "rotate90"
+          ],
+          "batch_size": 128,
+          "candidate_id": "resnet18_wide_cw",
+          "class_weighting": true,
+          "depth": 3,
+          "dropout": 0.1,
+          "early_stopping_patience": 5,
+          "gradient_clip_val": 1.0,
+          "hidden": 64,
+          "label_smoothing": 0.1,
+          "lr": 0.001,
+          "mlp_ratio": 4,
+          "model_family": "resnet18",
+          "normalization": "standardize",
+          "num_heads": 4,
+          "optimizer": "adamw",
+          "patch_size": 4,
+          "pooling": "cls",
+          "positional_encoding": "learned",
+          "rationale": "ResNet18 was the Round-1 leader (0.9789) but used the narrowest base width (hidden=32). Doubling to 64 roughly quadruples convolutional parameters while remaining well within the 11M upper bound for 90K samples. Depth is fixed at 3 (ignored by ResNet18's two-blocks-per-stage topology); hidden is the sole capacity knob. Enabling class_weighting addresses the 1.63x imbalance that was unaddressed in Round 1, and raising label_smoothing to 0.1 improves calibration. LR bumped to 1e-3 to train the wider network efficiently under cosine decay. rotate90 augmentation is safe for pathology tiles and adds spatial diversity beyond hflip+vflip. gradient_clip_val=1.0 guards against occasional large gradients in the wider conv layers.",
+          "scheduler": "cosine",
+          "tokenizer_layers": 2,
+          "weight_decay": 0.0001
+        },
+        {
+          "augmentations": [],
+          "batch_size": 128,
+          "candidate_id": "compact_tf_96_3l",
+          "class_weighting": true,
+          "depth": 3,
+          "dropout": 0.1,
+          "early_stopping_patience": 5,
+          "gradient_clip_val": 1.0,
+          "hidden": 96,
+          "label_smoothing": 0.1,
+          "lr": 0.0003,
+          "mlp_ratio": 4,
+          "model_family": "compact_transformer",
+          "normalization": "standardize",
+          "num_heads": 4,
+          "optimizer": "adamw",
+          "patch_size": 4,
+          "pooling": "mean",
+          "positional_encoding": "learned",
+          "rationale": "The Round-1 compact_transformer (hidden=48, depth=2, patch_size=4 \u2192 49 tokens, attention pooling) scored 0.9455, ~3.3 pts below ResNet18. The research guidance recommends 16 tokens (patch_size=7) with D\u2265128; I use hidden=96 (multiple of 8, divisible by 4 heads \u2192 24-dim per head) as a balanced choice. Depth increases to 3 for richer inter-token interactions. Mean pooling replaces attention pooling: with only 16 tokens, a learned attention head adds parameters without clear benefit and risks overfitting. LR reduced to 3e-4 (within the 1e-4\u20135e-4 transformer range) to stabilize attention weights in early training. tokenizer_layers=2 preserves the conv-tokenizer's ability to adapt receptive fields to pathology texture. class_weighting and label_smoothing=0.1 are new vs. Round 1. mlp_ratio=4 gives a 384-dim FFN, keeping total params \u22482.5M.",
+          "scheduler": "cosine",
+          "tokenizer_layers": 2,
+          "weight_decay": 0.0001
+        },
+        {
+          "augmentations": [
+            "hflip",
+            "rotate90",
+            "brightness"
+          ],
+          "batch_size": 128,
+          "candidate_id": "res_cnn_d5_w48",
+          "class_weighting": true,
+          "depth": 5,
+          "dropout": 0.15,
+          "early_stopping_patience": 5,
+          "gradient_clip_val": 1.0,
+          "hidden": 48,
+          "label_smoothing": 0.1,
+          "lr": 0.001,
+          "mlp_ratio": 4,
+          "model_family": "residual_cnn",
+          "normalization": "standardize",
+          "num_heads": 4,
+          "optimizer": "adamw",
+          "patch_size": 4,
+          "pooling": "cls",
+          "positional_encoding": "learned",
+          "rationale": "Residual CNN (0.9718) sits between the transformer and ResNet18. Round 1 used depth=3, hidden=32; this candidate pushes to depth=5, hidden=48 to test whether additional residual blocks and wider channels close the gap to ResNet18 without its full 18-block depth. Dropout raised to 0.15 to regularize the deeper/wider network. Three augmentations (hflip, rotate90, brightness) broaden the effective training distribution: hflip is the primary spatial regularizer, rotate90 adds orientation invariance safe for pathology tiles, and brightness compensates for staining variability. class_weighting addresses the 1.63x imbalance. LR=1e-3 with cosine decay and AdamW is consistent with the Round-1 residual_cnn setting that worked well. Total parameters remain in the 1-2M range, well-suited to 90K samples.",
+          "scheduler": "cosine",
+          "tokenizer_layers": 2,
+          "weight_decay": 0.0001
+        }
+      ],
+      "stop": false
+    },
+    "request": {
+      "fallback": {
+        "analysis": "Deterministic diverse candidate set; selection uses validation accuracy and macro-F1, never test metrics.",
+        "candidates": [
+          {
+            "augmentations": [
+              "hflip"
+            ],
+            "batch_size": 128,
+            "candidate_id": "tiny_regularized",
+            "class_weighting": false,
+            "depth": 2,
+            "dropout": 0.15,
+            "early_stopping_patience": 2,
+            "gradient_clip_val": 1.0,
+            "hidden": 32,
+            "label_smoothing": 0.0,
+            "lr": 0.001,
+            "mlp_ratio": 4,
+            "model_family": "tiny_cnn",
+            "normalization": "standardize",
+            "num_heads": 4,
+            "optimizer": "adamw",
+            "patch_size": 4,
+            "pooling": "cls",
+            "positional_encoding": "learned",
+            "rationale": "Low-cost control close to the best representation ablation.",
+            "scheduler": "cosine",
+            "tokenizer_layers": 2,
+            "weight_decay": 0.0001
+          },
+          {
+            "augmentations": [
+              "hflip",
+              "vflip"
+            ],
+            "batch_size": 128,
+            "candidate_id": "vit_patch4",
+            "class_weighting": false,
+            "depth": 3,
+            "dropout": 0.1,
+            "early_stopping_patience": 2,
+            "gradient_clip_val": 1.0,
+            "hidden": 64,
+            "label_smoothing": 0.05,
+            "lr": 0.0003,
+            "mlp_ratio": 3,
+            "model_family": "vision_transformer",
+            "normalization": "standardize",
+            "num_heads": 8,
+            "optimizer": "adamw",
+            "patch_size": 2,
+            "pooling": "mean",
+            "positional_encoding": "sinusoidal",
+            "rationale": "A fine-grained patch-2 ViT tests global interactions over 196 tissue tokens.",
+            "scheduler": "cosine",
+            "tokenizer_layers": 2,
+            "weight_decay": 0.0001
+          },
+          {
+            "augmentations": [
+              "hflip"
+            ],
+            "batch_size": 128,
+            "candidate_id": "residual_low_lr",
+            "class_weighting": false,
+            "depth": 3,
+            "dropout": 0.15,
+            "early_stopping_patience": 2,
+            "gradient_clip_val": 1.0,
+            "hidden": 32,
+            "label_smoothing": 0.05,
+            "lr": 0.0005,
+            "mlp_ratio": 4,
+            "model_family": "residual_cnn",
+            "normalization": "standardize",
+            "num_heads": 4,
+            "optimizer": "adamw",
+            "patch_size": 4,
+            "pooling": "cls",
+            "positional_encoding": "learned",
+            "rationale": "Refines the residual candidate with a lower learning rate.",
+            "scheduler": "cosine",
+            "tokenizer_layers": 2,
+            "weight_decay": 0.0001
+          }
+        ],
+        "stop": false
+      },
+      "model": "qwen3.8",
+      "schema": {
+        "$defs": {
+          "CandidateProposal": {
+            "additionalProperties": false,
+            "description": "One bounded model/representation hypothesis proposed by the LLM.",
+            "properties": {
+              "augmentations": {
+                "items": {
+                  "pattern": "^(hflip|vflip|rotate90|rotate180|brightness|contrast|approved_[a-z][a-z0-9_]{2,31})$",
+                  "type": "string"
+                },
+                "maxItems": 3,
+                "title": "Augmentations",
+                "type": "array"
+              },
+              "batch_size": {
+                "enum": [
+                  16,
+                  32,
+                  64,
+                  128,
+                  256
+                ],
+                "title": "Batch Size",
+                "type": "integer"
+              },
+              "candidate_id": {
+                "pattern": "^[a-z][a-z0-9_]{2,31}$",
+                "title": "Candidate Id",
+                "type": "string"
+              },
+              "class_weighting": {
+                "title": "Class Weighting",
+                "type": "boolean"
+              },
+              "depth": {
+                "maximum": 8,
+                "minimum": 1,
+                "title": "Depth",
+                "type": "integer"
+              },
+              "dropout": {
+                "maximum": 0.6,
+                "minimum": 0.0,
+                "title": "Dropout",
+                "type": "number"
+              },
+              "early_stopping_patience": {
+                "default": 2,
+                "maximum": 10,
+                "minimum": 0,
+                "title": "Early Stopping Patience",
+                "type": "integer"
+              },
+              "gradient_clip_val": {
+                "default": 1.0,
+                "maximum": 5.0,
+                "minimum": 0.0,
+                "title": "Gradient Clip Val",
+                "type": "number"
+              },
+              "hidden": {
+                "maximum": 192,
+                "minimum": 16,
+                "multipleOf": 8,
+                "title": "Hidden",
+                "type": "integer"
+              },
+              "label_smoothing": {
+                "maximum": 0.2,
+                "minimum": 0.0,
+                "title": "Label Smoothing",
+                "type": "number"
+              },
+              "lr": {
+                "maximum": 0.03,
+                "minimum": 1e-05,
+                "title": "Lr",
+                "type": "number"
+              },
+              "mlp_ratio": {
+                "default": 4,
+                "enum": [
+                  2,
+                  3,
+                  4
+                ],
+                "title": "Mlp Ratio",
+                "type": "integer"
+              },
+              "model_family": {
+                "enum": [
+                  "tiny_cnn",
+                  "residual_cnn",
+                  "resnet18",
+                  "vision_transformer",
+                  "compact_transformer"
+                ],
+                "title": "Model Family",
+                "type": "string"
+              },
+              "normalization": {
+                "enum": [
+                  "unit",
+                  "standardize"
+                ],
+                "title": "Normalization",
+                "type": "string"
+              },
+              "num_heads": {
+                "default": 4,
+                "enum": [
+                  2,
+                  3,
+                  4,
+                  6,
+                  8
+                ],
+                "title": "Num Heads",
+                "type": "integer"
+              },
+              "optimizer": {
+                "enum": [
+                  "adam",
+                  "adamw",
+                  "sgd"
+                ],
+                "title": "Optimizer",
+                "type": "string"
+              },
+              "patch_size": {
+                "default": 4,
+                "enum": [
+                  2,
+                  4,
+                  7
+                ],
+                "title": "Patch Size",
+                "type": "integer"
+              },
+              "pooling": {
+                "default": "cls",
+                "enum": [
+                  "cls",
+                  "mean",
+                  "attention"
+                ],
+                "title": "Pooling",
+                "type": "string"
+              },
+              "positional_encoding": {
+                "default": "learned",
+                "enum": [
+                  "learned",
+                  "sinusoidal"
+                ],
+                "title": "Positional Encoding",
+                "type": "string"
+              },
+              "rationale": {
+                "maxLength": 6000,
+                "minLength": 3,
+                "title": "Rationale",
+                "type": "string"
+              },
+              "scheduler": {
+                "enum": [
+                  "none",
+                  "cosine",
+                  "one_cycle",
+                  "reduce_on_plateau"
+                ],
+                "title": "Scheduler",
+                "type": "string"
+              },
+              "tokenizer_layers": {
+                "default": 2,
+                "maximum": 3,
+                "minimum": 1,
+                "title": "Tokenizer Layers",
+                "type": "integer"
+              },
+              "weight_decay": {
+                "maximum": 0.1,
+                "minimum": 0.0,
+                "title": "Weight Decay",
+                "type": "number"
+              }
+            },
+            "required": [
+              "candidate_id",
+              "model_family",
+              "hidden",
+              "depth",
+              "dropout",
+              "normalization",
+              "optimizer",
+              "scheduler",
+              "lr",
+              "weight_decay",
+              "class_weighting",
+              "label_smoothing",
+              "batch_size",
+              "rationale"
+            ],
+            "title": "CandidateProposal",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Schema-constrained proposal for one search round.",
+        "properties": {
+          "analysis": {
+            "maxLength": 12000,
+            "minLength": 3,
+            "title": "Analysis",
+            "type": "string"
+          },
+          "candidates": {
+            "items": {
+              "$ref": "#/$defs/CandidateProposal"
+            },
+            "maxItems": 4,
+            "minItems": 1,
+            "title": "Candidates",
+            "type": "array"
+          },
+          "stop": {
+            "default": false,
+            "title": "Stop",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "analysis",
+          "candidates"
+        ],
+        "title": "SearchDecision",
+        "type": "object"
+      },
+      "seed": 42,
+      "stage": "model_search.round_2",
+      "system": "You are a bounded ML search agent for PathMNIST. Propose diverse configurations only from the JSON schema. Use only training metadata and prior validation results. The test set is locked and must never influence a proposal. Avoid duplicate configurations and excessive weight decay. Explore log-scale learning rates. Transformer-only fields may vary only for vision_transformer or compact_transformer; hidden must be a multiple of 8 and divisible by num_heads. ResNet18 has a fixed topology of two residual blocks per stage: depth is ignored, while hidden controls its base channel width. Do not claim that changing depth changes ResNet18 capacity. Built-in augmentations in approved_augmentations are already runnable; only new extension recipes require an extension approval.",
+      "user": "round=2/3; candidate_budget=3; train_samples=89996; validation_samples=10004; train_counts=[9366, 9509, 10360, 10401, 8006, 12182, 7886, 9401, 12885]; train_imbalance=1.633908; channel_mean=[0.740545, 0.53298219, 0.70582885]; channel_std=[0.12368222, 0.17676253, 0.12443067]; approved_augmentations=['brightness', 'contrast', 'hflip', 'rotate180', 'rotate90', 'vflip']; cross_cutting_research={\"analysis\": \"PathMNIST presents a compact 28x28x3 classification problem with ~90K training samples across 9 moderately imbalanced classes (ratio 1.63x). The channel statistics reveal a notably higher-variance green channel (std 0.177 vs ~0.124 for R and B), suggesting tissue-specific spectral information concentrated there. The dataset was explicitly designed for lightweight models, and the small spatial extent (28x28) constrains both receptive-field depth and the number of meaningful spatial tokens for attention-based models.\\n\\nArchitecture selection should be guided by three constraints: (1) parameter budget under ~5M to match the dataset's lightweight design intent and prevent overfitting at 90K samples; (2) spatial resolution preservation\\u2014aggressive downsampling (e.g., stride-2 pooling chains) wastes the limited 28x28 signal; (3) the ability to capture both local texture (nuclear morphology, gland boundaries) and global tissue context (architectural patterns) that distinguish the 9 pathology classes.\\n\\nFor CNNs, tiny_cnn (3-5 conv blocks, global average pooling) is the fastest-to-train baseline and the natural first point of comparison. residual_cnn adds skip connections at modest parameter cost, improving gradient flow for 4-6 block depths. resnet18, already configured with a CIFAR-style 3x3 stride-1 stem and no max-pooling, is a reasonable mid-depth option but its 18-block depth may be excessive for 28x28 inputs at 90K samples; it should be treated as an upper-bound capacity check rather than a primary candidate.\\n\\nFor transformers, compact_transformer with a convolutional tokenizer is strongly preferred over vision_transformer. The conv tokenizer (e.g., a 7x7 conv with stride 7 producing 16 tokens, or 14x14 stride 14 producing 4 tokens) preserves local spatial structure in each token while allowing self-attention to model inter-token relationships. With 2-4 attention layers, 4-6 heads, and a hidden dimension of 128-256, the total parameter count stays in the 1-4M range, consistent with CCT's demonstrated success on CIFAR-10 at 3.7M params. vision_transformer with fixed patch embedding is a valid ablation but offers no advantage over the conv-tokenized variant at this resolution and adds a non-learnable projection that is less adaptive to the pathology texture distribution.\\n\\nTraining architecture should emphasize: (a) channel-wise normalization using the provided mean/std; (b) horizontal-flip augmentation as a primary regularizer given moderate per-class counts (7.8K-12.9K); (c) class-weighted cross-entropy or focal loss to address the 1.63x imbalance; (d) cosine or step LR schedule with warmup; (e) weight decay in the 1e-4 to 1e-3 range; (f) batch size 128-256 to balance gradient noise and memory. Temperature scaling on the validation split is a low-cost post-hoc calibration step worth including in the pipeline.\\n\\nThe search should proceed in two phases: Phase 1 establishes the tiny_cnn and compact_transformer baselines with a tight hyperparameter grid (LR, weight decay, dropout, augmentation strength). Phase 2 introduces residual_cnn and resnet18 as capacity ablations, and vision_transformer as a tokenization ablation against compact_transformer. This ordering maximizes information per experiment and keeps wall-clock time bounded.\", \"architecture_priorities\": [\"tiny_cnn\", \"compact_transformer\", \"residual_cnn\", \"resnet18\", \"vision_transformer\"], \"evidence_sources\": [\"https://arxiv.org/abs/2010.11929v2\", \"https://arxiv.org/abs/2104.05704v4\", \"https://arxiv.org/abs/2110.14795v2\", \"https://arxiv.org/abs/2309.13866v2\", \"https://arxiv.org/abs/2507.12248v1\", \"https://arxiv.org/abs/2508.18509v1\"], \"parametrization_priorities\": [\"Total parameter budget: target 1-4M for compact_transformer, 0.5-2M for tiny_cnn/residual_cnn, up to 11M for resnet18 as an upper-bound check only\", \"Learning rate: 1e-3 to 5e-4 for CNNs with AdamW; 1e-4 to 5e-4 for transformers with AdamW and 200-500 step linear warmup\", \"Weight decay: 1e-4 to 1e-3 for CNNs; 0.05-0.1 for transformers (decoupled weight decay via AdamW)\", \"Batch size: 128-256; use gradient accumulation if memory-constrained to maintain effective batch \\u2265128\", \"Transformer depth: 2-4 attention layers; hidden dim 128-256; 4-6 attention heads; FFN expansion ratio 2-4x\", \"CNN depth: 3-5 conv blocks for tiny_cnn; 4-6 residual blocks for residual_cnn; resnet18 at full depth only as capacity ablation\", \"Class imbalance handling: class-weighted cross-entropy with weights inversely proportional to class frequency, or focal loss with gamma=2.0\", \"Training epochs: 50-100 with early stopping on validation loss (patience 10-15 epochs); cosine LR decay to 0 over the full schedule\"], \"representation_priorities\": [\"Channel-wise normalization using provided mean [0.741, 0.533, 0.706] and std [0.124, 0.177, 0.124]; the green channel's higher variance should be preserved, not suppressed\", \"For compact_transformer: convolutional tokenizer with 7x7 kernel, stride 7, producing 16 spatial tokens of dimension (16, D); alternative 14x14 stride 14 yielding 4 tokens for a coarser ablation\", \"For vision_transformer: 7x7 fixed patches yielding 16 tokens; avoid 14x14 (only 4 tokens) as primary config due to excessive information loss per token\", \"For all CNNs: global average pooling over the final feature map rather than flattening + fully-connected, to reduce parameter count and overfitting risk\", \"Preserve spatial resolution through the network: prefer stride-1 convolutions with 3x3 kernels over stride-2 pooling; at most 2-3 spatial downsampling steps for 28x28 input\", \"Learnable positional encodings for transformer tokens; avoid sinusoidal fixed encodings which are less adaptive to pathology texture patterns\", \"Dropout (0.1-0.3) on transformer attention outputs and CNN fully-connected heads; avoid dropout on early conv layers where it disrupts local feature learning\", \"Horizontal flip augmentation as the primary spatial regularizer; consider mild random rotation (\\u00b110 degrees) as a secondary augmentation given the 28x28 constraint\"], \"risks\": [\"Overfitting: 90K samples across 9 classes (~10K per class) is moderate; transformer architectures with >4M params or >4 layers risk memorizing training patterns, especially on the minority classes\", \"Class imbalance (1.63x): without class-weighted loss or focal loss, the model will bias toward majority classes; validate per-class F1, not just macro accuracy\", \"Spatial resolution loss: aggressive downsampling (stride-2 pooling, large patch sizes) on 28x28 inputs destroys fine nuclear morphology that distinguishes pathology classes\", \"Channel variance asymmetry: the green channel (std 0.177) carries disproportionately more signal; uniform channel treatment or incorrect normalization may underweight this channel\", \"Transformer training instability: at 28x28 with only 16 tokens, attention matrices are small but the limited token count means each token must carry substantial information; poor initialization or too-high LR can cause attention collapse\", \"resnet18 depth mismatch: 18 residual blocks on a 28x28 input with 90K samples may over-parameterize relative to the signal available; treat as an upper-bound check, not a primary candidate\", \"Augmentation domain shift: horizontal flip is safe for pathology, but rotation or elastic deformation may alter tissue architecture in ways that do not reflect real biological variation, potentially hurting generalization\", \"Calibration gap: high accuracy does not guarantee well-calibrated probabilities; without temperature scaling or label smoothing, predicted confidences may be miscalibrated, which is critical for medical decision support\"], \"schema_version\": \"1.0\", \"source\": \"qwen3.8\", \"test_metrics_used\": false, \"transformer_guidance\": \"compact_transformer is the primary transformer candidate. Its convolutional tokenizer should be configured as a single 7x7 conv (stride 7, padding 0) mapping 28x28x3 \\u2192 16 tokens of dimension D (128 or 256). This preserves local 7x7 texture in each token while allowing self-attention to model inter-token spatial relationships (e.g., gland-to-stroma context). An alternative 14x14 stride-14 tokenizer yielding 4 tokens should be tested as a coarser ablation but is not the primary config. Use 2-4 transformer blocks, each with multi-head self-attention (4-6 heads), layer norm, and a position-wise FFN (2-4x expansion). Total parameters should stay under 4M. Learnable positional encodings of shape (16, D) are preferred over sinusoidal. A classification head (mean-pool over tokens \\u2192 linear \\u2192 9 classes) is sufficient; avoid per-token classification heads which add parameters without clear benefit at this token count.\\n\\nvision_transformer serves as a tokenization ablation: replace the conv tokenizer with a fixed 7x7 patch linear projection (28/7=4, so 4x4=16 patches, each projected from 147 to D). This isolates the effect of learnable vs. fixed tokenization. Expect it to perform at or slightly below compact_transformer, since the conv tokenizer can adapt its receptive field to pathology texture while the fixed projection cannot.\\n\\nCritical training differences for transformers vs. CNNs: (1) use a longer warmup (200-500 steps) before the main LR schedule; (2) apply label smoothing (0.1) to the cross-entropy loss to prevent overconfident predictions on the 9-class problem; (3) use a smaller initial LR (1e-4 to 3e-4) than CNNs to avoid destabilizing the attention weights in early training; (4) apply dropout (0.1) to attention weight matrices and FFN outputs, but not to layer norm or positional encodings; (5) if training is unstable, reduce to 2 layers and D=128 before increasing depth.\\n\\nDo NOT use a 7x7 stride-2 ImageNet-style stem for any architecture. The resnet18 implementation already uses a 3x3 stride-1 stem appropriate for 28x28 inputs. All spatial downsampling should be explicit and limited to at most 2-3 steps across the full network depth.\"}; prior_validation_results=[{\"best_epoch\": 3, \"candidate_id\": \"compact_transformer\", \"config_hash\": \"e4bc0782bc1687671903469a39ef5f9e1a07d32fc90def5b1460148e0a94e1a3\", \"configuration\": {\"batch_size\": 128, \"class_weighting\": false, \"depth\": 2, \"dropout\": 0.1, \"hidden\": 48, \"label_smoothing\": 0.05, \"lr\": 0.0005, \"mlp_ratio\": 3, \"model_family\": \"compact_transformer\", \"num_heads\": 4, \"optimizer\": \"adamw\", \"patch_size\": 4, \"pooling\": \"attention\", \"positional_encoding\": \"learned\", \"scheduler\": \"cosine\", \"tokenizer_layers\": 2, \"weight_decay\": 0.0001}, \"error\": null, \"representation\": {\"augmentations\": [\"hflip\", \"contrast\"], \"normalization\": \"standardize\"}, \"status\": \"completed\", \"validation_accuracy\": 0.945522, \"validation_balanced_accuracy\": 0.944077, \"validation_macro_f1\": 0.94517}, {\"best_epoch\": 3, \"candidate_id\": \"residual_balanced\", \"config_hash\": \"be4afb0bba188f4143cc28c9e4062b200fbc04222b9729e435b313ea1e26c37e\", \"configuration\": {\"batch_size\": 128, \"class_weighting\": false, \"depth\": 3, \"dropout\": 0.1, \"hidden\": 32, \"label_smoothing\": 0.05, \"lr\": 0.001, \"mlp_ratio\": 4, \"model_family\": \"residual_cnn\", \"num_heads\": 4, \"optimizer\": \"adamw\", \"patch_size\": 4, \"pooling\": \"cls\", \"positional_encoding\": \"learned\", \"scheduler\": \"cosine\", \"tokenizer_layers\": 2, \"weight_decay\": 0.0001}, \"error\": null, \"representation\": {\"augmentations\": [\"hflip\"], \"normalization\": \"standardize\"}, \"status\": \"completed\", \"validation_accuracy\": 0.971811, \"validation_balanced_accuracy\": 0.969391, \"validation_macro_f1\": 0.971486}, {\"best_epoch\": 3, \"candidate_id\": \"resnet18_conservative\", \"config_hash\": \"a48f20ec5b39dcfa521be0fd90b99b200968d5e692ce83238014c1a5fa5d2c82\", \"configuration\": {\"batch_size\": 128, \"class_weighting\": false, \"depth\": 3, \"dropout\": 0.1, \"hidden\": 32, \"label_smoothing\": 0.05, \"lr\": 0.0005, \"mlp_ratio\": 4, \"model_family\": \"resnet18\", \"num_heads\": 4, \"optimizer\": \"adamw\", \"patch_size\": 4, \"pooling\": \"cls\", \"positional_encoding\": \"learned\", \"scheduler\": \"cosine\", \"tokenizer_layers\": 2, \"weight_decay\": 0.0001}, \"error\": null, \"representation\": {\"augmentations\": [\"hflip\", \"vflip\"], \"normalization\": \"standardize\"}, \"status\": \"completed\", \"validation_accuracy\": 0.978908, \"validation_balanced_accuracy\": 0.978883, \"validation_macro_f1\": 0.979072}]"
+    },
+    "request_sha256": "9edc51d0f7682ad25bd9059e71e4ac19871f5a3b523648985f3c911a76030bb2",
+    "source": "qwen3.8",
+    "used_fallback": false
+  },
+  "sha256": "a4b37f45f2ce2ea059a0a392ffd4871b887f750263b8177645f57ccae90fda07"
+}

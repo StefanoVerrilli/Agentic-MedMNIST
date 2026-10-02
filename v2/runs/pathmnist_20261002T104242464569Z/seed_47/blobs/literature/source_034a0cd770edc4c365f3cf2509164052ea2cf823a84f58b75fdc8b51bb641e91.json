@@ -1,0 +1,7 @@
+{
+  "id": "2309.13866v2",
+  "origin": "arxiv_api",
+  "retrieved_at": "2026-10-02T10:43:34.990412+00:00",
+  "text": "We explore calibration properties at various precisions for three architectures: ShuffleNetv2, GhostNet-VGG, and MobileOne; and two datasets: CIFAR-100 and PathMNIST. The quality of calibration is observed to track the quantization quality; it is well-documented that performance worsens with lower precision, and we observe a similar correlation with poorer calibration. This becomes especially egregious at 4-bit activation regime. GhostNet-VGG is shown to be the most robust to overall performance drop at lower precision. We find that temperature scaling can improve calibration error for quantized networks, with some caveats. We hope that these preliminary insights can lead to more opportunities for explainable and reliable EdgeML.",
+  "title": "On Calibration of Modern Quantized Efficient Neural Networks"
+}

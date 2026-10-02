@@ -1,0 +1,63 @@
+{
+  "artefact": "trial_compact_transformer_e4bc0782_e3_s001",
+  "artefact_type": "TrialResult",
+  "created_at": "2026-10-02T10:48:40.537724+00:00",
+  "payload": {
+    "best_epoch": 3,
+    "candidate_id": "compact_transformer",
+    "checkpoint_path": "blobs/search/trial_compact_transformer_e4bc0782_e3_s001.ckpt",
+    "checkpoint_sha256": "822949d377d56901bfbc11f0fe258567948abce6278b460b9c547129fb4ff942",
+    "config": {
+      "batch_size": 128,
+      "class_weighting": false,
+      "depth": 2,
+      "device": "cuda",
+      "dropout": 0.1,
+      "early_stopping_patience": 2,
+      "epochs": 3,
+      "gradient_clip_val": 1.0,
+      "hidden": 48,
+      "label_smoothing": 0.05,
+      "lr": 0.0005,
+      "mlp_ratio": 3,
+      "model_family": "compact_transformer",
+      "num_heads": 4,
+      "optimizer": "adamw",
+      "patch_size": 4,
+      "pooling": "attention",
+      "positional_encoding": "learned",
+      "rationale": "Convolutional tokenization adds a useful local-image prior before attention.",
+      "scheduler": "cosine",
+      "schema_version": "1.0",
+      "seed": 42,
+      "source": "heuristic:coverage",
+      "tokenizer_layers": 2,
+      "weight_decay": 0.0001
+    },
+    "config_hash": "e4bc0782bc1687671903469a39ef5f9e1a07d32fc90def5b1460148e0a94e1a3",
+    "decision_source": "heuristic:coverage",
+    "duration_seconds": 50.9869,
+    "error": null,
+    "lightning_csv_path": "blobs/search/lightning_logs/trial_compact_transformer_e4bc0782_e3_s001/version_0/metrics.csv",
+    "representation": {
+      "augmentations": [
+        "hflip",
+        "contrast"
+      ],
+      "normalization": "standardize",
+      "rationale": "Convolutional tokenization adds a useful local-image prior before attention."
+    },
+    "round_index": 1,
+    "schema_version": "1.0",
+    "status": "completed",
+    "training_log_path": "blobs/search/trial_compact_transformer_e4bc0782_e3_s001.training.jsonl",
+    "validation_accuracy": 0.945522,
+    "validation_balanced_accuracy": 0.944077,
+    "validation_macro_f1": 0.94517
+  },
+  "payload_sha256": "2b2858401c2b1b82d311ff2da5759b6dfe0db109b1e8696bcd4e192af8fcb679",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 22,
+  "version": 1
+}
