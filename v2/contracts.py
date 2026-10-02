@@ -493,7 +493,7 @@ class RepresentationPlan(Artefact):
     stats_source: Literal["train"] = "train"
     train_channel_mean_unit: list[float] = Field(min_length=3, max_length=3)
     train_channel_std_unit: list[float] = Field(min_length=3, max_length=3)
-    augmentation_factor: int = Field(ge=1, le=4)
+    augmentation_factor: int = Field(ge=1, le=9)
     rationale: str
     source: str
 
