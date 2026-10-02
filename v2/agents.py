@@ -670,7 +670,12 @@ class ModelSearchAgent:
                     "configurations and excessive weight decay. Explore log-scale "
                     "learning rates. Transformer-only fields may vary only for "
                     "vision_transformer or compact_transformer; hidden must be a "
-                    "multiple of 8 and divisible by num_heads."
+                    "multiple of 8 and divisible by num_heads. ResNet18 has a fixed "
+                    "topology of two residual blocks per stage: depth is ignored, "
+                    "while hidden controls its base channel width. Do not claim "
+                    "that changing depth changes ResNet18 capacity. Built-in "
+                    "augmentations in approved_augmentations are already runnable; "
+                    "only new extension recipes require an extension approval."
                 ),
                 user=(
                     f"round={round_index}/{self.rounds}; candidate_budget={round_cap}; "
@@ -1502,7 +1507,16 @@ class ReviewerConsistencyAgent:
                 "uses the standard 28x28 RGB MedMNIST distribution; do not substitute "
                 "the source-dataset or MedMNIST+ resolution. Only deterministic "
                 "findings may justify action=stop; unsupported external-memory claims "
-                "must be warnings requesting verification."
+                "must be warnings requesting verification. ResNet18 has fixed "
+                "topology; hidden controls base width and depth is ignored. Generic "
+                "transformer fields are inactive for CNN families and do not make "
+                "them transformer hybrids. Built-in augmentations (hflip, vflip, "
+                "rotate90, rotate180, brightness, contrast) do not require extension "
+                "approval; pending new proposals do not invalidate these primitives. "
+                "A cited quote establishes traceability, not support for every "
+                "scientific inference: assess that support separately. The OOD "
+                "aggregate is the arithmetic mean of the selected score's AUROCs "
+                "across corruption severities, not a pooled-sample AUROC."
             ),
             user=(
                 f"current_utc={utc_now()}; stage={stage}; "
