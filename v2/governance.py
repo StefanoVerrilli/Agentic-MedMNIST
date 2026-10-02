@@ -24,6 +24,35 @@ def read_artefact(root: Path, name: str) -> dict[str, Any]:
     return envelope["payload"]
 
 
+def evidence_references(root: Path, value: Any, location: str = "payload"):
+    """Walk nested evidence, resolving only the declared frozen-config scope.
+
+    Historical frozen_best references belong to the original sibling seed.
+    New runs retain a local snapshot so they remain independently portable.
+    """
+    if isinstance(value, dict):
+        for path_key, hash_key in (
+            ("path", "sha256"), ("checkpoint_path", "checkpoint_sha256"),
+            ("lightning_config_path", "lightning_config_sha256"),
+            ("ood_evidence_path", "ood_evidence_sha256"),
+            ("snapshot_path", "snapshot_sha256"),
+        ):
+            if value.get(path_key) and value.get(hash_key):
+                yield (f"{location}.{path_key}",
+                       contained_path(root, value[path_key].replace("\\", "/")), value[hash_key])
+        for key, item in value.items():
+            scope = root
+            if key == "frozen_best" and item and value.get("frozen_reference_scope", "origin_seed") == "origin_seed":
+                seed = item["train_config"]["seed"]
+                if type(seed) is not int or seed < 0:
+                    raise ValueError("invalid frozen configuration origin seed")
+                scope = contained_path(root.parent, f"seed_{seed}")
+            yield from evidence_references(scope, item, f"{location}.{key}")
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            yield from evidence_references(root, item, f"{location}[{index}]")
+
+
 def check_integrity(root: Path) -> list[str]:
     issues = []
     for path in sorted((root / "artefacts").glob("*.json")):
@@ -32,15 +61,9 @@ def check_integrity(root: Path) -> list[str]:
             payload = envelope["payload"]
             if _sha256_json(payload) != envelope["payload_sha256"]:
                 raise ValueError("payload checksum mismatch")
-            for path_key, hash_key in (
-                ("path", "sha256"), ("checkpoint_path", "checkpoint_sha256"),
-                ("lightning_config_path", "lightning_config_sha256"),
-                ("ood_evidence_path", "ood_evidence_sha256"),
-            ):
-                if payload.get(path_key) and payload.get(hash_key):
-                    evidence = contained_path(root, payload[path_key])
-                    if sha256_file(evidence) != payload[hash_key]:
-                        raise ValueError(f"{path_key} checksum mismatch")
+            for location, evidence, expected in evidence_references(root, payload):
+                if sha256_file(evidence) != expected:
+                    issues.append(f"{path.name}: {location} checksum mismatch")
         except (ValueError, OSError, KeyError) as exc:
             issues.append(f"{path.name}: {exc}")
     for path in sorted((root / "blobs" / "reasoning").glob("*.json")):
@@ -120,8 +143,11 @@ def assess(root: Path, *, validation_path: Path | None = None,
         if repeated_seeds:
             frozen_configs = []
             for seed in summary["completed_seeds"]:
-                selected = read_artefact(root.parent / f"seed_{seed}", "best_configuration")["train_config"]
-                frozen_configs.append({k: v for k, v in selected.items() if k not in {"seed", "source", "rationale"}})
+                selected = read_artefact(root.parent / f"seed_{seed}", "best_configuration")
+                frozen_configs.append({
+                    "training": {k: v for k, v in selected["train_config"].items() if k not in {"seed", "source", "rationale"}},
+                    "representation": {k: v for k, v in selected["representation"].items() if k != "rationale"},
+                })
             repeated_seeds = all(config == frozen_configs[0] for config in frozen_configs)
     add("WP4_FROZEN_CONFIGURATION_SEED_VARIANCE", repeated_seeds, ["../experiment_summary.json"],
         "At least three completed seeds, with a shared validation-selected configuration.")
@@ -146,7 +172,9 @@ def assess(root: Path, *, validation_path: Path | None = None,
         if canonical_hash(payload) != document["sha256"]:
             raise ValueError("validation evidence checksum mismatch")
         manifest = artifacts.get("run_manifest", {})
-        validation_ok = bool(payload["tests_passed"] and payload["source_sha256"] == manifest.get("code_sha256"))
+        validation_ok = bool(payload["tests_passed"] and payload["source_sha256"] == manifest.get("code_sha256")
+                             and payload.get("source_hash_algorithm", "legacy-native-v1")
+                             == manifest.get("code_hash_algorithm", "legacy-native-v1"))
         fault_rate = payload["fault_detection_rate"]
         validation_ok = validation_ok and fault_rate >= 0.9
     add("WP6_FAULT_DETECTION_GE_90_PERCENT", validation_ok, [str(validation_path)] if validation_path else [],
@@ -293,7 +321,8 @@ def validate(output: Path) -> bool:
             stage = getattr(injected, name)(bb)
             findings = reviewer._deterministic_findings(bb, stage)
             faults.append({"fault": name, "detected": bool(findings), "findings": findings})
-    payload = {"source_sha256": code_tree_sha256(root), "tests_run": result.testsRun,
+    payload = {"source_sha256": code_tree_sha256(root), "source_hash_algorithm": "canonical-text-v2",
+               "tests_run": result.testsRun,
                "tests_passed": result.wasSuccessful(), "fault_cases": faults,
                "fault_detection_rate": sum(f["detected"] for f in faults) / len(faults), "created_at": utc_now()}
     output.parent.mkdir(parents=True, exist_ok=True)

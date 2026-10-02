@@ -34,15 +34,19 @@ PositionalEncodingName = Literal["learned", "sinusoidal"]
 
 
 def _validate_model_options(model: Any) -> None:
+    if model.optimizer == "sgd" and model.nesterov and model.momentum <= 0:
+        raise ValueError("Nesterov requires positive momentum")
+    if model.scheduler == "cosine" and model.cosine_eta_min > model.lr:
+        raise ValueError("cosine_eta_min cannot exceed lr")
     if model.model_family == "tiny_cnn" and model.depth > 4:
         raise ValueError("tiny_cnn depth cannot exceed four pooling blocks for 28x28 input")
     if model.model_family in {"vision_transformer", "compact_transformer"}:
         if model.hidden % model.num_heads != 0:
             raise ValueError("hidden must be divisible by num_heads")
-    if model.model_family == "resnet18" and model.hidden > 64:
-        raise ValueError("resnet18 hidden cannot exceed 64")
-    if model.model_family == "residual_cnn" and model.hidden > 96:
-        raise ValueError("residual_cnn hidden cannot exceed 96")
+    if model.model_family == "resnet18" and model.hidden > 256:
+        raise ValueError("resnet18 hidden cannot exceed 256")
+    if model.model_family == "residual_cnn" and model.hidden > 512:
+        raise ValueError("residual_cnn hidden cannot exceed 512")
 
 
 def _canonicalize_model_options(value: Any) -> Any:
@@ -65,6 +69,21 @@ def _canonicalize_model_options(value: Any) -> Any:
         data["patch_size"] = 4
     else:
         data["tokenizer_layers"] = 2
+    if family not in {"tiny_cnn", "residual_cnn"}:
+        data["channel_cap"] = 256
+    if data.get("optimizer", "adamw") == "sgd":
+        data.update(adam_beta1=0.9, adam_beta2=0.999, optimizer_eps=1e-8)
+    else:
+        data.update(momentum=0.9, nesterov=True)
+    for scheduler, values in {
+        "one_cycle": {"one_cycle_pct_start": 0.1},
+        "reduce_on_plateau": {"plateau_factor": 0.5, "plateau_patience": 1},
+        "cosine": {"cosine_eta_min": 0.0},
+    }.items():
+        if data.get("scheduler", "none") != scheduler:
+            data.update(values)
+    if data.get("early_stopping_patience") == 0:
+        data.update(early_stopping_monitor="val_accuracy", early_stopping_min_delta=0.0)
     return data
 
 
@@ -98,7 +117,7 @@ class AmbiguityDecision(StrictModel):
 
 class RepresentationDecision(StrictModel):
     normalization: Literal["unit", "standardize"]
-    augmentations: list[Augmentation] = Field(default_factory=list, max_length=3)
+    augmentations: list[Augmentation] = Field(default_factory=list, max_length=8)
     rationale: str = Field(min_length=3, max_length=6000)
 
     @model_validator(mode="after")
@@ -108,27 +127,47 @@ class RepresentationDecision(StrictModel):
         return self
 
 
-class ExperimentDecision(StrictModel):
+class ExecutionOptions(StrictModel):
+    """Shared tunable network/optimizer controls; defaults preserve old checkpoints."""
+    channel_cap: int = Field(default=256, ge=8, le=4096, multiple_of=8)
+    momentum: float = Field(default=0.9, ge=0.0, lt=1.0)
+    nesterov: bool = True
+    adam_beta1: float = Field(default=0.9, ge=0.0, lt=1.0)
+    adam_beta2: float = Field(default=0.999, ge=0.0, lt=1.0)
+    optimizer_eps: float = Field(default=1e-8, ge=1e-12, le=1e-2)
+    one_cycle_pct_start: float = Field(default=0.1, gt=0.0, lt=1.0)
+    plateau_factor: float = Field(default=0.5, gt=0.0, lt=1.0)
+    plateau_patience: int = Field(default=1, ge=0, le=500)
+    cosine_eta_min: float = Field(default=0.0, ge=0.0, le=1.0)
+
+
+def execution_options(config: Any) -> dict[str, Any]:
+    return {name: getattr(config, name) for name in ExecutionOptions.model_fields}
+
+
+class ExperimentDecision(ExecutionOptions):
     model_family: ModelFamily = "tiny_cnn"
-    lr: float = Field(ge=1e-5, le=3e-2)
-    epochs: int = Field(ge=1, le=50)
-    hidden: int = Field(ge=16, le=192, multiple_of=8)
-    depth: int = Field(default=2, ge=1, le=8)
-    dropout: float = Field(default=0.0, ge=0.0, le=0.6)
-    batch_size: Literal[16, 32, 64, 128, 256]
-    weight_decay: float = Field(ge=0.0, le=0.1)
+    lr: float = Field(ge=1e-7, le=1.0)
+    epochs: int = Field(ge=1, le=1000)
+    hidden: int = Field(ge=8, le=1024, multiple_of=8)
+    depth: int = Field(default=2, ge=1, le=48)
+    dropout: float = Field(default=0.0, ge=0.0, le=0.95)
+    batch_size: int = Field(ge=4, le=4096)
+    weight_decay: float = Field(ge=0.0, le=1.0)
     class_weighting: bool
     optimizer: OptimizerName = "adamw"
     scheduler: SchedulerName = "none"
-    label_smoothing: float = Field(default=0.0, ge=0.0, le=0.2)
-    patch_size: Literal[2, 4, 7] = 4
-    num_heads: Literal[2, 3, 4, 6, 8] = 4
-    mlp_ratio: Literal[2, 3, 4] = 4
+    label_smoothing: float = Field(default=0.0, ge=0.0, le=0.5)
+    patch_size: Literal[1, 2, 4, 7, 14, 28] = 4
+    num_heads: int = Field(default=4, ge=1, le=32)
+    mlp_ratio: int = Field(default=4, ge=1, le=16)
     pooling: PoolingName = "cls"
     positional_encoding: PositionalEncodingName = "learned"
-    tokenizer_layers: int = Field(default=2, ge=1, le=3)
-    early_stopping_patience: int = Field(default=3, ge=0, le=10)
-    gradient_clip_val: float = Field(default=1.0, ge=0.0, le=5.0)
+    tokenizer_layers: int = Field(default=2, ge=1, le=5)
+    early_stopping_patience: int = Field(default=3, ge=0, le=500)
+    early_stopping_monitor: Literal["val_accuracy", "val_macro_f1", "val_loss"] = "val_accuracy"
+    early_stopping_min_delta: float = Field(default=0.0, ge=0.0, le=1.0)
+    gradient_clip_val: float = Field(default=1.0, ge=0.0, le=100.0)
     rationale: str = Field(min_length=3, max_length=6000)
 
     @model_validator(mode="before")
@@ -142,31 +181,34 @@ class ExperimentDecision(StrictModel):
         return self
 
 
-class CandidateProposal(StrictModel):
+class CandidateProposal(ExecutionOptions):
     """One bounded model/representation hypothesis proposed by the LLM."""
 
     candidate_id: str = Field(pattern=r"^[a-z][a-z0-9_]{2,31}$")
     model_family: ModelFamily
-    hidden: int = Field(ge=16, le=192, multiple_of=8)
-    depth: int = Field(ge=1, le=8)
-    dropout: float = Field(ge=0.0, le=0.6)
+    epochs: int = Field(default=100, ge=1, le=1000)
+    hidden: int = Field(ge=8, le=1024, multiple_of=8)
+    depth: int = Field(ge=1, le=48)
+    dropout: float = Field(ge=0.0, le=0.95)
     normalization: Literal["unit", "standardize"]
-    augmentations: list[Augmentation] = Field(default_factory=list, max_length=3)
+    augmentations: list[Augmentation] = Field(default_factory=list, max_length=8)
     optimizer: OptimizerName
     scheduler: SchedulerName
-    lr: float = Field(ge=1e-5, le=3e-2)
-    weight_decay: float = Field(ge=0.0, le=0.1)
+    lr: float = Field(ge=1e-7, le=1.0)
+    weight_decay: float = Field(ge=0.0, le=1.0)
     class_weighting: bool
-    label_smoothing: float = Field(ge=0.0, le=0.2)
-    batch_size: Literal[16, 32, 64, 128, 256]
-    patch_size: Literal[2, 4, 7] = 4
-    num_heads: Literal[2, 3, 4, 6, 8] = 4
-    mlp_ratio: Literal[2, 3, 4] = 4
+    label_smoothing: float = Field(ge=0.0, le=0.5)
+    batch_size: int = Field(ge=4, le=4096)
+    patch_size: Literal[1, 2, 4, 7, 14, 28] = 4
+    num_heads: int = Field(default=4, ge=1, le=32)
+    mlp_ratio: int = Field(default=4, ge=1, le=16)
     pooling: PoolingName = "cls"
     positional_encoding: PositionalEncodingName = "learned"
-    tokenizer_layers: int = Field(default=2, ge=1, le=3)
-    early_stopping_patience: int = Field(default=2, ge=0, le=10)
-    gradient_clip_val: float = Field(default=1.0, ge=0.0, le=5.0)
+    tokenizer_layers: int = Field(default=2, ge=1, le=5)
+    early_stopping_patience: int = Field(default=2, ge=0, le=500)
+    early_stopping_monitor: Literal["val_accuracy", "val_macro_f1", "val_loss"] = "val_accuracy"
+    early_stopping_min_delta: float = Field(default=0.0, ge=0.0, le=1.0)
+    gradient_clip_val: float = Field(default=1.0, ge=0.0, le=100.0)
     rationale: str = Field(min_length=3, max_length=6000)
 
     @model_validator(mode="before")
@@ -188,7 +230,7 @@ class SearchDecision(StrictModel):
     """Schema-constrained proposal for one search round."""
 
     analysis: str = Field(min_length=3, max_length=12000)
-    candidates: list[CandidateProposal] = Field(min_length=1, max_length=4)
+    candidates: list[CandidateProposal] = Field(min_length=1, max_length=16)
     stop: bool = False
 
 
@@ -362,6 +404,7 @@ class RunManifest(Artefact):
     llm_model: str
     llm_model_digest: str | None = None
     code_sha256: str | None = None
+    code_hash_algorithm: Literal["legacy-native-v1", "canonical-text-v2"] = "legacy-native-v1"
     lightning_cli: bool = True
     deterministic_torch: bool = True
 
@@ -369,6 +412,7 @@ class RunManifest(Artefact):
 class RunConfiguration(Artefact):
     parameters: dict[str, Any]
     frozen_best: dict[str, Any] | None = None
+    frozen_reference_scope: Literal["origin_seed", "local_snapshot"] = "origin_seed"
     extension_registry: list[ApprovedExtension] = Field(default_factory=list)
 
 
@@ -467,27 +511,29 @@ class SplitManifest(Artefact):
     official_test_separate_center: bool = True
 
 
-class TrainConfig(Artefact):
+class TrainConfig(Artefact, ExecutionOptions):
     model_family: ModelFamily = "tiny_cnn"
-    lr: float = Field(ge=1e-5, le=3e-2)
-    epochs: int = Field(ge=1, le=50)
-    hidden: int = Field(ge=16, le=192, multiple_of=8)
-    depth: int = Field(default=2, ge=1, le=8)
-    dropout: float = Field(default=0.0, ge=0.0, le=0.6)
-    batch_size: Literal[16, 32, 64, 128, 256]
-    weight_decay: float = Field(ge=0.0, le=0.1)
+    lr: float = Field(ge=1e-7, le=1.0)
+    epochs: int = Field(ge=1, le=1000)
+    hidden: int = Field(ge=8, le=1024, multiple_of=8)
+    depth: int = Field(default=2, ge=1, le=48)
+    dropout: float = Field(default=0.0, ge=0.0, le=0.95)
+    batch_size: int = Field(ge=4, le=4096)
+    weight_decay: float = Field(ge=0.0, le=1.0)
     class_weighting: bool
     optimizer: OptimizerName = "adamw"
     scheduler: SchedulerName = "none"
-    label_smoothing: float = Field(default=0.0, ge=0.0, le=0.2)
-    patch_size: Literal[2, 4, 7] = 4
-    num_heads: Literal[2, 3, 4, 6, 8] = 4
-    mlp_ratio: Literal[2, 3, 4] = 4
+    label_smoothing: float = Field(default=0.0, ge=0.0, le=0.5)
+    patch_size: Literal[1, 2, 4, 7, 14, 28] = 4
+    num_heads: int = Field(default=4, ge=1, le=32)
+    mlp_ratio: int = Field(default=4, ge=1, le=16)
     pooling: PoolingName = "cls"
     positional_encoding: PositionalEncodingName = "learned"
-    tokenizer_layers: int = Field(default=2, ge=1, le=3)
-    early_stopping_patience: int = Field(default=3, ge=0, le=10)
-    gradient_clip_val: float = Field(default=1.0, ge=0.0, le=5.0)
+    tokenizer_layers: int = Field(default=2, ge=1, le=5)
+    early_stopping_patience: int = Field(default=3, ge=0, le=500)
+    early_stopping_monitor: Literal["val_accuracy", "val_macro_f1", "val_loss"] = "val_accuracy"
+    early_stopping_min_delta: float = Field(default=0.0, ge=0.0, le=1.0)
+    gradient_clip_val: float = Field(default=1.0, ge=0.0, le=100.0)
     seed: int = Field(ge=0)
     device: Literal["cpu", "cuda"]
     rationale: str
@@ -542,10 +588,10 @@ class TrainResult(Artefact):
 
 
 class SearchPlan(Artefact):
-    max_trials: int = Field(ge=1, le=24)
-    rounds: int = Field(ge=1, le=4)
-    search_epochs: int = Field(ge=1, le=12)
-    final_epochs: int = Field(ge=1, le=50)
+    max_trials: int = Field(ge=1, le=256)
+    rounds: int = Field(ge=1, le=16)
+    search_epochs: int = Field(ge=1, le=1000)
+    final_epochs: int = Field(ge=1, le=1000)
     accuracy_tolerance: float = Field(default=0.005, ge=0.0, le=0.05)
     objective: Literal["validation_accuracy_then_macro_f1"] = (
         "validation_accuracy_then_macro_f1"
@@ -553,7 +599,7 @@ class SearchPlan(Artefact):
     test_locked: Literal[True] = True
     framework: Literal["lightning.pytorch"] = "lightning.pytorch"
     progressive_budget: Literal[True] = True
-    round_epoch_budgets: list[int] = Field(min_length=1, max_length=4)
+    round_epoch_budgets: list[int] = Field(min_length=1, max_length=16)
 
     @model_validator(mode="after")
     def validate_epoch_budgets(self) -> SearchPlan:
@@ -582,9 +628,13 @@ class ArchitectureResearch(Artefact):
     source: str
 
 class TrialResult(Artefact):
+    epoch_budget: int | None = Field(default=None, ge=1, le=1000)
+    requested_epochs: int | None = Field(default=None, ge=1, le=1000)
+    epochs_completed: int | None = Field(default=None, ge=1, le=1000)
+    learning_curve: list[EpochMetrics] = Field(default_factory=list, max_length=1000)
     candidate_id: str
     config_hash: str = Field(min_length=64, max_length=64)
-    round_index: int = Field(ge=1, le=4)
+    round_index: int = Field(ge=1, le=16)
     status: Literal["completed", "failed"]
     config: TrainConfig
     representation: RepresentationDecision
@@ -699,6 +749,8 @@ class OODScenario(StrictModel):
     score: Literal["max_softmax", "predictive_entropy"]
     validation_auroc: float | None = Field(default=None, ge=0.0, le=1.0)
     test_auroc: float | None = Field(default=None, ge=0.0, le=1.0)
+    validation_false_accept_rate: float | None = Field(default=None, ge=0.0, le=1.0)
+    test_false_accept_rate: float | None = Field(default=None, ge=0.0, le=1.0)
 
 
 class RiskCoveragePoint(StrictModel):
@@ -711,6 +763,10 @@ class RiskCoveragePoint(StrictModel):
 
 
 class AbstentionReport(Artefact):
+    detector_status: Literal["legacy_unchecked", "eligible", "no_eligible_detector"] = "legacy_unchecked"
+    minimum_scenario_auroc: float = Field(default=0.65, ge=0.5, le=1.0)
+    maximum_false_accept_rate: float = Field(default=0.20, ge=0.0, le=1.0)
+    corruption_seed: int | None = Field(default=None, ge=0)
     method: Literal["max_softmax", "predictive_entropy"] = "max_softmax"
     threshold: float = Field(ge=0.0, le=1.0)
     calibrated_on: Literal["validation"] = "validation"

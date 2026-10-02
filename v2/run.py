@@ -80,7 +80,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--val-limit", type=int, default=None)
     parser.add_argument("--test-limit", type=int, default=None)
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cuda")
-    parser.add_argument("--max-epochs", type=int, default=15)
+    parser.add_argument("--max-epochs", type=int, default=100,
+                        help="shared epoch ceiling; each agent chooses its horizon (up to 1000)")
     parser.add_argument(
         "--no-search",
         action="store_true",
@@ -100,6 +101,12 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--stage-retries", type=int, default=1)
     parser.add_argument("--target-coverage", type=float, default=0.80)
+    parser.add_argument("--ood-min-auroc", type=float, default=0.65,
+                        help="minimum validation AUROC in every corruption scenario")
+    parser.add_argument("--ood-max-false-accept", type=float, default=0.20,
+                        help="maximum validation corrupted acceptance rate at the clean threshold")
+    parser.add_argument("--ood-corruption-seed", type=int, default=1729,
+                        help="fixed corruption panel seed, independent of training seed")
     parser.add_argument(
         "--ablation-suite",
         action="store_true",
@@ -157,7 +164,9 @@ def main(argv: list[str] | None = None) -> int:
         replay_root = Path(args.replay_run).resolve()
         original = read_artefact(replay_root, "run_configuration")
         manifest = read_artefact(replay_root, "run_manifest")
-        if manifest["code_sha256"] != code_tree_sha256(Path(__file__).resolve().parent):
+        if manifest["code_sha256"] != code_tree_sha256(
+                Path(__file__).resolve().parent,
+                algorithm=manifest.get("code_hash_algorithm", "legacy-native-v1")):
             parser.error("replay requires the original source tree; use the recorded code revision")
         # Restore the actual run settings; a replay is not a new experiment.
         output_root = args.output_root
@@ -302,8 +311,24 @@ def run_once(
     reasoner = CachedReasoner(reasoner, bb.root,
                               replay_root=Path(args.replay_run) if args.replay_run else None)
     from extensions import registry_entries
+    frozen_payload = frozen_best.model_dump(mode="json") if frozen_best else None
+    if frozen_payload:
+        from research import contained_path
+        origin = run_root.parent / f"seed_{frozen_best.train_config.seed}"
+        if args.replay_run:
+            from governance import read_artefact
+            replay_root = Path(args.replay_run)
+            replay_settings = read_artefact(replay_root, "run_configuration")
+            origin = (replay_root if replay_settings.get("frozen_reference_scope") == "local_snapshot"
+                      else replay_root.parent / f"seed_{frozen_best.train_config.seed}")
+        source = contained_path(origin, frozen_best.lightning_config_path.replace("\\", "/"))
+        if file_sha256(source) != frozen_best.lightning_config_sha256:
+            raise ValueError("frozen configuration source checksum mismatch")
+        snapshot = bb.blob_dir / "frozen_source_config.yaml"
+        snapshot.write_bytes(source.read_bytes())
+        frozen_payload["lightning_config_path"] = snapshot.relative_to(bb.root).as_posix()
     bb.put("run_configuration", RunConfiguration(parameters=vars(args),
-        frozen_best=frozen_best.model_dump(mode="json") if frozen_best else None,
+        frozen_best=frozen_payload, frozen_reference_scope="local_snapshot",
         extension_registry=registry_entries()), producer="run")
     manifest = RunManifest(
             run_id=bb.run_id,
@@ -318,7 +343,8 @@ def run_once(
             llm_model_digest=ollama_model_digest(
                 args.ollama_base if reasoner.enabled else None,
                 reasoner.model, timeout=min(args.llm_timeout, 5.0)),
-            code_sha256=code_tree_sha256(Path(__file__).resolve().parent))
+            code_sha256=code_tree_sha256(Path(__file__).resolve().parent),
+            code_hash_algorithm="canonical-text-v2")
     if args.replay_run:
         from governance import read_artefact
         original_manifest = read_artefact(Path(args.replay_run), "run_manifest")
@@ -398,7 +424,10 @@ def run_once(
         [
             TrainingAgent(),
             EvaluationAgent(),
-            AbstentionOODAgent(target_validation_coverage=args.target_coverage),
+            AbstentionOODAgent(target_validation_coverage=args.target_coverage,
+                               minimum_scenario_auroc=args.ood_min_auroc,
+                               maximum_false_accept_rate=args.ood_max_false_accept,
+                               corruption_seed=args.ood_corruption_seed),
             ReportingAgent(),
         ]
     )
@@ -570,16 +599,16 @@ def validate_args(args: argparse.Namespace) -> None:
         raise ValueError("--research-limit must be between 3 and 8")
     if not args.research_query.strip() or len(args.research_query) > 1000:
         raise ValueError("--research-query must contain 1 to 1000 characters")
-    if not 1 <= args.max_epochs <= 50:
-        raise ValueError("--max-epochs must be between 1 and 50")
-    if not 1 <= args.search_trials <= 24:
-        raise ValueError("--search-trials must be between 1 and 24")
-    if not 1 <= args.search_rounds <= 4:
-        raise ValueError("--search-rounds must be between 1 and 4")
+    if not 1 <= args.max_epochs <= 1000:
+        raise ValueError("--max-epochs must be between 1 and 1000")
+    if not 1 <= args.search_trials <= 256:
+        raise ValueError("--search-trials must be between 1 and 256")
+    if not 1 <= args.search_rounds <= 16:
+        raise ValueError("--search-rounds must be between 1 and 16")
     if args.search_trials < args.search_rounds:
         raise ValueError("--search-trials must be at least --search-rounds")
-    if not 1 <= args.search_epochs <= 12:
-        raise ValueError("--search-epochs must be between 1 and 12")
+    if not 1 <= args.search_epochs <= 1000:
+        raise ValueError("--search-epochs must be between 1 and 1000")
     if args.search_epochs > args.max_epochs:
         raise ValueError("--search-epochs cannot exceed --max-epochs")
     if not 0.0 <= args.accuracy_tolerance <= 0.05:
@@ -592,6 +621,12 @@ def validate_args(args: argparse.Namespace) -> None:
         raise ValueError("--llm-timeout must be positive")
     if not 0.0 < args.target_coverage <= 1.0:
         raise ValueError("--target-coverage must be in (0, 1]")
+    if not 0.5 <= args.ood_min_auroc <= 1.0:
+        raise ValueError("--ood-min-auroc must be in [0.5, 1]")
+    if not 0.0 <= args.ood_max_false_accept <= 1.0:
+        raise ValueError("--ood-max-false-accept must be in [0, 1]")
+    if args.ood_corruption_seed < 0:
+        raise ValueError("--ood-corruption-seed must be nonnegative")
     for name in ("train_limit", "val_limit", "test_limit"):
         value = getattr(args, name)
         if value is not None and value != 0 and value < 9:
@@ -643,14 +678,26 @@ def select_task_configuration(
     )
 
 
-def code_tree_sha256(root: Path) -> str:
+def code_tree_sha256(root: Path, *, algorithm: str = "canonical-text-v2") -> str:
     digest = hashlib.sha256()
     paths = list(root.glob("*.py")) + list((root / "tests").glob("*.py"))
     paths += list((root / "configs").glob("*.yaml"))
     paths += [root / "requirements.txt"]
-    for path in sorted((path for path in paths if path.is_file()), key=str):
-        digest.update(str(path.relative_to(root)).encode("utf-8"))
-        digest.update(path.read_bytes())
+    if algorithm not in {"legacy-native-v1", "canonical-text-v2"}:
+        raise ValueError(f"unsupported source hash algorithm: {algorithm}")
+    paths = [path for path in paths if path.is_file()]
+    if algorithm == "legacy-native-v1":
+        for path in sorted(paths, key=str):
+            digest.update(str(path.relative_to(root)).encode("utf-8"))
+            digest.update(path.read_bytes())
+    else:
+        digest.update(b"canonical-text-v2\0")
+        for path in sorted(paths, key=lambda p: p.relative_to(root).as_posix()):
+            name = path.relative_to(root).as_posix().encode("utf-8")
+            content = path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+            for value in (name, content):
+                digest.update(len(value).to_bytes(8, "big"))
+                digest.update(value)
     return digest.hexdigest()
 
 

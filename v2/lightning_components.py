@@ -148,6 +148,7 @@ def build_network(
     pooling: PoolingName = "cls",
     positional_encoding: PositionalEncodingName = "learned",
     tokenizer_layers: int = 2,
+    channel_cap: int = 256,
 ) -> nn.Module:
     if model_family == "tiny_cnn":
         layers: list[nn.Module] = []
@@ -163,7 +164,7 @@ def build_network(
                 ]
             )
             channels = width
-            width = min(width * 2, 256)
+            width = min(width * 2, channel_cap)
         layers.extend(
             [
                 nn.AdaptiveAvgPool2d((1, 1)),
@@ -182,7 +183,7 @@ def build_network(
         ]
         channels = hidden
         for block in range(depth):
-            out_channels = min(hidden * (2 ** min(block, 2)), 256)
+            out_channels = min(hidden * (2 ** min(block, 2)), channel_cap)
             layers.append(
                 ResidualBlock(channels, out_channels, stride=1 if block == 0 else 2)
             )
@@ -285,24 +286,52 @@ class PathMNISTLitModule(pl.LightningModule):
         weight_decay: float = 1e-4,
         label_smoothing: float = 0.05,
         class_weights: list[float] | None = None,
+        channel_cap: int = 256,
+        momentum: float = 0.9,
+        nesterov: bool = True,
+        adam_beta1: float = 0.9,
+        adam_beta2: float = 0.999,
+        optimizer_eps: float = 1e-8,
+        one_cycle_pct_start: float = 0.1,
+        plateau_factor: float = 0.5,
+        plateau_patience: int = 1,
+        cosine_eta_min: float = 0.0,
     ):
         super().__init__()
         if in_channels < 1 or n_classes < 2:
             raise ValueError("in_channels must be positive and n_classes at least 2")
-        if not 16 <= hidden <= 192 or hidden % 8:
-            raise ValueError("hidden must be a multiple of 8 between 16 and 192")
-        if not 1 <= depth <= 8:
-            raise ValueError("depth must be between 1 and 8")
-        if not 0.0 <= dropout <= 0.6:
-            raise ValueError("dropout must be between 0.0 and 0.6")
-        if not 1e-5 <= lr <= 3e-2:
-            raise ValueError("lr must be between 1e-5 and 3e-2")
-        if model_family in {"vision_transformer", "compact_transformer"} and hidden % num_heads:
-            raise ValueError("hidden must be divisible by num_heads")
-        if not 0.0 <= weight_decay <= 0.1:
-            raise ValueError("weight_decay must be between 0.0 and 0.1")
-        if not 0.0 <= label_smoothing <= 0.2:
-            raise ValueError("label_smoothing must be between 0.0 and 0.2")
+        from contracts import ExecutionOptions
+        ExecutionOptions(channel_cap=channel_cap, momentum=momentum, nesterov=nesterov,
+                         adam_beta1=adam_beta1, adam_beta2=adam_beta2, optimizer_eps=optimizer_eps,
+                         one_cycle_pct_start=one_cycle_pct_start, plateau_factor=plateau_factor,
+                         plateau_patience=plateau_patience, cosine_eta_min=cosine_eta_min)
+        if optimizer == "sgd" and nesterov and momentum <= 0:
+            raise ValueError("Nesterov requires positive momentum")
+        if scheduler == "cosine" and cosine_eta_min > lr:
+            raise ValueError("cosine_eta_min cannot exceed lr")
+        if not 8 <= hidden <= 1024 or hidden % 8:
+            raise ValueError("hidden must be a multiple of 8 between 8 and 1024")
+        if not 1 <= depth <= 48 or (model_family == "tiny_cnn" and depth > 4):
+            raise ValueError("depth must be 1..48 (1..4 for tiny_cnn pooling)")
+        if model_family == "resnet18" and hidden > 256:
+            raise ValueError("resnet18 base width cannot exceed 256")
+        if model_family == "residual_cnn" and hidden > 512:
+            raise ValueError("residual_cnn base width cannot exceed 512")
+        if not 0.0 <= dropout <= 0.95:
+            raise ValueError("dropout must be between 0.0 and 0.95")
+        if not 1e-7 <= lr <= 1.0:
+            raise ValueError("lr must be between 1e-7 and 1.0")
+        if model_family in {"vision_transformer", "compact_transformer"}:
+            if not 1 <= num_heads <= 32 or hidden % num_heads:
+                raise ValueError("num_heads must be 1..32 and divide hidden")
+            if not 1 <= mlp_ratio <= 16 or not 1 <= tokenizer_layers <= 5:
+                raise ValueError("invalid MLP ratio or tokenizer depth")
+            if patch_size not in {1, 2, 4, 7, 14, 28}:
+                raise ValueError("patch size must divide the 28x28 input")
+        if not 0.0 <= weight_decay <= 1.0:
+            raise ValueError("weight_decay must be between 0.0 and 1.0")
+        if not 0.0 <= label_smoothing <= 0.5:
+            raise ValueError("label_smoothing must be between 0.0 and 0.5")
         if class_weights is not None and len(class_weights) != n_classes:
             raise ValueError("class_weights must contain one value per class")
         if class_weights is not None and any(value <= 0 for value in class_weights):
@@ -321,6 +350,7 @@ class PathMNISTLitModule(pl.LightningModule):
             pooling=pooling,
             positional_encoding=positional_encoding,
             tokenizer_layers=tokenizer_layers,
+            channel_cap=channel_cap,
         )
         weight = (
             torch.tensor(class_weights, dtype=torch.float32)
@@ -425,19 +455,23 @@ class PathMNISTLitModule(pl.LightningModule):
                 self.parameters(),
                 lr=self.hparams.lr,
                 weight_decay=self.hparams.weight_decay,
+                betas=(self.hparams.adam_beta1, self.hparams.adam_beta2),
+                eps=self.hparams.optimizer_eps,
             )
         elif name == "adamw":
             optimizer = torch.optim.AdamW(
                 self.parameters(),
                 lr=self.hparams.lr,
                 weight_decay=self.hparams.weight_decay,
+                betas=(self.hparams.adam_beta1, self.hparams.adam_beta2),
+                eps=self.hparams.optimizer_eps,
             )
         elif name == "sgd":
             optimizer = torch.optim.SGD(
                 self.parameters(),
                 lr=self.hparams.lr,
-                momentum=0.9,
-                nesterov=True,
+                momentum=self.hparams.momentum,
+                nesterov=self.hparams.nesterov,
                 weight_decay=self.hparams.weight_decay,
             )
         else:
@@ -448,7 +482,7 @@ class PathMNISTLitModule(pl.LightningModule):
             return optimizer
         if scheduler_name == "cosine":
             scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-                optimizer, T_max=max(1, int(self.trainer.max_epochs))
+                optimizer, T_max=max(1, int(self.trainer.max_epochs)), eta_min=self.hparams.cosine_eta_min
             )
             return {"optimizer": optimizer, "lr_scheduler": scheduler}
         if scheduler_name == "one_cycle":
@@ -456,7 +490,7 @@ class PathMNISTLitModule(pl.LightningModule):
                 optimizer,
                 max_lr=float(self.hparams.lr),
                 total_steps=int(self.trainer.estimated_stepping_batches),
-                pct_start=0.1,
+                pct_start=self.hparams.one_cycle_pct_start,
             )
             return {
                 "optimizer": optimizer,
@@ -464,7 +498,7 @@ class PathMNISTLitModule(pl.LightningModule):
             }
         if scheduler_name == "reduce_on_plateau":
             scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-                optimizer, mode="max", factor=0.5, patience=1
+                optimizer, mode="max", factor=self.hparams.plateau_factor, patience=self.hparams.plateau_patience
             )
             return {
                 "optimizer": optimizer,

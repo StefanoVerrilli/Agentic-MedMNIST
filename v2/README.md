@@ -57,14 +57,44 @@ rate, weight decay, class weighting, label smoothing, batch size and guarded
 representations. It cannot emit Python code or select values outside the typed
 contracts.
 
-The widened search space accepts model widths from 16 to 192 (multiples of 8),
-depths from 1 to 8, batch sizes from 16 to 256, `one_cycle` scheduling and
-agent-selected early stopping and gradient clipping. Transformer candidates can
-also choose patch size, attention heads, MLP ratio, pooling, positional encoding
-and CCT tokenizer depth. Cross-field validators reject incompatible or ignored
-choices before training, and retain tighter capacity limits for ResNet families.
+The agent selects the training horizon and stopping policy along with model,
+representation and optimizer settings. The enlarged search space is:
+
+| Parameter | Available range |
+| --- | --- |
+| Desired epochs | 1–1,000, capped by `--max-epochs` (default **100**, previously 15) |
+| Early stopping patience | 0–500; 0 disables early stopping |
+| Early stopping monitor / min delta | `val_accuracy`, `val_macro_f1`, `val_loss` / 0–1 |
+| Hidden width | 8–1,024, multiples of 8; ResNet18 up to 256, residual CNN up to 512 |
+| Depth | 1–48; tiny CNN up to 4 because each block halves 28×28 inputs; ResNet18 topology fixed |
+| CNN channel cap | 8–4,096, multiples of 8; default 256 preserves old architectures |
+| Batch size | Any integer from 4 to 4,096 |
+| Learning rate / weight decay | 1e-7–1 / 0–1 |
+| Dropout / label smoothing / gradient clip | 0–0.95 / 0–0.5 / 0–100 |
+| Transformer patch size | 1, 2, 4, 7, 14, 28 |
+| Attention heads / MLP ratio / CCT tokenizer depth | 1–32 / 1–16 / 1–5 |
+| Search ceilings | 256 trials, 16 rounds; at most 16 adaptive proposals per call |
+
+Agents can also tune SGD momentum/Nesterov, Adam betas/epsilon, cosine minimum
+LR, one-cycle warmup fraction and plateau factor/patience. Heads must divide
+the embedding width; Nesterov needs positive momentum. Inactive options are
+canonicalized so they cannot manufacture duplicate trials. Larger settings may
+exhaust GPU memory; failed trials are recorded rather than silently resized.
 The guarded representation space also includes 180-degree rotation and mild,
 deterministic brightness or contrast variants in addition to the original flips.
+Up to eight distinct approved augmentation variants can be selected.
+
+`--search-epochs` controls the initial exploration ceiling, not the candidate's
+desired horizon. Exploration ceilings grow by round; the last round gives all
+finalists the shared `--max-epochs` ceiling. Each candidate trains for
+`min(proposed_epochs, round_ceiling)`, possibly ending earlier via its own stopping
+policy. Ranking compares the same **allocated ceiling**, while proposed/effective
+epochs, actual epochs and learning curves remain visible to the next decision.
+Thus epochs and early stopping are genuine search hyperparameters. Final training
+preserves the selected horizon and stopping settings; it no longer forces the
+maximum epoch count or replaces patience with a heuristic. If every final-budget
+trial fails, selection fails explicitly. Default epoch ceilings have increased:
+full runs can take longer, especially with stopping disabled.
 
 Use Python 3.10 or newer. Ollama is optional for offline validation, but add
 `--require-llm` when an experiment must fail rather than fall back if the local
@@ -104,20 +134,23 @@ restores the earlier one-decision design.
 
 The search loop never receives test metrics. Each round follows this sequence:
 
-1. Ollama proposes one to four schema-valid candidates.
+1. Ollama proposes up to 16 schema-valid candidates when adaptive slots exist.
 2. Lightning trains candidates sequentially with progressive round budgets
-   (`search_epochs`, `2 * search_epochs`, ... capped at `max_epochs`). The
-   incumbent is promoted to later budgets, and final ranking compares only
-   completed trials at the highest budget.
+   (`search_epochs`, `2 * search_epochs`, ...); the last round uses `max_epochs`
+   as its shared ceiling. Candidates can choose shorter horizons and their own
+   early stopping. Promotions rank only the latest successful budget, and final
+   ranking compares only completed trials with the final allocated ceiling.
 3. Deterministic code evaluates validation accuracy, balanced accuracy and
    macro-F1.
-4. The next Ollama call receives only prior validation results.
+4. The next Ollama call receives training curves, actual epochs and prior
+   validation results, along with proposed/effective horizons and budget caps.
 5. The winner is selected by validation accuracy; candidates within the
    declared tolerance (default 0.5 percentage points) are ordered by macro-F1.
 6. The winner is retrained, frozen, and only then evaluated on test.
 
-When at least five trials are available, the deterministic portfolio reserves
-capacity for all five architecture families before adaptive refinements.
+Exploration prioritizes adaptive proposals and permits at most one forced
+architecture-coverage slot per round. The final round promotes finalists;
+five-family coverage is reported and is not guaranteed by a small budget.
 Selection-time profiling contains only train and validation statistics;
 representation and model-design prompts never receive test labels,
 distributions, predictions or performance.
@@ -146,15 +179,33 @@ compatible GPU is unavailable.
   the checkpoint. Their paths are persisted in the training/search/baseline
   artefacts;
 - model search is budgeted, deduplicated by configuration hash and driven only
-  by validation evidence; failed trials remain auditable artefacts;
+  by validation evidence; failed trials remain auditable artefacts. Exploration
+  rounds prioritize adaptive proposals, with at most one forced coverage slot.
+  Promotions rank only the latest successful epoch budget; the final round
+  compares its finalists at the larger budget. An 8-trial / 3-round search
+  normally allocates 3/3/2 trials, with four adaptive slots, one coverage trial,
+  one intermediate promotion and two finalists.
+  Small budgets cannot guarantee coverage of all five families. Rounds with
+  no adaptive capacity do not call the LLM; duplicate proposals fall back to
+  the portfolio. Early-stop requests cannot skip the final comparison;
 - evaluation reports accuracy, balanced accuracy, macro/per-class precision,
   recall, F1, one-vs-rest ROC-AUC (when defined), Wilson 95% intervals for
   accuracy and per-class recall, and a confusion matrix;
 - abstention calibrates on validation and compares max-softmax with predictive
   entropy on three Gaussian-noise severities; score selection uses validation,
   while test remains evaluation-only. It also records validation-calibrated
-  risk/coverage points from 50% through 90% coverage. OOD below chance is a
-  deterministic warning and never a clinical OOD claim;
+  risk/coverage points from 50% through 90% coverage. Eligibility requires every
+  validation corruption scenario to meet `--ood-min-auroc` (default 0.65) and
+  `--ood-max-false-accept` (default 0.20) at the clean-validation threshold.
+  These are explicit engineering defaults, not empirically validated clinical
+  cutoffs. Freeze them before evaluating the test set. If no detector qualifies,
+  `detector_status=no_eligible_detector` disables automatic acceptance and sends
+  all cases to review. The retained method/threshold and scenario false-accept
+  rates describe the rejected detector for diagnosis; risk/coverage masks are
+  disabled too. Zero coverage uses the existing accuracy=0/risk=1 convention.
+  `ood_pass` additionally requires the same limits on held-out corruptions;
+  a test failure is reported without changing validation-selected routing.
+  `--ood-corruption-seed` defaults to 1729, independently of training seeds;
 - the conventional baseline uses the exact same selected split and seed; the
   optional ablation suite runs three representation scenarios;
 - `--seeds 42,43,44` produces a mean and population standard deviation for
@@ -181,6 +232,18 @@ Per-sample validation/test probabilities, logits, targets and predictions are
 stored in a checksummed NPZ. Run manifests include the source-tree SHA-256,
 package versions and, when exposed by Ollama, the immutable model digest.
 Baseline and ablation checkpoints are checksummed as well.
+Integrity validation recursively checks nested evidence and literature snapshots.
+New frozen-seed runs include `blobs/frozen_source_config.yaml`; historical
+`frozen_best` references resolve to the original sibling seed. Historical files
+are read without migration. Source hashes use `canonical-text-v2` (POSIX relative
+paths, normalized line endings and length-delimited content); manifests without
+an algorithm retain legacy semantics. File evidence hashes still verify exact
+bytes. A historical replay still requires its original code revision.
+
+Exported `best_config.yaml` shares checkpoint selection (`val_accuracy`, max,
+top-1) and optional early stopping with the agent trainer. Logging/output paths
+remain execution-specific. CLI evaluation should load the best checkpoint
+explicitly rather than assume the final epoch is the selected model.
 
 ## Tests
 
@@ -188,8 +251,9 @@ The dependency-light tests do not download data. They cover contract bounds,
 Ollama JSON-schema validation and fallback, global request serialization,
 official split preservation, remediation-aware retry/veto behaviour,
 validation-only search and ranking, OOD scoring, multiclass metrics and ten
-fault-injection cases. A real Lightning CPU smoke test is recommended after
-installing requirements.
+fault-injection cases, plus real Lightning CPU training and offline replay on
+small synthetic datasets. They do not establish full-dataset accuracy or CUDA
+reproducibility.
 
 ```bash
 python -m unittest discover -s tests -v

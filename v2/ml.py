@@ -288,7 +288,9 @@ def train_model(
         else None
     )
 
+    from contracts import execution_options
     model = PathMNISTLitModule(
+        **execution_options(config),
         model_family=config.model_family,
         in_channels=prepared.bundle.n_channels,
         n_classes=prepared.bundle.n_classes,
@@ -321,15 +323,12 @@ def train_model(
         name=target.stem,
         version=0,
     )
+    from search import training_callback_specs
+    callback_specs = training_callback_specs(config)
     checkpoint = ModelCheckpoint(
         dirpath=target.parent,
         filename=target.stem,
-        monitor="val_accuracy",
-        mode="max",
-        save_top_k=1,
-        save_last=False,
-        auto_insert_metric_name=False,
-        enable_version_counter=False,
+        **callback_specs[0]["init_args"],
     )
     history_callback = MetricsHistory(
         echo=echo_epoch_log,
@@ -339,12 +338,7 @@ def train_model(
     callbacks: list[Any] = [checkpoint, history_callback]
     if config.early_stopping_patience > 0:
         callbacks.append(
-            EarlyStopping(
-                monitor="val_accuracy",
-                mode="max",
-                patience=config.early_stopping_patience,
-                check_finite=True,
-            )
+            EarlyStopping(**callback_specs[1]["init_args"])
         )
     trainer = pl.Trainer(
         max_epochs=config.epochs,

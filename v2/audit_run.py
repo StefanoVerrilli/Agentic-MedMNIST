@@ -8,6 +8,7 @@ from pathlib import Path
 
 import numpy as np
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, f1_score, roc_auc_score
+from governance import evidence_references
 
 
 def canonical(value):
@@ -30,11 +31,8 @@ def auc(clean, corrupted, method):
 
 def audit_seed(root):
     artifacts, files, problems, newline_changes = {}, {}, [], []
-    def check_file(value, expected):
-        path = (root / value).resolve()
-        if not path.is_relative_to(root.resolve()):
-            problems.append(f"external reference: {value}")
-            return
+    def check_file(path, expected):
+        value = str(path)
         if str(path) in files:
             if files[str(path)] != expected:
                 problems.append(f"conflicting checksum: {value}")
@@ -51,18 +49,11 @@ def audit_seed(root):
                 problems.append(f"checksum mismatch: {value}")
 
     def walk(value):
-        if isinstance(value, dict):
-            for path_key, hash_key in (("path", "sha256"), ("checkpoint_path", "checkpoint_sha256"),
-                                       ("lightning_config_path", "lightning_config_sha256"),
-                                       ("ood_evidence_path", "ood_evidence_sha256"),
-                                       ("snapshot_path", "snapshot_sha256")):
-                if value.get(path_key) and value.get(hash_key):
-                    check_file(value[path_key], value[hash_key])
-            for item in value.values():
-                walk(item)
-        elif isinstance(value, list):
-            for item in value:
-                walk(item)
+        try:
+            for _, path, expected in evidence_references(root, value):
+                check_file(path, expected)
+        except (ValueError, KeyError, TypeError) as exc:
+            problems.append(f"invalid reference: {exc}")
 
     for path in sorted((root / "artefacts").glob("*.json")):
         envelope = json.loads(path.read_text(encoding="utf-8"))
@@ -98,9 +89,11 @@ def audit_seed(root):
         val_conf = 1 - score(predictions["validation_probabilities"], abstention["method"])
         threshold = float(np.quantile(val_conf, 1-abstention["target_validation_coverage"], method="lower"))
         compare("threshold", threshold, abstention["threshold"])
-        covered = 1-score(p, abstention["method"]) >= threshold
+        eligible = abstention.get("detector_status") != "no_eligible_detector"
+        covered = (1-score(p, abstention["method"]) >= threshold) & eligible
         compare("test_coverage", covered.mean(), abstention["test_coverage"])
-        compare("accuracy_on_covered", (predicted[covered] == y[covered]).mean(), abstention["accuracy_on_covered"])
+        compare("accuracy_on_covered", (predicted[covered] == y[covered]).mean() if covered.any() else 0,
+                abstention["accuracy_on_covered"])
         compare("human_review_count", (~covered).sum(), abstention["human_review_count"])
         queue = json.loads((root / artifacts["human_review_queue"]["path"]).read_text(encoding="utf-8"))
         compare("queue_indices", set(int(c["sample_index"]) for c in queue["cases"]) == set(np.flatnonzero(~covered)), 1)
@@ -112,6 +105,13 @@ def audit_seed(root):
                 actual = auc(probabilities[split], ood[f"{prefix}_gaussian_{key}"], scenario["score"])
                 row[f"{prefix}_auroc"] = actual
                 compare(f"ood_{prefix}_{sigma}_{scenario['score']}", actual, scenario[f"{prefix}_auroc"])
+                if scenario.get(f"{prefix}_false_accept_rate") is not None:
+                    method_threshold = np.quantile(1-score(probabilities["val"], scenario["score"]),
+                                                   1-abstention["target_validation_coverage"], method="lower")
+                    far = float(((1-score(ood[f"{prefix}_gaussian_{key}"], scenario["score"])) >= method_threshold).mean())
+                    row[f"{prefix}_false_accept_rate"] = far
+                    compare(f"ood_{prefix}_far_{sigma}_{scenario['score']}", far,
+                            scenario[f"{prefix}_false_accept_rate"])
             corrupted = ood[f"test_gaussian_{key}"]
             row["corrupted_mean_max_softmax"] = float(corrupted.max(axis=1).mean())
             row["corrupted_predicted_class_counts"] = np.bincount(corrupted.argmax(axis=1), minlength=p.shape[1]).tolist()
@@ -119,7 +119,17 @@ def audit_seed(root):
             ood_rows.append(row)
         selected = [row for row in ood_rows if row["method"] == abstention["method"]]
         compare("ood_aggregate", np.mean([row["test_auroc"] for row in selected]), abstention["ood_auroc"])
-        compare("ood_pass", min(row["test_auroc"] for row in selected) >= .5, abstention["ood_pass"])
+        if abstention.get("detector_status", "legacy_unchecked") == "legacy_unchecked":
+            passed = min(row["test_auroc"] for row in selected) >= .5
+        else:
+            validation_eligible = all(row["validation_auroc"] >= abstention["minimum_scenario_auroc"]
+                                      and row["validation_false_accept_rate"] <= abstention["maximum_false_accept_rate"]
+                                      for row in selected)
+            compare("detector_eligibility", validation_eligible, eligible)
+            passed = validation_eligible and all(
+                row["test_auroc"] >= abstention["minimum_scenario_auroc"]
+                and row["test_false_accept_rate"] <= abstention["maximum_false_accept_rate"] for row in selected)
+        compare("ood_pass", passed, abstention["ood_pass"])
         for item in evaluation["per_class"]:
             label = item["label"]
             mask = y == label

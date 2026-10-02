@@ -13,6 +13,7 @@ from contracts import (
     RepresentationDecision,
     TrainConfig,
     TrialResult,
+    execution_options,
 )
 
 
@@ -38,9 +39,10 @@ def proposal_to_config(
     source: str,
 ) -> TrainConfig:
     return TrainConfig(
+        **execution_options(candidate),
         model_family=candidate.model_family,
         lr=candidate.lr,
-        epochs=epochs,
+        epochs=min(candidate.epochs, epochs),
         hidden=candidate.hidden,
         depth=candidate.depth,
         dropout=candidate.dropout,
@@ -56,7 +58,9 @@ def proposal_to_config(
         pooling=candidate.pooling,
         positional_encoding=candidate.positional_encoding,
         tokenizer_layers=candidate.tokenizer_layers,
-        early_stopping_patience=min(candidate.early_stopping_patience, max(0, epochs - 1)),
+        early_stopping_patience=candidate.early_stopping_patience,
+        early_stopping_monitor=candidate.early_stopping_monitor,
+        early_stopping_min_delta=candidate.early_stopping_min_delta,
         gradient_clip_val=candidate.gradient_clip_val,
         seed=seed,
         device=device,
@@ -80,6 +84,8 @@ def rank_trials(
     completed = [trial for trial in trials if trial.status == "completed"]
     if not completed:
         raise RuntimeError("model search produced no successful trial")
+    if len({trial.epoch_budget or trial.config.epochs for trial in completed}) != 1:
+        raise ValueError("rank_trials requires equal epoch budgets")
     max_accuracy = max(float(trial.validation_accuracy) for trial in completed)
     eligible = [
         trial
@@ -91,7 +97,7 @@ def rank_trials(
         key=lambda trial: (
             float(trial.validation_macro_f1),
             float(trial.validation_accuracy),
-            -trial.duration_seconds,
+            trial.config_hash,
             trial.candidate_id,
         ),
     )
@@ -487,8 +493,11 @@ def lightning_config_payload(
             "logger": False,
             "enable_progress_bar": True,
             "num_sanity_val_steps": 0,
+            "enable_checkpointing": True,
+            "callbacks": training_callback_specs(config),
         },
         "model": {
+            **execution_options(config),
             "model_family": config.model_family,
             "hidden": config.hidden,
             "depth": config.depth,
@@ -518,3 +527,22 @@ def lightning_config_payload(
             "download": download,
         },
     }
+
+
+def training_callback_specs(config: TrainConfig) -> list[dict[str, Any]]:
+    """Shared selection/stopping policy for the agent trainer and LightningCLI."""
+    callbacks = [{
+        "class_path": "lightning.pytorch.callbacks.ModelCheckpoint",
+        "init_args": {"monitor": "val_accuracy", "mode": "max", "save_top_k": 1,
+                      "save_last": False, "auto_insert_metric_name": False,
+                      "enable_version_counter": False},
+    }]
+    if config.early_stopping_patience > 0:
+        callbacks.append({
+            "class_path": "lightning.pytorch.callbacks.EarlyStopping",
+            "init_args": {"monitor": config.early_stopping_monitor,
+                          "mode": "min" if config.early_stopping_monitor == "val_loss" else "max",
+                          "min_delta": config.early_stopping_min_delta,
+                          "patience": config.early_stopping_patience, "check_finite": True},
+        })
+    return callbacks

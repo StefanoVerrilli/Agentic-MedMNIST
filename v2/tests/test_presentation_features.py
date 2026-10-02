@@ -214,6 +214,22 @@ class PresentationFeaturesTests(unittest.TestCase):
                 self.assertFalse(report.acceptance_ready)
                 self.assertFalse(report.trl7_evidence_complete)
                 self.assertEqual(result["agentic_accuracy"], repeated["agentic_accuracy"])
+                # A frozen seed and its replay must carry their own source YAML,
+                # without requiring the first seed in the replay destination.
+                from contracts import BestConfiguration
+                from governance import check_integrity, read_artefact
+                selected = BestConfiguration.model_validate(read_artefact(original, "best_configuration"))
+                frozen_root = original.parent / "seed_47"
+                frozen_replay = root / "frozen_replay" / "seed_47"
+                args.replay_run = None
+                with patch("run.IngestionAgent", side_effect=ingestion), contextlib.redirect_stdout(io.StringIO()):
+                    run_once(args, 47, frozen_root, resolve_limits(args), frozen_best=selected)
+                    args.replay_run = str(frozen_root)
+                    embedded = BestConfiguration.model_validate(read_artefact(frozen_root, "run_configuration")["frozen_best"])
+                    run_once(args, 47, frozen_replay, resolve_limits(args), frozen_best=embedded)
+                self.assertEqual(check_integrity(frozen_replay), [])
+                frozen_comparison = json.loads((frozen_replay / "replay_comparison.json").read_text())
+                self.assertTrue(frozen_comparison["payload"]["matched"], frozen_comparison)
         finally:
             torch.set_num_threads(previous_threads)
 

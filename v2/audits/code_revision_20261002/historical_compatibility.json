@@ -1,0 +1,21 @@
+{
+  "run": "runs/pathmnist_20261002T104242464569Z",
+  "read_only": true,
+  "seeds": [
+    {
+      "seed": "seed_42",
+      "typed_artefacts_loaded": 58,
+      "integrity_issues": []
+    },
+    {
+      "seed": "seed_47",
+      "typed_artefacts_loaded": 48,
+      "integrity_issues": []
+    },
+    {
+      "seed": "seed_72",
+      "typed_artefacts_loaded": 48,
+      "integrity_issues": []
+    }
+  ]
+}

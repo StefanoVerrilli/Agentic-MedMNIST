@@ -41,8 +41,9 @@ from contracts import (
     TrialResult,
     sha256_file,
     utc_now,
+    execution_options,
 )
-from llm import Reasoner
+from llm import Reasoner, ReasonedDecision
 from extensions import allowed_augmentations, validate_representation
 from ml import (
     DatasetBundle,
@@ -441,8 +442,8 @@ class ExperimentDesignAgent:
         device: str = "cpu",
         max_epochs: int = 8,
     ):
-        if max_epochs < 1 or max_epochs > 50:
-            raise ValueError("max_epochs must be between 1 and 50")
+        if max_epochs < 1 or max_epochs > 1000:
+            raise ValueError("max_epochs must be between 1 and 1000")
         if device not in {"cpu", "cuda"}:
             raise ValueError("device must be cpu or cuda")
         self.reasoner = reasoner
@@ -472,8 +473,9 @@ class ExperimentDesignAgent:
         decision = self.reasoner.decide(
             stage="experiment_design.configuration",
             system=(
-                "Configure a deliberately small CNN. Values outside the JSON "
-                "Schema are invalid. Prefer stable, low-cost settings and explain "
+                "Select any supported architecture and all its active hyperparameters, "
+                "including epochs and early stopping (patience=0 disables it). "
+                "Values outside the JSON Schema are invalid. Explain "
                 "how the data profile and representation informed the choice."
             ),
             user=(
@@ -498,6 +500,7 @@ class ExperimentDesignAgent:
                 accepted=epochs,
             )
         config = TrainConfig(
+            **execution_options(selected),
             model_family=selected.model_family,
             lr=selected.lr,
             epochs=epochs,
@@ -517,6 +520,8 @@ class ExperimentDesignAgent:
             positional_encoding=selected.positional_encoding,
             tokenizer_layers=selected.tokenizer_layers,
             early_stopping_patience=selected.early_stopping_patience,
+            early_stopping_monitor=selected.early_stopping_monitor,
+            early_stopping_min_delta=selected.early_stopping_min_delta,
             gradient_clip_val=selected.gradient_clip_val,
             seed=self.seed,
             device=self.device,
@@ -540,7 +545,7 @@ class ModelSearchAgent:
         max_trials: int = 6,
         rounds: int = 2,
         search_epochs: int = 3,
-        final_epochs: int = 15,
+        final_epochs: int = 100,
         accuracy_tolerance: float = 0.005,
         data_root: str | None = None,
         train_limit: int | None = None,
@@ -550,16 +555,16 @@ class ModelSearchAgent:
         trainer: Callable[..., Any] = train_model,
         predictor: Callable[..., Any] = predict_probabilities,
     ):
-        if not 1 <= max_trials <= 24:
-            raise ValueError("max_trials must be between 1 and 24")
-        if not 1 <= rounds <= 4:
-            raise ValueError("rounds must be between 1 and 4")
+        if not 1 <= max_trials <= 256:
+            raise ValueError("max_trials must be between 1 and 256")
+        if not 1 <= rounds <= 16:
+            raise ValueError("rounds must be between 1 and 16")
         if max_trials < rounds:
             raise ValueError("max_trials must be at least the number of rounds")
-        if not 1 <= search_epochs <= 12:
-            raise ValueError("search_epochs must be between 1 and 12")
-        if not search_epochs <= final_epochs <= 50:
-            raise ValueError("final_epochs must be between search_epochs and 50")
+        if not 1 <= search_epochs <= 1000:
+            raise ValueError("search_epochs must be between 1 and 1000")
+        if not search_epochs <= final_epochs <= 1000:
+            raise ValueError("final_epochs must be between search_epochs and 1000")
         if device not in {"cpu", "cuda"}:
             raise ValueError("device must be cpu or cuda")
         self.reasoner = reasoner
@@ -593,7 +598,7 @@ class ModelSearchAgent:
             final_epochs=self.final_epochs,
             accuracy_tolerance=self.accuracy_tolerance,
             round_epoch_budgets=[
-                min(self.final_epochs, self.search_epochs * index)
+                self.final_epochs if index == self.rounds else min(self.final_epochs, self.search_epochs * index)
                 for index in range(1, self.rounds + 1)
             ],
         )
@@ -609,8 +614,23 @@ class ModelSearchAgent:
             if remaining <= 0:
                 break
             rounds_left = self.rounds - round_index + 1
-            round_cap = min(4, max(1, (remaining + rounds_left - 1) // rounds_left))
+            round_cap = max(1, (remaining + rounds_left - 1) // rounds_left)
             trial_epochs = plan.round_epoch_budgets[round_index - 1]
+            completed_so_far = [item for item in trials if item.status == "completed"]
+            promotion_pool = []
+            if completed_so_far:
+                latest_budget = max(item.epoch_budget or item.config.epochs for item in completed_so_far)
+                promotion_pool = [item for item in completed_so_far
+                                  if (item.epoch_budget or item.config.epochs) == latest_budget
+                                  and (item.config_hash, trial_epochs) not in seen]
+            final_round = round_index == self.rounds
+            promotion_count = min(len(promotion_pool), round_cap if final_round else min(1, round_cap - 1))
+            promotions = []
+            for _ in range(promotion_count):
+                winner = rank_trials(promotion_pool, accuracy_tolerance=self.accuracy_tolerance)
+                promotions.append(proposals_by_hash[winner.config_hash])
+                promotion_pool = [item for item in promotion_pool if item.config_hash != winner.config_hash]
+            coverage_slots = min(1, max(0, round_cap - len(promotions) - 2))
             portfolio_candidates = coverage_candidates(round_index, evaluated_families)
             required_candidates: list[CandidateProposal] = []
             required_families: set[str] = set()
@@ -621,8 +641,9 @@ class ModelSearchAgent:
                 ):
                     required_candidates.append(candidate)
                     required_families.add(candidate.model_family)
-            required_candidates = required_candidates[:round_cap]
-            fallback_candidates = portfolio_candidates[:round_cap]
+            required_candidates = required_candidates[:coverage_slots]
+            adaptive_slots = min(16, round_cap - len(promotions) - len(required_candidates))
+            fallback_candidates = portfolio_candidates[:max(1, adaptive_slots)]
             fallback = SearchDecision(
                 analysis=(
                     "Deterministic diverse candidate set; selection uses validation "
@@ -635,13 +656,18 @@ class ModelSearchAgent:
                 {
                     "candidate_id": trial.candidate_id,
                     "config_hash": trial.config_hash,
+                    "epoch_budget": trial.epoch_budget,
+                    "requested_epochs": trial.requested_epochs,
+                    "effective_epochs": trial.config.epochs,
+                    "epochs_completed": trial.epochs_completed,
+                    "learning_curve_tail": [row.model_dump(mode="json") for row in trial.learning_curve[-8:]],
+                    "early_stopping_patience": trial.config.early_stopping_patience,
                     "configuration": trial.config.model_dump(
                         mode="json",
                         exclude={
                             "schema_version",
                             "epochs",
                             "early_stopping_patience",
-                            "gradient_clip_val",
                             "seed",
                             "device",
                             "rationale",
@@ -675,10 +701,18 @@ class ModelSearchAgent:
                     "while hidden controls its base channel width. Do not claim "
                     "that changing depth changes ResNet18 capacity. Built-in "
                     "augmentations in approved_augmentations are already runnable; "
-                    "only new extension recipes require an extension approval."
+                    "only new extension recipes require an extension approval. "
+                    "Choose epochs and all active hyperparameters, including "
+                    "early_stopping_patience (0 disables stopping), early_stopping_monitor "
+                    "and early_stopping_min_delta. Epochs is the desired horizon: "
+                    "exploration caps it at epoch_budget; finalists receive the same "
+                    "maximum_epochs ceiling. Patience is never silently shortened. "
+                    "Use prior validation and convergence evidence to revise these choices."
                 ),
                 user=(
-                    f"round={round_index}/{self.rounds}; candidate_budget={round_cap}; "
+                    f"round={round_index}/{self.rounds}; candidate_budget={adaptive_slots}; "
+                    f"epoch_budget={trial_epochs}; maximum_epochs={self.final_epochs}; "
+                    f"scheduled_configurations={json.dumps([c.model_dump(mode='json') for c in [*required_candidates, *promotions]], sort_keys=True)}; "
                     f"train_samples={manifest.loaded_split_sizes['train']}; "
                     f"validation_samples={manifest.loaded_split_sizes['val']}; "
                     f"train_counts={profile.class_counts['train']}; "
@@ -693,25 +727,24 @@ class ModelSearchAgent:
                 response_model=SearchDecision,
                 fallback=fallback,
                 audit=bb.record_event,
+            ) if adaptive_slots else ReasonedDecision(
+                value=fallback, source="scheduler:promotion_only", used_fallback=False,
+                attempts=0, request_id=None,
             )
-            # Reserve capacity for architecture coverage before adaptive refinements.
+            bb.record_event("search_round_allocation", round_index=round_index,
+                            epoch_budget=trial_epochs, capacity=round_cap,
+                            coverage_slots=len(required_candidates),
+                            promotion_slots=len(promotions), adaptive_slots=adaptive_slots)
             candidate_entries = [
                 (candidate, "heuristic:coverage") for candidate in required_candidates
             ]
-            if trials:
-                completed_so_far = [item for item in trials if item.status == "completed"]
-                if completed_so_far:
-                    incumbent = rank_trials(
-                        completed_so_far, accuracy_tolerance=self.accuracy_tolerance
-                    )
-                    candidate_entries.append(
-                        (proposals_by_hash[incumbent.config_hash], "promotion:incumbent")
-                    )
+            candidate_entries.extend((candidate, "promotion:finalist") for candidate in promotions)
             candidate_entries.extend(
                 (candidate, decision.source) for candidate in decision.value.candidates
+                if adaptive_slots
             )
             candidate_entries.extend(
-                (candidate, "heuristic:portfolio") for candidate in fallback_candidates
+                (candidate, "heuristic:portfolio") for candidate in portfolio_candidates
             )
             accepted = 0
             for candidate, candidate_source in candidate_entries:
@@ -741,7 +774,6 @@ class ModelSearchAgent:
                     source=candidate_source,
                 )
                 representation = proposal_to_representation(candidate)
-                prepared = prepare_data(bundle, representation)
                 search_version = sum(item["artefact"] == "search_plan" for item in bb.registry)
                 artefact_name = f"{safe_trial_name(candidate.candidate_id, digest)}_e{trial_epochs}_s{search_version:03d}"
                 checkpoint = bb.blob_dir / "search" / f"{artefact_name}.ckpt"
@@ -752,8 +784,12 @@ class ModelSearchAgent:
                     candidate_id=candidate.candidate_id,
                     config_hash=digest,
                     epochs=trial_epochs,
+                    decision_source=candidate_source,
+                    requested_epochs=candidate.epochs,
+                    effective_epochs=config.epochs,
                 )
                 try:
+                    prepared = prepare_data(bundle, representation)
                     output = self.trainer(prepared, config, checkpoint)
                     probabilities, targets = self.predictor(
                         output.model,
@@ -769,6 +805,9 @@ class ModelSearchAgent:
                     actual_checkpoint = Path(output.result.checkpoint_path)
                     checkpoint_relative = _relative_to_run(actual_checkpoint, bb.root)
                     trial = TrialResult(
+                        epoch_budget=trial_epochs, requested_epochs=candidate.epochs,
+                        epochs_completed=output.result.epochs_completed,
+                        learning_curve=output.result.history,
                         candidate_id=candidate.candidate_id,
                         config_hash=digest,
                         round_index=round_index,
@@ -803,6 +842,7 @@ class ModelSearchAgent:
                 # entirely failed search.
                 except Exception as exc:  # noqa: BLE001
                     trial = TrialResult(
+                        epoch_budget=trial_epochs, requested_epochs=candidate.epochs,
                         candidate_id=candidate.candidate_id,
                         config_hash=digest,
                         round_index=round_index,
@@ -823,6 +863,8 @@ class ModelSearchAgent:
                     candidate_id=candidate.candidate_id,
                     config_hash=digest,
                     status=trial.status,
+                    epochs=trial_epochs,
+                    decision_source=candidate_source,
                     validation_accuracy=trial.validation_accuracy,
                     validation_macro_f1=trial.validation_macro_f1,
                 )
@@ -830,7 +872,7 @@ class ModelSearchAgent:
             if (
                 decision.value.stop
                 and sum(t.status == "completed" for t in trials) >= minimum_trials
-                and round_index >= min(2, self.rounds)
+                and round_index == self.rounds
             ):
                 bb.record_event(
                     "search_stop_requested",
@@ -842,23 +884,24 @@ class ModelSearchAgent:
                 bb.record_event(
                     "search_stop_rejected",
                     round_index=round_index,
-                    reason=("adaptive_round_or_minimum_validation_trials_not_reached"),
+                    reason="final_comparison_or_minimum_validation_trials_not_reached",
                     minimum_trials=minimum_trials,
                 )
 
         completed_trials = [trial for trial in trials if trial.status == "completed"]
         if not completed_trials:
             raise RuntimeError("model search produced no successful trial")
-        highest_budget = max(trial.config.epochs for trial in completed_trials)
+        highest_budget = max(trial.epoch_budget or trial.config.epochs for trial in completed_trials)
+        if highest_budget != self.final_epochs:
+            raise RuntimeError("no candidate completed the final comparison budget; refusing an unvalidated final configuration")
         selected = rank_trials(
-            [trial for trial in completed_trials if trial.config.epochs == highest_budget],
+            [trial for trial in completed_trials if (trial.epoch_budget or trial.config.epochs) == highest_budget],
             accuracy_tolerance=self.accuracy_tolerance,
         )
         candidate = proposals_by_hash[selected.config_hash]
         final_config = selected.config.model_copy(
             update={
-                "epochs": self.final_epochs,
-                "early_stopping_patience": min(5, max(0, self.final_epochs // 4)),
+                "epochs": min(candidate.epochs, self.final_epochs),
                 "source": f"agentic_search:selected:{selected.decision_source}",
                 "rationale": (
                     f"Selected from {sum(t.status == 'completed' for t in trials)} "
@@ -985,8 +1028,8 @@ class ArchitectureResearchAgent:
                 "compact_transformer", "vision_transformer", "residual_cnn", "resnet18"
             ],
             transformer_guidance=(
-                "Explore 2x2, 4x4 or 7x7 ViT patches, compatible head counts, pooling "
-                "and positional encodings; for CCT vary one to three tokenizer layers."
+                "Explore ViT patch sizes dividing 28, compatible head counts, pooling "
+                "and positional encodings; for CCT vary one to five tokenizer layers."
             ),
             risks=[
                 "pure ViT can be data-inefficient without pretraining",
@@ -1260,6 +1303,9 @@ class AbstentionOODAgent:
         target_validation_coverage: float = 0.80,
         corruption_sigma: float = 0.25,
         corruption_sigmas: tuple[float, ...] | None = None,
+        minimum_scenario_auroc: float = 0.65,
+        maximum_false_accept_rate: float = 0.20,
+        corruption_seed: int = 1729,
     ):
         if not 0.0 < target_validation_coverage <= 1.0:
             raise ValueError("target_validation_coverage must be in (0, 1]")
@@ -1270,6 +1316,13 @@ class AbstentionOODAgent:
         if not sigmas or any(value <= 0 for value in sigmas):
             raise ValueError("all corruption sigmas must be positive")
         self.corruption_sigmas = tuple(dict.fromkeys(float(value) for value in sigmas))
+        if not 0.5 <= minimum_scenario_auroc <= 1 or not 0 <= maximum_false_accept_rate <= 1:
+            raise ValueError("invalid OOD eligibility thresholds")
+        if corruption_seed < 0:
+            raise ValueError("corruption_seed must be nonnegative")
+        self.minimum_scenario_auroc = minimum_scenario_auroc
+        self.maximum_false_accept_rate = maximum_false_accept_rate
+        self.corruption_seed = corruption_seed
 
     def run(self, bb: Blackboard) -> None:
         import numpy as np
@@ -1288,6 +1341,13 @@ class AbstentionOODAgent:
             "predictive_entropy": [],
         }
         ood_arrays: dict[str, Any] = {}
+        thresholds = {
+            method: float(np.quantile(1.0 - _ood_score(probabilities["val"], method),
+                                     1.0 - self.target_validation_coverage, method="lower"))
+            for method in method_validation
+        }
+        validation_eligible = {method: True for method in method_validation}
+        test_acceptable = {method: True for method in method_validation}
         for sigma in self.corruption_sigmas:
             val_ood, _, _ = predict_outputs(
                 model,
@@ -1295,7 +1355,7 @@ class AbstentionOODAgent:
                 "val",
                 config.batch_size,
                 device=config.device,
-                seed=config.seed,
+                seed=self.corruption_seed,
                 corruption_sigma=sigma,
             )
             test_ood, _, _ = predict_outputs(
@@ -1304,7 +1364,7 @@ class AbstentionOODAgent:
                 "test",
                 config.batch_size,
                 device=config.device,
-                seed=config.seed,
+                seed=self.corruption_seed,
                 corruption_sigma=sigma,
             )
             key = str(sigma).replace(".", "_")
@@ -1313,6 +1373,14 @@ class AbstentionOODAgent:
             for method in ("max_softmax", "predictive_entropy"):
                 val_auc = _ood_auc(probabilities["val"], val_ood, method)
                 test_auc = _ood_auc(probabilities["test"], test_ood, method)
+                val_far = float(((1.0 - _ood_score(val_ood, method)) >= thresholds[method]).mean())
+                test_far = float(((1.0 - _ood_score(test_ood, method)) >= thresholds[method]).mean())
+                validation_eligible[method] &= bool(
+                    val_auc is not None and val_auc >= self.minimum_scenario_auroc
+                    and val_far <= self.maximum_false_accept_rate)
+                test_acceptable[method] &= bool(
+                    test_auc is not None and test_auc >= self.minimum_scenario_auroc
+                    and test_far <= self.maximum_false_accept_rate)
                 if val_auc is not None:
                     method_validation[method].append(val_auc)
                 if test_auc is not None:
@@ -1325,25 +1393,28 @@ class AbstentionOODAgent:
                         if val_auc is not None
                         else None,
                         test_auroc=round(test_auc, 6) if test_auc is not None else None,
+                        validation_false_accept_rate=val_far,
+                        test_false_accept_rate=test_far,
                     )
                 )
         selected_method = max(
-            method_validation,
+            [method for method in method_validation if validation_eligible[method]] or list(method_validation),
             key=lambda name: (
                 sum(method_validation[name]) / max(len(method_validation[name]), 1),
                 name == "max_softmax",
             ),
         )
+        detector_eligible = validation_eligible[selected_method]
         val_confidence = 1.0 - _ood_score(probabilities["val"], selected_method)
         quantile = max(0.0, 1.0 - self.target_validation_coverage)
         threshold = float(np.quantile(val_confidence, quantile, method="lower"))
-        validation_covered = val_confidence >= threshold
+        validation_covered = (val_confidence >= threshold) & detector_eligible
 
         test_probs = probabilities["test"]
         test_targets = probabilities["test_targets"]
         test_confidence = 1.0 - _ood_score(test_probs, selected_method)
         prediction = test_probs.argmax(axis=1)
-        covered = test_confidence >= threshold
+        covered = (test_confidence >= threshold) & detector_eligible
         base_accuracy = float((prediction == test_targets).mean())
         covered_accuracy = (
             float((prediction[covered] == test_targets[covered]).mean())
@@ -1364,8 +1435,8 @@ class AbstentionOODAgent:
                     method="lower",
                 )
             )
-            val_mask = val_confidence >= point_threshold
-            test_mask = test_confidence >= point_threshold
+            val_mask = (val_confidence >= point_threshold) & detector_eligible
+            test_mask = (test_confidence >= point_threshold) & detector_eligible
             val_accuracy = (
                 float((val_prediction[val_mask] == val_targets[val_mask]).mean())
                 if val_mask.any()
@@ -1395,7 +1466,7 @@ class AbstentionOODAgent:
             else None
         )
         ood_auc = sum(test_values) / len(test_values) if test_values else None
-        ood_pass = bool(test_values and min(test_values) >= 0.5)
+        ood_pass = bool(detector_eligible and test_acceptable[selected_method])
         version = 1 + sum(item["artefact"] == "abstention_report" for item in bb.registry)
         ood_path = bb.blob_dir / f"ood_probabilities_v{version:03d}.npz"
         ood_sha = save_prediction_arrays(ood_path, **ood_arrays)
@@ -1409,7 +1480,7 @@ class AbstentionOODAgent:
              "prediction": int(prediction[index]),
              "predicted_label": prepared.bundle.labels[int(prediction[index])],
              "confidence": float(test_confidence[index]), "threshold": threshold,
-             "reason": "no_confident_finding", "status": "pending"}
+             "reason": "no_confident_finding" if detector_eligible else "no_eligible_detector", "status": "pending"}
             for index in np.flatnonzero(~covered)
         ]
         queue_path.write_text(json.dumps({"purpose": "benchmark_review", "cases": entries},
@@ -1417,8 +1488,12 @@ class AbstentionOODAgent:
         bb.put("human_review_queue", HumanReviewQueue(path=queue_path.relative_to(bb.root).as_posix(),
             sha256=sha256_file(queue_path), count=len(entries)), producer=self.name)
         report = AbstentionReport(
+            detector_status="eligible" if detector_eligible else "no_eligible_detector",
+            minimum_scenario_auroc=self.minimum_scenario_auroc,
+            maximum_false_accept_rate=self.maximum_false_accept_rate,
+            corruption_seed=self.corruption_seed,
             method=selected_method,
-            threshold=round(threshold, 8),
+            threshold=threshold,
             target_validation_coverage=self.target_validation_coverage,
             validation_coverage=round(float(validation_covered.mean()), 6),
             test_coverage=round(coverage, 6),
@@ -1798,6 +1873,10 @@ class ReviewerConsistencyAgent:
                         ("critical", "OOD scope is not explicitly qualified")
                     )
                 ood_auroc = getattr(report, "ood_auroc", None)
+                if getattr(report, "detector_status", "legacy_unchecked") == "no_eligible_detector":
+                    findings.append(("warning", "no OOD detector qualified on validation; automatic acceptance disabled"))
+                elif getattr(report, "detector_status", "legacy_unchecked") == "eligible" and not report.ood_pass:
+                    findings.append(("warning", "OOD detector failed held-out AUROC or false-accept limits"))
                 if ood_auroc is None:
                     findings.append(("warning", "OOD AUROC is undefined"))
                 elif ood_auroc < 0.5:
