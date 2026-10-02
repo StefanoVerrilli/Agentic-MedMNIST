@@ -1,0 +1,28 @@
+{
+  "artefact": "anomaly_reporting",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T09:22:37.903634+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "Reporting stage is internally consistent and ready to proceed. No deterministic findings are present (deterministic_findings=[]), so no stop is warranted.\n\n**Verified arithmetic:** OOD aggregate AUROC = (0.878883 + 0.300678 + 0.001771) / 3 = 0.393777, matching the reported value. The computation correctly uses the arithmetic mean of the selected score's (max_softmax) test AUROCs across the three corruption severities, consistent with the pipeline definition.\n\n**Key findings to carry into the final report:**\n\n1. **OOD detection is below random chance (warning).** At σ≥0.25 the max_softmax AUROC drops to 0.301 and 0.0018, meaning the model's confidence is anti-correlated with corruption severity. The abstention threshold (0.888) is therefore counterproductive for OOD samples: the most corrupted inputs are the ones the model is most confident about. This must be stated explicitly in the report as a limitation of the selective-prediction safety net. It does not invalidate the in-distribution accuracy or the in-distribution selective-risk curve.\n\n2. **In-distribution selective prediction is sound.** At 80 % target validation coverage, test coverage is 65.3 % with selective risk 2.43 % (vs. base error 7.86 %). The risk-coverage curve is monotone and well-behaved. Accuracy on covered samples (97.57 %) exceeds base accuracy (92.14 %) by ~5.4 pp, confirming the abstention mechanism functions as intended for in-distribution data.\n\n3. **Class 7 (cancer-associated stroma) is the weakest class.** Recall 56.5 % (CI 51.8–61.2 %), F1 0.70. 110 of 421 samples misclassified, predominantly to smooth muscle (63) and debris (47). This is a genuine model limitation, not a pipeline defect, and should be highlighted in the per-class discussion.\n\n4. **Val-test accuracy gap ≈ 7.5 pp** (99.60 % val vs 92.14 % test). Consistent with a moderate generalization gap; not a pipeline error but worth noting for downstream interpretation.\n\n5. **Configuration is policy-compliant.** ResNet18 (CNN family) with hidden=48 controlling base width; depth=3 and all transformer-specific fields (num_heads, patch_size, pooling, positional_encoding, mlp_ratio, tokenizer_layers) are correctly inactive. Built-in augmentations (hflip, vflip, rotate90, rotate180, brightness, contrast) require no extension approval. compact_conv_stem_transformer remains pending_review and does not affect this run.\n\n6. **Data audit passed all checks** with zero train-validation overlap. Test split was not inspected (test_inspected=false), which is appropriate.\n\n7. **Upstream warnings (non-blocking):** architecture_research and data_audit carry action=revise / severity=warning for LLM-identified process inconsistencies (built-in augmentation gate status, null model digest, curated excerpt retrieval). None are deterministic findings and none affect the correctness of the current ResNet18 evaluation.\n\n**Recommendation for the report:** Proceed with the final report. Prominently flag the OOD AUROC < 0.5 as a known limitation of the max_softmax confidence score under Gaussian-noise corruption, clearly distinguishing it from the in-distribution selective-prediction results which are valid. Include the per-class breakdown with emphasis on class 7. Note the pending compact_conv_stem_transformer extension as an open item. All artefact hashes and schema versions are present and consistent.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "warning: OOD AUROC (0.3938) is below random chance (0.5); max_softmax confidence is anti-correlated with OOD-ness at σ≥0.25, making the abstention threshold counterproductive for OOD samples",
+      "warning: At σ=0.4 the test AUROC is 0.0018 (max_softmax) and 0.0016 (predictive_entropy), indicating near-complete inversion of the OOD ranking",
+      "warning: Class 7 (cancer-associated stroma) recall is 56.5% (F1=0.70), the weakest class; 110 of 421 samples misclassified, primarily to smooth muscle (63) and debris (47)",
+      "warning: Val-test accuracy gap of ~7.5 pp (99.60% val vs 92.14% test) indicates moderate generalization gap; not a pipeline defect but should be noted in the final report",
+      "info: compact_conv_stem_transformer extension remains pending_review; does not affect current ResNet18 run but should be resolved before any downstream stage attempts to instantiate that architecture",
+      "info: Upstream architecture_research and data_audit stages carry action=revise (severity=warning) for non-blocking LLM-identified process inconsistencies; none are deterministic findings and none affect the current run's correctness"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "reporting"
+  },
+  "payload_sha256": "79131219f231d6f7e4bf9eec21f721956cfd10f8b605d78b17b0d6ba869b149d",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 38,
+  "version": 1
+}

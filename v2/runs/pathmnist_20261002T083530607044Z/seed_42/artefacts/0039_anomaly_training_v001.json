@@ -1,0 +1,25 @@
+{
+  "artefact": "anomaly_training",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T09:04:48.996303+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Training stage is well-executed and internally consistent. ResNet18 (hidden=48, class_weighting=true) completed all 15 epochs with monotonic validation improvement (0.9512 → 0.9947), a small train/val loss gap (0.4954 vs 0.5067), and no failures. Selection was validation-only (test_metrics_used=false), augmentations are all built-in primitives (hflip, rotate180, brightness), and generic transformer fields (num_heads, mlp_ratio, patch_size, pooling, positional_encoding, tokenizer_layers) are correctly inactive for this CNN family. Checkpoint and config SHA-256 hashes are present. Three minor, non-deterministic observations: (1) label_smoothing=0.1 is slightly above the 0.0–0.05 range suggested for CNN heads in the architecture-research notes; validation performance is unaffected and this is a monitoring note, not a defect. (2) weight_decay=0.001 is below the 0.01 suggestion for conv stems; no negative impact observed. (3) best_epoch=15 equals the final epoch, indicating the model was still marginally improving (Δ=0.01% from epoch 14→15); this is a budget boundary, not a convergence failure. None of these rise to a deterministic finding. No issues warrant revision; proceed to the next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "label_smoothing=0.1 slightly exceeds the 0.0–0.05 CNN-head recommendation from architecture research; no observed impact, monitor in downstream evaluation",
+      "weight_decay=0.001 is below the 0.01 suggestion for conv stem/LayerNorm; no observed negative impact",
+      "best_epoch=15 (final epoch) indicates the model had not fully plateaued; improvement from epoch 14→15 was marginal (0.01%), so this is a budget boundary rather than a convergence concern"
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "training"
+  },
+  "payload_sha256": "6a592158f5a491fc76272ca61617846697e7322877662b4c7256fd0430c8b852",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 39,
+  "version": 1
+}

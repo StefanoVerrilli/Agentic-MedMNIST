@@ -1,0 +1,32 @@
+{
+  "artefact": "extension_gate_report",
+  "artefact_type": "ExtensionGateReport",
+  "created_at": "2026-10-02T08:36:54.161210+00:00",
+  "payload": {
+    "approvals_sha256": null,
+    "entries": [
+      {
+        "proposal_id": "tissue_geometric_aug",
+        "reason": "A hash-bound independent review is required.",
+        "registry_name": null,
+        "reviewer": null,
+        "spec_sha256": "0934be5b4728667375abf618a115ae0481a6513fe9a0333ac02e6df7b77b04c1",
+        "status": "pending_review"
+      },
+      {
+        "proposal_id": "compact_conv_stem_transformer",
+        "reason": "A hash-bound independent review is required.",
+        "registry_name": null,
+        "reviewer": null,
+        "spec_sha256": "fffb2acfa4a8adc98bc437b352d6e2fdc7ac31701182799f188f6c458ad03290",
+        "status": "pending_review"
+      }
+    ],
+    "schema_version": "1.0"
+  },
+  "payload_sha256": "63cc21a639bcaf8e44937e8fda89f926329a63c1754737686b0ebed24ee6ff39",
+  "producer": "prior_art",
+  "run_id": "seed_42",
+  "sequence": 10,
+  "version": 1
+}

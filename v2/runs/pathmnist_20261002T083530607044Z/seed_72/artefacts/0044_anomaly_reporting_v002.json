@@ -1,0 +1,28 @@
+{
+  "artefact": "anomaly_reporting",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T09:40:13.068860+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Reporting stage is internally consistent and complete. All arithmetic and cross-reference checks pass:\n\n1. **OOD AUROC aggregate**: Correctly computed as the arithmetic mean of max_softmax test AUROCs across the three corruption severities: (0.919512 + 0.902798 + 0.577791) / 3 = 0.800034, matching the reported ood_auroc. Validation aggregate (0.990905 + 0.974161 + 0.634552) / 3 = 0.866539 also matches. The OOD scope is correctly labeled 'controlled_corruption_proxy'.\n\n2. **Abstention arithmetic**: abstain_rate (0.312953) + test_coverage (0.687047) = 1.0 exactly. human_review_count 2247 = 7180 × 0.312953 (rounded). selective_risk 0.023312 = 1 − accuracy_on_covered 0.976688. The risk-coverage curve entry at target_validation_coverage 0.8 is consistent with the top-level fields.\n\n3. **Comparison integrity**: accuracy_delta 0.106546 = 0.93468 − 0.828134. common_seed (72) and common_split_fingerprint match the baseline_report. baseline_met_or_exceeded is correctly true.\n\n4. **Calibration & threshold**: Threshold 0.88890755 calibrated on validation (correct practice); test coverage 0.687047 at that threshold is reported transparently.\n\n5. **Artefact provenance**: SHA-256 hashes present for OOD evidence, predictions, human-review queue, and baseline checkpoint. Schema version 1.0 uniform across all artefacts.\n\n6. **reporting_status**: complete_through_stage 'comparison' is consistent with the reporting stage being the current execution stage. 43 artefact versions recorded; 21 listed as omitted in this evidence slice.\n\nMinor non-blocking observations (all carried from upstream anomaly reviews, none deterministic):\n- OOD AUROC degrades to ~0.58/0.53 at σ=0.4, expected under heavy Gaussian noise for a controlled-corruption proxy; relevant only if deployment may encounter such inputs.\n- Val-to-test accuracy gap (~6 pp) persists from evaluation; monitoring item.\n- llm_model_digest is null for the review LLM across all stages; exact revision not pinned (reproducibility note).\n- Transformer-specific config fields present in ResNet18 config but inactive per fixed-topology rules; harmless.\n- tissue_geometric_aug (hflip/vflip) appears as pending_review in the extension gate despite being a built-in primitive that does not require approval; redundant gate entry, no functional impact.\n\nNo deterministic findings. No action required beyond proceeding.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "info: OOD AUROC drops to 0.578 (max_softmax) / 0.529 (predictive_entropy) at σ=0.4; expected for controlled-corruption proxy but relevant if deployment may encounter high-noise inputs",
+      "info: Val-to-test accuracy gap of ~6 pp (0.9956 → 0.9347) persists from evaluation stage; monitoring item, not a deterministic error",
+      "info: llm_model_digest is null for ollama qwen3.8 across all upstream stages; exact model revision not pinned (reproducibility note, non-blocking)",
+      "info: tissue_geometric_aug (hflip/vflip) listed as pending_review in extension gate despite being a built-in augmentation that does not require approval; redundant gate entry, no functional impact",
+      "info: Transformer-specific fields (depth, num_heads, mlp_ratio, patch_size, pooling, positional_encoding, tokenizer_layers) present in ResNet18 config but inactive per fixed-topology rules; harmless, could be omitted for clarity",
+      "info: anomaly_reporting comment references '37 artefact versions' while reporting_status records 43; likely reflects different counting scopes (e.g., excluding anomaly reports themselves); no functional impact"
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "reporting"
+  },
+  "payload_sha256": "3f3a821c43fc56339edf84b99ba641884cf036d46e69f946e6d88c102fb12b59",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 44,
+  "version": 2
+}

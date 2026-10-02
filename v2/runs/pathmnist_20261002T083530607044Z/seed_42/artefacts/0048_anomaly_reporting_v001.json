@@ -1,0 +1,28 @@
+{
+  "artefact": "anomaly_reporting",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T09:06:52.240087+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "Reporting stage is internally consistent and mechanically correct. All arithmetic verified: confusion-matrix row/column sums (7180), per-class precision/recall/F1, overall accuracy (6627/7180 = 0.922981), OOD aggregate AUROC ((0.96231+0.970555+0.946572)/3 = 0.959812), OOD validation AUROC ((0.996542+0.997375+0.992553)/3 = 0.99549), and human-review count (7180 × 0.326323 ≈ 2343). No deterministic findings.\n\nWarning-level observations (informational, not pipeline defects):\n\n1. Val/test accuracy gap of ~7.1 pp (99.40% val vs 92.30% test) is the dominant concern. It propagates into the selective-risk curve: at 80% target coverage, validation_risk is 0.001124 while test_risk is 0.025842 (≈23×). The abstention threshold calibrated on validation data therefore underestimates test risk. This is a calibration-transfer issue, not a mechanical error, but it should be flagged in any operational deployment plan.\n\n2. OOD evaluation is a controlled corruption proxy (unit-scale Gaussian noise at σ = 0.15, 0.25, 0.40). ood_pass = true is valid within that narrow scope but does not constitute a general OOD guarantee. The report correctly labels this as 'controlled_corruption_proxy'.\n\n3. Class 7 (cancer-associated stroma) has the weakest recall (0.620) and F1 (0.737); 55 samples misclassified as debris and 58 as smooth muscle. Class 5 (smooth muscle) F1 is 0.767. These are the primary sources of the macro-F1 (0.899) being below overall accuracy (0.923).\n\n4. Label smoothing 0.1 slightly exceeds the 0.0–0.05 CNN-head recommendation from architecture research; weight decay 0.001 is below the 0.01 suggestion. Neither shows a negative impact on validation or test metrics, but both are minor deviations worth noting for reproducibility.\n\n5. best_epoch = 15 (final epoch) with only 0.01 pp improvement from epoch 14→15 indicates the 15-epoch budget was the binding constraint. The model had essentially plateaued.\n\n6. The 32.6% abstention rate (2343 samples deferred to human review) is a design choice. Accuracy on covered samples (97.4%) is strong, but the deferred fraction is non-trivial for operational planning.\n\n7. Generic transformer fields (num_heads, patch_size, pooling, positional_encoding, mlp_ratio, tokenizer_layers) are present in train_config but inactive for the ResNet18 CNN family. Depth=3 is ignored per fixed ResNet18 topology. No inconsistency.\n\nAll augmentations (hflip, rotate180, brightness) are built-in primitives. test_metrics_used=false confirms no test-set leakage into model selection. The 8-trial search across 5 families completed with 0 failures. The report is complete through the abstention stage with 47 artefact versions and 114 decision events.\n\nNo deterministic findings justify a stop or revise. The report is fit for release with the above warnings documented.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Val/test accuracy gap of ~7.1 pp (99.40% vs 92.30%) propagates into a 23× selective-risk gap at 80% coverage (val 0.0011 vs test 0.0258); calibration transfer should be monitored in deployment.",
+      "OOD evaluation is a controlled corruption proxy (Gaussian noise, 3 severities); ood_pass=true is scope-limited and does not constitute a general OOD guarantee.",
+      "Class 7 (cancer-associated stroma) recall 0.620 / F1 0.737 and Class 5 (smooth muscle) F1 0.767 are the weakest per-class metrics; 113 combined misclassifications into debris/smooth-music.",
+      "Label smoothing 0.1 exceeds the 0.0–0.05 CNN-head recommendation; weight decay 0.001 is below the 0.01 suggestion. No observed negative impact but noted for reproducibility.",
+      "best_epoch=15 is the budget boundary; improvement from epoch 14→15 was 0.01 pp (plateau).",
+      "32.6% abstention rate (2343/7180) is a design choice; accuracy_on_covered 97.4% is strong but the deferred fraction is non-trivial for operational planning."
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "reporting"
+  },
+  "payload_sha256": "062e79954d5994c1c8ab7efa65cafa5d1900563fc80c14bc6345331c5c6b216b",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 48,
+  "version": 1
+}

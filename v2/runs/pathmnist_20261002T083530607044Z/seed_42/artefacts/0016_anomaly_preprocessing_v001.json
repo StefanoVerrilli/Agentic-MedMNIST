@@ -1,0 +1,25 @@
+{
+  "artefact": "anomaly_preprocessing",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T08:38:10.124158+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "Preprocessing stage is structurally sound and internally consistent. All deterministic integrity checks pass: PathMNIST 28×28 RGB, 9-class, split sizes (89996/10004/7180) exactly match the official MedMNIST distribution; archive MD5 verified against manifest; zero blank images; zero duplicate train samples; no subsampling. Class imbalance is modest (ratio 1.63) and train/val proportions are nearly identical. The representation plan (hflip, brightness, rotate90; standardize normalization; augmentation factor 4 → 359984 augmented samples) is consistent with the data profile and uses only built-in augmentation primitives that do not require extension approval per pipeline rules.\n\nThree non-blocking warnings are noted:\n\n1. **Prior-art evidentiary weight (deterministic warning):** All three literature sources are curated_excerpt origin with bundled retrieval mode. Quotes are traceable via SHA-256 but are not live-retrieval evidence. Per pipeline rules, a cited quote establishes traceability, not support for every scientific inference. The prior-art LLM issues correctly flag that inferences in ideas 1, 3, and 4 (tissue-relationship superiority, patch-granularity trade-off, class-weighted loss benefit) extend beyond what the one-line excerpts directly state. These are reasonable hypotheses but should not be treated as established findings. This is a warning requesting verification, not a deterministic failure.\n\n2. **tissue_geometric_aug pending_review status:** The extension_gate_report lists tissue_geometric_aug (hflip, vflip) as pending_review. Per pipeline rules, built-in augmentations (hflip, vflip, rotate90, rotate180, brightness, contrast) do not require extension approval, and pending new proposals do not invalidate these primitives. The representation plan's use of hflip, brightness, and rotate90 is therefore valid regardless of the pending status. This is a minor process inconsistency, non-blocking.\n\n3. **llm_model_digest is null (qwen3.8 / Ollama):** Exact model weights are not pinned across ingestion, prior-art, and profiling stages. This reduces full reproducibility of LLM-generated artefacts. Recommend recording a digest or commit hash in a future run. Non-blocking for the current preprocessing output.\n\nThe compact_conv_stem_transformer proposal is appropriately pending independent review; its pending status does not affect the current preprocessing pipeline. The test-domain note (CRC-VAL-HE-7K from a different clinical center) is correctly flagged and relevant for downstream OOD evaluation (arithmetic mean of AUROCs across corruption severities). No deterministic findings are present. All data integrity, split, and manifest checks are clean. Proceed to the next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "warning: curated excerpts are not live retrieval evidence; scientific inferences in prior-art ideas 1, 3, 4 extend beyond cited one-line excerpts and should be treated as hypotheses, not established findings",
+      "warning: tissue_geometric_aug (hflip, vflip) is listed as pending_review in extension_gate_report despite being a built-in augmentation that does not require extension approval per pipeline rules; minor process inconsistency, non-blocking",
+      "warning: llm_model_digest is null for qwen3.8 (Ollama) across ingestion, prior-art, and profiling stages; exact model weights are not pinned, reducing full reproducibility of LLM-generated artefacts; recommend recording a digest or commit hash in a future run"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "preprocessing"
+  },
+  "payload_sha256": "6b44aabc0405aa89517a889d7ea4d77a658e52dd28d63512986d724c5c79aa94",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 16,
+  "version": 1
+}

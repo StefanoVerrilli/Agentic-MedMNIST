@@ -1,0 +1,28 @@
+{
+  "artefact": "anomaly_evaluation",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T09:05:33.441210+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "Evaluation stage is internally consistent and mechanically correct. No deterministic findings. The confusion matrix row/column sums, per-class precision/recall/F1, and overall accuracy (6627/7180 = 0.92298) all verify correctly. Test metrics were not used in model selection (test_metrics_used=false), and all augmentations are built-in primitives.\n\nPrimary concern (warning-level): a 7.2 pp gap between validation accuracy (99.47%) and test accuracy (92.30%). This is not a pipeline defect—the selection protocol was correctly validation-only—but it warrants monitoring. The ROC AUC (OVR macro 0.9855) remains high, indicating strong ranking ability; the accuracy gap is driven by hard-boundary confusions concentrated in three classes: cancer-associated stroma (recall 0.620, F1 0.737), smooth muscle (F1 0.767), and debris (F1 0.834). The confusion matrix shows substantial cross-talk among these three (e.g., 55 stroma→debris, 58 stroma→smooth-muscle, 55 smooth-muscle→background), consistent with genuine histological similarity at 28×28 resolution rather than a data-leakage or split-contamination issue.\n\nMinor hyperparameter notes (carried from search/training stages, no observed negative impact): label_smoothing=0.1 slightly exceeds the 0.0–0.05 CNN-head guideline; weight_decay=0.001 is below the 0.01 suggestion for conv stem/LayerNorm. Both are within acceptable ranges and did not degrade validation performance.\n\nBudget note: best_epoch=15 (final epoch) with only 0.01 pp improvement from epoch 14→15, indicating the model was at a plateau rather than under-trained. No action needed.\n\nGeneric transformer fields (num_heads, mlp_ratio, patch_size, pooling, positional_encoding, tokenizer_layers) are inert for the ResNet18 CNN family and do not alter topology. The depth=3 field is ignored per fixed ResNet18 topology; hidden=48 correctly controls base channel width. All consistent.\n\nRecommendation: proceed. If downstream OOD or robustness evaluation is planned, the three weak classes (stroma, smooth muscle, debris) are the expected failure modes and should be tracked per-severity in the OOD AUROC aggregate (arithmetic mean across severities).",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Val/test accuracy gap of ~7.2 pp (99.47% val vs 92.30% test) is notable; not a pipeline error but warrants monitoring in any downstream robustness or OOD evaluation.",
+      "Class 7 (cancer-associated stroma) has the weakest recall at 0.620 and F1 at 0.737; 55 samples misclassified as debris and 58 as smooth muscle.",
+      "Class 5 (smooth muscle) F1 0.767; 55 samples misclassified as background, 27 as debris.",
+      "Label smoothing 0.1 slightly exceeds the 0.0–0.05 CNN-head recommendation from architecture research; no observed negative impact on validation or test metrics.",
+      "Weight decay 0.001 is below the 0.01 suggestion for conv stem/LayerNorm; no observed negative impact.",
+      "best_epoch=15 (final epoch) indicates the 15-epoch budget was the binding constraint, though improvement from epoch 14→15 was only 0.01 pp (plateau)."
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "evaluation"
+  },
+  "payload_sha256": "793ee01338c571e48e9a643b75cb479414d2a79c50db83a63af45499464dd064",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 43,
+  "version": 1
+}

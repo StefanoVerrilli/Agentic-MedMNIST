@@ -1,0 +1,14 @@
+{
+  "artefact": "approved_extensions",
+  "artefact_type": "ExtensionRegistry",
+  "created_at": "2026-10-02T09:25:23.543413+00:00",
+  "payload": {
+    "entries": [],
+    "schema_version": "1.0"
+  },
+  "payload_sha256": "225f8238537afdd25104c1edbb3bc4aa9042c67984fdad6c99b8ec50813e120c",
+  "producer": "prior_art",
+  "run_id": "seed_72",
+  "sequence": 11,
+  "version": 1
+}

@@ -1,0 +1,23 @@
+{
+  "artefact": "anomaly_profiling",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T09:09:02.433793+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Profiling stage is clean and internally consistent. PathMNIST (9-class, 28×28 RGB, standard MedMNIST distribution) is correctly loaded with official split sizes (train=89996, val=10004, test=7180); no subsampling. Archive MD5 verified against manifest; per-split SHA256 index hashes recorded. Data profile confirms 100,000 samples profiled (train+val), zero blank images, zero duplicate train samples, and a modest imbalance ratio of 1.63. Train and validation class proportions are nearly identical (max absolute deviation < 0.0001), indicating no split-level distribution shift. Channel statistics (R≈0.74, G≈0.53, B≈0.71; stds 0.12–0.18) are consistent with H&E-stained histology at 28×28. Ambiguity risks (background/debris/mucus overlap, adipose vs. background, smooth muscle vs. stroma, etc.) are well-identified and expected at this resolution; they inform augmentation and architecture choices downstream but do not constitute a defect. The test-domain note (CRC-VAL-HE-7K from a different clinical center) is properly flagged for OOD evaluation. No deterministic findings were raised. The single LLM observation (llm_model_digest is null for qwen3.8 via Ollama) is non-blocking and does not affect data integrity or reproducibility of the profiling artefacts. Run manifest records seed 47, deterministic torch, and full package versions. All checks pass; proceed to the next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "llm_model_digest is null for qwen3.8 via Ollama; recording a model snapshot hash or version pin would improve full reproducibility traceability (non-blocking, informational)."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "profiling"
+  },
+  "payload_sha256": "07a1f4e0681de90f07989ffed9750d6d14e0fdd51b5c35ff7eff006e64376638",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 8,
+  "version": 1
+}

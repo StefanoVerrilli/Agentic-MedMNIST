@@ -1,0 +1,57 @@
+{
+  "artefact": "best_configuration",
+  "artefact_type": "BestConfiguration",
+  "created_at": "2026-10-02T09:12:18.292573+00:00",
+  "payload": {
+    "lightning_config_path": "best_config_v001.yaml",
+    "lightning_config_sha256": "7109141c16cd43c20875f5b07574732072dff0a4aa3b643f15cf12c8a83c0d3d",
+    "representation": {
+      "augmentations": [
+        "hflip",
+        "rotate180",
+        "brightness"
+      ],
+      "normalization": "standardize",
+      "rationale": "ResNet18 at hidden=32 already reached 99.08% (best_epoch=6), the best result so far. This candidate modestly increases base channel width to 48 (still well within the 28x28 / 90k-sample regime) to capture slightly richer multi-scale tissue features (nuclei, cytoplasm, stroma). Key changes from the prior best: (1) class_weighting=true addresses the 1.63:1 imbalance that was unaddressed in all prior runs, potentially recovering 0.3-0.8% on minority classes (classes 5 and 7 with ~7900-8000 samples vs 12885 for class 8). (2) lr raised from 0.0005 to 0.001 for faster convergence within the cosine schedule, matching the residual_cnn's successful LR. (3) weight_decay increased from 0.0001 to 0.001 for mild L2 regularization on the wider channels. (4) label_smoothing raised to 0.1 to prevent overconfident predictions on the 9-class problem. (5) Augmentations expanded to hflip+rotate180+brightness for more geometric and photometric diversity without distorting the H&E channel asymmetry (green std 0.177 vs red/blue ~0.124). (6) Depth is set to 3 but is ignored by ResNet18's fixed two-residual-blocks-per-stage topology; hidden=48 is the sole capacity knob. Note: ResNet18's CIFAR-style 3x3 stride-1 stem preserves 28x28 spatial resolution through the first stage, which is critical for sub-pixel nuclear morphology."
+    },
+    "schema_version": "1.0",
+    "selected_candidate_id": "resnet18_wider_cw",
+    "selected_config_hash": "37ae670f2cd1c94d0a007e46ceb1aeedc8ff97d87592d368ef325d114b53f1b7",
+    "selection_rule": "highest epoch budget, then accuracy within tolerance, then macro-F1; test locked; frozen and replayed without test-dependent adaptation",
+    "test_metrics_used": false,
+    "train_config": {
+      "batch_size": 128,
+      "class_weighting": true,
+      "depth": 3,
+      "device": "cuda",
+      "dropout": 0.1,
+      "early_stopping_patience": 3,
+      "epochs": 15,
+      "gradient_clip_val": 1.0,
+      "hidden": 48,
+      "label_smoothing": 0.1,
+      "lr": 0.001,
+      "mlp_ratio": 4,
+      "model_family": "resnet18",
+      "num_heads": 4,
+      "optimizer": "adamw",
+      "patch_size": 4,
+      "pooling": "cls",
+      "positional_encoding": "learned",
+      "rationale": "Selected from 8 validation-only trials. ResNet18 at hidden=32 already reached 99.08% (best_epoch=6), the best result so far. This candidate modestly increases base channel width to 48 (still well within the 28x28 / 90k-sample regime) to capture slightly richer multi-scale tissue features (nuclei, cytoplasm, stroma). Key changes from the prior best: (1) class_weighting=true addresses the 1.63:1 imbalance that was unaddressed in all prior runs, potentially recovering 0.3-0.8% on minority classes (classes 5 and 7 with ~7900-8000 samples vs 12885 for class 8). (2) lr raised from 0.0005 to 0.001 for faster convergence within the cosine schedule, matching the residual_cnn's successful LR. (3) weight_decay increased from 0.0001 to 0.001 for mild L2 regularization on the wider channels. (4) label_smoothing raised to 0.1 to prevent overconfident predictions on the 9-class problem. (5) Augmentations expanded to hflip+rotate180+brightness for more geometric and photometric diversity without distorting the H&E channel asymmetry (green std 0.177 vs red/blue ~0.124). (6) Depth is set to 3 but is ignored by ResNet18's fixed two-residual-blocks-per-stage topology; hidden=48 is the sole capacity knob. Note: ResNet18's CIFAR-style 3x3 stride-1 stem preserves 28x28 spatial resolution through the first stage, which is critical for sub-pixel nuclear morphology.",
+      "scheduler": "cosine",
+      "schema_version": "1.0",
+      "seed": 47,
+      "source": "configuration_replay:37ae670f2cd1",
+      "tokenizer_layers": 2,
+      "weight_decay": 0.001
+    },
+    "validation_accuracy": 0.994002,
+    "validation_macro_f1": 0.993938
+  },
+  "payload_sha256": "8fb9ba4d49c534f01daae3cbb6e3afa28a1b72512ca4d5ba9bf481e3b6a3b28a",
+  "producer": "configuration_replay",
+  "run_id": "seed_47",
+  "sequence": 25,
+  "version": 1
+}

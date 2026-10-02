@@ -1,0 +1,26 @@
+{
+  "artefact": "anomaly_data_audit",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T08:38:32.614071+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "Data audit stage passes cleanly. All deterministic integrity checks are green: official split sizes (89996/10004/7180) match the standard 28×28 RGB MedMNIST PathMNIST distribution exactly; archive MD5 verified against manifest; zero blank images; zero duplicate train samples; no subsampling; train/validation overlap is 0; class imbalance is modest (ratio 1.63) with near-identical train/val proportions. Test was correctly held out (test_inspected: false) and the separate-clinical-center provenance is documented.\n\nNon-blocking warnings carried forward from upstream LLM artefacts:\n1. llm_model_digest is null for qwen3.8 (Ollama) across all stages; exact model weights are not pinned, limiting full reproducibility of LLM-generated artefacts. Recommend recording a digest or commit hash in a future run.\n2. tissue_geometric_aug (hflip, vflip) appears as pending_review in the extension gate report despite being a built-in augmentation that does not require extension approval per pipeline rules. This is a minor process inconsistency and does not invalidate the augmentation primitives.\n3. Prior-art literature sources are curated_excerpt origin (bundled retrieval), not live-retrieval evidence. Cited quotes are traceable via SHA-256 but carry limited evidentiary weight for downstream scientific inferences.\n4. Scientific inferences in prior-art ideas (tissue-relationship superiority, patch-granularity trade-off, class-weighted loss benefit) extend beyond what the one-line cited excerpts directly state; they are reasonable hypotheses but should not be treated as established findings from the cited sources.\n\nThe representation plan (standardize normalization, built-in augmentations hflip/brightness/rotate90, augmentation factor 4) is internally consistent with the channel statistics and does not require extension approval. The split manifest is coherent: official strategy, augmented train = 4×89996 = 359984, train_stats_only = true. No deterministic findings justify revision or stop. Proceed to the next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "llm_model_digest is null for qwen3.8 (Ollama); exact model weights are not pinned for full reproducibility of LLM-generated artefacts",
+      "tissue_geometric_aug (hflip, vflip) is listed as pending_review in extension_gate_report despite being a built-in augmentation that does not require extension approval per pipeline rules; minor process inconsistency, non-blocking",
+      "Prior-art literature sources are curated_excerpt origin with bundled retrieval mode; quotes are traceable via SHA-256 but are not live-retrieval evidence, limiting evidentiary weight of downstream inferences",
+      "Scientific inferences in prior-art ideas 1, 3, and 4 extend beyond what the one-line cited excerpts directly state; they are reasonable hypotheses but should not be treated as established findings from the cited sources"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "data_audit"
+  },
+  "payload_sha256": "635603e86abc0fe7641b0f7d67f02173993f46b4cf82228bcc5185b117bbc07d",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 18,
+  "version": 1
+}

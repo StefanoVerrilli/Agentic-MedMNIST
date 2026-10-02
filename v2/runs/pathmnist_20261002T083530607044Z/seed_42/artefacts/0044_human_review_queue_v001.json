@@ -1,0 +1,18 @@
+{
+  "artefact": "human_review_queue",
+  "artefact_type": "HumanReviewQueue",
+  "created_at": "2026-10-02T09:05:36.862090+00:00",
+  "payload": {
+    "count": 2343,
+    "path": "blobs/human_review_queue_v001.json",
+    "purpose": "benchmark_review",
+    "schema_version": "1.0",
+    "sha256": "f52f2467043cb3e3baeebcb87e065f5089161fa79543d498e15cf8bb79de9c67",
+    "split": "test"
+  },
+  "payload_sha256": "ad6b6ebabd2a776e9006e6c6f55a3df65c7a098505f29f59fd53c38495dbeb51",
+  "producer": "abstention",
+  "run_id": "seed_42",
+  "sequence": 44,
+  "version": 1
+}

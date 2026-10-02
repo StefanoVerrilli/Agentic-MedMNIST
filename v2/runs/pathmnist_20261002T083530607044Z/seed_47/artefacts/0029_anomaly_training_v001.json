@@ -1,0 +1,25 @@
+{
+  "artefact": "anomaly_training",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T09:21:09.263975+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Training stage is clean and internally consistent. No deterministic findings. Key verification points: (1) ResNet18 with hidden=48 correctly selected; all transformer-specific fields (num_heads=4, patch_size=4, pooling=cls, positional_encoding=learned, mlp_ratio=4, tokenizer_layers=2) are present in the config but correctly inactive for this CNN family per pipeline policy. (2) Cosine LR schedule verified numerically: epoch 1→0.000989, epoch 5→0.00075, epoch 10→0.00025, epoch 15→0.0, matching the analytic formula 0.5·lr_max·(1+cos(π·e/E)) with lr_max=0.001, E=15. (3) Training dynamics are healthy: val accuracy rises from 0.9557 (ep 1) to 0.9960 (ep 15) with only minor transient dips (ep 5: 0.9838, ep 10: 0.9918); train loss decreases monotonically 0.7235→0.4954; val loss tracks closely (0.6019→0.5049), indicating no overfitting. (4) Early stopping (patience=3) did not trigger because val accuracy continued improving through all 15 epochs; best_epoch=15 is consistent. (5) Augmentations (hflip, rotate180, brightness) are all built-in primitives requiring no extension approval. (6) Seed=47 is consistent across split_manifest, train_config, and train_result. (7) Checkpoint SHA256 and lightning config SHA256 are recorded for reproducibility. (8) The best_configuration.validation_accuracy (0.994002) reflects the selection-time trial metric from the 8 validation-only trials, while train_result.best_val_accuracy (0.996002) reflects the full 15-epoch training run of the selected configuration; this is a normal selection-then-train workflow, not a discrepancy. (9) Upstream architecture_research and data_audit carry action=revise with severity=warning, but all flagged items are non-blocking LLM-identified process inconsistencies (built-in augmentation gate status, null model digest, curated-excerpt retrieval mode) with zero deterministic findings; none affect training correctness. (10) Data audit confirms official PathMNIST splits (train=89996, val=10004, test=7180), zero overlap, zero blanks, zero duplicates, 100% profiled, MD5 verified. No issues warrant revision or stop.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Upstream architecture_research and data_audit stages carry action=revise (severity=warning) for non-blocking LLM-identified process inconsistencies (built-in augmentation gate status, null llm_model_digest, curated_excerpt retrieval mode); none are deterministic findings and none affect training correctness",
+      "compact_conv_stem_transformer extension remains pending_review in the extension gate; this does not affect the selected resnet18 configuration but should be resolved before any downstream stage attempts to instantiate that architecture",
+      "tiny_cnn is retained in architecture_priorities despite the research flagging it as likely to underfit multi-scale tissue texture; if ever selected in a future trial, results should be interpreted as a sanity-check baseline only"
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "training"
+  },
+  "payload_sha256": "b2cf72407e9fd84f35b1a7d8ff3b210b66ec089a3e68b86f81bce82da5dcadd1",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 29,
+  "version": 1
+}

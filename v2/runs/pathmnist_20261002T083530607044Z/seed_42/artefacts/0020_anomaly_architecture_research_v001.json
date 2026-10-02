@@ -1,0 +1,24 @@
+{
+  "artefact": "anomaly_architecture_research",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T08:39:36.742430+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "The architecture_research artefact is well-structured, internally consistent, and appropriately scoped for the 28×28 RGB PathMNIST task (90k train, 9 classes, 1.63:1 imbalance). Key observations:\n\n1. **Architecture priorities are sound.** Placing compact_transformer first, followed by resnet18, residual_cnn, vision_transformer, and tiny_cnn is a reasonable ordering given the data scale and the H&E channel asymmetry. ResNet18's fixed topology (base width controls depth) is correctly treated as a CNN entry; generic transformer fields are inactive for it per pipeline rules.\n\n2. **Parametrization guidance is appropriate.** Width 192–384, depth 4–6, heads 4–6 for the compact transformer at 90k samples is well-calibrated. The conv-tokenizer stride analysis (stride 4 → 49 tokens, stride 7 → 16 tokens on 28×28) is arithmetically correct. LR schedules, weight decay, stochastic depth, and class-weighting recommendations are standard and proportionate to the mild imbalance.\n\n3. **Representation priorities align with data characteristics.** Per-channel normalization (green std 0.177 vs red/blue ~0.124) is correctly flagged as important for H&E. Learned positional encodings for ≤49 tokens, avoiding early max-pooling, and preserving 28×28 through the stem are all well-justified.\n\n4. **Risks are well-identified and non-alarmist.** The overfitting boundary for pure ViT at 90k samples, the binary stride choice on 28×28, and the underfitting risk of tiny_cnn are all legitimate concerns that inform the priority ordering.\n\n5. **Extension-gate cross-check.** The tissue_geometric_aug (hflip, vflip) pending_review status is a non-issue: these are built-in augmentations that do not require extension approval per pipeline rules, and pending proposals do not invalidate primitives. The compact_conv_stem_transformer extension is pending_review; the architecture research implicitly references a conv-tokenizer approach consistent with that proposal. Since this is a research/planning stage (not execution), the pending status does not block the identification of priorities. Approval will be required before implementation, which is the correct sequencing.\n\n6. **Evidence traceability.** Three arXiv sources are cited. Per pipeline rules, citations establish traceability, not blanket support for every inference. The DeiT conv-tokenization finding is a reasonable and well-known result; the inferences drawn here (conv tokenization prevents overfitting at moderate data scales) are consistent with the cited work and do not overreach.\n\n7. **No deterministic findings.** The deterministic_findings array is empty. All data-audit checks pass. Split sizes (89996/10004/7180) match the official MedMNIST PathMNIST distribution. No integrity issues.\n\nNo blocking issues identified. The research artefact provides a coherent, evidence-grounded plan for the architecture search. Proceed to the next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Minor process note: compact_conv_stem_transformer extension is pending_review; the architecture research's conv-tokenizer guidance implicitly depends on this extension. Approval must be secured before implementation, but this does not block the research/planning stage.",
+      "tissue_geometric_aug (hflip, vflip) appears as pending_review in the extension gate despite being a built-in augmentation requiring no approval; this is a non-blocking process inconsistency already flagged in prior stages."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "architecture_research"
+  },
+  "payload_sha256": "b687e85365d36c8cc9d2913d76851296f64806d4259ba4392caebd9e4fc8d5cb",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 20,
+  "version": 1
+}

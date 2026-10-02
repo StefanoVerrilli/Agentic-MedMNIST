@@ -1,0 +1,17 @@
+{
+  "artefact": "blob_probabilities",
+  "artefact_type": "BlobReference",
+  "created_at": "2026-10-02T09:04:50.199282+00:00",
+  "payload": {
+    "kind": "arrays",
+    "metadata": {},
+    "path": "blobs/probabilities_v001.npz",
+    "schema_version": "1.0",
+    "sha256": "b261761538628ce1e32a166f78d2085c505defb497cc1b077dd67d61475a94cd"
+  },
+  "payload_sha256": "e275349fb0fc8b0763718674746b9316f115a47d8014cbd880b683b742b29491",
+  "producer": "evaluation",
+  "run_id": "seed_42",
+  "sequence": 40,
+  "version": 1
+}

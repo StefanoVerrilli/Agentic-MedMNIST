@@ -1,0 +1,25 @@
+{
+  "artefact": "anomaly_abstention",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T09:06:12.993440+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "The abstention stage is internally consistent and mechanically correct. Verified the following:\n\n1. OOD aggregate: The reported ood_auroc of 0.959812 is the correct arithmetic mean of the predictive_entropy test AUROCs across the three corruption severities: (0.96231 + 0.970555 + 0.946572) / 3 = 0.959812. ✓\n\n2. OOD validation AUROC: (0.996542 + 0.997375 + 0.992553) / 3 = 0.99549, matching the reported ood_validation_auroc. ✓\n\n3. Coverage/abstention consistency: test_coverage (0.673677) + abstain_rate (0.326323) = 1.000000. ✓\n\n4. Human review count: 2343 abstained samples = 7180 × 0.326323 ≈ 2343, matching human_review_count. ✓\n\n5. Selective risk: The reported selective_risk (0.025842) matches the test_risk at target_validation_coverage 0.8 in the risk_coverage_curve. ✓\n\n6. Threshold consistency: The threshold 0.7361573 is consistent across the report and the risk_coverage_curve entry for 80% target coverage. ✓\n\n7. Calibration: The threshold was calibrated on validation (calibrated_on=\"validation\"), consistent with the pipeline's no-test-leakage principle. ✓\n\n8. OOD scope is appropriately labeled as \"controlled_corruption_proxy\" with unit-scale Gaussian noise at three severities, and ood_pass=true is supported by the AUROC values.\n\n9. The risk_coverage_curve is monotonically sensible: as target coverage increases, the threshold decreases and test_risk increases, while validation_risk remains near-flat (~0.001).\n\nObservations (non-blocking, already flagged in evaluation stage):\n- The val/test selective-risk gap at 80% coverage (0.0011 vs 0.0258) reflects the broader ~7.2 pp val/test accuracy gap noted in the evaluation stage. This is a distributional observation, not a pipeline defect.\n- The 32.6% abstention rate is a design parameter; the resulting 97.4% accuracy_on_covered is strong.\n- The OOD evaluation uses a controlled corruption proxy, which is appropriately scoped and does not claim general OOD robustness.\n\nNo deterministic findings. No critical or warning-level issues specific to the abstention stage. All prior-stage warnings (label smoothing, weight decay, best_epoch at budget boundary) are carried forward as informational context only.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Val/test selective-risk gap at 80% coverage (0.0011 vs 0.0258) mirrors the broader val/test accuracy gap; informational, not a pipeline defect.",
+      "32.6% abstention rate is a design choice; accuracy_on_covered of 97.4% is strong but the deferred fraction is non-trivial for operational planning.",
+      "OOD evaluation is a controlled corruption proxy (unit-scale Gaussian noise, 3 severities); ood_pass=true is valid within that scope but does not constitute a general OOD guarantee."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "abstention"
+  },
+  "payload_sha256": "b2680f03518088e74f42e6d58b67df51025c7bec1cc9a2acb87086adb7c00a42",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 46,
+  "version": 1
+}

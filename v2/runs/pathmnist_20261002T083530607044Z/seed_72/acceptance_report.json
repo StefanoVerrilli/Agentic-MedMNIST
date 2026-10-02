@@ -1,0 +1,168 @@
+{
+  "schema_version": "1.0",
+  "criteria": [
+    {
+      "requirement": "WP1_TYPED_VERSIONED_HANDOFFS",
+      "status": "passed",
+      "evidence": [
+        "artefacts/",
+        "blobs/"
+      ],
+      "detail": "Every persisted payload and referenced file is checksummed."
+    },
+    {
+      "requirement": "WP1_ZERO_DIRECT_AGENT_CALLS",
+      "status": "passed",
+      "evidence": [
+        "agents.py"
+      ],
+      "detail": "AST check of direct agent-class calls."
+    },
+    {
+      "requirement": "WP2_PRETRAINING_LEAKAGE_AUDIT",
+      "status": "passed",
+      "evidence": [
+        "data_audit_report",
+        "decision_log.jsonl"
+      ],
+      "detail": "Actual train/validation evidence audited before any training."
+    },
+    {
+      "requirement": "WP2_CITED_IDEAS",
+      "status": "passed",
+      "evidence": [
+        "prior_art_brief",
+        "blobs/literature/"
+      ],
+      "detail": "Exact supporting quotes resolve to checksummed snapshots; recommendations remain hypotheses."
+    },
+    {
+      "requirement": "WP2_WEB_RETRIEVAL",
+      "status": "failed",
+      "evidence": [
+        "prior_art_brief"
+      ],
+      "detail": "Curated excerpts alone do not demonstrate web retrieval."
+    },
+    {
+      "requirement": "WP3_VALIDATION_ONLY_SELECTION",
+      "status": "passed",
+      "evidence": [
+        "best_configuration",
+        "search_report"
+      ],
+      "detail": "Test metrics are excluded from search and configuration selection."
+    },
+    {
+      "requirement": "WP4_BASELINE_COMPARISON",
+      "status": "passed",
+      "evidence": [
+        "comparison_report",
+        "baseline_report"
+      ],
+      "detail": "Conventional baseline uses the same seed and selected splits; negative deltas are retained."
+    },
+    {
+      "requirement": "WP4_REPRESENTATION_ABLATIONS",
+      "status": "failed",
+      "evidence": [
+        "ablation_report"
+      ],
+      "detail": "Three bounded representation scenarios."
+    },
+    {
+      "requirement": "WP4_FROZEN_CONFIGURATION_SEED_VARIANCE",
+      "status": "passed",
+      "evidence": [
+        "../experiment_summary.json"
+      ],
+      "detail": "At least three completed seeds, with a shared validation-selected configuration."
+    },
+    {
+      "requirement": "WP5_ABSTENTION_AND_HANDOFF",
+      "status": "passed",
+      "evidence": [
+        "abstention_report",
+        "human_review_queue"
+      ],
+      "detail": "Validation-calibrated abstention with a persistent benchmark review queue."
+    },
+    {
+      "requirement": "WP6_STAGE_REVIEWS",
+      "status": "passed",
+      "evidence": [
+        "anomaly_*",
+        "decision_log.jsonl"
+      ],
+      "detail": "Every promoted stage has an independent reviewer report."
+    },
+    {
+      "requirement": "WP6_DECISION_PROVENANCE",
+      "status": "passed",
+      "evidence": [
+        "decision_log.jsonl",
+        "blobs/reasoning/"
+      ],
+      "detail": "Decision source and stage are recorded; exact prompts/schema/results are retained."
+    },
+    {
+      "requirement": "WP6_FAULT_DETECTION_GE_90_PERCENT",
+      "status": "pending",
+      "evidence": [],
+      "detail": "Requires passing tests and measured fault injection for this exact source tree."
+    },
+    {
+      "requirement": "WP5_FULL_RUN_REPLAY",
+      "status": "pending",
+      "evidence": [],
+      "detail": "A transcript alone is not proof that retraining reproduces predictions and metrics."
+    },
+    {
+      "requirement": "WP5_END_TO_END",
+      "status": "passed",
+      "evidence": [
+        "dossier.json"
+      ],
+      "detail": "completed_with_warning"
+    },
+    {
+      "requirement": "WP6_APPROVED_RISK_MITIGATIONS",
+      "status": "failed",
+      "evidence": [
+        "anomaly_*"
+      ],
+      "detail": "Every unresolved reviewer issue requires an explicit approved mitigation."
+    },
+    {
+      "requirement": "TRL7_INDEPENDENT_DEMONSTRATION_AND_SIGNOFF",
+      "status": "pending",
+      "evidence": [],
+      "detail": "Requires named independent demonstrator/reviewer, bound predictions and checksummed environment evidence."
+    }
+  ],
+  "kpis": {
+    "cited_idea_fraction": 1.0,
+    "unresolved_citation_issues": 0,
+    "live_source_fraction": 0.0,
+    "fault_detection_rate": null,
+    "decisions_logged": 17,
+    "decision_provenance_fraction": 1.0,
+    "reasoning_snapshots": 17,
+    "unresolved_reviewer_issues": [
+      "idea 'conv_tokenization_compact' cites stride 7 while the binding proposal 'compact_conv_stem_transformer' uses stride 4; the proposal is authoritative and the idea is still hypothesis_to_validate, so no functional conflict, but the inconsistency could cause confusion in downstream traceability",
+      "info: llm_model_digest is null for ollama qwen3.8; exact model revision not pinned, slightly weakening reproducibility of LLM-assisted analysis",
+      "info: stride inconsistency between idea conv_tokenization_compact (stride 7) and binding proposal compact_conv_stem_transformer (stride 4); proposal is authoritative, traceability concern only",
+      "info: test split not individually profiled (test_imbalance_ratio=1.0, test_to_train_prevalence_ratio empty); informational only",
+      "llm_model_digest is null for ollama qwen3.8; exact model revision is not pinned, slightly weakening full reproducibility of LLM-assisted analysis (non-blocking, informational)",
+      "tissue_geometric_aug proposal for hflip/vflip is redundant: these are built-in augmentations that do not require extension approval per pipeline rules; the pending_review entry is harmless but adds unnecessary gate overhead",
+      "warning: curated excerpts are not live retrieval evidence (deterministic finding); prior-art grounding is limited to cached text snippets rather than full-paper verification",
+      "warning: extension_gate_report lists tissue_geometric_aug (hflip/vflip) as pending_review despite these being built-in augmentations that do not require extension approval; redundant gate overhead",
+      "warning: prior-art grounding uses curated cache excerpts rather than live retrieval (deterministic warning in anomaly_prior_art)",
+      "warning:curated excerpts are not live retrieval evidence"
+    ]
+  },
+  "technical_complete": true,
+  "acceptance_ready": false,
+  "trl7_evidence_complete": false,
+  "independent_signoff": null
+}

@@ -1,0 +1,26 @@
+{
+  "artefact": "anomaly_comparison",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T09:39:39.333035+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Comparison stage is internally consistent and free of deterministic findings. Verification points:\n\n1. **Arithmetic**: accuracy_delta = 0.93468 − 0.828134 = 0.106546 ✓. baseline_met_or_exceeded = true is correctly derived (0.93468 > 0.828134).\n\n2. **Split & seed alignment**: common_split_fingerprint (9afc9ed3…c7505) and common_seed (72) match both the baseline_report and the evaluation_report, confirming a like-for-like comparison on identical data.\n\n3. **Accuracy cross-reference**: agentic_accuracy (0.93468) matches evaluation_report.accuracy exactly; baseline_accuracy (0.828134) matches baseline_report.accuracy exactly.\n\n4. **OOD AUROC aggregate**: ood_auroc 0.800034 = (0.919512 + 0.902798 + 0.577791) / 3, the arithmetic mean of max_softmax test AUROCs across the three corruption severities, consistent with the stated aggregation rule.\n\n5. **Upstream consistency**: All three upstream anomaly stages (evaluation, abstention, reporting) report severity \"ok\", action \"continue\", zero deterministic issues. Data audit passed all 11 checks with zero train–validation overlap.\n\n6. **Baseline fairness**: The baseline rationale explicitly states it is a \"Fixed conventional control with the agentic run's epoch budget\" (15 epochs, patience 3), so the comparison is not confounded by unequal compute budgets. Architectural difference (tiny_cnn hidden=16 vs. ResNet18 hidden=48) is the intended variable under test.\n\nMinor informational notes (non-blocking, already flagged upstream):\n- OOD AUROC degrades to ~0.58/0.53 at σ=0.4, expected for a controlled-corruption proxy.\n- Val-to-test accuracy gap (~6 pp) persists; monitoring item only.\n- Transformer-specific config fields present in both CNN configs are inactive per fixed-topology rules; harmless.\n- llm_model_digest is null across stages (reproducibility note, non-blocking).\n\nNo deterministic findings justify revision or stop. The comparison conclusion is supported.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "info: OOD AUROC drops to 0.578 (max_softmax) / 0.529 (predictive_entropy) at σ=0.4; expected for controlled-corruption proxy but relevant if deployment may encounter high-noise inputs",
+      "info: Val-to-test accuracy gap of ~6 pp (0.9956 → 0.9347) persists from evaluation stage; monitoring item, not a deterministic error",
+      "info: llm_model_digest is null for ollama qwen3.8 across all upstream stages; exact model revision not pinned (reproducibility note, non-blocking)",
+      "info: Transformer-specific fields (depth, num_heads, mlp_ratio, patch_size, pooling, positional_encoding, tokenizer_layers) present in both CNN configs but inactive per fixed-topology rules; harmless, could be omitted for clarity"
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "comparison"
+  },
+  "payload_sha256": "b35efb1858b7084246d2d4db3a2ac4faa9b0e5e6aef5153a1d0cde850618ea36",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 42,
+  "version": 1
+}

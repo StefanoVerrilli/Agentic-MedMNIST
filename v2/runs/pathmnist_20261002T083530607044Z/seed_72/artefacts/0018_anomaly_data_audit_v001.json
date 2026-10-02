@@ -1,0 +1,27 @@
+{
+  "artefact": "anomaly_data_audit",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T09:26:47.074985+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Data audit stage is clean and internally consistent. All 11 integrity checks pass (official_split, train/val indices, labels, pixels, shape, disjointness). PathMNIST 9-class 28×28 RGB with train=89996/val=10004/test=7180 matches the official MedMNIST distribution exactly; no subsampling. Archive MD5 cross-checks against verified_archive_md5; SHA-256 present. Zero duplicates, zero blank images, zero train–val overlap. Class counts sum correctly to split sizes; imbalance ratio ≈1.63 is modest. Channel statistics (means 0.53–0.74, stds 0.12–0.18) are consistent with [0,1] RGB and justify the z-score normalization choice in the representation plan. The three augmentations selected (hflip, brightness, rotate90) are all built-in primitives and do not require extension approval per pipeline rules; the pending_review entry for tissue_geometric_aug in the extension gate is redundant but harmless and does not invalidate the augmentation plan. The compact_conv_stem_transformer proposal is a model-architecture item, not an augmentation, and its pending status is appropriate. Minor non-blocking notes: (1) llm_model_digest is null for ollama qwen3.8, slightly weakening full reproducibility of LLM-assisted analysis; (2) test split was not individually profiled (test_imbalance_ratio=1.0, test_to_train_prevalence_ratio empty), which is informational since the test set originates from a different clinical center (CRC-VAL-HE-7K); (3) prior-art grounding relies on curated cache excerpts rather than live retrieval, flagged as a deterministic warning in the prior_art stage but not a data-integrity concern. No deterministic findings are present. The data_audit stage is ready to proceed.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "llm_model_digest is null for ollama qwen3.8; exact model revision not pinned (non-blocking reproducibility note)",
+      "tissue_geometric_aug (hflip/vflip) listed as pending_review in extension gate despite being built-in augmentations that do not require approval; redundant but harmless",
+      "test split not individually profiled (test_imbalance_ratio=1.0, test_to_train_prevalence_ratio empty); informational only given different clinical center origin",
+      "prior-art grounding uses curated cache excerpts rather than live retrieval (deterministic warning from prior_art stage; does not affect data integrity)",
+      "stride inconsistency between idea conv_tokenization_compact (stride 7) and binding proposal compact_conv_stem_transformer (stride 4); proposal is authoritative, traceability note only"
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "data_audit"
+  },
+  "payload_sha256": "5e9704c69e57570702846984e59522f9ba173663af9c1f424049c87c39cb03a9",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 18,
+  "version": 1
+}
