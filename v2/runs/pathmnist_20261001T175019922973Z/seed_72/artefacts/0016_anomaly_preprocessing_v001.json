@@ -1,0 +1,26 @@
+{
+  "artefact": "anomaly_preprocessing",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T18:56:23.313657+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "Preprocessing stage evidence is internally consistent and passes all deterministic checks. Verified specifics: (1) PathMNIST 28×28×3, 9 classes, official splits (train=89996, val=10004, test=7180) confirmed; archive MD5/SHA-256 match verified values; subsampled=false. (2) Class-count sums verified: train=89996, val=10004; imbalance ratio 1.634 = 12885/7886 ✓. (3) augmented_train_size 359984 = 89996×4 ✓. (4) Normalization 'standardize' with train-only stats is appropriate and avoids leakage. (5) Resolution 28×28×3 matches the standard MedMNIST distribution as required. No deterministic findings are present.\n\nWarnings (non-blocking): (a) llm_model_digest is null across all LLM-assisted stages (ingestion, profiling, representation plan); the exact qwen3.8 weight revision is not pinned, creating a reproducibility gap for any LLM-influenced decisions. Recommend pinning the Ollama model digest in the run manifest before downstream training. (b) test_imbalance_ratio is reported as exactly 1.0 and test_to_train_prevalence_ratio is empty; the test split (7180 samples) was excluded from class-count profiling (samples_profiled=100000 = train+val). This is acceptable as a held-out set, but test-set class balance remains unverified. (c) Two extension proposals (hflip_only_aug, compact_conv_token_transformer) are in pending_review status with no assigned reviewer and approvals_sha256=null; the hflip_only_aug proposal appears partially redundant with the already-included 'hflip' augmentation in the representation plan. These should be resolved before the extension gate is closed. (d) prior_art_brief is listed under omitted_artefacts; the prior-art stage evidence is present and passes, but the brief document itself is absent from the artefact set.\n\nNo deterministic failures. The stage is ready to proceed to the next pipeline stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "llm_model_digest is null in the run manifest; the exact qwen3.8 Ollama weight revision is not pinned, creating a reproducibility gap for LLM-assisted decisions (non-blocking).",
+      "test_imbalance_ratio=1.0 and test_to_train_prevalence_ratio=[] indicate the test split was not included in class-count profiling; test-set class balance is unverified.",
+      "Extension proposals hflip_only_aug and compact_conv_token_transformer remain in pending_review with no assigned reviewer; hflip_only_aug overlaps with the already-included hflip augmentation in the representation plan.",
+      "prior_art_brief is listed under omitted_artefacts; the brief document is absent from the artefact set (stage evidence is present and passes)."
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "preprocessing"
+  },
+  "payload_sha256": "0e31a1cce8055c7b80cfbe885e1a7b5e11b1bae03d517ed07be7e8be8024cd22",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 16,
+  "version": 1
+}

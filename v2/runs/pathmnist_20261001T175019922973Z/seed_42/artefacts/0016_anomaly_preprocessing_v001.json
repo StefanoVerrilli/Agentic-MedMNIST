@@ -1,0 +1,27 @@
+{
+  "artefact": "anomaly_preprocessing",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T17:53:36.721285+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "Preprocessing stage passes all deterministic integrity checks (empty deterministic_findings list). Archive MD5/SHA-256 verified, split sizes match official PathMNIST (89996/10004/7180), 28×28 RGB 9-class format confirmed, no duplicates, no blank images. However, several non-blocking but important issues warrant attention before downstream stages:\n\n1. **test_imbalance_ratio = 1.0 is a placeholder.** Only train+val (100,000 samples) were profiled; the test set (7,180 samples, 9 classes) was never class-counted. A ratio of exactly 1.0 across 9 classes is arithmetically implausible and is almost certainly a default. The profiling stage was already flagged 'revise' for this. This does not block preprocessing but must be resolved before any evaluation or class-weighting step that reads test-set statistics.\n\n2. **Representation plan references augmentations still pending review.** The representation_plan specifies hflip, brightness, and contrast (factor 4 → augmented_train_size 359,984), yet the extension_gate_report shows 'hflip_only_aug' with status 'pending_review' and approvals_sha256 = null. The pipeline is configuring an augmentation strategy that has not received hash-bound independent approval. This is a process-integrity gap: the preprocessing artefacts should either (a) wait for the gate to clear, or (b) explicitly record that the plan is provisional pending review. As-is, the split_manifest's augmented_train_size is locked to an unapproved configuration.\n\n3. **llm_model_digest is null for qwen3.8.** Flagged independently in ingestion, prior_art, and profiling stages. Not blocking for the deterministic preprocessing computations, but any downstream stage that relies on LLM-generated artefacts (e.g., model selection, hyperparameter search) will lack a reproducible model fingerprint. Resolve before the first LLM-dependent stage.\n\n4. **Profiling stage action was 'revise', not 'continue'.** The preprocessing stage is proceeding on top of a profiling artefact that was not cleanly passed. The core data-integrity checks all pass, so this is not a hard blocker, but the pipeline should record that the profiling 'revise' disposition was acknowledged and the specific open item (test-set class counts) was consciously deferred.\n\n5. **Minor:** prior_art_brief is listed in omitted_artefacts. Confirm this is intentional and that no downstream stage expects it as input.\n\nNo deterministic findings are present, so no stop condition is met. The issues above are process and reproducibility concerns that should be tracked and resolved before training or evaluation stages begin.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "test_imbalance_ratio=1.0 is a placeholder; test set (7180 samples, 9 classes) was never class-counted — resolve before any evaluation or class-weighting step",
+      "Representation plan locks augmented_train_size=359984 to an augmentation set (hflip, brightness, contrast) that is still 'pending_review' in the extension gate with approvals_sha256=null — process-integrity gap",
+      "llm_model_digest is null for qwen3.8 across all stages; must be resolved before any LLM-dependent downstream stage to guarantee reproducibility",
+      "Profiling stage disposition was 'revise' (not 'continue'); preprocessing proceeds on top of an unresolved profiling artefact — acknowledge and track the open item",
+      "prior_art_brief listed in omitted_artefacts; confirm no downstream stage depends on it"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "preprocessing"
+  },
+  "payload_sha256": "6b931b36f76b91bf03e38f0b252f36a15c0103d9548232f325b1aff49f4db7b4",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 16,
+  "version": 1
+}

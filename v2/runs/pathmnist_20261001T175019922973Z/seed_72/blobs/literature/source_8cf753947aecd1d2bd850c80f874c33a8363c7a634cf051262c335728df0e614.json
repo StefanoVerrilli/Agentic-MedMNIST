@@ -1,0 +1,7 @@
+{
+  "id": "2507.12248v1",
+  "origin": "arxiv_api",
+  "retrieved_at": "2026-10-01T17:51:31.885807+00:00",
+  "text": "Deep learning has significantly advanced the field of medical image classification, particularly with the adoption of Convolutional Neural Networks (CNNs). Various deep learning frameworks such as Keras, PyTorch and JAX offer unique advantages in model development and deployment. However, their comparative performance in medical imaging tasks remains underexplored. This study presents a comprehensive analysis of CNN implementations across these frameworks, using the PathMNIST dataset as a benchmark. We evaluate training efficiency, classification accuracy and inference speed to assess their suitability for real-world applications. Our findings highlight the trade-offs between computational speed and model accuracy, offering valuable insights for researchers and practitioners in medical image analysis.",
+  "title": "Comparative Analysis of CNN Performance in Keras, PyTorch and JAX on PathMNIST"
+}

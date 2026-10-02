@@ -1,0 +1,21 @@
+{
+  "artefact": "anomaly_prior_art",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T18:55:34.879061+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Prior-art stage evidence is internally consistent and well-grounded. All seven ideas are appropriately scoped as hypotheses to validate, each citing a source whose text snippet supports the quoted evidence. All six sources carry complete metadata (origin, timestamp, snapshot path, SHA-256, title, URL) and were retrieved at 2026-10-01T17:51:31, before the current UTC stamp. No retrieval errors. Cross-references are clean: every source_id cited in ideas and proposals resolves to an entry in the sources array. The two proposals are consistent with the cited literature and with the 28×28×3 MedMNIST distribution. The compact_conv_token_transformer architecture is mathematically coherent: 28→14→7 spatial reduction via two stride-2 convs yields 7×7×128 = 49 tokens of dim 128; 4 attention heads × head_dim 32 = 128, matching the token dimension; the classification head targets 9 PathMNIST classes; the parameter budget (<2 M) is plausible for the described depth. The hflip_only_aug proposal is conservative, well-justified by the label-preservation rationale, and correctly excludes rotations that could invert tissue polarity. test_metrics_used is false, appropriate for this stage. No deterministic findings are present. No issues warrant revision or stop.",
+    "deterministic_issues": [],
+    "llm_issues": [],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "prior_art"
+  },
+  "payload_sha256": "27cadecfc7519131bdab800b082ad495c9cd6f19c79106de66fb6de8a59deb8d",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 12,
+  "version": 1
+}

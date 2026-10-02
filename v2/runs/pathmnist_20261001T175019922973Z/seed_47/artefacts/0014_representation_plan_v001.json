@@ -1,0 +1,33 @@
+{
+  "artefact": "representation_plan",
+  "artefact_type": "RepresentationPlan",
+  "created_at": "2026-10-01T18:26:13.552601+00:00",
+  "payload": {
+    "augmentation_factor": 4,
+    "augmentations": [
+      "hflip",
+      "brightness",
+      "contrast"
+    ],
+    "normalization": "standardize",
+    "rationale": "Normalization choice: 'standardize' (z-score per channel) is selected because the three H&E channels exhibit meaningfully different statistics—red mean 0.741 / std 0.124, green mean 0.533 / std 0.177, blue mean 0.706 / std 0.124. Without standardization, the green channel carries roughly 40% more variance than the red and blue channels, which would bias gradient magnitudes and slow convergence in a lightweight backbone (the cited MedMNIST design intent calls for <5 M parameters). Z-scoring equalizes per-channel scale, stabilizes early-training dynamics, and is the standard precondition for both CNN and conv-tokenized transformer heads discussed in the cited hypotheses. Because the raw values already sit in [0,1], 'unit' scaling would be nearly a no-op and would leave the inter-channel variance mismatch unaddressed.\n\nAugmentation selection (train-only, max 3): hflip, brightness, contrast.\n\n1) hflip – Tissue-type labels (gland, stroma, epithelium, etc.) carry no intrinsic left-right asymmetry, so horizontal mirroring is orientation-safe. It is the single most reliable geometric regularizer for 28×28 patches and effectively doubles the spatial diversity of the ~90 K training images without introducing unrealistic orientations. The cited augmentation-regularization hypothesis (arxiv_2508_18509v1) explicitly flags horizontal flipping as a critical regularizer at this sample size.\n\n2) brightness – H&E staining intensity varies substantially across labs, slide batches, and scanner settings. A global brightness shift emulates this photometric domain shift while preserving the relative hematoxylin/eosin color ratio that encodes tissue morphology. This is the most common source of inter-site variability in computational pathology and directly addresses the 'no background knowledge required' design goal of PathMNIST by making the model robust to absolute intensity.\n\n3) contrast – Complements brightness by simulating variation in stain saturation and optical density. Low-contrast slides (faded eosin) and high-contrast slides (over-stained hematoxylin) are both common in real H&E workflows. Pairing brightness with contrast spans the two principal axes of photometric variation, giving the model a broader effective training distribution than either alone.\n\nWhy not rotate90/rotate180/vflip? All are orientation-safe, but with only three slots the photometric pair (brightness + contrast) is prioritized over a second geometric transform because H&E staining variability is the dominant real-world domain shift for tissue-type classification, whereas geometric diversity is already well covered by hflip at 28×28 resolution. Adding a second geometric flip or rotation would yield diminishing returns relative to the photometric coverage gap.\n\nThis combination—standardized input, one geometric and two photometric augmentations—matches the lightweight, robust design philosophy of the cited MedMNIST and GhostNet-VGG hypotheses while specifically targeting the staining-variability challenge unique to H&E histopathology.",
+    "schema_version": "1.0",
+    "source": "qwen3.8",
+    "stats_source": "train",
+    "train_channel_mean_unit": [
+      0.740545,
+      0.53298219,
+      0.70582885
+    ],
+    "train_channel_std_unit": [
+      0.12368222,
+      0.17676253,
+      0.12443067
+    ]
+  },
+  "payload_sha256": "81480cab3751f6087cd440e65e966ada45957b2bc884a11a4d805733feea61eb",
+  "producer": "preprocessing",
+  "run_id": "seed_47",
+  "sequence": 14,
+  "version": 1
+}

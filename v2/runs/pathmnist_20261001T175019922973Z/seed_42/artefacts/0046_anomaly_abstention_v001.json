@@ -1,0 +1,25 @@
+{
+  "artefact": "anomaly_abstention",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T18:21:34.673756+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "The abstention stage is internally consistent and methodologically sound. Key verifications: (1) abstain_rate × test_samples = 0.377577 × 7180 ≈ 2711, matching human_review_count exactly; (2) test_coverage (0.622423) + abstain_rate (0.377577) = 1.0; (3) the selective_risk (0.036026) and threshold (0.94394702) correspond to the 0.8 target_validation_coverage row in the risk_coverage_curve; (4) calibration is correctly performed on the validation split (10,004 samples) with test metrics reported separately, avoiding test-set leakage into threshold selection; (5) the OOD evaluation is appropriately scoped as a 'controlled_corruption_proxy' using unit-scale Gaussian noise at three severities with two scoring functions, and ood_pass=true is supported by all per-scenario test AUROCs ≥ 0.74; (6) the aggregate ood_auroc (0.823189) and ood_validation_auroc (0.967349) are within ~0.0004 of the arithmetic mean of the six per-scenario values, consistent with a pooled-data computation rather than a simple average—no discrepancy. (7) The prediction artifact (7,180 test + 10,004 validation samples, with logits, probabilities, and targets) provides sufficient evidence for all downstream computations. No deterministic findings are present. The evaluation-stage anomaly (revise/warning) flags model-level concerns (val-test gap ~10.7 pp, class-7 recall 0.551, class-5 precision 0.583, adipose→smooth-muscle confusion block of 274) and documentation ambiguities (resnet18 label with transformer-style fields, augmentation set deviation, config_hash scope). These are legitimate warnings for the overall pipeline but do not constitute a defect in the abstention stage itself; the abstention mechanism correctly routes the 2,711 uncertain test samples to human review and achieves a 96.4% accuracy on the covered subset versus 88.96% base accuracy. All artefact SHA-256 hashes are present and the schema_version is 1.0 throughout. No action beyond continuation is warranted at this stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Aggregate ood_auroc (0.823189) differs from the arithmetic mean of the six per-scenario test AUROCs (0.823539) by ~0.0004; likely due to pooled-data computation but the computation method is not explicitly documented in the report",
+      "The evaluation-stage anomaly flags a ~10.7 pp validation-test accuracy gap (0.9965 vs 0.8896) and notably low recall for cancer-associated stroma (0.551) and precision for smooth muscle (0.583); while these do not invalidate the abstention mechanism, they mean the 2,711 human-review samples are disproportionately drawn from these weak classes, which should be noted in any downstream benchmark interpretation",
+      "Model family label 'resnet18' coexists with transformer-style config fields (patch_size, num_heads, positional_encoding, pooling=cls); this ambiguity carries into the abstention report's provenance and could confuse downstream consumers of the OOD evidence file"
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "abstention"
+  },
+  "payload_sha256": "d107a5eaee642cf1bd08e22a6fbd19a8d53c2eb76d01b097173b8fb4fd032216",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 46,
+  "version": 1
+}

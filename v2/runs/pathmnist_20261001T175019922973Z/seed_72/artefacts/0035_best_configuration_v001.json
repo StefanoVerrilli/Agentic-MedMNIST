@@ -1,0 +1,57 @@
+{
+  "artefact": "best_configuration",
+  "artefact_type": "BestConfiguration",
+  "created_at": "2026-10-01T19:13:21.935127+00:00",
+  "payload": {
+    "lightning_config_path": "best_config_v001.yaml",
+    "lightning_config_sha256": "49373c51850402e1af9aa86a70befd0600e74347a6b90dbeb37bc58b01195ada",
+    "representation": {
+      "augmentations": [
+        "hflip",
+        "vflip",
+        "rotate90"
+      ],
+      "normalization": "standardize",
+      "rationale": "Building on the best prior result (resnet18 depth=3, hidden=32, lr=0.0005 → 99.16% acc), this candidate increases capacity moderately: depth 3→4 adds one more residual block for richer feature hierarchy, and hidden 32→48 widens channels by 50% to capture more discriminative pathology features. The LR is reduced to 0.0003 to maintain training stability with the larger parameter count (roughly 1.5-2x more params). rotate90 is added as a third conservative geometric augmentation (alongside hflip and vflip) to provide orientation invariance without destroying tissue-orientation cues. All other hyperparameters (adamw, cosine, wd=1e-4, ls=0.05, batch=128, dropout=0.1, standardize) are held constant to isolate the effect of the capacity and augmentation changes. The 1.63x class imbalance is mild enough that class_weighting is unnecessary; label_smoothing=0.05 provides sufficient regularization."
+    },
+    "schema_version": "1.0",
+    "selected_candidate_id": "resnet18_depth4_wider",
+    "selected_config_hash": "6bac86b49e9fd939f6874061c8f3a1c118f5804b83dfbb7b262bf745518a6a6e",
+    "selection_rule": "highest epoch budget, then accuracy within tolerance, then macro-F1; test locked",
+    "test_metrics_used": false,
+    "train_config": {
+      "batch_size": 128,
+      "class_weighting": false,
+      "depth": 4,
+      "device": "cuda",
+      "dropout": 0.1,
+      "early_stopping_patience": 3,
+      "epochs": 15,
+      "gradient_clip_val": 1.0,
+      "hidden": 48,
+      "label_smoothing": 0.05,
+      "lr": 0.0003,
+      "mlp_ratio": 4,
+      "model_family": "resnet18",
+      "num_heads": 4,
+      "optimizer": "adamw",
+      "patch_size": 4,
+      "pooling": "cls",
+      "positional_encoding": "learned",
+      "rationale": "Selected from 8 validation-only trials. Building on the best prior result (resnet18 depth=3, hidden=32, lr=0.0005 → 99.16% acc), this candidate increases capacity moderately: depth 3→4 adds one more residual block for richer feature hierarchy, and hidden 32→48 widens channels by 50% to capture more discriminative pathology features. The LR is reduced to 0.0003 to maintain training stability with the larger parameter count (roughly 1.5-2x more params). rotate90 is added as a third conservative geometric augmentation (alongside hflip and vflip) to provide orientation invariance without destroying tissue-orientation cues. All other hyperparameters (adamw, cosine, wd=1e-4, ls=0.05, batch=128, dropout=0.1, standardize) are held constant to isolate the effect of the capacity and augmentation changes. The 1.63x class imbalance is mild enough that class_weighting is unnecessary; label_smoothing=0.05 provides sufficient regularization.",
+      "scheduler": "cosine",
+      "schema_version": "1.0",
+      "seed": 72,
+      "source": "agentic_search:selected:qwen3.8",
+      "tokenizer_layers": 2,
+      "weight_decay": 0.0001
+    },
+    "validation_accuracy": 0.995902,
+    "validation_macro_f1": 0.99589
+  },
+  "payload_sha256": "f61f4de18fb277ac8fd493e6ffe0e4e72405e451e7a1c60c8d45332e9bf5e20c",
+  "producer": "model_search",
+  "run_id": "seed_72",
+  "sequence": 35,
+  "version": 1
+}

@@ -1,0 +1,31 @@
+{
+  "artefact": "anomaly_reporting",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T18:23:38.268042+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "No deterministic findings are present; all arithmetic cross-checks pass (abstain_rate × 7180 = 2711 = human_review_count; test_coverage + abstain_rate = 1.0; selective_risk and threshold align with the 0.8-coverage row; accuracy_delta = 0.068245; split fingerprints and seeds match across baseline and agentic reports). The reporting stage is internally consistent and complete.\n\nHowever, three of the four anomaly reviewers (comparison, evaluation, reporting) returned action=revise with severity=warning, and their LLM-flagged issues collectively identify documentation and annotation gaps that the final dossier should address before publication:\n\n1. **Model-family naming ambiguity (recurring across all stages):** The selected model is labelled 'resnet18' yet its config carries transformer-style fields (patch_size, num_heads, positional_encoding, pooling=cls, tokenizer_layers). The baseline is labelled 'tiny_cnn' with the same transformer-style fields. This ambiguity propagates into the abstention report provenance and the OOD evidence file. The dossier should include an explicit architecture description (e.g., 'hybrid CNN-Transformer with ResNet-18 backbone and ViT head') to prevent downstream misinterpretation.\n\n2. **OOD AUROC aggregation method:** The aggregate ood_auroc (0.823189) differs from the arithmetic mean of the six per-scenario test AUROCs (0.823539) by ≈0.0004. This is consistent with a pooled-data computation, but the method is not stated in the report. The dossier should document whether the aggregate is computed on pooled (N×6) samples or as a macro-average.\n\n3. **Validation–test accuracy gap (~10.7 pp):** Validation accuracy ≈0.9965 vs test accuracy 0.8896. While not an error, this gap (likely driven by the 9-class imbalance and the two weakest classes: cancer-associated stroma recall 0.551, smooth muscle precision 0.583) should be annotated in the dossier as a known limitation, and the disproportionate draw of the 2,711 human-review samples from these classes should be noted for benchmark reviewers.\n\n4. **Comparison report scope:** Only accuracy is tracked as primary_metric. The macro_f1 delta (0.889554 vs 0.750857 → Δ≈0.139) and balanced_accuracy are omitted despite the imbalanced 9-class setting. No statistical significance test (bootstrap CI, permutation) accompanies the 6.8 pp accuracy delta. The dossier should either include these or explicitly state why accuracy alone is the reporting metric.\n\n5. **Augmentation and training-config documentation:** The augmentation set (hflip, vflip, rotate180) deviates from the commonly recommended set for 28×28 RGB MedMNIST without in-report justification. The config_hash is shared between the 9-epoch search trial and the 15-epoch final training despite differing epochs/patience; the hash scope should be documented.\n\nNone of these issues constitute a correctness error or a deterministic failure. They are annotation and documentation completeness concerns that the reporting stage should incorporate into the final dossier before the pipeline is marked complete. Action is therefore 'revise' (not 'stop') to ensure the dossier carries these caveats.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Model-family label 'resnet18' (and baseline 'tiny_cnn') coexists with transformer-style config fields (patch_size, num_heads, positional_encoding, pooling=cls, tokenizer_layers); dossier should include an unambiguous architecture description",
+      "Aggregate ood_auroc (0.823189) vs arithmetic mean of per-scenario test AUROCs (0.823539) differs by ~0.0004; pooled-data computation method not documented in the report",
+      "Validation-test accuracy gap of ~10.7 pp (≈0.9965 val vs 0.8896 test) should be annotated as a known limitation in the final dossier",
+      "Cancer-associated stroma (class 7) recall 0.551 and smooth muscle (class 5) precision 0.583 are the weakest per-class metrics; the 2,711 human-review samples are disproportionately drawn from these classes and this should be noted for benchmark reviewers",
+      "Comparison report tracks only accuracy as primary_metric; macro_f1 delta (≈0.139) and balanced_accuracy are omitted despite the imbalanced 9-class setting",
+      "No statistical significance test (paired bootstrap, permutation, or CI overlap) accompanies the 6.8 pp accuracy delta in the comparison report",
+      "Augmentation set (hflip, vflip, rotate180) deviates from the commonly recommended set for 28×28 RGB MedMNIST without explicit justification in the rationale",
+      "config_hash is shared between the 9-epoch search trial and the 15-epoch final training despite differing epochs and patience values; hash scope should be documented in the dossier",
+      "Architecture asymmetry between baseline (tiny_cnn) and agentic (resnet18/transformer-hybrid) is by design but not restated in the comparison report; parameter-count gap as the likely dominant source of the accuracy delta should be explicitly noted"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "reporting"
+  },
+  "payload_sha256": "515c26ccbf39ccde9d982e023f3dad72a6c6778cb31ae01c975128ed2388bf9c",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 54,
+  "version": 2
+}

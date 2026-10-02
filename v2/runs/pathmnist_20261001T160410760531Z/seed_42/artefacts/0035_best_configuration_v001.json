@@ -1,0 +1,57 @@
+{
+  "artefact": "best_configuration",
+  "artefact_type": "BestConfiguration",
+  "created_at": "2026-10-01T16:24:54.168111+00:00",
+  "payload": {
+    "lightning_config_path": "best_config_v001.yaml",
+    "lightning_config_sha256": "65e01b83e44c37e8579276459a50a9b7d28de81cfd8f662884ae5379346310b7",
+    "representation": {
+      "augmentations": [
+        "hflip",
+        "vflip",
+        "rotate180"
+      ],
+      "normalization": "standardize",
+      "rationale": "Builds on the best prior resnet18 result (0.9908) by increasing hidden 32→48 and depth 3→4 for ~30% more capacity, while raising dropout to 0.15 and lowering lr to 3e-4 to maintain stability. Enables class_weighting to explicitly address the 1.63× class imbalance (minority classes at 7.9K vs majority at 12.9K). Adds rotate180 as a third augmentation for broader spatial invariance. Label smoothing increased to 0.1 for better calibration on the 9-class problem. All other hyperparameters (batch 128, AdamW, cosine, standardize, wd=1e-4) match the proven best configuration."
+    },
+    "schema_version": "1.0",
+    "selected_candidate_id": "resnet18_capacity_wt",
+    "selected_config_hash": "a836389a52bcbde527ba7a79a781fe4d6d42bd19978cf9356feebcb1a2406734",
+    "selection_rule": "highest epoch budget, then accuracy within tolerance, then macro-F1; test locked",
+    "test_metrics_used": false,
+    "train_config": {
+      "batch_size": 128,
+      "class_weighting": true,
+      "depth": 4,
+      "device": "cuda",
+      "dropout": 0.15,
+      "early_stopping_patience": 3,
+      "epochs": 15,
+      "gradient_clip_val": 1.0,
+      "hidden": 48,
+      "label_smoothing": 0.1,
+      "lr": 0.0003,
+      "mlp_ratio": 4,
+      "model_family": "resnet18",
+      "num_heads": 4,
+      "optimizer": "adamw",
+      "patch_size": 4,
+      "pooling": "cls",
+      "positional_encoding": "learned",
+      "rationale": "Selected from 8 validation-only trials. Builds on the best prior resnet18 result (0.9908) by increasing hidden 32→48 and depth 3→4 for ~30% more capacity, while raising dropout to 0.15 and lowering lr to 3e-4 to maintain stability. Enables class_weighting to explicitly address the 1.63× class imbalance (minority classes at 7.9K vs majority at 12.9K). Adds rotate180 as a third augmentation for broader spatial invariance. Label smoothing increased to 0.1 for better calibration on the 9-class problem. All other hyperparameters (batch 128, AdamW, cosine, standardize, wd=1e-4) match the proven best configuration.",
+      "scheduler": "cosine",
+      "schema_version": "1.0",
+      "seed": 42,
+      "source": "agentic_search:selected:qwen3.8",
+      "tokenizer_layers": 2,
+      "weight_decay": 0.0001
+    },
+    "validation_accuracy": 0.994802,
+    "validation_macro_f1": 0.994648
+  },
+  "payload_sha256": "2a87fefa35c50bd4581c2521355a854829cc54c9604f5c55490a42f008a3e702",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 35,
+  "version": 1
+}

@@ -1,0 +1,29 @@
+{
+  "artefact": "anomaly_abstention",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T19:22:29.819376+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "The abstention stage executed mechanically correctly: the max_softmax threshold was calibrated on validation, applied to test, and the risk-coverage curve is internally consistent. However, several substantive concerns warrant revision before downstream use.\n\n**1. OOD detection is weak and fails at high noise.** The overall OOD AUROC is 0.587 (ood_pass=false). More critically, at sigma_0.4 the AUROC drops to 0.134 (max_softmax) and 0.125 (predictive_entropy), both well below 0.5, meaning the model is *more* confident on OOD samples than in-distribution ones under heavy noise. This is a serious failure mode: the abstention mechanism will actively *accept* the most corrupted inputs rather than flag them. The validation AUROC at sigma_0.4 is also below 0.5 (0.093), so this is not a test-only artifact.\n\n**2. Large validation-to-test coverage and risk gap.** The target validation coverage is 0.800, but test coverage is only 0.589 (a ~21 pp shortfall). Correspondingly, validation risk at that operating point is 0.000375 while test risk is 0.030031—an ~80× inflation. This is consistent with the ~11.3 pp val-to-test accuracy gap flagged in the evaluation stage and suggests a distribution or calibration shift between splits that the max_softmax threshold does not absorb.\n\n**3. Abstain rate is high (41.1%).** While accuracy on covered samples is strong (97.0%), the mechanism routes nearly half the test set to human review (2,951 samples). Combined with the coverage gap, the practical selectivity benefit is reduced.\n\n**4. Single-method reliance.** Only max_softmax is used as the abstention score. The OOD scenarios show predictive_entropy performs comparably (slightly better at low noise, slightly worse at high noise), but no ensemble or temperature-scaled approach was tried. Given the anti-correlated AUROC at sigma_0.4, a more robust OOD score (e.g., Mahalanobis distance, energy score, or ensemble disagreement) would be advisable.\n\n**5. No deterministic pipeline errors.** The deterministic_findings list is empty. All issues above are model-performance and calibration concerns, not pipeline bugs. The confusion matrix, CIs, split integrity, and artifact hashes are internally consistent.\n\n**Recommended revisions:** (a) Investigate the val-to-test distribution shift (class-frequency or texture differences) that drives the 21 pp coverage gap; (b) Replace or augment max_softmax with a more robust OOD score given the sub-chance AUROC at sigma_0.4; (c) Re-calibrate the threshold using a conformal or split-conformal procedure that guarantees finite-sample coverage on the test distribution rather than relying on validation calibration; (d) Document the OOD limitation explicitly in the abstention report so downstream consumers are aware that high-noise inputs will not be reliably flagged.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "OOD AUROC at sigma_0.4 is 0.134 (max_softmax) and 0.125 (predictive_entropy), both below 0.5, indicating confidence is anti-correlated with OOD under heavy noise; the abstention mechanism will accept the most corrupted inputs",
+      "Overall OOD AUROC is 0.587 with ood_pass=false; the controlled-corruption proxy does not meet a reasonable detection threshold",
+      "Validation-to-test coverage gap of ~21 pp (0.800 val vs 0.589 test) at the target operating point, indicating the max_softmax threshold calibrated on validation does not transfer to test",
+      "Validation-to-test risk gap of ~80× (0.000375 val vs 0.030031 test) at the same operating point, undermining the reliability of the selective-risk guarantee",
+      "Abstain rate of 41.1% routes 2,951 test samples to human review, reducing practical selectivity benefit",
+      "Only max_softmax is used as the abstention score; no ensemble, energy, or Mahalanobis-based OOD score was evaluated despite the sub-chance AUROC at high noise",
+      "The val-to-test accuracy gap (~11.3 pp) flagged in the evaluation stage is consistent with the coverage/risk gaps here, suggesting a systematic distribution or calibration shift between splits that should be investigated before the abstention mechanism is relied upon in production"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "abstention"
+  },
+  "payload_sha256": "282352a4f4cd4e3266872ff35769ec9f7427dc59ee6bee57b32e562f5da41a1e",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 46,
+  "version": 1
+}

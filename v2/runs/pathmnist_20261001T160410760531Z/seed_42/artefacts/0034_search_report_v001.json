@@ -1,0 +1,39 @@
+{
+  "artefact": "search_report",
+  "artefact_type": "SearchReport",
+  "created_at": "2026-10-01T16:24:54.165195+00:00",
+  "payload": {
+    "completed_trials": 8,
+    "failed_trials": 0,
+    "families_evaluated": [
+      "compact_transformer",
+      "residual_cnn",
+      "resnet18",
+      "tiny_cnn",
+      "vision_transformer"
+    ],
+    "missing_families": [],
+    "schema_version": "1.0",
+    "selected_candidate_id": "resnet18_capacity_wt",
+    "selected_config_hash": "a836389a52bcbde527ba7a79a781fe4d6d42bd19978cf9356feebcb1a2406734",
+    "selected_validation_accuracy": 0.994802,
+    "selected_validation_macro_f1": 0.994648,
+    "selection_rule": "highest_budget_accuracy_tolerance_then_macro_f1",
+    "test_metrics_used": false,
+    "trial_artefacts": [
+      "trial_compact_transformer_e4bc0782_e3_s001",
+      "trial_residual_balanced_be4afb0b_e3_s001",
+      "trial_resnet18_conservative_a48f20ec_e3_s001",
+      "trial_tiny_regularized_ee0112db_e6_s001",
+      "trial_vit_patch4_2c7c1bdc_e6_s001",
+      "trial_resnet18_conservative_a48f20ec_e6_s001",
+      "trial_resnet18_conservative_a48f20ec_e9_s001",
+      "trial_resnet18_capacity_wt_a836389a_e9_s001"
+    ]
+  },
+  "payload_sha256": "1551145941ecbd1bd942e30f2d9cefbdf15701bc713c5c85e67e1243e39a54ba",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 34,
+  "version": 1
+}

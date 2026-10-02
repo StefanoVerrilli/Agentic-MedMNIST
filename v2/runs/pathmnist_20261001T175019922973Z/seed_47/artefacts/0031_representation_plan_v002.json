@@ -1,0 +1,32 @@
+{
+  "artefact": "representation_plan",
+  "artefact_type": "RepresentationPlan",
+  "created_at": "2026-10-01T18:43:28.445346+00:00",
+  "payload": {
+    "augmentation_factor": 3,
+    "augmentations": [
+      "hflip",
+      "vflip"
+    ],
+    "normalization": "standardize",
+    "rationale": "Extends the best prior result (resnet18, 0.9924 at epoch 6) by: (1) increasing hidden 32→48 and depth 3→4 for ~30% more capacity to capture finer nuclear/glandular morphology; (2) lowering LR 5e-4→3e-4 for more stable convergence with the added parameters; (3) enabling class_weighting to directly address the 1.63x imbalance (classes range 7.9K–12.9K samples), which was untested in all prior runs; (4) raising label_smoothing 0.05→0.1 for better-calibrated probabilities on the 9-class problem; (5) increasing dropout 0.1→0.15 as a mild regularizer for the extra capacity; (6) extending early_stopping_patience to 8 epochs since the prior best peaked at epoch 6, giving the model room to continue improving. Augmentations (hflip+vflip) and standardize normalization are retained from the winning config. Weight decay stays at 1e-4 to avoid over-regularizing the already well-performing architecture.",
+    "schema_version": "1.0",
+    "source": "agentic_search:selected:qwen3.8",
+    "stats_source": "train",
+    "train_channel_mean_unit": [
+      0.740545,
+      0.53298219,
+      0.70582885
+    ],
+    "train_channel_std_unit": [
+      0.12368222,
+      0.17676253,
+      0.12443067
+    ]
+  },
+  "payload_sha256": "ae9d00a8e4de2ede4c61a0e636b4d7c57248c280eab64da5c4393d0a00c7fb22",
+  "producer": "model_search",
+  "run_id": "seed_47",
+  "sequence": 31,
+  "version": 2
+}

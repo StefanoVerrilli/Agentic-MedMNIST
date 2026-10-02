@@ -1,0 +1,64 @@
+{
+  "proposals": [
+    {
+      "proposal_id": "hflip_pathology_safe",
+      "kind": "augmentation",
+      "description": "Apply horizontal flip (hflip) as the sole geometric augmentation during PathMNIST training. Pathology tissue sections do not have a strict left-right asymmetry that would change the histological class (e.g., cell morphology, gland architecture, stromal pattern remain invariant under left-right mirroring). Vertical flip, 90-degree, and 180-degree rotations are excluded because tissue orientation (e.g., direction of collagen fibers, apical-basal polarity of epithelial cells, orientation of glandular structures) can be diagnostically meaningful and flipping/rotating may alter the visual signature of certain classes. This conservative augmentation strategy preserves label semantics while providing a 2x effective training set.",
+      "source_ids": [
+        "arxiv_2508_18509v1",
+        "arxiv_2110_14795v2"
+      ],
+      "operations": [
+        "hflip"
+      ],
+      "label_preservation_rationale": "Horizontal mirroring preserves the morphological features that define pathology classes (cell shape, nuclear-to-cytoplasmic ratio, gland architecture, stromal density) because these features are not directionally encoded in the left-right axis. In contrast, vertical or rotational transforms could invert apical-basal polarity or alter the perceived orientation of tissue structures, potentially changing the visual appearance of class-specific patterns.",
+      "implementation_requirements": []
+    },
+    {
+      "proposal_id": "compact_conv_token_transformer",
+      "kind": "architecture",
+      "description": "A non-executable architecture specification for a compact transformer adapted to 28x28x3 PathMNIST input. (1) Convolutional tokenizer: a 3x3 conv (stride 2, 32 filters) followed by a 3x3 conv (stride 2, 64 filters) producing a 7x7x64 feature map, then reshaped to 49 tokens of dimension 64. (2) Positional encoding: learnable 49x64 positional embeddings added to tokens. (3) Transformer encoder: 3 layers, each with multi-head self-attention (4 heads, head_dim=16), layer norm, and a 2x64 FFN with GELU activation. (4) Classification head: global average pooling over the 49 tokens, a linear layer (64 to 128), ReLU, dropout (0.3), and a final linear layer (128 to 9) for the 9 PathMNIST classes. Total parameter budget approximately 1.5-2.5M. This design follows the CCT principle of convolutional tokenization to avoid the data-hungry nature of fixed patch embeddings while retaining self-attention for global context modeling on the small 28x28 input.",
+      "source_ids": [
+        "arxiv_2104_05704v4",
+        "arxiv_2010_11929v2",
+        "arxiv_2110_14795v2"
+      ],
+      "operations": [],
+      "label_preservation_rationale": "",
+      "implementation_requirements": [
+        "Input tensor shape must be (batch, 28, 28, 3) with 3-channel RGB pathology images",
+        "Convolutional tokenizer must produce exactly 49 tokens of dimension 64 via two stride-2 convolutions",
+        "Learnable positional embeddings of shape (49, 64) must be added before the first attention layer",
+        "Each transformer layer must use pre-norm (LayerNorm before attention and FFN) with 4 attention heads of dimension 16",
+        "FFN intermediate dimension must be 2x the embedding dimension (128) with GELU activation",
+        "Classification head must use global average pooling over token dimension, then a single hidden linear layer with dropout 0.3",
+        "Total trainable parameters must not exceed 3M to maintain data efficiency on ~90K training samples",
+        "Output must be a (batch, 9) logit vector for the 9 PathMNIST classes",
+        "Training should use cross-entropy loss with class-weighted sampling to address the mild imbalance (7886-12885 per class)",
+        "Horizontal flip augmentation should be applied during training as the sole geometric transform"
+      ]
+    }
+  ],
+  "gate": {
+    "schema_version": "1.0",
+    "entries": [
+      {
+        "proposal_id": "hflip_pathology_safe",
+        "spec_sha256": "08f37296d5c251af50d370af91c39564b2691686b92fa8af4329227a2e014b8b",
+        "status": "pending_review",
+        "reason": "A hash-bound independent review is required.",
+        "registry_name": null,
+        "reviewer": null
+      },
+      {
+        "proposal_id": "compact_conv_token_transformer",
+        "spec_sha256": "7a9db7f9567d5826d28f0a76a1e5df74e74a394d9570a0f9baa3aa37b9a88be6",
+        "status": "pending_review",
+        "reason": "A hash-bound independent review is required.",
+        "registry_name": null,
+        "reviewer": null
+      }
+    ],
+    "approvals_sha256": null
+  }
+}

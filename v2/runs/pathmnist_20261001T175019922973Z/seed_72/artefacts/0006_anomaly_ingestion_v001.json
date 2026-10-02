@@ -1,0 +1,23 @@
+{
+  "artefact": "anomaly_ingestion",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T18:53:49.057472+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Ingestion stage evidence is internally consistent and passes all deterministic checks. Specifics verified: (1) Archive integrity confirmed — archive_md5 matches verified_archive_md5 (a8b06965200029087d5bd730944a56c1); SHA-256 also recorded. (2) Split sizes (train=89996, val=10004, test=7180) match the official PathMNIST distribution exactly; subsampled=false confirms full dataset. (3) n_channels=3 (RGB) and n_classes=9 are consistent with the standard 28×28 RGB MedMNIST PathMNIST distribution and the 9 listed tissue-class labels. (4) Deterministic findings list is empty — no hard failures. (5) Run manifest records seed=72, deterministic_torch=true, and a pinned package set (torch 2.14.0+cu126, lightning 2.6.5, medmnist 3.0.2, numpy 2.4.6). Minor observation (non-blocking): llm_model_digest is null, meaning the exact Ollama qwen3.8 weight revision is not pinned in the manifest; this is a reproducibility gap for any LLM-assisted steps downstream but does not affect the ingestion data path. The test_domain_note (CRC-VAL-HE-7K cross-center origin) is informational and does not alter the ingestion contract. No deterministic findings justify stop or revise. Proceed to next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "llm_model_digest is null — the exact qwen3.8 weight revision used by Ollama is not pinned in the run manifest, creating a reproducibility gap for any LLM-assisted downstream steps (non-blocking for ingestion)."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "ingestion"
+  },
+  "payload_sha256": "c459fe89ab54220cf6ca2ad8d5c8803a21e8fecffe070ae5b117ddd8195657ef",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 6,
+  "version": 1
+}

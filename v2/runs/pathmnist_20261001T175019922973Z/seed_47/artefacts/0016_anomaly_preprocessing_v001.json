@@ -1,0 +1,27 @@
+{
+  "artefact": "anomaly_preprocessing",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T18:26:47.460262+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "Preprocessing stage is internally consistent and passes all verifiable checks. No deterministic findings.\n\n**Verified items:**\n1. Split integrity: train=89996, val=10004, test=7180 match official PathMNIST sizes exactly; subsampled=false; official_data_fraction=1.0.\n2. Class-count sums: train counts sum to 89996; val counts sum to 10004. Both match loaded split sizes.\n3. Image shape 28×28×3 matches the standard MedMNIST distribution.\n4. Imbalance ratio 1.633908 = 12885/7886 verified.\n5. Normalization stats (mean/std) are sourced from train only (stats_source='train', train_stats_only=true), preventing val/test leakage.\n6. Augmented train size 359984 = 89996 × 4 (augmentation_factor) is arithmetically correct.\n7. Archive MD5 and SHA-256 match verified values; selected_index_sha256 hashes are consistent across dataset_manifest and split_manifest.\n8. No duplicates, no blank images, 100% profiled.\n9. Run manifest timestamps are before the current UTC timestamp; seed and run_id are consistent.\n\n**Warnings (non-blocking):**\n1. **hflip extension still pending_review**: The representation_plan includes 'hflip' as an augmentation, but the extension_gate_report shows proposal 'hflip_pathology_safe' with status 'pending_review', no reviewer assigned, and no registry_name. The prior_art stage also flagged that the hflip label_preservation_rationale contains histology-domain claims not directly supported by cited sources. Recommend completing the hash-bound independent review and documenting domain-expert sign-off before the augmentation is locked into training. This is a governance gap, not a data-integrity failure.\n2. **Test-split statistics absent**: test_imbalance_ratio=1.0 and test_to_train_prevalence_ratio=[] indicate the test split was not profiled. Downstream evaluation stages must compute test-set class distributions independently. This is expected given the separate-center test domain (CRC-VAL-HE-7K) but should be explicitly handled.\n3. **llm_model_digest is null** in run_manifest (flagged across ingestion, prior_art, and profiling stages). Populate before any LLM-dependent downstream stage to guarantee full reproducibility. Informational, non-blocking.\n4. **Prior-art sample-count discrepancy (upstream)**: The prior_art reviewer cited 85,593 as the 'actual' PathMNIST training sample count, but the verified manifest shows 89,996. The '~90K' figure in the prior-art brief is actually accurate; the 85,593 figure appears to be an error in the prior-art review itself. No correction needed in preprocessing, but the prior_art_brief (omitted from this stage's evidence) should be corrected to avoid propagating the wrong number into compute planning.\n5. **compact_conv_token_transformer extension** remains pending_review. The prior_art stage recommended deprioritizing it given limited practical impact at 28×28×3 scale. Resolve the review status before architecture selection to avoid scope creep.\n\n**No deterministic findings justify action=stop. All identified issues are process/governance warnings or informational notes. The preprocessing artefacts are consistent, complete, and ready for the next stage.**",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "hflip augmentation is included in representation_plan but the corresponding extension 'hflip_pathology_safe' is still pending_review with no assigned reviewer; complete hash-bound review and domain-expert sign-off before training",
+      "Test-split class distribution and imbalance ratio are not profiled (test_imbalance_ratio=1.0, test_to_train_prevalence_ratio=[]); downstream evaluation must compute these independently for the separate-center CRC-VAL-HE-7K test set",
+      "llm_model_digest is null in run_manifest; populate before any LLM-dependent downstream stage for full reproducibility (informational)",
+      "Prior-art review cited 85,593 as actual PathMNIST training samples but verified manifest shows 89,996; correct the prior_art_brief to prevent propagation of the erroneous figure into compute planning",
+      "compact_conv_token_transformer extension remains pending_review; prior_art recommended deprioritizing at 28x28x3 scale; resolve status before architecture selection"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "preprocessing"
+  },
+  "payload_sha256": "025b12e7f5d19d8fdff8d90788b742100bdc23de65302e127ed80eabdc91c20b",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 16,
+  "version": 1
+}

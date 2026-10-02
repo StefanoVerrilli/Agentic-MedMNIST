@@ -1,0 +1,24 @@
+{
+  "artefact": "anomaly_prior_art",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T16:06:17.531637+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Prior art stage is well-constructed and internally consistent. Six arxiv sources are retrieved with proper provenance (snapshot paths, SHA-256 hashes, timestamps). Seven hypotheses are generated, all correctly scoped as 'hypothesis_to_validate' with evidence quotes traceable to the cited sources. Two proposals (hflip augmentation, compact conv-token transformer) are appropriately detailed for this stage.\n\nConsistency checks passed:\n- 28x28x3 RGB MedMNIST distribution correctly referenced throughout; no substitution to source-dataset or MedMNIST+ resolution.\n- PathMNIST 9-class, ~90K training samples, per-class sizes 7.8K–12.9K are consistent with the standard distribution.\n- Token math in the compact transformer proposal is correct: 28→14→7 via two stride-2 convs yields 7×7=49 tokens of dim 64.\n- ViT idea token counts (4 from 14×14, 16 from 7×7) are arithmetically correct.\n- CCT reference to CIFAR-10 (32×32×3, 3.7M params) matches the source paper.\n- hflip label-preservation rationale is sound for histopathology (morphological features are not left-right directionally encoded).\n- No test metrics used (appropriate for prior art stage).\n- No retrieval errors.\n- Omitted artifacts (data_profile, run_manifest, etc.) are expected at this stage.\n\nMinor observations (non-blocking):\n1. The temperature-scaling hypothesis is extrapolated from a quantization-specific finding (arxiv_2309_13866v2) to a non-quantized setting. The benefit may be less pronounced without quantization-induced miscalibration. This is acceptable as a hypothesis to validate but should be deprioritized relative to architecture choices.\n2. The framework-efficiency idea (arxiv_2507_12248v1) is tangential to model design; it is a valid training consideration but unlikely to be a differentiating factor for a 28×28×3, 9-class problem. No action needed.\n\nNo deterministic findings. No unsupported external-memory claims. All evidence is grounded in the retrieved sources. Proceed to next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Temperature-scaling hypothesis extrapolates from a quantization-specific calibration finding to a non-quantized setting; benefit may be marginal without quantization-induced miscalibration (minor, non-blocking).",
+      "Framework-efficiency idea is tangential to architecture design and unlikely to differentiate on a 28x28x3 9-class problem (minor, non-blocking)."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "prior_art"
+  },
+  "payload_sha256": "d8c8a47303e3227602bea8275c05dd4739a4e780e5045cebe4af55bac567b82b",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 12,
+  "version": 1
+}

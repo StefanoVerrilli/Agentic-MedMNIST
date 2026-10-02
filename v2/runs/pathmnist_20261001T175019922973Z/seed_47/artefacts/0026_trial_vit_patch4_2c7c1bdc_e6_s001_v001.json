@@ -1,0 +1,63 @@
+{
+  "artefact": "trial_vit_patch4_2c7c1bdc_e6_s001",
+  "artefact_type": "TrialResult",
+  "created_at": "2026-10-01T18:35:16.169305+00:00",
+  "payload": {
+    "best_epoch": 6,
+    "candidate_id": "vit_patch4",
+    "checkpoint_path": "blobs/search/trial_vit_patch4_2c7c1bdc_e6_s001.ckpt",
+    "checkpoint_sha256": "e89e5d295b132c6d109af856de10a6ee53107ce4b0368057523f33d03fa4c879",
+    "config": {
+      "batch_size": 128,
+      "class_weighting": false,
+      "depth": 3,
+      "device": "cuda",
+      "dropout": 0.1,
+      "early_stopping_patience": 2,
+      "epochs": 6,
+      "gradient_clip_val": 1.0,
+      "hidden": 64,
+      "label_smoothing": 0.05,
+      "lr": 0.0003,
+      "mlp_ratio": 3,
+      "model_family": "vision_transformer",
+      "num_heads": 8,
+      "optimizer": "adamw",
+      "patch_size": 2,
+      "pooling": "mean",
+      "positional_encoding": "sinusoidal",
+      "rationale": "A fine-grained patch-2 ViT tests global interactions over 196 tissue tokens.",
+      "scheduler": "cosine",
+      "schema_version": "1.0",
+      "seed": 47,
+      "source": "heuristic:coverage",
+      "tokenizer_layers": 2,
+      "weight_decay": 0.0001
+    },
+    "config_hash": "2c7c1bdc28e963e180253598010a9ae4e5d77863a501ea10b202bd2970bddb58",
+    "decision_source": "heuristic:coverage",
+    "duration_seconds": 171.3232,
+    "error": null,
+    "lightning_csv_path": "blobs/search/lightning_logs/trial_vit_patch4_2c7c1bdc_e6_s001/version_0/metrics.csv",
+    "representation": {
+      "augmentations": [
+        "hflip",
+        "vflip"
+      ],
+      "normalization": "standardize",
+      "rationale": "A fine-grained patch-2 ViT tests global interactions over 196 tissue tokens."
+    },
+    "round_index": 2,
+    "schema_version": "1.0",
+    "status": "completed",
+    "training_log_path": "blobs/search/trial_vit_patch4_2c7c1bdc_e6_s001.training.jsonl",
+    "validation_accuracy": 0.962815,
+    "validation_balanced_accuracy": 0.961683,
+    "validation_macro_f1": 0.962156
+  },
+  "payload_sha256": "0de2ed6d6f9e3c6799d1663a3e4a932d1ab46a6c6bf21af4437b476b0b605c62",
+  "producer": "model_search",
+  "run_id": "seed_47",
+  "sequence": 26,
+  "version": 1
+}

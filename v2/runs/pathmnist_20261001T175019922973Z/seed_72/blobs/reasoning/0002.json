@@ -1,0 +1,58 @@
+{
+  "payload": {
+    "decision": {
+      "ambiguity_note": "Using only the provided train and validation metadata, the main ambiguity risks are patch-level label ambiguity and visual overlap among histology classes at 28x28 RGB resolution. The class counts and proportions are nearly identical between train and validation, and the imbalance ratio is modest, so there is no strong evidence of split-level distribution mismatch from these statistics alone. However, several labels are likely to be visually confusable in small tissue patches: background, debris, and mucus can appear as low-structure or amorphous regions; adipose may resemble background or empty space depending on staining and cropping; smooth muscle and cancer-associated stroma can share fibrous or spindle-cell texture; normal colon mucosa and colorectal adenocarcinoma epithelium may overlap when a patch contains mixed glandular architecture; and lymphocytes may be confused with small debris or nuclear fragments. Because the images are intentionally small, boundary effects, mixed-tissue patches, and annotation uncertainty are plausible ambiguity sources. The held-out test split is locked and unavailable, so these risks cannot be validated against test performance.",
+      "risks": [
+        "background, debris, and mucus may be visually similar in low-resolution 28x28 patches",
+        "adipose tissue may be confused with background or empty tissue regions",
+        "smooth muscle and cancer-associated stroma may share fibrous or spindle-cell appearance",
+        "normal colon mucosa and colorectal adenocarcinoma epithelium may overlap in mixed glandular patches",
+        "lymphocytes may be confused with small debris or nuclear fragments",
+        "patch-level labels may contain multiple tissue types, increasing label ambiguity",
+        "small image size may reduce discriminative texture and boundary detail",
+        "train and validation distributions are similar, so split-level ambiguity cannot be assessed from these statistics alone"
+      ]
+    },
+    "request": {
+      "fallback": {
+        "ambiguity_note": "PathMNIST is a nine-class histology task with train imbalance ratio 1.63; tissue-boundary and inter-center shift remain the main ambiguity risks.",
+        "risks": [
+          "Class imbalance can hide minority-class errors."
+        ]
+      },
+      "model": "qwen3.8",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "ambiguity_note": {
+            "maxLength": 6000,
+            "minLength": 3,
+            "title": "Ambiguity Note",
+            "type": "string"
+          },
+          "risks": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 8,
+            "title": "Risks",
+            "type": "array"
+          }
+        },
+        "required": [
+          "ambiguity_note"
+        ],
+        "title": "AmbiguityDecision",
+        "type": "object"
+      },
+      "seed": 72,
+      "stage": "profiling.ambiguity",
+      "system": "You are an independent medical-image data auditor. Do not make clinical claims. Identify ambiguity risks using train and validation only. The held-out test split is unavailable at this stage. PathMNIST images in this run are intentionally 28x28 RGB.",
+      "user": "Dataset=PathMNIST; labels=['adipose', 'background', 'debris', 'lymphocytes', 'mucus', 'smooth muscle', 'normal colon mucosa', 'cancer-associated stroma', 'colorectal adenocarcinoma epithelium']; class_counts={'train': [9366, 9509, 10360, 10401, 8006, 12182, 7886, 9401, 12885], 'val': [1041, 1057, 1152, 1156, 890, 1354, 877, 1045, 1432]}; class_proportions={'train': [0.10407129205742477, 0.1056602515667363, 0.11511622738788391, 0.11557180319125294, 0.08895950931152495, 0.13536157162540557, 0.0876261167162985, 0.10446019823103249, 0.14317302991244055], 'val': [0.10405837664934027, 0.1056577369052379, 0.11515393842463015, 0.11555377848860456, 0.08896441423430627, 0.13534586165533785, 0.08766493402638945, 0.10445821671331468, 0.14314274290283888]}; train_imbalance=1.6339; loaded_sizes={'train': 89996, 'val': 10004}; held_out_test=locked"
+    },
+    "request_sha256": "99a909b437a0f5e7e0c43aefe6fc5323faa3ef7ec5a6cb090129995cb4e67f36",
+    "source": "qwen3.8",
+    "used_fallback": false
+  },
+  "sha256": "f6f5999c9c252bda531b358aa4fa16802ea5ec45f9cc52003a9f7345e1f1def6"
+}

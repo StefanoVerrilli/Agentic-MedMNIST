@@ -1,0 +1,30 @@
+{
+  "artefact": "anomaly_reporting",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T16:35:41.552245+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Reporting stage is complete and internally consistent. All required artifacts are present (evaluation_report, abstention_report, human_review_queue, prediction_artifact, search_report, reporting_status) with schema_version 1.0, SHA-256 hashes, and cross-referenced counts (human_review_queue.count=2658 matches abstention_report.human_review_count; prediction_artifact.test_samples=7180 matches evaluation_report.n_samples). Confusion matrix row sums match per-class supports exactly; per-class precision/recall/F1 values verified against the matrix (e.g., class 7: 262/311=0.8424 precision, 262/421=0.6223 recall, F1=0.7158). No deterministic findings are present. The ~10 pp validation-to-test gap (val acc 0.9958 vs test acc 0.8964, non-overlapping 95% CIs) and the resulting coverage/risk inflation in the abstention curve (test coverage 0.630 vs target 0.800; test selective risk 0.037 vs validation 0.001) are properly documented in the risk_coverage_curve and anomaly reports as distribution-shift consequences, not as pipeline errors. OOD evaluation is correctly scoped as a controlled-corruption proxy with ood_pass=true. The transformer-specific config fields on a ResNet-18 model, the early-stopping patience discrepancy, the missing prior-baseline provenance, and the best-epoch-at-final-epoch observation are all carried as warnings in the anomaly reports and do not constitute deterministic defects. The 116 decision events and 47 artefact versions in reporting_status confirm full pipeline traceability. No action beyond continuation is warranted.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Carried-forward warning: ~10 pp validation-to-test accuracy gap (0.9958 vs 0.8964) with non-overlapping 95% CIs; documented in anomaly_evaluation and anomaly_abstention; ensure the final report frames the 80% coverage guarantee as a validation-set guarantee, not a test-set guarantee",
+      "Carried-forward warning: test selective risk at 80% target coverage is 0.0369 vs validation risk 0.0010 (~37x inflation); downstream consumers should not rely on the validation risk figure for test-set expectations",
+      "Carried-forward warning: model_family=resnet18 carries transformer-specific config fields (patch_size, num_heads, mlp_ratio, tokenizer_layers, positional_encoding, pooling=cls); verify inert in ResNet-18 code path",
+      "Carried-forward warning: early_stopping_patience=3 in final config vs 5 in selected search trial; confirm intentional for 15-epoch cosine schedule",
+      "Carried-forward warning: rationale references prior resnet18 baseline 0.9908 not present in current search_report; record provenance (run/round ID)",
+      "Carried-forward warning: best_epoch=15 (final epoch) with validation accuracy still improving; 15-epoch budget may be insufficient",
+      "Carried-forward warning: Class 7 (cancer-associated stroma) recall 0.622 and Class 5 (smooth muscle) F1 0.713 are weakest; 246 class-0→class-5 and 63 class-7→class-2 misroutes warrant targeted error analysis in the final report",
+      "Carried-forward warning: test-set class-imbalance ratio (~3.9x) exceeds the 1.63x cited in rationale; confirm which split the rationale figure refers to"
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "reporting"
+  },
+  "payload_sha256": "aa847d0d70e8732fd903e18b333c20aa76c5fd236d67200cb32d849c8dee2f4b",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 48,
+  "version": 1
+}

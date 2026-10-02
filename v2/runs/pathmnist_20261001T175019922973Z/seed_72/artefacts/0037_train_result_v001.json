@@ -1,0 +1,148 @@
+{
+  "artefact": "train_result",
+  "artefact_type": "TrainResult",
+  "created_at": "2026-10-01T19:20:55.269813+00:00",
+  "payload": {
+    "best_epoch": 15,
+    "best_val_accuracy": 0.996701,
+    "checkpoint_path": "blobs/agentic_model_v001.ckpt",
+    "checkpoint_sha256": "2e1e4c712dcb482dcdeacd3c9248e8603b53ae147e4e9767dc7374acf16b3cf4",
+    "device": "cuda",
+    "epochs_completed": 15,
+    "final_train_loss": 0.275968,
+    "final_val_accuracy": 0.996701,
+    "framework": "lightning.pytorch",
+    "history": [
+      {
+        "epoch": 1,
+        "learning_rate": 0.0002967221,
+        "train_loss": 0.506083,
+        "val_accuracy": 0.957817,
+        "val_loss": 0.386396,
+        "val_macro_f1": 0.958491
+      },
+      {
+        "epoch": 2,
+        "learning_rate": 0.0002870318,
+        "train_loss": 0.370617,
+        "val_accuracy": 0.970612,
+        "val_loss": 0.347552,
+        "val_macro_f1": 0.970526
+      },
+      {
+        "epoch": 3,
+        "learning_rate": 0.0002713525,
+        "train_loss": 0.339301,
+        "val_accuracy": 0.977409,
+        "val_loss": 0.331992,
+        "val_macro_f1": 0.977198
+      },
+      {
+        "epoch": 4,
+        "learning_rate": 0.0002503696,
+        "train_loss": 0.321599,
+        "val_accuracy": 0.979908,
+        "val_loss": 0.328552,
+        "val_macro_f1": 0.979647
+      },
+      {
+        "epoch": 5,
+        "learning_rate": 0.000225,
+        "train_loss": 0.309175,
+        "val_accuracy": 0.982107,
+        "val_loss": 0.32358,
+        "val_macro_f1": 0.981813
+      },
+      {
+        "epoch": 6,
+        "learning_rate": 0.0001963525,
+        "train_loss": 0.300279,
+        "val_accuracy": 0.991004,
+        "val_loss": 0.299197,
+        "val_macro_f1": 0.991043
+      },
+      {
+        "epoch": 7,
+        "learning_rate": 0.0001656793,
+        "train_loss": 0.294028,
+        "val_accuracy": 0.988904,
+        "val_loss": 0.303032,
+        "val_macro_f1": 0.988776
+      },
+      {
+        "epoch": 8,
+        "learning_rate": 0.0001343207,
+        "train_loss": 0.288823,
+        "val_accuracy": 0.992503,
+        "val_loss": 0.295209,
+        "val_macro_f1": 0.992563
+      },
+      {
+        "epoch": 9,
+        "learning_rate": 0.0001036475,
+        "train_loss": 0.284678,
+        "val_accuracy": 0.992703,
+        "val_loss": 0.29396,
+        "val_macro_f1": 0.992833
+      },
+      {
+        "epoch": 10,
+        "learning_rate": 7.5e-05,
+        "train_loss": 0.281507,
+        "val_accuracy": 0.992503,
+        "val_loss": 0.294879,
+        "val_macro_f1": 0.992398
+      },
+      {
+        "epoch": 11,
+        "learning_rate": 4.96304e-05,
+        "train_loss": 0.279559,
+        "val_accuracy": 0.994002,
+        "val_loss": 0.292116,
+        "val_macro_f1": 0.994119
+      },
+      {
+        "epoch": 12,
+        "learning_rate": 2.86475e-05,
+        "train_loss": 0.277727,
+        "val_accuracy": 0.995702,
+        "val_loss": 0.287113,
+        "val_macro_f1": 0.995668
+      },
+      {
+        "epoch": 13,
+        "learning_rate": 1.29682e-05,
+        "train_loss": 0.276752,
+        "val_accuracy": 0.996102,
+        "val_loss": 0.286747,
+        "val_macro_f1": 0.996035
+      },
+      {
+        "epoch": 14,
+        "learning_rate": 3.2779e-06,
+        "train_loss": 0.276262,
+        "val_accuracy": 0.996501,
+        "val_loss": 0.286027,
+        "val_macro_f1": 0.996502
+      },
+      {
+        "epoch": 15,
+        "learning_rate": 0.0,
+        "train_loss": 0.275968,
+        "val_accuracy": 0.996701,
+        "val_loss": 0.285171,
+        "val_macro_f1": 0.996734
+      }
+    ],
+    "lightning_config_path": "best_config_v001.yaml",
+    "lightning_csv_path": "blobs/lightning_logs/agentic_model_v001/version_0/metrics.csv",
+    "schema_version": "1.0",
+    "seed": 72,
+    "training_log_path": "blobs/agentic_model_v001.training.jsonl"
+  },
+  "payload_sha256": "c2f3e580484b2a58eebbe931328cbdcc2c1d2b9f601b02fd6516f34459ffbb87",
+  "producer": "training",
+  "run_id": "seed_72",
+  "sequence": 37,
+  "version": 1
+}

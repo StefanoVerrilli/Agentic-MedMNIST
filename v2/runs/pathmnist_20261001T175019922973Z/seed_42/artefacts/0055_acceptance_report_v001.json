@@ -1,0 +1,208 @@
+{
+  "artefact": "acceptance_report",
+  "artefact_type": "AcceptanceReport",
+  "created_at": "2026-10-01T18:23:38.616922+00:00",
+  "payload": {
+    "acceptance_ready": false,
+    "criteria": [
+      {
+        "detail": "Every persisted payload and referenced file is checksummed.",
+        "evidence": [
+          "artefacts/",
+          "blobs/"
+        ],
+        "requirement": "WP1_TYPED_VERSIONED_HANDOFFS",
+        "status": "passed"
+      },
+      {
+        "detail": "AST check of direct agent-class calls.",
+        "evidence": [
+          "agents.py"
+        ],
+        "requirement": "WP1_ZERO_DIRECT_AGENT_CALLS",
+        "status": "passed"
+      },
+      {
+        "detail": "Actual train/validation evidence audited before any training.",
+        "evidence": [
+          "data_audit_report",
+          "decision_log.jsonl"
+        ],
+        "requirement": "WP2_PRETRAINING_LEAKAGE_AUDIT",
+        "status": "passed"
+      },
+      {
+        "detail": "Exact supporting quotes resolve to checksummed snapshots; recommendations remain hypotheses.",
+        "evidence": [
+          "prior_art_brief",
+          "blobs/literature/"
+        ],
+        "requirement": "WP2_CITED_IDEAS",
+        "status": "passed"
+      },
+      {
+        "detail": "Curated excerpts alone do not demonstrate web retrieval.",
+        "evidence": [
+          "prior_art_brief"
+        ],
+        "requirement": "WP2_WEB_RETRIEVAL",
+        "status": "passed"
+      },
+      {
+        "detail": "Test metrics are excluded from search and configuration selection.",
+        "evidence": [
+          "best_configuration",
+          "search_report"
+        ],
+        "requirement": "WP3_VALIDATION_ONLY_SELECTION",
+        "status": "passed"
+      },
+      {
+        "detail": "Conventional baseline uses the same seed and selected splits; negative deltas are retained.",
+        "evidence": [
+          "comparison_report",
+          "baseline_report"
+        ],
+        "requirement": "WP4_BASELINE_COMPARISON",
+        "status": "passed"
+      },
+      {
+        "detail": "Three bounded representation scenarios.",
+        "evidence": [
+          "ablation_report"
+        ],
+        "requirement": "WP4_REPRESENTATION_ABLATIONS",
+        "status": "failed"
+      },
+      {
+        "detail": "At least three completed seeds, with a shared validation-selected configuration.",
+        "evidence": [
+          "../experiment_summary.json"
+        ],
+        "requirement": "WP4_FROZEN_CONFIGURATION_SEED_VARIANCE",
+        "status": "pending"
+      },
+      {
+        "detail": "Validation-calibrated abstention with a persistent benchmark review queue.",
+        "evidence": [
+          "abstention_report",
+          "human_review_queue"
+        ],
+        "requirement": "WP5_ABSTENTION_AND_HANDOFF",
+        "status": "passed"
+      },
+      {
+        "detail": "Every promoted stage has an independent reviewer report.",
+        "evidence": [
+          "anomaly_*",
+          "decision_log.jsonl"
+        ],
+        "requirement": "WP6_STAGE_REVIEWS",
+        "status": "passed"
+      },
+      {
+        "detail": "Decision source and stage are recorded; exact prompts/schema/results are retained.",
+        "evidence": [
+          "decision_log.jsonl",
+          "blobs/reasoning/"
+        ],
+        "requirement": "WP6_DECISION_PROVENANCE",
+        "status": "passed"
+      },
+      {
+        "detail": "Requires passing tests and measured fault injection for this exact source tree.",
+        "evidence": [],
+        "requirement": "WP6_FAULT_DETECTION_GE_90_PERCENT",
+        "status": "pending"
+      },
+      {
+        "detail": "A transcript alone is not proof that retraining reproduces predictions and metrics.",
+        "evidence": [],
+        "requirement": "WP5_FULL_RUN_REPLAY",
+        "status": "pending"
+      },
+      {
+        "detail": "completed_with_warning",
+        "evidence": [
+          "dossier.json"
+        ],
+        "requirement": "WP5_END_TO_END",
+        "status": "passed"
+      },
+      {
+        "detail": "Every unresolved reviewer issue requires an explicit approved mitigation.",
+        "evidence": [
+          "anomaly_*"
+        ],
+        "requirement": "WP6_APPROVED_RISK_MITIGATIONS",
+        "status": "failed"
+      },
+      {
+        "detail": "Requires named independent demonstrator/reviewer, bound predictions and checksummed environment evidence.",
+        "evidence": [],
+        "requirement": "TRL7_INDEPENDENT_DEMONSTRATION_AND_SIGNOFF",
+        "status": "pending"
+      }
+    ],
+    "independent_signoff": null,
+    "kpis": {
+      "cited_idea_fraction": 1.0,
+      "decision_provenance_fraction": 1.0,
+      "decisions_logged": 20,
+      "fault_detection_rate": null,
+      "live_source_fraction": 1.0,
+      "reasoning_snapshots": 20,
+      "unresolved_citation_issues": 0,
+      "unresolved_reviewer_issues": [
+        "Adipose→smooth muscle confusion (274 samples) is the single largest error block in the confusion matrix",
+        "Aggregate ood_auroc (0.823189) vs arithmetic mean of per-scenario test AUROCs (0.823539) differs by ~0.0004; pooled-data computation method not documented in the report",
+        "Analysis text is truncated mid-sentence ('~90K samples acros…'); ensure full rationale is persisted for downstream reference",
+        "Architecture asymmetry (tiny_cnn vs resnet18/transformer-hybrid) is by design but not restated in the comparison report; parameter-count gap is the likely dominant source of the delta and should be explicitly noted",
+        "Architecture asymmetry between baseline (tiny_cnn) and agentic (resnet18/transformer-hybrid) is by design but not restated in the comparison report; parameter-count gap as the likely dominant source of the accuracy delta should be explicitly noted",
+        "Architecture research augmentation guidance (hflip, rotation ±10°, translation ±2 px) differs from the locked augmentation set (hflip, brightness, contrast) in the representation plan — reconcile before implementation",
+        "Augmentation set (hflip, vflip, rotate180) deviates from research-recommended set (hflip, rotation ±10°, translation ±2px) without explicit justification in the rationale",
+        "Augmentation set (hflip, vflip, rotate180) deviates from the commonly recommended set for 28×28 RGB MedMNIST without explicit justification in the rationale",
+        "Baseline config uses transformer-style fields (num_heads, patch_size, positional_encoding, pooling=cls) under the 'tiny_cnn' label, perpetuating the naming ambiguity flagged in prior stages",
+        "Cancer-associated stroma (class 7) has the lowest recall (0.551) and F1 (0.678); 74 samples misclassified as debris, 60 as smooth muscle",
+        "Cancer-associated stroma (class 7) recall 0.551 and smooth muscle (class 5) precision 0.583 are the weakest per-class metrics; the 2,711 human-review samples are disproportionately drawn from these classes and this should be noted for benchmark reviewers",
+        "Comparison report omits baseline macro_f1 (0.750857) and balanced_accuracy, limiting per-class and fairness assessment of the improvement",
+        "Comparison report tracks only accuracy as primary_metric; macro_f1 delta (≈0.139) and balanced_accuracy are omitted despite the imbalanced 9-class setting",
+        "Comparison tracks only accuracy as primary_metric; macro_f1 delta (0.116) and balanced_accuracy are omitted despite the imbalanced 9-class setting",
+        "Extension gate approvals_sha256=null; augmentation set (hflip, brightness, contrast) remains pending_review, yet representation_plan locks augmented_train_size=359984 — reconcile with architecture research augmentation guidance before training",
+        "Extension gate approvals_sha256=null; hflip_only_aug and compact_conv_token_transformer remain pending_review with no reviewer, yet representation_plan locks augmented_train_size=359984 to an unapproved augmentation set — process-integrity gap",
+        "Model family label 'resnet18' combined with transformer-style config fields (patch_size, num_heads, positional_encoding, tokenizer_layers, pooling=cls) is ambiguous and risks downstream misinterpretation",
+        "Model-family label 'resnet18' (and baseline 'tiny_cnn') coexists with transformer-style config fields (patch_size, num_heads, positional_encoding, pooling=cls, tokenizer_layers); dossier should include an unambiguous architecture description",
+        "No statistical significance test (paired bootstrap, permutation, or CI overlap) accompanies the 6.8 pp accuracy delta in the comparison report",
+        "No statistical significance test (paired bootstrap, permutation, or CI overlap) accompanies the 6.8 pp accuracy delta; baseline reports no CI for comparison",
+        "Prior-art evidence quotes are truncated in several ideas, limiting full verifiability of cited claims against source text",
+        "Profiling stage disposition was 'revise' (not 'continue'); preprocessing proceeds on top of an unresolved profiling artefact — acknowledge and track the open item",
+        "Profiling stage disposition was 'revise'; preprocessing and data_audit proceed on top of an unresolved profiling artefact — acknowledge and track to closure",
+        "Profiling stage disposition was 'revise'; preprocessing and data_audit proceeded on top of an unresolved profiling artefact — confirm closure or explicit waiver",
+        "Representation plan locks augmented_train_size=359984 to an augmentation set (hflip, brightness, contrast) that is still 'pending_review' in the extension gate with approvals_sha256=null — process-integrity gap",
+        "Six arXiv evidence-source IDs cited but not verifiable from supplied evidence; request confirmation each exists and supports the attributed claims",
+        "Smooth muscle (class 5) has the lowest precision (0.583); 57 samples misclassified as background",
+        "Validation-test accuracy gap of ~10.7 pp (0.9965 val vs 0.8896 test) suggests overfitting to validation or split distribution shift; warrants investigation before drawing conclusions",
+        "Validation-test accuracy gap of ~10.7 pp (≈0.9965 val vs 0.8896 test) should be annotated as a known limitation in the final dossier",
+        "config_hash is shared between the 9-epoch search trial and the 15-epoch final training despite differing epochs and patience values; hash scope should be documented",
+        "config_hash is shared between the 9-epoch search trial and the 15-epoch final training despite differing epochs and patience values; hash scope should be documented in the dossier",
+        "early_stopping_patience=3 is below the commonly recommended 10–15 range; did not trigger in this run but could cause premature stopping in less stable configurations",
+        "framework_training_efficiency is an engineering/infrastructure consideration rather than a model-research hypothesis; should be separated in downstream prioritization",
+        "ghostnet_vgg_robustness idea makes a tenuous logical bridge from quantization robustness to class-imbalance generalization; validation should explicitly test the imbalance hypothesis",
+        "llm_model_digest is null for qwen3.8 across all stages; must be resolved before any LLM-dependent downstream stage to guarantee reproducibility",
+        "llm_model_digest is null for qwen3.8; must be resolved before any LLM-dependent downstream stage to guarantee reproducibility",
+        "prior_art_brief listed in omitted_artefacts; confirm no downstream stage depends on it",
+        "test_imbalance_ratio reported as exactly 1.0, which is arithmetically impossible for 7180 samples across 9 classes; likely a placeholder since only train+val (100000 samples) were profiled — verify whether test-set class counts were actually computed",
+        "test_imbalance_ratio=1.0 is a placeholder; test set (7180 samples, 9 classes) was never class-counted (test_inspected=false) — resolve before any evaluation or class-weighting step",
+        "test_imbalance_ratio=1.0 is a placeholder; test set (7180 samples, 9 classes) was never class-counted — resolve before any evaluation or class-weighting step"
+      ]
+    },
+    "schema_version": "1.0",
+    "technical_complete": true,
+    "trl7_evidence_complete": false
+  },
+  "payload_sha256": "9c53ebc9f42882575df173174b7bbd4b1492ba7ae2b0cc0c0b9e23de58098396",
+  "producer": "acceptance",
+  "run_id": "seed_42",
+  "sequence": 55,
+  "version": 1
+}

@@ -1,0 +1,33 @@
+{
+  "artefact": "representation_plan",
+  "artefact_type": "RepresentationPlan",
+  "created_at": "2026-10-01T18:11:28.204402+00:00",
+  "payload": {
+    "augmentation_factor": 4,
+    "augmentations": [
+      "hflip",
+      "vflip",
+      "rotate180"
+    ],
+    "normalization": "standardize",
+    "rationale": "Building on the best prior result (resnet18 at 0.9908 with depth=3, hidden=32), this candidate increases capacity modestly (depth 3→4, hidden 32→48) to capture finer multi-scale pathology features while staying well within the 90K-sample training budget. The lower learning rate (3e-4 vs 5e-4) compensates for the additional depth, reducing the risk of training instability. Class weighting is enabled to explicitly address the 1.63× imbalance (classes 5 and 8 have ~7.9K samples vs 12.9K for class 8), which the prior best result did not use. Adding rotate180 to the hflip+vflip augmentation set provides geometric diversity without destroying tissue-orientation cues (unlike arbitrary rotations). The cosine scheduler and adamw optimizer with weight_decay=1e-4 are retained from the proven configuration. Early stopping patience of 5 allows the model to converge past the epoch-3 plateau seen in prior runs. Total parameters remain in the 2-4M range, appropriate for 90K samples.",
+    "schema_version": "1.0",
+    "source": "agentic_search:selected:qwen3.8",
+    "stats_source": "train",
+    "train_channel_mean_unit": [
+      0.740545,
+      0.53298219,
+      0.70582885
+    ],
+    "train_channel_std_unit": [
+      0.12368222,
+      0.17676253,
+      0.12443067
+    ]
+  },
+  "payload_sha256": "d19be40dad505187269f1875c9271170eef875521afca40e296662d87f2d362c",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 31,
+  "version": 2
+}

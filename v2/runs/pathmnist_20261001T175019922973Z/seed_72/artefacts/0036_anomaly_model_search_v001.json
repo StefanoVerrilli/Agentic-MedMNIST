@@ -1,0 +1,27 @@
+{
+  "artefact": "anomaly_model_search",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T19:14:01.312838+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "Model search stage is well-conducted: all 5 architecture families evaluated, 8/8 trials completed with 0 failures, test metrics locked and unused, selection rule applied consistently (highest epoch budget → accuracy within 0.005 tolerance → macro-F1). The selected resnet18_depth4_wider (val_acc=0.995902, val_macro_f1=0.99589) outperforms the incumbent resnet18_conservative (0.993802) at the same e9 budget, justifying promotion. Config hash prefix (6bac86b4) matches the trial artifact name. No deterministic findings are present.\n\nThree advisory warnings warrant attention before final training:\n\n1. Augmentation deviation: The selected representation uses [hflip, vflip, rotate90], but the architecture research explicitly recommends only hflip, ±10° rotation, and ±2px translation, warning that aggressive geometric transforms may destroy tissue-orientation diagnostic cues in pathology. vflip and rotate90 are substantially more aggressive than the recommended set. Empirical val accuracy is strong, but this is a principled mismatch that could affect generalization to out-of-distribution tissue orientations.\n\n2. Early-stopping patience: The config sets early_stopping_patience=3 with a 15-epoch budget, meaning training could halt as early as epoch 12. The research recommends patience 10–15. With a 15-epoch total budget, patience 3 leaves very little room for the loss to recover from a temporary plateau, risking underfitting. Consider raising to ≥5 for the final 15-epoch run.\n\n3. Parameter budget: The research flags resnet18 (~11M params) as exceeding the 1–4M primary-model budget and notes overfitting risk. The selected depth=4/hidden=48 variant likely sits near or above 11M. With 90K samples and 99.59% val accuracy, overfitting is not currently manifest, but the margin between val and (locked) test performance is unverified. Monitor for a val-test gap in the final evaluation.\n\nMinor note: Transformer-specific fields (num_heads, patch_size, mlp_ratio, tokenizer_layers, pooling, positional_encoding) appear in the resnet18 config. This is likely a shared schema and functionally harmless, but could cause confusion in downstream config parsing.\n\nThe selected trial's full record is in omitted_artefacts; key metrics are confirmed via the search_report. No action-blocking issues identified. Proceed to final training with the above warnings noted.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Augmentation set (vflip, rotate90) deviates from research-recommended conservative set (hflip, ±10° rotation, ±2px translation); vflip and rotate90 may disrupt tissue-orientation cues in pathology images",
+      "Early-stopping patience of 3 is well below the research-recommended 10–15; with a 15-epoch budget this risks premature stopping at epoch 12",
+      "Selected resnet18 (depth=4, hidden=48) likely exceeds the 1–4M primary-model parameter budget flagged in the architecture research; overfitting risk on 90K samples, though current val accuracy is strong",
+      "Transformer-specific config fields (num_heads, patch_size, mlp_ratio, tokenizer_layers, pooling, positional_encoding) present in the resnet18 config; likely shared-schema artifact but worth verifying they are correctly ignored",
+      "Selected trial full record is in omitted_artefacts; independent verification of per-epoch metrics and checkpoint integrity is limited to the search_report summary"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "model_search"
+  },
+  "payload_sha256": "e81453867647976beea3b2d9b565cf874cc45021f80aa79e534482e2ba30db2c",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 36,
+  "version": 1
+}

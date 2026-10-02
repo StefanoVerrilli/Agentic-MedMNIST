@@ -1,0 +1,33 @@
+{
+  "artefact": "representation_plan",
+  "artefact_type": "RepresentationPlan",
+  "created_at": "2026-10-01T16:24:54.155896+00:00",
+  "payload": {
+    "augmentation_factor": 4,
+    "augmentations": [
+      "hflip",
+      "vflip",
+      "rotate180"
+    ],
+    "normalization": "standardize",
+    "rationale": "Builds on the best prior resnet18 result (0.9908) by increasing hidden 32→48 and depth 3→4 for ~30% more capacity, while raising dropout to 0.15 and lowering lr to 3e-4 to maintain stability. Enables class_weighting to explicitly address the 1.63× class imbalance (minority classes at 7.9K vs majority at 12.9K). Adds rotate180 as a third augmentation for broader spatial invariance. Label smoothing increased to 0.1 for better calibration on the 9-class problem. All other hyperparameters (batch 128, AdamW, cosine, standardize, wd=1e-4) match the proven best configuration.",
+    "schema_version": "1.0",
+    "source": "agentic_search:selected:qwen3.8",
+    "stats_source": "train",
+    "train_channel_mean_unit": [
+      0.740545,
+      0.53298219,
+      0.70582885
+    ],
+    "train_channel_std_unit": [
+      0.12368222,
+      0.17676253,
+      0.12443067
+    ]
+  },
+  "payload_sha256": "2e072e60b82e1c7036eeb68e31d41c9e7df7e5933f1ce9225d85b6a8cb5de7b6",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 31,
+  "version": 2
+}

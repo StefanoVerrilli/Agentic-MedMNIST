@@ -1,0 +1,33 @@
+{
+  "artefact": "representation_plan",
+  "artefact_type": "RepresentationPlan",
+  "created_at": "2026-10-01T19:13:21.923989+00:00",
+  "payload": {
+    "augmentation_factor": 4,
+    "augmentations": [
+      "hflip",
+      "vflip",
+      "rotate90"
+    ],
+    "normalization": "standardize",
+    "rationale": "Building on the best prior result (resnet18 depth=3, hidden=32, lr=0.0005 → 99.16% acc), this candidate increases capacity moderately: depth 3→4 adds one more residual block for richer feature hierarchy, and hidden 32→48 widens channels by 50% to capture more discriminative pathology features. The LR is reduced to 0.0003 to maintain training stability with the larger parameter count (roughly 1.5-2x more params). rotate90 is added as a third conservative geometric augmentation (alongside hflip and vflip) to provide orientation invariance without destroying tissue-orientation cues. All other hyperparameters (adamw, cosine, wd=1e-4, ls=0.05, batch=128, dropout=0.1, standardize) are held constant to isolate the effect of the capacity and augmentation changes. The 1.63x class imbalance is mild enough that class_weighting is unnecessary; label_smoothing=0.05 provides sufficient regularization.",
+    "schema_version": "1.0",
+    "source": "agentic_search:selected:qwen3.8",
+    "stats_source": "train",
+    "train_channel_mean_unit": [
+      0.740545,
+      0.53298219,
+      0.70582885
+    ],
+    "train_channel_std_unit": [
+      0.12368222,
+      0.17676253,
+      0.12443067
+    ]
+  },
+  "payload_sha256": "e568a4ad0ceb84a702b3e7f1b7ee718762aa9cd0efe9962144b482968d8140da",
+  "producer": "model_search",
+  "run_id": "seed_72",
+  "sequence": 31,
+  "version": 2
+}

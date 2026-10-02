@@ -1,0 +1,28 @@
+{
+  "artefact": "anomaly_architecture_research",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T18:28:16.151592+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "Architecture research is technically sound and internally consistent. No deterministic findings.\n\n**Verified correct:**\n- Token math: 7×7 stride-7 on 28×28 → 4×4 = 16 tokens; 14×14 stride-14 → 2×2 = 4 tokens. Both correct.\n- Channel stats (mean [0.741, 0.533, 0.706], std [0.124, 0.177, 0.124]) match data_profile exactly.\n- ~90K training samples, 9 classes, 1.63× imbalance, 28×28×3 shape all consistent with split_manifest and data_profile.\n- Parameter budgets (0.5–4M primary, 11M upper-bound) are proportionate to the 90K-sample, 9-class problem.\n- Learning-rate, weight-decay, batch-size, and epoch ranges are standard and well-justified.\n- test_metrics_used=false — correct; test set (separate-center CRC-VAL-HE-7K) is properly excluded from architecture selection.\n- Risk register is thorough: overfitting, imbalance, spatial-resolution loss, channel-variance asymmetry, transformer instability, resnet18 over-parameterization, augmentation domain shift, and calibration gap are all relevant and correctly scoped.\n- The prior-art 85,593 error was already flagged in preprocessing; architecture_research correctly uses \"~90K\" and does not propagate the erroneous figure.\n\n**Warnings (non-blocking for this stage, but must be resolved before training):**\n1. **compact_transformer is the primary recommendation** yet the supporting extension `compact_conv_token_transformer` remains `pending_review` and `approved_extensions` is empty. The architecture choice is contingent on that extension being hash-bound reviewed and approved. Resolve before moving to implementation.\n2. **hflip_pathology_safe** is also `pending_review` with no assigned reviewer, yet horizontal flip is designated the primary spatial regularizer in representation_priorities. Domain-expert sign-off is required before augmentation is applied.\n3. **llm_model_digest is null** in run_manifest (flagged in both data_audit and preprocessing). Populate before any LLM-dependent downstream stage for full reproducibility.\n4. **Test-split statistics are unprofiled** (test_imbalance_ratio=1.0, test_to_train_prevalence_ratio=[]). Downstream evaluation must compute test-set class distribution independently given the separate-center provenance; do not assume train/val ratios transfer.\n5. **Class-ambiguity risks** at 28×28 (background/debris/mucus, adipose/background, smooth-muscle/stroma) should be explicitly reflected in the evaluation-metric plan (per-class F1, confusion-matrix analysis) and augmentation design, not only in the risk register.\n\nNone of these are deterministic errors in the architecture research artefact itself. The technical content is correct, well-reasoned, and appropriately scoped for the standard 28×28 RGB MedMNIST distribution. Proceed to the next stage, but gate training on resolution of the two pending extension reviews.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "compact_transformer (primary architecture) depends on compact_conv_token_transformer extension which is pending_review; approved_extensions is empty — resolve before implementation",
+      "hflip_pathology_safe extension is pending_review with no assigned reviewer, yet hflip is the designated primary spatial regularizer — domain-expert sign-off required before training",
+      "llm_model_digest is null in run_manifest; populate before any LLM-dependent downstream stage for reproducibility",
+      "Test-split class distribution and imbalance ratio are unprofiled (test_imbalance_ratio=1.0, test_to_train_prevalence_ratio=[]); downstream evaluation must compute independently for separate-center CRC-VAL-HE-7K",
+      "Prior-art brief cited 85,593 training samples; verified manifest confirms 89,996 — correct prior_art_brief to prevent propagation into compute planning",
+      "Class-ambiguity risks at 28x28 (background/debris/mucus, adipose/background, smooth-muscle/stroma) should be explicitly encoded in evaluation-metric choices (per-class F1, confusion matrix) and augmentation design, not only listed in the risk register"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "architecture_research"
+  },
+  "payload_sha256": "4bd307244bcd889deb3a8a94540865e76d5db35758810c0de092afe5171527b2",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 20,
+  "version": 1
+}

@@ -1,0 +1,25 @@
+{
+  "artefact": "anomaly_preprocessing",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T16:07:07.913685+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Preprocessing stage is clean and internally consistent. All deterministic checks pass with zero findings across ingestion, prior-art, and profiling sub-stages. Key verifications confirmed: (1) Archive MD5 a8b06965200029087d5bd730944a56c1 matches the verified hash; SHA-256 recorded. (2) Loaded split sizes (train=89996, val=10004, test=7180) exactly match official PathMNIST sizes. (3) Image shape 28×28×3 RGB, 9-class multi-class — consistent with the standard MedMNIST distribution. (4) No duplicate train samples, no blank images. (5) Train and validation class proportions are nearly identical (max absolute delta < 0.001), confirming no split-level distribution mismatch. (6) Imbalance ratio 1.63 is modest; no resampling needed. (7) Normalization is z-score per channel using train-split statistics only (no leakage). (8) Augmentation factor 4 (hflip, brightness, contrast) yields augmented_train_size 359984 = 89996×4, arithmetically consistent. (9) Code SHA-256, package versions, seed, and platform are all recorded in the run manifest. Minor non-blocking observations: (a) llm_model_digest is null for qwen3.8 across all LLM-assisted stages, so the exact model artifact is not content-addressed; this weakens full reproducibility of LLM-generated plans but does not affect the deterministic data pipeline. (b) Two extension proposals (hflip_pathology_safe, compact_conv_token_transformer) remain in pending_review status in the extension gate; the representation_plan already references hflip as a standard augmentation, so this is a process-timing note rather than a correctness issue. (c) The test set (CRC-VAL-HE-7K) originates from a different clinical center and test_to_train_prevalence_ratio is empty, so cross-domain prevalence shift is not quantified — this is an expected property of the official PathMNIST split and is correctly flagged. No deterministic findings exist; no action=stop justification. Proceed to the next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "llm_model_digest is null for qwen3.8; the exact Ollama model artifact is not content-addressed, weakening full reproducibility of LLM-assisted planning steps (informational, non-blocking)",
+      "Extension gate: hflip_pathology_safe and compact_conv_token_transformer are pending_review; representation_plan already lists hflip as a standard augmentation — verify that the gate approval is completed before training begins (process, non-blocking)",
+      "Test set (CRC-VAL-HE-7K) is from a different clinical center and test_to_train_prevalence_ratio is empty; cross-domain prevalence shift is not quantified (expected dataset property, informational)"
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "preprocessing"
+  },
+  "payload_sha256": "a0ccf8ba144c9ccdfa3d2a0c698292898a3a0d4f714329f2d9551f9853e894f4",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 16,
+  "version": 1
+}

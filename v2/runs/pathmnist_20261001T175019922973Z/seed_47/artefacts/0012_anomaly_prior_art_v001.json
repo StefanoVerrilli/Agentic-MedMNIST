@@ -1,0 +1,26 @@
+{
+  "artefact": "anomaly_prior_art",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T18:25:49.080309+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Prior-art stage is well-structured and internally consistent. Six arXiv sources are cited with verifiable snapshot SHA-256 hashes and valid retrieval timestamps (all within the same session window, 17:51 UTC). The query is appropriately scoped to PathMNIST and compact-transformer literature. Seven hypotheses and two proposals are generated, all correctly marked hypothesis_to_validate with no premature commitments.\n\nResolution consistency: All references to PathMNIST input use 28×28×3 RGB, matching the pipeline's standard MedMNIST distribution. The MedMNIST v2 source (arxiv_2110_14795v2) confirms the 28×28 2D standardization. No source-dataset or MedMNIST+ resolution is substituted.\n\nCCT adaptation (compact_conv_token_transformer): The token-count arithmetic is correct (28→14→7, yielding 7×7=49 tokens). The 3M parameter cap, pre-norm, 4 heads of dim 16, and GELU FFN at 2× embedding are coherent design choices for a small-data regime. The proposal is explicitly non-executable, which is appropriate at this stage.\n\nMinor observations (none deterministic, none blocking):\n1. The '~90K training samples' figure appears in multiple ideas; MedMNIST v2 PathMNIST training split is 85,593. The ~5% overestimate is immaterial to the architectural reasoning but should be corrected before any budget or compute planning.\n2. The per-class range '7,886–12,885' is cited in the transformer proposal's implementation requirements. The dataset_manifest is in omitted_artefacts, so this cannot be cross-checked here. Flag for verification at the data_profile stage.\n3. The hflip_pathology_safe proposal's label_preservation_rationale contains domain-specific claims about histological invariance under left-right mirroring. These are reasonable hypotheses but are not verifiable from the cited sources alone (arxiv_2508_18509v1 discusses augmentation impact on unlearning quality, not per-class morphological invariance). Recommend a domain-expert sign-off before the augmentation is locked in.\n4. The framework_training_efficiency idea (arxiv_2507_12248v1) is a valid source but its practical impact on a 28×28×3, 9-class problem is likely marginal; it is correctly scoped as a training-stage consideration rather than an architectural one.\n\nNo retrieval errors, no deterministic findings, no schema violations. All sources are from arxiv_api with consistent origin metadata. The stage is ready to proceed.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "~90K training-sample figure is a ~5% overestimate of the actual 85,593 PathMNIST training samples; correct before compute planning",
+      "Per-class distribution (7,886–12,885) cannot be verified here because dataset_manifest is omitted; confirm at data_profile stage",
+      "hflip label_preservation_rationale contains histology-domain claims not directly supported by the cited sources; recommend domain-expert review before locking augmentation policy",
+      "framework_training_efficiency idea has limited practical impact at 28x28x3 scale; consider deprioritizing to reduce scope creep"
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "prior_art"
+  },
+  "payload_sha256": "6305226b6b35502e5ba5042e2251059c0ac5e054e261a8fc18c69227d3d0f822",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 12,
+  "version": 1
+}

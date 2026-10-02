@@ -1,0 +1,2333 @@
+{
+  "artefact_registry": [
+    {
+      "artefact": "run_configuration",
+      "path": "artefacts/0001_run_configuration_v001.json",
+      "producer": "run",
+      "sha256": "d20a43733be889a9ea539fb0ab063f17a1c5d231657d1233754bfa217ab3ea39",
+      "type": "RunConfiguration",
+      "version": 1
+    },
+    {
+      "artefact": "run_manifest",
+      "path": "artefacts/0002_run_manifest_v001.json",
+      "producer": "run",
+      "sha256": "424a72aa643e76816a490ca5206271860834d6c8718141dea4288114094effb3",
+      "type": "RunManifest",
+      "version": 1
+    },
+    {
+      "artefact": "execution_status",
+      "path": "artefacts/0003_execution_status_v001.json",
+      "producer": "orchestrator",
+      "sha256": "0bdf60ade86513602487f8e7ddf9f9115f05c34e4b7287b0e8ec650b4d498661",
+      "type": "ExecutionState",
+      "version": 1
+    },
+    {
+      "artefact": "blob_raw_dataset",
+      "path": "artefacts/0004_blob_raw_dataset_v001.json",
+      "producer": "ingestion",
+      "sha256": "43e15911f1d681b0b898c4b667108cea7fad4afe967363ebb816219db2c37118",
+      "type": "BlobReference",
+      "version": 1
+    },
+    {
+      "artefact": "dataset_manifest",
+      "path": "artefacts/0005_dataset_manifest_v001.json",
+      "producer": "ingestion",
+      "sha256": "1ba579f6a267443fd5b6b75795aeafb219825c25ba5963d50fcadab1f5a6fff2",
+      "type": "DatasetManifest",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_ingestion",
+      "path": "artefacts/0006_anomaly_ingestion_v001.json",
+      "producer": "reviewer",
+      "sha256": "6115754fbdc15c0fda378915c82b74950cee5f25c3f66f8339530f98711ad135",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "data_profile",
+      "path": "artefacts/0007_data_profile_v001.json",
+      "producer": "profiling",
+      "sha256": "133f765ea8436a0b4d95b2620184449f77c408255b6599313d47ec15cccce9d0",
+      "type": "DataProfile",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_profiling",
+      "path": "artefacts/0008_anomaly_profiling_v001.json",
+      "producer": "reviewer",
+      "sha256": "63a1988021b18e1dc7eda2928e90dbc5cb97b47c5fbff94f7e762654b02e81d2",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "prior_art_brief",
+      "path": "artefacts/0009_prior_art_brief_v001.json",
+      "producer": "prior_art",
+      "sha256": "c7ed253c869402f0725f2a5414c4f914741e8d0e05c4227c45e3b4b6f2e34ff4",
+      "type": "PriorArtBrief",
+      "version": 1
+    },
+    {
+      "artefact": "extension_gate_report",
+      "path": "artefacts/0010_extension_gate_report_v001.json",
+      "producer": "prior_art",
+      "sha256": "5049e664f80c92184a155377c026b8cfb2dd848ce252b3b10d6913c828ee0444",
+      "type": "ExtensionGateReport",
+      "version": 1
+    },
+    {
+      "artefact": "approved_extensions",
+      "path": "artefacts/0011_approved_extensions_v001.json",
+      "producer": "prior_art",
+      "sha256": "225f8238537afdd25104c1edbb3bc4aa9042c67984fdad6c99b8ec50813e120c",
+      "type": "ExtensionRegistry",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_prior_art",
+      "path": "artefacts/0012_anomaly_prior_art_v001.json",
+      "producer": "reviewer",
+      "sha256": "d8c8a47303e3227602bea8275c05dd4739a4e780e5045cebe4af55bac567b82b",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "blob_prepared_data",
+      "path": "artefacts/0013_blob_prepared_data_v001.json",
+      "producer": "preprocessing",
+      "sha256": "d3fac71d7d08b5ec527e746b09494aa67b03e13f6dbf8ae6592de17666075b00",
+      "type": "BlobReference",
+      "version": 1
+    },
+    {
+      "artefact": "representation_plan",
+      "path": "artefacts/0014_representation_plan_v001.json",
+      "producer": "preprocessing",
+      "sha256": "81480cab3751f6087cd440e65e966ada45957b2bc884a11a4d805733feea61eb",
+      "type": "RepresentationPlan",
+      "version": 1
+    },
+    {
+      "artefact": "split_manifest",
+      "path": "artefacts/0015_split_manifest_v001.json",
+      "producer": "preprocessing",
+      "sha256": "d944ca6d92f559d3690c72ffb2ee4c4e9f5981ee02d36a3a7edcc68c449096ee",
+      "type": "SplitManifest",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_preprocessing",
+      "path": "artefacts/0016_anomaly_preprocessing_v001.json",
+      "producer": "reviewer",
+      "sha256": "a0ccf8ba144c9ccdfa3d2a0c698292898a3a0d4f714329f2d9551f9853e894f4",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "data_audit_report",
+      "path": "artefacts/0017_data_audit_report_v001.json",
+      "producer": "data_audit",
+      "sha256": "dabe03193a815ad12968be0b79bbd210e487dbc0b32f2ecbb7af3915dfbc50e6",
+      "type": "DataAuditReport",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_data_audit",
+      "path": "artefacts/0018_anomaly_data_audit_v001.json",
+      "producer": "reviewer",
+      "sha256": "ef5fed50fac3eaf8ef1ea6f00b23ac5cd7e5d774ac7fe90a78541bc17a37442b",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "architecture_research",
+      "path": "artefacts/0019_architecture_research_v001.json",
+      "producer": "architecture_research",
+      "sha256": "16f0bdf4ccf7f052f2b57a084541c6c0273dcdbe05f001a7d2d863fe62b27118",
+      "type": "ArchitectureResearch",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_architecture_research",
+      "path": "artefacts/0020_anomaly_architecture_research_v001.json",
+      "producer": "reviewer",
+      "sha256": "4aaceebf8391e05a6bacf1b92dc1537fa9873ff566b19537061548a15c67f083",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "search_plan",
+      "path": "artefacts/0021_search_plan_v001.json",
+      "producer": "model_search",
+      "sha256": "ade2a886289b551ddc5554ada71c5e90a174735b7fc01142788cab0ea9557a11",
+      "type": "SearchPlan",
+      "version": 1
+    },
+    {
+      "artefact": "trial_compact_transformer_e4bc0782_e3_s001",
+      "path": "artefacts/0022_trial_compact_transformer_e4bc0782_e3_s001_v001.json",
+      "producer": "model_search",
+      "sha256": "1e9f98d304746ecd09705397c895f6b023b57f4afc003dc2829bd87b60ea3300",
+      "type": "TrialResult",
+      "version": 1
+    },
+    {
+      "artefact": "trial_residual_balanced_be4afb0b_e3_s001",
+      "path": "artefacts/0023_trial_residual_balanced_be4afb0b_e3_s001_v001.json",
+      "producer": "model_search",
+      "sha256": "ba0405c8bf4efe0f228c113318ab26562337ff994f4583c24c11133dcc603634",
+      "type": "TrialResult",
+      "version": 1
+    },
+    {
+      "artefact": "trial_resnet18_conservative_a48f20ec_e3_s001",
+      "path": "artefacts/0024_trial_resnet18_conservative_a48f20ec_e3_s001_v001.json",
+      "producer": "model_search",
+      "sha256": "f3c28443127c083144442bbcf056d0a220fb26e4567b66b51da20c39932660eb",
+      "type": "TrialResult",
+      "version": 1
+    },
+    {
+      "artefact": "trial_tiny_regularized_ee0112db_e6_s001",
+      "path": "artefacts/0025_trial_tiny_regularized_ee0112db_e6_s001_v001.json",
+      "producer": "model_search",
+      "sha256": "2532dabd34f027dd028a1b11925b81097afb3ed109dd4d0abdb270fafc35b829",
+      "type": "TrialResult",
+      "version": 1
+    },
+    {
+      "artefact": "trial_vit_patch4_2c7c1bdc_e6_s001",
+      "path": "artefacts/0026_trial_vit_patch4_2c7c1bdc_e6_s001_v001.json",
+      "producer": "model_search",
+      "sha256": "0f3ffa514bd84ec542f28e2526c3e51bc568b93fc345751d56df3dc1cdaed858",
+      "type": "TrialResult",
+      "version": 1
+    },
+    {
+      "artefact": "trial_resnet18_conservative_a48f20ec_e6_s001",
+      "path": "artefacts/0027_trial_resnet18_conservative_a48f20ec_e6_s001_v001.json",
+      "producer": "model_search",
+      "sha256": "1fcd1a60ca224f68d2c4e4e5c9064b389a3fa9572ea57695fd245eb7f6b3eb52",
+      "type": "TrialResult",
+      "version": 1
+    },
+    {
+      "artefact": "trial_resnet18_conservative_a48f20ec_e9_s001",
+      "path": "artefacts/0028_trial_resnet18_conservative_a48f20ec_e9_s001_v001.json",
+      "producer": "model_search",
+      "sha256": "c4c6ee8c2f385e87c19481683b0a530b6681397f3df413c81a75edad2b614ba0",
+      "type": "TrialResult",
+      "version": 1
+    },
+    {
+      "artefact": "trial_resnet18_capacity_wt_a836389a_e9_s001",
+      "path": "artefacts/0029_trial_resnet18_capacity_wt_a836389a_e9_s001_v001.json",
+      "producer": "model_search",
+      "sha256": "31eacf25aa3d9dcfd0468c563f8ef101eb2356e3acabc3ec48fb12ba62d89488",
+      "type": "TrialResult",
+      "version": 1
+    },
+    {
+      "artefact": "blob_prepared_data",
+      "path": "artefacts/0030_blob_prepared_data_v002.json",
+      "producer": "model_search",
+      "sha256": "91cf40a6fa4c7c2afcb44413e937365bcf5e349d01fa0c1d944eb580e49af114",
+      "type": "BlobReference",
+      "version": 2
+    },
+    {
+      "artefact": "representation_plan",
+      "path": "artefacts/0031_representation_plan_v002.json",
+      "producer": "model_search",
+      "sha256": "2e072e60b82e1c7036eeb68e31d41c9e7df7e5933f1ce9225d85b6a8cb5de7b6",
+      "type": "RepresentationPlan",
+      "version": 2
+    },
+    {
+      "artefact": "split_manifest",
+      "path": "artefacts/0032_split_manifest_v002.json",
+      "producer": "model_search",
+      "sha256": "d944ca6d92f559d3690c72ffb2ee4c4e9f5981ee02d36a3a7edcc68c449096ee",
+      "type": "SplitManifest",
+      "version": 2
+    },
+    {
+      "artefact": "train_config",
+      "path": "artefacts/0033_train_config_v001.json",
+      "producer": "model_search",
+      "sha256": "839332e01a7898e6a9438aa57c2456b11d99387468e27c37d3a5d542d3fb1d10",
+      "type": "TrainConfig",
+      "version": 1
+    },
+    {
+      "artefact": "search_report",
+      "path": "artefacts/0034_search_report_v001.json",
+      "producer": "model_search",
+      "sha256": "1551145941ecbd1bd942e30f2d9cefbdf15701bc713c5c85e67e1243e39a54ba",
+      "type": "SearchReport",
+      "version": 1
+    },
+    {
+      "artefact": "best_configuration",
+      "path": "artefacts/0035_best_configuration_v001.json",
+      "producer": "model_search",
+      "sha256": "2a87fefa35c50bd4581c2521355a854829cc54c9604f5c55490a42f008a3e702",
+      "type": "BestConfiguration",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_model_search",
+      "path": "artefacts/0036_anomaly_model_search_v001.json",
+      "producer": "reviewer",
+      "sha256": "a5178b80a8c37f40236ff7b10466612435f8a9d532e80d6d31037a0fbdb9a8cd",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "train_result",
+      "path": "artefacts/0037_train_result_v001.json",
+      "producer": "training",
+      "sha256": "e2d0b06c05270dd64205850617778dee8786f2b5d7cce3f0b813a51b515ad340",
+      "type": "TrainResult",
+      "version": 1
+    },
+    {
+      "artefact": "blob_model",
+      "path": "artefacts/0038_blob_model_v001.json",
+      "producer": "training",
+      "sha256": "125810c7bd90a100c171a4ecb67da90f19dc30a1b8eeca380ee8f6210a52541b",
+      "type": "BlobReference",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_training",
+      "path": "artefacts/0039_anomaly_training_v001.json",
+      "producer": "reviewer",
+      "sha256": "2868c6db277b7165f96fbb93befff1408a2414d4a8bef701f24ee35871c3df68",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "blob_probabilities",
+      "path": "artefacts/0040_blob_probabilities_v001.json",
+      "producer": "evaluation",
+      "sha256": "ba7557f7477cd17744ad131384d1b418facb5b840bdeb933107c1605487fe6f4",
+      "type": "BlobReference",
+      "version": 1
+    },
+    {
+      "artefact": "prediction_artifact",
+      "path": "artefacts/0041_prediction_artifact_v001.json",
+      "producer": "evaluation",
+      "sha256": "86f9e84c96b06137a79e5f467cc405a8b0e211231b3ce65a17d030cfd171a86f",
+      "type": "PredictionArtifact",
+      "version": 1
+    },
+    {
+      "artefact": "evaluation_report",
+      "path": "artefacts/0042_evaluation_report_v001.json",
+      "producer": "evaluation",
+      "sha256": "0efc23e1ee995e385d224db440f0523372dcb00a6ad59f15a6034c12c6b29ba3",
+      "type": "EvalReport",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_evaluation",
+      "path": "artefacts/0043_anomaly_evaluation_v001.json",
+      "producer": "reviewer",
+      "sha256": "9a418ae0dc0263b6f5438063dee8db7e4d8ab8f623026695440adfbc04457e7d",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "human_review_queue",
+      "path": "artefacts/0044_human_review_queue_v001.json",
+      "producer": "abstention",
+      "sha256": "7d8b80693ed35ca1272c78f553dce69e0ae31d6ee9461df9c5aaf7c65e183395",
+      "type": "HumanReviewQueue",
+      "version": 1
+    },
+    {
+      "artefact": "abstention_report",
+      "path": "artefacts/0045_abstention_report_v001.json",
+      "producer": "abstention",
+      "sha256": "b04b720cddffc184d21d9479add1c5aee805ab0291fd6a27b46d495f82f828b4",
+      "type": "AbstentionReport",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_abstention",
+      "path": "artefacts/0046_anomaly_abstention_v001.json",
+      "producer": "reviewer",
+      "sha256": "e8123bddc8451263393dc1f6529f3f9ceb0b4fd7f23115b9a179ae4896e7394e",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "reporting_status",
+      "path": "artefacts/0047_reporting_status_v001.json",
+      "producer": "reporting",
+      "sha256": "4be5e60214932ae1e70b035b7665f75d0d011338da1e3c66603e2f1912733156",
+      "type": "ReportingStatus",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_reporting",
+      "path": "artefacts/0048_anomaly_reporting_v001.json",
+      "producer": "reviewer",
+      "sha256": "aa847d0d70e8732fd903e18b333c20aa76c5fd236d67200cb32d849c8dee2f4b",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "execution_status",
+      "path": "artefacts/0049_execution_status_v002.json",
+      "producer": "orchestrator",
+      "sha256": "64ebfe2c3e300ac79e53ff543959b34490f5f9cd5566ec85578271e009f28ebf",
+      "type": "ExecutionState",
+      "version": 2
+    },
+    {
+      "artefact": "baseline_report",
+      "path": "artefacts/0050_baseline_report_v001.json",
+      "producer": "baseline",
+      "sha256": "69b58498c0fcb067a35fc18268be4df25cc2f8fe6b2bad3785f66636bf9e4862",
+      "type": "BaselineReport",
+      "version": 1
+    },
+    {
+      "artefact": "comparison_report",
+      "path": "artefacts/0051_comparison_report_v001.json",
+      "producer": "run",
+      "sha256": "4073e50f399bb26cb5be1a7d8fd4511630c47fc5bb7494ecfa27b330876633fa",
+      "type": "ComparisonReport",
+      "version": 1
+    },
+    {
+      "artefact": "anomaly_comparison",
+      "path": "artefacts/0052_anomaly_comparison_v001.json",
+      "producer": "reviewer",
+      "sha256": "6d36763988bcdbaef3dd1a0111cd1365e2735c2266c183e952213c88c0ae0680",
+      "type": "AnomalyReport",
+      "version": 1
+    },
+    {
+      "artefact": "reporting_status",
+      "path": "artefacts/0053_reporting_status_v002.json",
+      "producer": "reporting",
+      "sha256": "c933a823cbc1e95de11035ba7e0e9d5f5a2085dc24ba1b920035bddbda401097",
+      "type": "ReportingStatus",
+      "version": 2
+    },
+    {
+      "artefact": "anomaly_reporting",
+      "path": "artefacts/0054_anomaly_reporting_v002.json",
+      "producer": "reviewer",
+      "sha256": "e6cbfbdc62072e61cb3d6ec26be4f5fbeb7e1e8ab2266df04cfcfd16b59b8657",
+      "type": "AnomalyReport",
+      "version": 2
+    }
+  ],
+  "decision_events": 129,
+  "decision_log": "decision_log.jsonl",
+  "latest_artefacts": {
+    "abstention_report": {
+      "abstain_rate": 0.370195,
+      "accuracy_on_covered": 0.963069,
+      "base_test_accuracy": 0.896379,
+      "calibrated_on": "validation",
+      "human_review_count": 2658,
+      "method": "predictive_entropy",
+      "ood_auroc": 0.924618,
+      "ood_corruption": "unit_scale_gaussian_noise_multi_severity",
+      "ood_evidence_path": "blobs/ood_probabilities_v001.npz",
+      "ood_evidence_sha256": "7dfc06e05b3ea075438771e6701eae057399a2c5e4a1324cc939fb7b180dfdb3",
+      "ood_pass": true,
+      "ood_scenarios": [
+        {
+          "corruption": "unit_scale_gaussian_noise_sigma_0.15",
+          "score": "max_softmax",
+          "test_auroc": 0.896277,
+          "validation_auroc": 0.99039
+        },
+        {
+          "corruption": "unit_scale_gaussian_noise_sigma_0.15",
+          "score": "predictive_entropy",
+          "test_auroc": 0.896185,
+          "validation_auroc": 0.990346
+        },
+        {
+          "corruption": "unit_scale_gaussian_noise_sigma_0.25",
+          "score": "max_softmax",
+          "test_auroc": 0.92203,
+          "validation_auroc": 0.995619
+        },
+        {
+          "corruption": "unit_scale_gaussian_noise_sigma_0.25",
+          "score": "predictive_entropy",
+          "test_auroc": 0.925641,
+          "validation_auroc": 0.996187
+        },
+        {
+          "corruption": "unit_scale_gaussian_noise_sigma_0.4",
+          "score": "max_softmax",
+          "test_auroc": 0.942281,
+          "validation_auroc": 0.997078
+        },
+        {
+          "corruption": "unit_scale_gaussian_noise_sigma_0.4",
+          "score": "predictive_entropy",
+          "test_auroc": 0.95203,
+          "validation_auroc": 0.998176
+        }
+      ],
+      "ood_scope": "controlled_corruption_proxy",
+      "ood_validation_auroc": 0.994903,
+      "risk_coverage_curve": [
+        {
+          "target_validation_coverage": 0.5,
+          "test_coverage": 0.448329,
+          "test_risk": 0.019571,
+          "threshold": 0.77342292,
+          "validation_coverage": 0.5001,
+          "validation_risk": 0.000999
+        },
+        {
+          "target_validation_coverage": 0.6,
+          "test_coverage": 0.493315,
+          "test_risk": 0.023433,
+          "threshold": 0.76755505,
+          "validation_coverage": 0.60006,
+          "validation_risk": 0.001166
+        },
+        {
+          "target_validation_coverage": 0.7,
+          "test_coverage": 0.549025,
+          "test_risk": 0.025368,
+          "threshold": 0.76048563,
+          "validation_coverage": 0.70012,
+          "validation_risk": 0.000999
+        },
+        {
+          "target_validation_coverage": 0.8,
+          "test_coverage": 0.629805,
+          "test_risk": 0.036931,
+          "threshold": 0.73602929,
+          "validation_coverage": 0.80008,
+          "validation_risk": 0.001
+        },
+        {
+          "target_validation_coverage": 0.9,
+          "test_coverage": 0.710864,
+          "test_risk": 0.038401,
+          "threshold": 0.72665118,
+          "validation_coverage": 0.90004,
+          "validation_risk": 0.001
+        }
+      ],
+      "schema_version": "1.0",
+      "selective_risk": 0.036931,
+      "target_validation_coverage": 0.8,
+      "test_coverage": 0.629805,
+      "threshold": 0.73602929,
+      "validation_coverage": 0.80008
+    },
+    "anomaly_abstention": {
+      "action": "revise",
+      "attempt": 1,
+      "comment": "The abstention stage is methodologically sound and internally consistent. No deterministic findings are present, so no stop is warranted. The predictive-entropy abstention mechanism is correctly calibrated on validation, the OOD evaluation is properly scoped as a controlled-corruption proxy with multiple severities and scoring functions, and all artifacts carry proper schema versions, SHA-256 hashes, and file paths. The human-review queue count (2658) is arithmetically consistent with the abstain rate (0.3702 × 7180 ≈ 2658) and the test split size.\n\n**Primary concern – coverage/risk gap (inherited, not a defect in this stage):**\nThe threshold (0.736) was calibrated to achieve 80 % validation coverage, but test coverage is only 63.0 %. Correspondingly, test selective risk at that operating point is 0.0369 versus validation risk of 0.0010. This ~37× risk inflation is a direct consequence of the ~10 pp validation-to-test accuracy gap already flagged in the training and evaluation anomaly reviews. The abstention mechanism is functioning correctly—it is simply encountering a harder distribution on test. This does not require re-running the abstention stage but should be explicitly documented in the final report so downstream consumers understand that the 80 % coverage target is a validation-set guarantee, not a test-set guarantee.\n\n**OOD evaluation:**\nTest AUROC ranges from 0.896 (σ=0.15) to 0.952 (σ=0.4, predictive entropy), all well above chance. Validation AUROCs are 0.990–0.998. The gap mirrors the broader distribution shift. ood_pass=true is appropriate given the controlled-corruption-proxy scope. The use of both max_softmax and predictive_entropy as scoring functions is good practice.\n\n**Inherited warnings carried forward (not re-raised as new issues):**\n1. model_family=\"resnet18\" carries transformer-specific config fields (patch_size, num_heads, mlp_ratio, tokenizer_layers, positional_encoding, pooling=\"cls\"); verify inert in the ResNet-18 code path.\n2. early_stopping_patience is 3 in final config vs 5 in the selected search trial; confirm intentional.\n3. Rationale references a prior resnet18 baseline of 0.9908 not present in the current search_report; record provenance.\n4. best_epoch = 15 (final epoch); validation accuracy was still improving, suggesting the 15-epoch budget may be insufficient.\n5. Test-set class-imbalance ratio (~3.9×) exceeds the 1.63× cited in the rationale; confirm which split the rationale figure refers to.\n6. Class 7 (cancer-associated stroma) recall 0.622 and Class 5 (smooth muscle) F1 0.713 remain the weakest classes; 246 class-0 samples misrouted to class 5.\n\n**Minor observations:**\n- The risk-coverage curve shows test risk is monotonically increasing with coverage (0.0196 → 0.0384), which is expected, but the absolute values are 20–38× the validation risk at every operating point. This is a distribution-shift artifact, not a calibration error.\n- The OOD evidence path (blobs/ood_probabilities_v001.npz) and SHA-256 are recorded, enabling reproducibility.\n- The prediction artifact includes logits, probabilities, and targets for both test (7180) and validation (10004) splits, which is sufficient for downstream analysis.\n\n**Recommendation:** Proceed to the next stage. Ensure the final report explicitly states that the 80 % coverage target is a validation-set calibration guarantee and that test coverage is 63.0 % due to the known distribution gap. The abstention mechanism itself requires no revision.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "Test coverage 0.630 vs target 0.800: the abstention threshold calibrated on validation yields 17 pp lower coverage on test, a direct consequence of the inherited ~10 pp validation/test distribution gap; document as a validation-set guarantee, not a test-set guarantee",
+        "Test selective risk 0.0369 vs validation risk 0.0010 at the 80 % coverage operating point (~37× inflation); same root cause as above; ensure downstream consumers are not misled by the validation risk figure",
+        "OOD test AUROC (0.896–0.952) is 4–9 pp below validation AUROC (0.990–0.998); consistent with the broader distribution shift; ood_pass=true is appropriate for the controlled-corruption-proxy scope but the gap should be noted",
+        "Inherited: model_family=\"resnet18\" carries transformer-specific config fields (patch_size, num_heads, mlp_ratio, tokenizer_layers, positional_encoding, pooling=\"cls\"); verify they are inert in the ResNet-18 code path",
+        "Inherited: early_stopping_patience is 3 in the final training config but 5 in the selected search trial; confirm the tighter value is intentional for the 15-epoch cosine schedule",
+        "Inherited: rationale references a prior resnet18 baseline of 0.9908 not present in the current search_report; record provenance (run/round ID) for audit trail",
+        "Inherited: best_epoch equals the final epoch (15); validation accuracy was still improving, so the 15-epoch budget may be insufficient",
+        "Inherited: test-set class-imbalance ratio (~3.9×) exceeds the 1.63× cited in the rationale; confirm which split the rationale figure refers to",
+        "Inherited: Class 7 (cancer-associated stroma) recall 0.622 and Class 5 (smooth muscle) F1 0.713 are the weakest classes; 246 class-0 samples misrouted to class 5 and 63 class-7 samples to class 2 warrant targeted error analysis"
+      ],
+      "schema_version": "1.0",
+      "severity": "warning",
+      "source": "qwen3.8",
+      "stage": "abstention"
+    },
+    "anomaly_architecture_research": {
+      "action": "continue",
+      "attempt": 1,
+      "comment": "Architecture research stage is internally consistent and well-structured. All deterministic checks pass (empty deterministic_findings list). Key verifications: (1) 28×28×3 RGB shape confirmed across data_profile, representation_plan, and architecture_research. (2) Class counts sum correctly: train=89996, val=10004; imbalance ratio 12885/7886≈1.634 matches reported 1.633908. (3) Transformer tokenization math is correct: 7×7 stride-7 on 28×28 → 4×4=16 tokens; 14×14 stride-14 → 2×2=4 tokens. (4) Channel statistics (mean [0.741,0.533,0.706], std [0.124,0.177,0.124]) are consistent between data_profile and representation_plan. (5) augmented_train_size 359984 = 89996×4 matches augmentation_factor=4. (6) test_metrics_used=false confirms no test-set leakage. (7) Parameter budgets (0.5–4M primary, 11M upper-bound) are appropriate for 28×28 pathology patches. (8) Hyperparameter ranges (LR, weight decay, batch size, depth) are standard and well-justified for this problem scale. (9) Risk analysis covers overfitting, imbalance, spatial resolution loss, channel asymmetry, transformer instability, and calibration—comprehensive. Non-blocking observations: (a) Six arXiv evidence-source URLs (including 2507.12248v1 and 2508.18509v1) are external references that cannot be content-verified from this pipeline; they should be spot-checked before being cited in any final report. (b) Extension-gate entries hflip_pathology_safe and compact_conv_token_transformer remain pending_review while the representation_plan already lists hflip and the architecture_research proposes compact_transformer; ensure gate approval is recorded before training begins. (c) llm_model_digest is null for qwen3.8, so LLM-assisted planning steps are not fully content-addressed (informational). None of these constitute deterministic failures; the stage output is sound and ready to proceed to implementation.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "External arXiv references (2010.11929v2, 2104.05704v4, 2110.14795v2, 2309.13866v2, 2507.12248v1, 2508.18509v1) are not content-addressed within the pipeline; verify existence and relevance before citing in final documentation (informational, non-blocking)",
+        "Extension gate: hflip_pathology_safe and compact_conv_token_transformer are still pending_review; representation_plan already lists hflip and architecture_research proposes compact_transformer—complete gate approval before training begins (process, non-blocking)",
+        "llm_model_digest is null for qwen3.8; exact Ollama model artifact is not content-addressed, weakening full reproducibility of LLM-assisted planning steps (informational, non-blocking)",
+        "Representation plan includes brightness and contrast augmentations but architecture_research suggests mild random rotation (±10°) as a secondary option; ensure the final augmentation pipeline is finalized consistently before training (minor consistency, non-blocking)"
+      ],
+      "schema_version": "1.0",
+      "severity": "ok",
+      "source": "qwen3.8",
+      "stage": "architecture_research"
+    },
+    "anomaly_comparison": {
+      "action": "continue",
+      "attempt": 1,
+      "comment": "Comparison stage is internally consistent and arithmetically correct. Verification: (1) accuracy_delta 0.896379 − 0.821309 = 0.075070 ✓; (2) baseline_met_or_exceeded = true is correct since 0.896379 > 0.821309; (3) common_split_fingerprint matches baseline_report.split_fingerprint (9afc9ed3…c7505) ✓; (4) common_seed 42 matches both reports ✓; (5) agentic_accuracy matches evaluation_report.accuracy ✓; (6) baseline_accuracy matches baseline_report.accuracy ✓; (7) primary_metric declared as accuracy, consistent with both source reports. No deterministic findings. The baseline is a deliberately minimal tiny_cnn (depth 2, hidden 16) serving as a fixed conventional control with the same 15-epoch cosine budget, which is a valid methodological choice. Minor observation: the baseline report lacks a 95 % CI on accuracy (the agentic evaluation report includes one), so the delta CI cannot be formally stated from the artifacts alone; however, with n = 7 180 and a 7.5 pp gap the result is unambiguously significant. All carried-forward warnings from prior stages (validation-to-test coverage gap, transformer config fields on ResNet-18, early-stopping patience mismatch, best_epoch = final epoch, class-imbalance ratio discrepancy, weak-class recall) remain valid context but do not affect the comparison-stage arithmetic or logic. Proceed to next stage.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "Carried-forward: ~10 pp validation-to-test accuracy gap (0.9958 vs 0.8964); the 80 % coverage guarantee is a validation-set guarantee, not a test-set guarantee",
+        "Carried-forward: test selective risk 0.0369 vs validation risk 0.0010 at 80 % target coverage (~37× inflation); downstream consumers should not rely on the validation risk figure",
+        "Carried-forward: model_family=resnet18 carries transformer-specific config fields (patch_size, num_heads, mlp_ratio, tokenizer_layers, positional_encoding, pooling=cls); verify inert in ResNet-18 code path",
+        "Carried-forward: early_stopping_patience=3 in final config vs 5 in selected search trial; confirm intentional for 15-epoch cosine schedule",
+        "Carried-forward: rationale references prior resnet18 baseline 0.9908 not present in current search_report; record provenance",
+        "Carried-forward: best_epoch=15 (final epoch) with validation accuracy still improving; 15-epoch budget may be insufficient",
+        "Carried-forward: Class 7 recall 0.622 and Class 5 F1 0.713 are weakest; 246 class-0→class-5 and 63 class-7→class-2 misroutes warrant targeted error analysis",
+        "Carried-forward: test-set class-imbalance ratio (~3.9×) exceeds the 1.63× cited in rationale; confirm which split the figure refers to",
+        "Minor: baseline report lacks a 95 % CI on accuracy (agentic report includes one); delta CI not formally derivable from artifacts, though the 7.5 pp gap at n=7180 is unambiguously significant"
+      ],
+      "schema_version": "1.0",
+      "severity": "ok",
+      "source": "qwen3.8",
+      "stage": "comparison"
+    },
+    "anomaly_data_audit": {
+      "action": "continue",
+      "attempt": 1,
+      "comment": "Data audit stage is clean. All 11 deterministic checks pass (official_split, train/val indices, labels, pixels, shape, train-validation disjointness). Key verifications: (1) Archive MD5 a8b06965200029087d5bd730944a56c1 matches the verified hash; SHA-256 recorded. (2) Loaded split sizes (train=89996, val=10004, test=7180) exactly match official PathMNIST sizes. (3) Image shape 28×28×3 RGB, 9-class multi-class — consistent with the standard MedMNIST distribution. (4) train_validation_overlap=0, test_inspected=false, train_stats_only=true — no leakage. (5) 100,000 samples profiled (89996+10004), zero duplicates, zero blank images. (6) Class proportions between train and val are tightly aligned (max absolute deviation <0.001), confirming no split-level distribution shift. (7) Imbalance ratio 1.63 is modest. (8) Normalization stats (per-channel mean/std) computed from train only. (9) Augmented train size 359984 = 89996×4 is arithmetically correct. Minor non-blocking observations: (a) llm_model_digest is null for qwen3.8 across all stages, so LLM-assisted planning steps are not fully content-addressed for reproducibility; (b) two extension proposals (hflip_pathology_safe, compact_conv_token_transformer) remain pending_review in the extension gate — ensure hash-bound review is completed before training begins; (c) test set (CRC-VAL-HE-7K) originates from a different clinical center and test_to_train_prevalence_ratio is empty, so cross-domain prevalence shift is unquantified (expected dataset property). None of these are deterministic failures. Proceed to next stage.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "llm_model_digest is null for qwen3.8; the exact Ollama model artifact is not content-addressed, weakening full reproducibility of LLM-assisted planning steps (informational, non-blocking)",
+        "Extension gate: hflip_pathology_safe and compact_conv_token_transformer are pending_review; ensure hash-bound independent review is completed before training begins (process, non-blocking)",
+        "Test set (CRC-VAL-HE-7K) is from a different clinical center and test_to_train_prevalence_ratio is empty; cross-domain prevalence shift is not quantified (expected dataset property, informational)"
+      ],
+      "schema_version": "1.0",
+      "severity": "ok",
+      "source": "qwen3.8",
+      "stage": "data_audit"
+    },
+    "anomaly_evaluation": {
+      "action": "revise",
+      "attempt": 1,
+      "comment": "The evaluation reveals a statistically significant validation-to-test performance gap that must be investigated before the results can be accepted.\n\n**Primary critical issue – validation/test gap (~10 pp):**\n- Validation accuracy (training stage): 0.995802; Validation macro-F1: 0.995625\n- Test accuracy: 0.896379 (95 % CI [0.8891, 0.9032]); Test macro-F1: 0.876845\n- The test CI does not overlap the validation point estimate. With 7 180 test samples this gap is far beyond sampling noise. Possible causes: (a) the validation split is not fully independent of the training split (leakage via shared patches, near-duplicate crops, or split-generation bug); (b) a preprocessing/normalisation mismatch between the validation and test pipelines; (c) the test set is drawn from a different acquisition batch or source than the train/val pool. The search report confirms test_metrics_used=false and the selection rule states 'test locked', so the test set was not used for model selection, but the magnitude of the gap still demands a root-cause check before the evaluation is finalised.\n\n**Per-class observations (test split):**\n- Class 7 (label 7): recall 0.622, F1 0.716 – the weakest class; 63 samples misrouted to class 2 and 53 to class 5.\n- Class 5 (label 5): recall 0.858, F1 0.713 – 54 samples misrouted to class 4.\n- Class 0 (label 0): recall 0.805, F1 0.884 – 246 samples misrouted to class 5.\n- Classes 1, 3, 6, 8 perform well (recall ≥ 0.95).\n- The class-imbalance ratio in the test set (1338/339 ≈ 3.9×) is larger than the 1.63× cited in the rationale, suggesting the rationale's imbalance figure may refer to a different split or a different definition.\n\n**Inherited warnings (from model-search and training stages, still unresolved):**\n1. model_family=\"resnet18\" carries transformer-specific fields (patch_size=4, num_heads=4, mlp_ratio=4, tokenizer_layers=2, positional_encoding=\"learned\", pooling=\"cls\"). Confirm these are inert in the ResNet-18 code path; if they are active, the architecture is not what the label implies.\n2. early_stopping_patience is 3 in the final training config but was 5 in the selected search trial. Confirm the tighter value is intentional and compatible with the 15-epoch cosine schedule.\n3. The rationale references a prior resnet18 baseline of 0.9908 that does not appear in the current search_report trial list. Record the provenance (run/round ID) for the audit trail.\n4. best_epoch = 15 (the final epoch), meaning validation accuracy was still rising at the end of training. A longer budget or a second cosine cycle could yield further gains; this should be noted in the evaluation summary.\n\n**Recommended next steps before accepting the evaluation:**\n1. Verify train/val/test split independence (e.g., check for overlapping image IDs, near-duplicate crops, or shared patient identifiers across splits).\n2. Confirm that the same normalisation, augmentation-free preprocessing, and input pipeline are applied to both validation and test inference.\n3. Re-run test evaluation with a fixed seed and log the exact preprocessing steps to rule out a pipeline mismatch.\n4. Resolve the inherited config-field and patience discrepancies and document the provenance of the 0.9908 baseline.\n5. If the gap persists after the above checks, flag it as a data-quality or split-generation issue and escalate.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "Validation accuracy 0.9958 vs test accuracy 0.8964: ~10 pp gap with non-overlapping 95 % CI; investigate split independence, preprocessing parity, and distribution shift before accepting results",
+        "Class 7 recall 0.622 / F1 0.716 and Class 5 recall 0.858 / F1 0.713 are the weakest classes; 246 class-0 samples misrouted to class 5 and 63 class-7 samples to class 2 warrant targeted error analysis",
+        "Test-set class-imbalance ratio (~3.9×) exceeds the 1.63× cited in the rationale; confirm which split the rationale figure refers to",
+        "model_family=\"resnet18\" carries transformer-specific config fields (patch_size, num_heads, mlp_ratio, tokenizer_layers, positional_encoding, pooling=\"cls\"); verify they are inert in the ResNet-18 code path",
+        "early_stopping_patience is 3 in the final training config but 5 in the selected search trial; confirm the tighter value is intentional",
+        "Rationale references a prior resnet18 baseline of 0.9908 not present in the current search_report; record provenance for audit trail",
+        "best_epoch equals the final epoch (15); validation accuracy was still improving, so the 15-epoch budget may be insufficient"
+      ],
+      "schema_version": "1.0",
+      "severity": "warning",
+      "source": "qwen3.8",
+      "stage": "evaluation"
+    },
+    "anomaly_ingestion": {
+      "action": "continue",
+      "attempt": 1,
+      "comment": "Ingestion stage is clean. All deterministic checks pass: (1) Archive MD5 (a8b06965200029087d5bd730944a56c1) matches the verified hash; SHA256 is recorded. (2) Loaded split sizes (train=89996, val=10004, test=7180) exactly match the official PathMNIST split sizes. (3) Dataset is correctly identified as 28×28 RGB (n_channels=3), 9-class multi-class, consistent with the standard MedMNIST distribution. (4) All three selected_index_sha256 values are present. (5) No artefacts omitted. (6) Run manifest records seed=42, deterministic_torch=true, and a full package-version pin. (7) The test_domain_note (CRC-VAL-HE-7K from a different clinical center) is expected for PathMNIST and is properly documented. Minor observation (non-blocking): llm_model_digest is null, meaning the exact Ollama model weights for 'qwen3.8' are not content-addressed; this does not affect the ingestion stage but should be noted for downstream reproducibility auditing. No deterministic findings were raised. Proceed to the next stage.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "llm_model_digest is null; the exact Ollama model artifact for 'qwen3.8' is not content-addressed, which weakens full reproducibility of any LLM-assisted steps downstream (informational, non-blocking)."
+      ],
+      "schema_version": "1.0",
+      "severity": "ok",
+      "source": "qwen3.8",
+      "stage": "ingestion"
+    },
+    "anomaly_model_search": {
+      "action": "revise",
+      "attempt": 1,
+      "comment": "Model search stage completed with 8/8 trials across all 5 architecture families, 0 failures, and test metrics properly locked. The selected candidate (resnet18_capacity_wt) achieved validation accuracy 0.994802 and macro-F1 0.994648, a clear improvement over the referenced prior best (0.9908). Selection rule (highest epoch budget → accuracy within tolerance → macro-F1) is correctly applied to the round-3 (e9) trial. Progressive budget [3,6,9] is respected. Class-weighted loss, label smoothing, and three geometric augmentations (hflip, vflip, rotate180) are appropriate for the 1.63× imbalance and 28×28 pathology domain. No deterministic findings were raised.\n\nTwo minor observations warrant verification before the final 15-epoch run:\n\n1. **model_family label vs. config parameters**: The selected config is labelled model_family=\"resnet18\" yet carries transformer-specific fields (patch_size=4, num_heads=4, mlp_ratio=4, tokenizer_layers=2, positional_encoding=\"learned\", pooling=\"cls\"). If the framework uses a unified config schema where unused fields are simply ignored, this is benign. However, if these fields are active, the actual architecture is a hybrid (CNN backbone + transformer head) and the \"resnet18\" label is misleading for downstream reproducibility and reporting. Verify which parameters the training code actually consumes for this model_family.\n\n2. **early_stopping_patience mismatch**: The best_config (final 15-epoch run) sets early_stopping_patience=3, while the selected trial ran with patience=5. With best_epoch=8 in the 9-epoch trial, a patience of 3 in the 15-epoch run would trigger stopping at epoch 11 if no improvement is seen after epoch 8. This is a tighter schedule than what was validated. Confirm this is intentional and that the cosine LR schedule (15 epochs) is compatible with a potential early stop at epoch 11.\n\nAll other aspects—normalization (standardize), augmentation set, optimizer (AdamW, lr=3e-4, wd=1e-4), batch size 128, gradient clipping 1.0, seed 42, and the absence of test-metric leakage—are consistent with the architecture research guidance and the search plan. No critical or blocking issues identified. Proceed to final training with the two verifications above.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "model_family=\"resnet18\" is inconsistent with transformer-specific config fields (patch_size, num_heads, mlp_ratio, tokenizer_layers, positional_encoding, cls pooling); verify whether these are active or inert in the unified schema",
+        "early_stopping_patience differs between best_config (3) and the selected trial (5); confirm the tighter patience is intentional and compatible with the 15-epoch cosine schedule",
+        "Rationale references a prior resnet18 result (0.9908) not present in the current search_report trial list; confirm provenance of that baseline for audit trail"
+      ],
+      "schema_version": "1.0",
+      "severity": "warning",
+      "source": "qwen3.8",
+      "stage": "model_search"
+    },
+    "anomaly_preprocessing": {
+      "action": "continue",
+      "attempt": 1,
+      "comment": "Preprocessing stage is clean and internally consistent. All deterministic checks pass with zero findings across ingestion, prior-art, and profiling sub-stages. Key verifications confirmed: (1) Archive MD5 a8b06965200029087d5bd730944a56c1 matches the verified hash; SHA-256 recorded. (2) Loaded split sizes (train=89996, val=10004, test=7180) exactly match official PathMNIST sizes. (3) Image shape 28×28×3 RGB, 9-class multi-class — consistent with the standard MedMNIST distribution. (4) No duplicate train samples, no blank images. (5) Train and validation class proportions are nearly identical (max absolute delta < 0.001), confirming no split-level distribution mismatch. (6) Imbalance ratio 1.63 is modest; no resampling needed. (7) Normalization is z-score per channel using train-split statistics only (no leakage). (8) Augmentation factor 4 (hflip, brightness, contrast) yields augmented_train_size 359984 = 89996×4, arithmetically consistent. (9) Code SHA-256, package versions, seed, and platform are all recorded in the run manifest. Minor non-blocking observations: (a) llm_model_digest is null for qwen3.8 across all LLM-assisted stages, so the exact model artifact is not content-addressed; this weakens full reproducibility of LLM-generated plans but does not affect the deterministic data pipeline. (b) Two extension proposals (hflip_pathology_safe, compact_conv_token_transformer) remain in pending_review status in the extension gate; the representation_plan already references hflip as a standard augmentation, so this is a process-timing note rather than a correctness issue. (c) The test set (CRC-VAL-HE-7K) originates from a different clinical center and test_to_train_prevalence_ratio is empty, so cross-domain prevalence shift is not quantified — this is an expected property of the official PathMNIST split and is correctly flagged. No deterministic findings exist; no action=stop justification. Proceed to the next stage.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "llm_model_digest is null for qwen3.8; the exact Ollama model artifact is not content-addressed, weakening full reproducibility of LLM-assisted planning steps (informational, non-blocking)",
+        "Extension gate: hflip_pathology_safe and compact_conv_token_transformer are pending_review; representation_plan already lists hflip as a standard augmentation — verify that the gate approval is completed before training begins (process, non-blocking)",
+        "Test set (CRC-VAL-HE-7K) is from a different clinical center and test_to_train_prevalence_ratio is empty; cross-domain prevalence shift is not quantified (expected dataset property, informational)"
+      ],
+      "schema_version": "1.0",
+      "severity": "ok",
+      "source": "qwen3.8",
+      "stage": "preprocessing"
+    },
+    "anomaly_prior_art": {
+      "action": "continue",
+      "attempt": 1,
+      "comment": "Prior art stage is well-constructed and internally consistent. Six arxiv sources are retrieved with proper provenance (snapshot paths, SHA-256 hashes, timestamps). Seven hypotheses are generated, all correctly scoped as 'hypothesis_to_validate' with evidence quotes traceable to the cited sources. Two proposals (hflip augmentation, compact conv-token transformer) are appropriately detailed for this stage.\n\nConsistency checks passed:\n- 28x28x3 RGB MedMNIST distribution correctly referenced throughout; no substitution to source-dataset or MedMNIST+ resolution.\n- PathMNIST 9-class, ~90K training samples, per-class sizes 7.8K–12.9K are consistent with the standard distribution.\n- Token math in the compact transformer proposal is correct: 28→14→7 via two stride-2 convs yields 7×7=49 tokens of dim 64.\n- ViT idea token counts (4 from 14×14, 16 from 7×7) are arithmetically correct.\n- CCT reference to CIFAR-10 (32×32×3, 3.7M params) matches the source paper.\n- hflip label-preservation rationale is sound for histopathology (morphological features are not left-right directionally encoded).\n- No test metrics used (appropriate for prior art stage).\n- No retrieval errors.\n- Omitted artifacts (data_profile, run_manifest, etc.) are expected at this stage.\n\nMinor observations (non-blocking):\n1. The temperature-scaling hypothesis is extrapolated from a quantization-specific finding (arxiv_2309_13866v2) to a non-quantized setting. The benefit may be less pronounced without quantization-induced miscalibration. This is acceptable as a hypothesis to validate but should be deprioritized relative to architecture choices.\n2. The framework-efficiency idea (arxiv_2507_12248v1) is tangential to model design; it is a valid training consideration but unlikely to be a differentiating factor for a 28×28×3, 9-class problem. No action needed.\n\nNo deterministic findings. No unsupported external-memory claims. All evidence is grounded in the retrieved sources. Proceed to next stage.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "Temperature-scaling hypothesis extrapolates from a quantization-specific calibration finding to a non-quantized setting; benefit may be marginal without quantization-induced miscalibration (minor, non-blocking).",
+        "Framework-efficiency idea is tangential to architecture design and unlikely to differentiate on a 28x28x3 9-class problem (minor, non-blocking)."
+      ],
+      "schema_version": "1.0",
+      "severity": "ok",
+      "source": "qwen3.8",
+      "stage": "prior_art"
+    },
+    "anomaly_profiling": {
+      "action": "continue",
+      "attempt": 1,
+      "comment": "Profiling stage is clean. All deterministic checks pass with no findings. Key verifications: (1) Archive MD5 a8b06965200029087d5bd730944a56c1 matches the verified hash; SHA256 recorded. (2) Loaded split sizes (train=89996, val=10004, test=7180) exactly match official PathMNIST sizes. (3) Image shape 28×28×3 RGB, 9-class multi-class — consistent with the standard MedMNIST distribution. (4) No duplicate train samples, zero blank images, full profiled fraction (1.0). (5) Class proportions between train and val are nearly identical (max absolute deviation < 0.0001), confirming no split-level distribution mismatch. (6) Imbalance ratio 1.63 is modest; channel statistics (means ≈ 0.53–0.74, stds ≈ 0.12–0.18) are reasonable for RGB histology patches. (7) Ambiguity risks (background/debris/mucus overlap, adipose vs. background, smooth muscle vs. stroma, etc.) are well-documented and expected at 28×28 resolution — informational, not blocking. (8) Test set originates from CRC-VAL-HE-7K (different clinical center), a known domain-shift property of PathMNIST; test_imbalance_ratio=1.0 and empty test_to_train_prevalence_ratio are consistent with this design. Minor informational note: llm_model_digest is null for 'qwen3.8', which weakens full content-addressed reproducibility of any LLM-assisted downstream steps; this is non-blocking but should be tracked. No deterministic issues, no critical or warning-level findings. Pipeline may proceed to the next stage.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "llm_model_digest is null for qwen3.8; exact model artifact is not content-addressed, weakening full reproducibility of LLM-assisted steps (informational, non-blocking)",
+        "Test set (CRC-VAL-HE-7K) originates from a different clinical center; test_to_train_prevalence_ratio is empty, so cross-domain prevalence shift is not quantified (expected dataset property, informational)"
+      ],
+      "schema_version": "1.0",
+      "severity": "ok",
+      "source": "qwen3.8",
+      "stage": "profiling"
+    },
+    "anomaly_reporting": {
+      "action": "revise",
+      "attempt": 1,
+      "comment": "Reporting stage is internally consistent and all cross-references verify correctly. No deterministic findings are present, so no stop is warranted. Verification performed: (1) human_review_queue.count (2658) matches abstention_report.human_review_count (2658); (2) comparison_report.agentic_accuracy (0.896379) matches abstention_report.base_test_accuracy (0.896379); (3) comparison_report.baseline_accuracy (0.821309) matches baseline_report.accuracy (0.821309); (4) accuracy_delta 0.896379−0.821309=0.075070 ✓; (5) common_split_fingerprint and common_seed (42) match across baseline and comparison reports; (6) 7180×0.370195≈2658 (abstain count) ✓; (7) risk_coverage_curve at target 0.8 is consistent with top-level selective_risk (0.036931), test_coverage (0.629805), and threshold (0.73602929); (8) OOD evaluation is properly scoped as controlled-corruption-proxy with three severity levels and two scoring functions; ood_pass=true is appropriate for this scope; (9) search_report correctly reports test_metrics_used=false; (10) all artifacts carry schema_version 1.0 and SHA-256 hashes where applicable.\n\nCarried-forward warnings that must be addressed in the final report: (a) ~10 pp validation-to-test accuracy gap (0.9948 vs 0.8964) — the 80 % coverage guarantee is a validation-set guarantee, not a test-set guarantee; (b) test selective risk 0.0369 vs validation risk 0.0010 at 80 % target coverage (~37× inflation) — downstream consumers must not rely on the validation risk figure; (c) OOD test AUROC (0.896–0.952) is 4–9 pp below validation AUROC (0.990–0.998), consistent with the broader distribution shift; (d) model_family fields (resnet18, tiny_cnn) carry transformer-specific config keys (patch_size, num_heads, mlp_ratio, tokenizer_layers, positional_encoding, pooling=cls) — verify inert in the actual code path; (e) early_stopping_patience=3 in final config vs 5 in selected search trial — confirm intentional; (f) rationale references a prior resnet18 baseline of 0.9908 not present in the current search_report — record provenance; (g) best_epoch=15 equals the final epoch with validation accuracy still improving — 15-epoch budget may be insufficient; (h) Class 7 recall 0.622 and Class 5 F1 0.713 are the weakest classes; 246 class-0→class-5 and 63 class-7→class-2 misroutes warrant targeted error analysis; (i) test-set class-imbalance ratio (~3.9×) exceeds the 1.63× cited in rationale — confirm which split the figure refers to.\n\nThe anomaly_abstention review returned action=revise (severity=warning), flagging that the abstention report should more explicitly frame the coverage guarantee as validation-set and note the risk inflation. This is a documentation improvement, not a correctness error, and should be incorporated into the final report narrative. The anomaly_reporting review returned action=continue (severity=ok), confirming the reporting stage artifacts are complete and consistent. reporting_status.complete_through_stage=comparison is expected since the reporting stage is the current stage under review. All issues are documentation/framing warnings; no deterministic correctness violations were identified.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "Carried-forward: ~10 pp validation-to-test accuracy gap (0.9948 vs 0.8964); the 80% coverage guarantee is a validation-set guarantee, not a test-set guarantee — must be explicitly framed in the final report",
+        "Carried-forward: test selective risk 0.0369 vs validation risk 0.0010 at 80% target coverage (~37x inflation); downstream consumers must not rely on the validation risk figure for test-set expectations",
+        "Carried-forward: OOD test AUROC (0.896-0.952) is 4-9 pp below validation AUROC (0.990-0.998); consistent with distribution shift but should be noted alongside ood_pass=true",
+        "Carried-forward: model_family=resnet18 and tiny_cnn carry transformer-specific config fields (patch_size, num_heads, mlp_ratio, tokenizer_layers, positional_encoding, pooling=cls); verify inert in the actual code path",
+        "Carried-forward: early_stopping_patience=3 in final config vs 5 in selected search trial; confirm the tighter value is intentional for the 15-epoch cosine schedule",
+        "Carried-forward: rationale references a prior resnet18 baseline of 0.9908 not present in the current search_report; record provenance (run/round ID) for audit trail",
+        "Carried-forward: best_epoch=15 equals the final epoch with validation accuracy still improving; the 15-epoch budget may be insufficient",
+        "Carried-forward: Class 7 (cancer-associated stroma) recall 0.622 and Class 5 (smooth muscle) F1 0.713 are the weakest classes; 246 class-0 to class-5 and 63 class-7 to class-2 misroutes warrant targeted error analysis in the final report",
+        "Carried-forward: test-set class-imbalance ratio (~3.9x) exceeds the 1.63x cited in the rationale; confirm which split the rationale figure refers to",
+        "anomaly_abstention returned action=revise (severity=warning): the abstention report should more explicitly frame the coverage guarantee as validation-set and note the ~37x risk inflation; incorporate into final report narrative",
+        "reporting_status.complete_through_stage=comparison: the reporting stage is not yet marked complete; expected during active review but should be updated to reporting upon final sign-off"
+      ],
+      "schema_version": "1.0",
+      "severity": "warning",
+      "source": "qwen3.8",
+      "stage": "reporting"
+    },
+    "anomaly_training": {
+      "action": "revise",
+      "attempt": 1,
+      "comment": "Training stage completed successfully: 15/15 epochs, best val accuracy 0.995802 (macro-F1 0.995625), monotonic loss decrease, cosine LR schedule properly decayed to 0, no early-stopping trigger, no deterministic findings. Three inherited warnings from the model-search stage warrant verification but do not block progression:\n\n1. **Schema field inconsistency (warning):** model_family=\"resnet18\" coexists with transformer-specific parameters (patch_size=4, num_heads=4, mlp_ratio=4, tokenizer_layers=2, positional_encoding=\"learned\", pooling=\"cls\"). If the unified Lightning schema carries these as inert defaults for non-transformer families, this is benign but should be explicitly documented. If any of these fields are conditionally active in the ResNet-18 forward pass, the architecture is mis-specified. Verify in the model-building code that these fields are ignored for model_family=\"resnet18\".\n\n2. **Early-stopping patience mismatch (warning):** The selected search trial used early_stopping_patience=5 (9-epoch budget), while the final training config uses patience=3 (15-epoch budget). Because the training run's best epoch is 15 (i.e., val accuracy was still improving at the final epoch), the tighter patience did not truncate training. However, if a re-run or hyperparameter sweep is performed, the 3-epoch patience could stop training earlier than the 5-epoch patience that produced the search-stage selection. Confirm the tighter value is intentional for the 15-epoch cosine schedule.\n\n3. **Prior-baseline provenance (warning):** The rationale repeatedly cites a \"best prior resnet18 result (0.9908)\" that does not appear in the current search_report trial list (the closest is resnet18_conservative at 0.991104). This likely originates from an earlier round or a separate baseline run. For audit-trail completeness, record the source run/round identifier for that 0.9908 figure.\n\nNone of these are deterministic failures. Training metrics are healthy, the cosine schedule is correctly applied, class-weighting addresses the documented 1.63× imbalance, and the 28×28 RGB MedMNIST input resolution is consistent with the pipeline specification. Proceed to the next stage (e.g., test evaluation / final reporting) with the above verifications logged.",
+      "deterministic_issues": [],
+      "llm_issues": [
+        "model_family=\"resnet18\" carries transformer-specific config fields (patch_size, num_heads, mlp_ratio, tokenizer_layers, positional_encoding, pooling=\"cls\"); verify these are inert in the ResNet-18 code path",
+        "early_stopping_patience is 3 in the final training config but was 5 in the selected search trial; confirm the tighter value is intentional for the 15-epoch cosine schedule",
+        "Rationale references a prior resnet18 baseline of 0.9908 not present in the current search_report; record provenance (run/round ID) for audit trail",
+        "Training best epoch is 15 (final epoch), meaning val accuracy was still improving; consider whether a longer budget or a second cosine cycle would yield further gains before locking the final model"
+      ],
+      "schema_version": "1.0",
+      "severity": "warning",
+      "source": "qwen3.8",
+      "stage": "training"
+    },
+    "approved_extensions": {
+      "entries": [],
+      "schema_version": "1.0"
+    },
+    "architecture_research": {
+      "analysis": "PathMNIST presents a compact 28x28x3 classification problem with ~90K training samples across 9 moderately imbalanced classes (ratio 1.63x). The channel statistics reveal a notably higher-variance green channel (std 0.177 vs ~0.124 for R and B), suggesting tissue-specific spectral information concentrated there. The dataset was explicitly designed for lightweight models, and the small spatial extent (28x28) constrains both receptive-field depth and the number of meaningful spatial tokens for attention-based models.\n\nArchitecture selection should be guided by three constraints: (1) parameter budget under ~5M to match the dataset's lightweight design intent and prevent overfitting at 90K samples; (2) spatial resolution preservation—aggressive downsampling (e.g., stride-2 pooling chains) wastes the limited 28x28 signal; (3) the ability to capture both local texture (nuclear morphology, gland boundaries) and global tissue context (architectural patterns) that distinguish the 9 pathology classes.\n\nFor CNNs, tiny_cnn (3-5 conv blocks, global average pooling) is the fastest-to-train baseline and the natural first point of comparison. residual_cnn adds skip connections at modest parameter cost, improving gradient flow for 4-6 block depths. resnet18, already configured with a CIFAR-style 3x3 stride-1 stem and no max-pooling, is a reasonable mid-depth option but its 18-block depth may be excessive for 28x28 inputs at 90K samples; it should be treated as an upper-bound capacity check rather than a primary candidate.\n\nFor transformers, compact_transformer with a convolutional tokenizer is strongly preferred over vision_transformer. The conv tokenizer (e.g., a 7x7 conv with stride 7 producing 16 tokens, or 14x14 stride 14 producing 4 tokens) preserves local spatial structure in each token while allowing self-attention to model inter-token relationships. With 2-4 attention layers, 4-6 heads, and a hidden dimension of 128-256, the total parameter count stays in the 1-4M range, consistent with CCT's demonstrated success on CIFAR-10 at 3.7M params. vision_transformer with fixed patch embedding is a valid ablation but offers no advantage over the conv-tokenized variant at this resolution and adds a non-learnable projection that is less adaptive to the pathology texture distribution.\n\nTraining architecture should emphasize: (a) channel-wise normalization using the provided mean/std; (b) horizontal-flip augmentation as a primary regularizer given moderate per-class counts (7.8K-12.9K); (c) class-weighted cross-entropy or focal loss to address the 1.63x imbalance; (d) cosine or step LR schedule with warmup; (e) weight decay in the 1e-4 to 1e-3 range; (f) batch size 128-256 to balance gradient noise and memory. Temperature scaling on the validation split is a low-cost post-hoc calibration step worth including in the pipeline.\n\nThe search should proceed in two phases: Phase 1 establishes the tiny_cnn and compact_transformer baselines with a tight hyperparameter grid (LR, weight decay, dropout, augmentation strength). Phase 2 introduces residual_cnn and resnet18 as capacity ablations, and vision_transformer as a tokenization ablation against compact_transformer. This ordering maximizes information per experiment and keeps wall-clock time bounded.",
+      "architecture_priorities": [
+        "tiny_cnn",
+        "compact_transformer",
+        "residual_cnn",
+        "resnet18",
+        "vision_transformer"
+      ],
+      "evidence_sources": [
+        "https://arxiv.org/abs/2010.11929v2",
+        "https://arxiv.org/abs/2104.05704v4",
+        "https://arxiv.org/abs/2110.14795v2",
+        "https://arxiv.org/abs/2309.13866v2",
+        "https://arxiv.org/abs/2507.12248v1",
+        "https://arxiv.org/abs/2508.18509v1"
+      ],
+      "parametrization_priorities": [
+        "Total parameter budget: target 1-4M for compact_transformer, 0.5-2M for tiny_cnn/residual_cnn, up to 11M for resnet18 as an upper-bound check only",
+        "Learning rate: 1e-3 to 5e-4 for CNNs with AdamW; 1e-4 to 5e-4 for transformers with AdamW and 200-500 step linear warmup",
+        "Weight decay: 1e-4 to 1e-3 for CNNs; 0.05-0.1 for transformers (decoupled weight decay via AdamW)",
+        "Batch size: 128-256; use gradient accumulation if memory-constrained to maintain effective batch ≥128",
+        "Transformer depth: 2-4 attention layers; hidden dim 128-256; 4-6 attention heads; FFN expansion ratio 2-4x",
+        "CNN depth: 3-5 conv blocks for tiny_cnn; 4-6 residual blocks for residual_cnn; resnet18 at full depth only as capacity ablation",
+        "Class imbalance handling: class-weighted cross-entropy with weights inversely proportional to class frequency, or focal loss with gamma=2.0",
+        "Training epochs: 50-100 with early stopping on validation loss (patience 10-15 epochs); cosine LR decay to 0 over the full schedule"
+      ],
+      "representation_priorities": [
+        "Channel-wise normalization using provided mean [0.741, 0.533, 0.706] and std [0.124, 0.177, 0.124]; the green channel's higher variance should be preserved, not suppressed",
+        "For compact_transformer: convolutional tokenizer with 7x7 kernel, stride 7, producing 16 spatial tokens of dimension (16, D); alternative 14x14 stride 14 yielding 4 tokens for a coarser ablation",
+        "For vision_transformer: 7x7 fixed patches yielding 16 tokens; avoid 14x14 (only 4 tokens) as primary config due to excessive information loss per token",
+        "For all CNNs: global average pooling over the final feature map rather than flattening + fully-connected, to reduce parameter count and overfitting risk",
+        "Preserve spatial resolution through the network: prefer stride-1 convolutions with 3x3 kernels over stride-2 pooling; at most 2-3 spatial downsampling steps for 28x28 input",
+        "Learnable positional encodings for transformer tokens; avoid sinusoidal fixed encodings which are less adaptive to pathology texture patterns",
+        "Dropout (0.1-0.3) on transformer attention outputs and CNN fully-connected heads; avoid dropout on early conv layers where it disrupts local feature learning",
+        "Horizontal flip augmentation as the primary spatial regularizer; consider mild random rotation (±10 degrees) as a secondary augmentation given the 28x28 constraint"
+      ],
+      "risks": [
+        "Overfitting: 90K samples across 9 classes (~10K per class) is moderate; transformer architectures with >4M params or >4 layers risk memorizing training patterns, especially on the minority classes",
+        "Class imbalance (1.63x): without class-weighted loss or focal loss, the model will bias toward majority classes; validate per-class F1, not just macro accuracy",
+        "Spatial resolution loss: aggressive downsampling (stride-2 pooling, large patch sizes) on 28x28 inputs destroys fine nuclear morphology that distinguishes pathology classes",
+        "Channel variance asymmetry: the green channel (std 0.177) carries disproportionately more signal; uniform channel treatment or incorrect normalization may underweight this channel",
+        "Transformer training instability: at 28x28 with only 16 tokens, attention matrices are small but the limited token count means each token must carry substantial information; poor initialization or too-high LR can cause attention collapse",
+        "resnet18 depth mismatch: 18 residual blocks on a 28x28 input with 90K samples may over-parameterize relative to the signal available; treat as an upper-bound check, not a primary candidate",
+        "Augmentation domain shift: horizontal flip is safe for pathology, but rotation or elastic deformation may alter tissue architecture in ways that do not reflect real biological variation, potentially hurting generalization",
+        "Calibration gap: high accuracy does not guarantee well-calibrated probabilities; without temperature scaling or label smoothing, predicted confidences may be miscalibrated, which is critical for medical decision support"
+      ],
+      "schema_version": "1.0",
+      "source": "qwen3.8",
+      "test_metrics_used": false,
+      "transformer_guidance": "compact_transformer is the primary transformer candidate. Its convolutional tokenizer should be configured as a single 7x7 conv (stride 7, padding 0) mapping 28x28x3 → 16 tokens of dimension D (128 or 256). This preserves local 7x7 texture in each token while allowing self-attention to model inter-token spatial relationships (e.g., gland-to-stroma context). An alternative 14x14 stride-14 tokenizer yielding 4 tokens should be tested as a coarser ablation but is not the primary config. Use 2-4 transformer blocks, each with multi-head self-attention (4-6 heads), layer norm, and a position-wise FFN (2-4x expansion). Total parameters should stay under 4M. Learnable positional encodings of shape (16, D) are preferred over sinusoidal. A classification head (mean-pool over tokens → linear → 9 classes) is sufficient; avoid per-token classification heads which add parameters without clear benefit at this token count.\n\nvision_transformer serves as a tokenization ablation: replace the conv tokenizer with a fixed 7x7 patch linear projection (28/7=4, so 4x4=16 patches, each projected from 147 to D). This isolates the effect of learnable vs. fixed tokenization. Expect it to perform at or slightly below compact_transformer, since the conv tokenizer can adapt its receptive field to pathology texture while the fixed projection cannot.\n\nCritical training differences for transformers vs. CNNs: (1) use a longer warmup (200-500 steps) before the main LR schedule; (2) apply label smoothing (0.1) to the cross-entropy loss to prevent overconfident predictions on the 9-class problem; (3) use a smaller initial LR (1e-4 to 3e-4) than CNNs to avoid destabilizing the attention weights in early training; (4) apply dropout (0.1) to attention weight matrices and FFN outputs, but not to layer norm or positional encodings; (5) if training is unstable, reduce to 2 layers and D=128 before increasing depth.\n\nDo NOT use a 7x7 stride-2 ImageNet-style stem for any architecture. The resnet18 implementation already uses a 3x3 stride-1 stem appropriate for 28x28 inputs. All spatial downsampling should be explicit and limited to at most 2-3 steps across the full network depth."
+    },
+    "baseline_report": {
+      "accuracy": 0.821309,
+      "checkpoint_path": "blobs/baseline_model.ckpt",
+      "checkpoint_sha256": "7bf08f8059cf5d13bc6c8bcf7540a8dd5d4416c557730e9e243ff831ef8b05c4",
+      "config": {
+        "batch_size": 128,
+        "class_weighting": false,
+        "depth": 2,
+        "device": "cuda",
+        "dropout": 0.0,
+        "early_stopping_patience": 3,
+        "epochs": 15,
+        "gradient_clip_val": 1.0,
+        "hidden": 16,
+        "label_smoothing": 0.0,
+        "lr": 0.001,
+        "mlp_ratio": 4,
+        "model_family": "tiny_cnn",
+        "num_heads": 4,
+        "optimizer": "adamw",
+        "patch_size": 4,
+        "pooling": "cls",
+        "positional_encoding": "learned",
+        "rationale": "Fixed conventional control with the agentic run's epoch budget.",
+        "scheduler": "cosine",
+        "schema_version": "1.0",
+        "seed": 42,
+        "source": "baseline:fixed",
+        "tokenizer_layers": 2,
+        "weight_decay": 0.0001
+      },
+      "dataset": "pathmnist",
+      "lightning_csv_path": "blobs/lightning_logs/baseline_model/version_0/metrics.csv",
+      "macro_f1": 0.750857,
+      "schema_version": "1.0",
+      "seed": 42,
+      "split_fingerprint": "9afc9ed3c5a00c7391bcdd170372981b088ec7867c12f721313eda0b303c7505",
+      "training_log_path": "blobs/baseline_model.training.jsonl"
+    },
+    "best_configuration": {
+      "lightning_config_path": "best_config_v001.yaml",
+      "lightning_config_sha256": "65e01b83e44c37e8579276459a50a9b7d28de81cfd8f662884ae5379346310b7",
+      "representation": {
+        "augmentations": [
+          "hflip",
+          "vflip",
+          "rotate180"
+        ],
+        "normalization": "standardize",
+        "rationale": "Builds on the best prior resnet18 result (0.9908) by increasing hidden 32→48 and depth 3→4 for ~30% more capacity, while raising dropout to 0.15 and lowering lr to 3e-4 to maintain stability. Enables class_weighting to explicitly address the 1.63× class imbalance (minority classes at 7.9K vs majority at 12.9K). Adds rotate180 as a third augmentation for broader spatial invariance. Label smoothing increased to 0.1 for better calibration on the 9-class problem. All other hyperparameters (batch 128, AdamW, cosine, standardize, wd=1e-4) match the proven best configuration."
+      },
+      "schema_version": "1.0",
+      "selected_candidate_id": "resnet18_capacity_wt",
+      "selected_config_hash": "a836389a52bcbde527ba7a79a781fe4d6d42bd19978cf9356feebcb1a2406734",
+      "selection_rule": "highest epoch budget, then accuracy within tolerance, then macro-F1; test locked",
+      "test_metrics_used": false,
+      "train_config": {
+        "batch_size": 128,
+        "class_weighting": true,
+        "depth": 4,
+        "device": "cuda",
+        "dropout": 0.15,
+        "early_stopping_patience": 3,
+        "epochs": 15,
+        "gradient_clip_val": 1.0,
+        "hidden": 48,
+        "label_smoothing": 0.1,
+        "lr": 0.0003,
+        "mlp_ratio": 4,
+        "model_family": "resnet18",
+        "num_heads": 4,
+        "optimizer": "adamw",
+        "patch_size": 4,
+        "pooling": "cls",
+        "positional_encoding": "learned",
+        "rationale": "Selected from 8 validation-only trials. Builds on the best prior resnet18 result (0.9908) by increasing hidden 32→48 and depth 3→4 for ~30% more capacity, while raising dropout to 0.15 and lowering lr to 3e-4 to maintain stability. Enables class_weighting to explicitly address the 1.63× class imbalance (minority classes at 7.9K vs majority at 12.9K). Adds rotate180 as a third augmentation for broader spatial invariance. Label smoothing increased to 0.1 for better calibration on the 9-class problem. All other hyperparameters (batch 128, AdamW, cosine, standardize, wd=1e-4) match the proven best configuration.",
+        "scheduler": "cosine",
+        "schema_version": "1.0",
+        "seed": 42,
+        "source": "agentic_search:selected:qwen3.8",
+        "tokenizer_layers": 2,
+        "weight_decay": 0.0001
+      },
+      "validation_accuracy": 0.994802,
+      "validation_macro_f1": 0.994648
+    },
+    "blob_model": {
+      "kind": "model",
+      "metadata": {
+        "device": "cuda",
+        "loader": "PathMNISTLitModule"
+      },
+      "path": "blobs/agentic_model_v001.ckpt",
+      "schema_version": "1.0",
+      "sha256": "004d1368259a4ad642a9a284d57e99475ec2a4429cdd306bdfc4148e55ce45d8"
+    },
+    "blob_prepared_data": {
+      "kind": "prepared",
+      "metadata": {
+        "augmentations": [
+          "hflip",
+          "vflip",
+          "rotate180"
+        ],
+        "dataset_reference": {
+          "kind": "dataset",
+          "metadata": {
+            "archive_md5": "a8b06965200029087d5bd730944a56c1",
+            "archive_sha256": "81823f52dc622e69db2db4c72f8e8e617938dd6864d3c1f23d4e49724a28ea72",
+            "data_reference": "https://zenodo.org/records/10519652/files/pathmnist.npz?download=1",
+            "dataset": "pathmnist",
+            "labels": [
+              "adipose",
+              "background",
+              "debris",
+              "lymphocytes",
+              "mucus",
+              "smooth muscle",
+              "normal colon mucosa",
+              "cancer-associated stroma",
+              "colorectal adenocarcinoma epithelium"
+            ],
+            "license": "CC BY 4.0",
+            "n_channels": 3,
+            "n_classes": 9,
+            "official_sizes": {
+              "test": 7180,
+              "train": 89996,
+              "val": 10004
+            },
+            "selected_index_sha256": {
+              "test": "27ab586ecd9b4ac7278c6a91cf0b336a2ba742afe742d13eff51f702635791e8",
+              "train": "1478a96c1d8ad06d0a600d6c9b8d5c8dddd83fbda22307ab449764f013683b51",
+              "val": "a13f875ade8e54f5aee16ff205c36aa628396dddec09a33a175fcf9cbbb9d402"
+            },
+            "task": "multi-class",
+            "test_domain_note": "CRC-VAL-HE-7K test images originate from a different clinical center.",
+            "verified_archive_md5": "a8b06965200029087d5bd730944a56c1"
+          },
+          "path": "blobs/raw_dataset_v001.npz",
+          "schema_version": "1.0",
+          "sha256": "0a5d92f7f73805a31850383389c537dab3dc3d02551d320ce1685bab83f19e18"
+        },
+        "mean": [
+          0.7405450001207593,
+          0.5329821931682919,
+          0.7058288502750202
+        ],
+        "normalization": "standardize",
+        "std": [
+          0.12368221657081077,
+          0.1767625322234254,
+          0.12443067387504066
+        ]
+      },
+      "path": "blobs/prepared_data_v002.json",
+      "schema_version": "1.0",
+      "sha256": "ba4c71f839618cc4009e5e6b689745f14a65968a2d1158e69c506cb187805035"
+    },
+    "blob_probabilities": {
+      "kind": "arrays",
+      "metadata": {},
+      "path": "blobs/probabilities_v001.npz",
+      "schema_version": "1.0",
+      "sha256": "c720e2c23423db82aff88f24e7ec555581798b00de02389e50085ec7734b54f6"
+    },
+    "blob_raw_dataset": {
+      "kind": "dataset",
+      "metadata": {
+        "archive_md5": "a8b06965200029087d5bd730944a56c1",
+        "archive_sha256": "81823f52dc622e69db2db4c72f8e8e617938dd6864d3c1f23d4e49724a28ea72",
+        "data_reference": "https://zenodo.org/records/10519652/files/pathmnist.npz?download=1",
+        "dataset": "pathmnist",
+        "labels": [
+          "adipose",
+          "background",
+          "debris",
+          "lymphocytes",
+          "mucus",
+          "smooth muscle",
+          "normal colon mucosa",
+          "cancer-associated stroma",
+          "colorectal adenocarcinoma epithelium"
+        ],
+        "license": "CC BY 4.0",
+        "n_channels": 3,
+        "n_classes": 9,
+        "official_sizes": {
+          "test": 7180,
+          "train": 89996,
+          "val": 10004
+        },
+        "selected_index_sha256": {
+          "test": "27ab586ecd9b4ac7278c6a91cf0b336a2ba742afe742d13eff51f702635791e8",
+          "train": "1478a96c1d8ad06d0a600d6c9b8d5c8dddd83fbda22307ab449764f013683b51",
+          "val": "a13f875ade8e54f5aee16ff205c36aa628396dddec09a33a175fcf9cbbb9d402"
+        },
+        "task": "multi-class",
+        "test_domain_note": "CRC-VAL-HE-7K test images originate from a different clinical center.",
+        "verified_archive_md5": "a8b06965200029087d5bd730944a56c1"
+      },
+      "path": "blobs/raw_dataset_v001.npz",
+      "schema_version": "1.0",
+      "sha256": "0a5d92f7f73805a31850383389c537dab3dc3d02551d320ce1685bab83f19e18"
+    },
+    "comparison_report": {
+      "accuracy_delta": 0.07507,
+      "agentic_accuracy": 0.896379,
+      "baseline_accuracy": 0.821309,
+      "baseline_met_or_exceeded": true,
+      "common_seed": 42,
+      "common_split_fingerprint": "9afc9ed3c5a00c7391bcdd170372981b088ec7867c12f721313eda0b303c7505",
+      "primary_metric": "accuracy",
+      "schema_version": "1.0"
+    },
+    "data_audit_report": {
+      "checks": {
+        "official_split": true,
+        "train_indices": true,
+        "train_labels": true,
+        "train_only_statistics": true,
+        "train_pixels": true,
+        "train_shape": true,
+        "train_validation_disjoint_images": true,
+        "val_indices": true,
+        "val_labels": true,
+        "val_pixels": true,
+        "val_shape": true
+      },
+      "issues": [],
+      "passed": true,
+      "schema_version": "1.0",
+      "test_inspected": false,
+      "train_validation_overlap": 0
+    },
+    "data_profile": {
+      "ambiguity_note": "Using only the provided train and validation metadata, the main ambiguity risks are patch-level label ambiguity and visual overlap among histology classes at 28x28 RGB resolution. The class counts and proportions are nearly identical between train and validation, and the imbalance ratio is modest, so there is no strong evidence of split-level distribution mismatch from these statistics alone. However, several labels are likely to be visually confusable in small tissue patches: background, debris, and mucus can appear as low-structure or amorphous regions; adipose may resemble background or empty space depending on staining and cropping; smooth muscle and cancer-associated stroma can share fibrous or spindle-cell texture; normal colon mucosa and colorectal adenocarcinoma epithelium may overlap when a patch contains mixed glandular architecture; and lymphocytes may be confused with small debris or nuclear fragments. Because the images are intentionally small, boundary effects, mixed-tissue patches, and annotation uncertainty are plausible ambiguity sources. The held-out test split is locked and unavailable, so these risks cannot be validated against test performance.",
+      "ambiguity_risks": [
+        "background, debris, and mucus may be visually similar in low-resolution 28x28 patches",
+        "adipose tissue may be confused with background or empty tissue regions",
+        "smooth muscle and cancer-associated stroma may share fibrous or spindle-cell appearance",
+        "normal colon mucosa and colorectal adenocarcinoma epithelium may overlap in mixed glandular patches",
+        "lymphocytes may be confused with small debris or nuclear fragments",
+        "patch-level labels may contain multiple tissue types, increasing label ambiguity",
+        "small image size may reduce discriminative texture and boundary detail",
+        "train and validation distributions are similar, so split-level ambiguity cannot be assessed from these statistics alone"
+      ],
+      "blank_image_fraction": 0.0,
+      "class_counts": {
+        "train": [
+          9366,
+          9509,
+          10360,
+          10401,
+          8006,
+          12182,
+          7886,
+          9401,
+          12885
+        ],
+        "val": [
+          1041,
+          1057,
+          1152,
+          1156,
+          890,
+          1354,
+          877,
+          1045,
+          1432
+        ]
+      },
+      "class_proportions": {
+        "train": [
+          0.10407129,
+          0.10566025,
+          0.11511623,
+          0.1155718,
+          0.08895951,
+          0.13536157,
+          0.08762612,
+          0.1044602,
+          0.14317303
+        ],
+        "val": [
+          0.10405838,
+          0.10565774,
+          0.11515394,
+          0.11555378,
+          0.08896441,
+          0.13534586,
+          0.08766493,
+          0.10445822,
+          0.14314274
+        ]
+      },
+      "dataset": "pathmnist",
+      "decision_source": "qwen3.8",
+      "duplicate_train_samples": 0,
+      "image_shape_hwc": [
+        28,
+        28,
+        3
+      ],
+      "imbalance_ratio": 1.633908,
+      "n_channels": 3,
+      "n_classes": 9,
+      "official_data_fraction": 1.0,
+      "profiled_fraction": 1.0,
+      "samples_profiled": 100000,
+      "schema_version": "1.0",
+      "test_imbalance_ratio": 1.0,
+      "test_to_train_prevalence_ratio": [],
+      "train_channel_mean_unit": [
+        0.740545,
+        0.53298219,
+        0.70582885
+      ],
+      "train_channel_std_unit": [
+        0.12368222,
+        0.17676253,
+        0.12443067
+      ]
+    },
+    "dataset_manifest": {
+      "archive_md5": "a8b06965200029087d5bd730944a56c1",
+      "archive_sha256": "81823f52dc622e69db2db4c72f8e8e617938dd6864d3c1f23d4e49724a28ea72",
+      "data_reference": "https://zenodo.org/records/10519652/files/pathmnist.npz?download=1",
+      "dataset": "pathmnist",
+      "labels": [
+        "adipose",
+        "background",
+        "debris",
+        "lymphocytes",
+        "mucus",
+        "smooth muscle",
+        "normal colon mucosa",
+        "cancer-associated stroma",
+        "colorectal adenocarcinoma epithelium"
+      ],
+      "license": "CC BY 4.0",
+      "loaded_split_sizes": {
+        "test": 7180,
+        "train": 89996,
+        "val": 10004
+      },
+      "n_channels": 3,
+      "n_classes": 9,
+      "official_split_sizes": {
+        "test": 7180,
+        "train": 89996,
+        "val": 10004
+      },
+      "schema_version": "1.0",
+      "selected_index_sha256": {
+        "test": "27ab586ecd9b4ac7278c6a91cf0b336a2ba742afe742d13eff51f702635791e8",
+        "train": "1478a96c1d8ad06d0a600d6c9b8d5c8dddd83fbda22307ab449764f013683b51",
+        "val": "a13f875ade8e54f5aee16ff205c36aa628396dddec09a33a175fcf9cbbb9d402"
+      },
+      "subsampled": false,
+      "task": "multi-class",
+      "test_domain_note": "CRC-VAL-HE-7K test images originate from a different clinical center.",
+      "verified_archive_md5": "a8b06965200029087d5bd730944a56c1"
+    },
+    "evaluation_report": {
+      "accuracy": 0.896379,
+      "accuracy_ci95_high": 0.903218,
+      "accuracy_ci95_low": 0.889116,
+      "balanced_accuracy": 0.88518,
+      "confusion_matrix": [
+        [
+          1077,
+          0,
+          6,
+          0,
+          0,
+          246,
+          1,
+          1,
+          7
+        ],
+        [
+          0,
+          847,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          9,
+          302,
+          0,
+          0,
+          18,
+          0,
+          10,
+          0
+        ],
+        [
+          0,
+          0,
+          11,
+          623,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          21,
+          44,
+          0,
+          0,
+          921,
+          6,
+          27,
+          0,
+          16
+        ],
+        [
+          0,
+          8,
+          8,
+          0,
+          54,
+          508,
+          0,
+          14,
+          0
+        ],
+        [
+          0,
+          0,
+          1,
+          5,
+          0,
+          0,
+          706,
+          17,
+          12
+        ],
+        [
+          0,
+          6,
+          63,
+          0,
+          2,
+          53,
+          2,
+          262,
+          33
+        ],
+        [
+          0,
+          0,
+          2,
+          18,
+          1,
+          1,
+          14,
+          7,
+          1190
+        ]
+      ],
+      "macro_f1": 0.876845,
+      "macro_precision": 0.88027,
+      "macro_recall": 0.88518,
+      "n_samples": 7180,
+      "per_class": [
+        {
+          "f1": 0.884236,
+          "label": 0,
+          "name": "adipose",
+          "precision": 0.980874,
+          "recall": 0.804933,
+          "recall_ci95_high": 0.825279,
+          "recall_ci95_low": 0.78284,
+          "support": 1338
+        },
+        {
+          "f1": 0.961953,
+          "label": 1,
+          "name": "background",
+          "precision": 0.926696,
+          "recall": 1.0,
+          "recall_ci95_high": 1.0,
+          "recall_ci95_low": 0.995485,
+          "support": 847
+        },
+        {
+          "f1": 0.825137,
+          "label": 2,
+          "name": "debris",
+          "precision": 0.768448,
+          "recall": 0.890855,
+          "recall_ci95_high": 0.919772,
+          "recall_ci95_low": 0.85318,
+          "support": 339
+        },
+        {
+          "f1": 0.973437,
+          "label": 3,
+          "name": "lymphocytes",
+          "precision": 0.964396,
+          "recall": 0.98265,
+          "recall_ci95_high": 0.990285,
+          "recall_ci95_low": 0.969201,
+          "support": 634
+        },
+        {
+          "f1": 0.915052,
+          "label": 4,
+          "name": "mucus",
+          "precision": 0.941718,
+          "recall": 0.889855,
+          "recall_ci95_high": 0.907506,
+          "recall_ci95_low": 0.869321,
+          "support": 1035
+        },
+        {
+          "f1": 0.713483,
+          "label": 5,
+          "name": "smooth muscle",
+          "precision": 0.610577,
+          "recall": 0.858108,
+          "recall_ci95_high": 0.883912,
+          "recall_ci95_low": 0.827687,
+          "support": 592
+        },
+        {
+          "f1": 0.947015,
+          "label": 6,
+          "name": "normal colon mucosa",
+          "precision": 0.941333,
+          "recall": 0.952767,
+          "recall_ci95_high": 0.965844,
+          "recall_ci95_low": 0.935019,
+          "support": 741
+        },
+        {
+          "f1": 0.715847,
+          "label": 7,
+          "name": "cancer-associated stroma",
+          "precision": 0.842444,
+          "recall": 0.622328,
+          "recall_ci95_high": 0.667335,
+          "recall_ci95_low": 0.575108,
+          "support": 421
+        },
+        {
+          "f1": 0.95544,
+          "label": 8,
+          "name": "colorectal adenocarcinoma epithelium",
+          "precision": 0.945946,
+          "recall": 0.965126,
+          "recall_ci95_high": 0.974007,
+          "recall_ci95_low": 0.953355,
+          "support": 1233
+        }
+      ],
+      "primary_metric": "accuracy",
+      "roc_auc_ovr_macro": 0.979299,
+      "schema_version": "1.0",
+      "split": "test"
+    },
+    "execution_status": {
+      "schema_version": "1.0",
+      "stage": null,
+      "status": "completed"
+    },
+    "extension_gate_report": {
+      "approvals_sha256": null,
+      "entries": [
+        {
+          "proposal_id": "hflip_pathology_safe",
+          "reason": "A hash-bound independent review is required.",
+          "registry_name": null,
+          "reviewer": null,
+          "spec_sha256": "08f37296d5c251af50d370af91c39564b2691686b92fa8af4329227a2e014b8b",
+          "status": "pending_review"
+        },
+        {
+          "proposal_id": "compact_conv_token_transformer",
+          "reason": "A hash-bound independent review is required.",
+          "registry_name": null,
+          "reviewer": null,
+          "spec_sha256": "7a9db7f9567d5826d28f0a76a1e5df74e74a394d9570a0f9baa3aa37b9a88be6",
+          "status": "pending_review"
+        }
+      ],
+      "schema_version": "1.0"
+    },
+    "human_review_queue": {
+      "count": 2658,
+      "path": "blobs/human_review_queue_v001.json",
+      "purpose": "benchmark_review",
+      "schema_version": "1.0",
+      "sha256": "1b9a30e8cba1523632555c788d79064e45755599f6a92c8cdd1e73799f115896",
+      "split": "test"
+    },
+    "prediction_artifact": {
+      "includes_logits": true,
+      "includes_probabilities": true,
+      "includes_targets": true,
+      "path": "blobs/predictions_v001.npz",
+      "schema_version": "1.0",
+      "sha256": "e9d8a0a89e730ecc36f9b42a1afd0a5bb28d3be88742fb98b6f766a195766f3b",
+      "test_samples": 7180,
+      "validation_samples": 10004
+    },
+    "prior_art_brief": {
+      "ideas": [
+        {
+          "evidence_quote": "with the right size, convolutional tokenization, transformers can avoid overfitting and outperform state-of-the-art CNNs on small datasets",
+          "hypothesis": "A compact transformer using convolutional tokenization (rather than fixed-size patch embedding) can be adapted to the 28x28x3 PathMNIST input, leveraging the fact that CCT demonstrated competitive accuracy on CIFAR-10 (32x32x3) with only 3.7M parameters. For PathMNIST's ~90K training samples across 9 classes, a similarly sized conv-tokenized transformer (1-4M params) with 2-4 attention layers may avoid overfitting while capturing inter-pixel dependencies that a plain CNN misses, particularly for subtle histological patterns.",
+          "idea_id": "cct_conv_tokenization",
+          "source_id": "arxiv_2104_05704v4",
+          "status": "hypothesis_to_validate",
+          "target": "architecture"
+        },
+        {
+          "evidence_quote": "a pure transformer applied directly to sequences of image patches can perform very well on image classification tasks",
+          "hypothesis": "Applying a pure self-attention mechanism over a small number of spatial tokens (e.g., 4 tokens from 14x14 patches or 16 tokens from 7x7 patches) on the 28x28x3 PathMNIST input could model global tissue-context relationships (e.g., gland architecture, stromal patterns) that local convolutions struggle to capture, provided the token count is kept small to avoid overfitting on ~90K samples.",
+          "idea_id": "vit_small_patch_attention",
+          "source_id": "arxiv_2010_11929v2",
+          "status": "hypothesis_to_validate",
+          "target": "representation"
+        },
+        {
+          "evidence_quote": "All images are pre-processed into a small size of 28x28 (2D) or 28x28x28 (3D) with the corresponding classification labels so that no background knowledge is required for users.",
+          "hypothesis": "Because PathMNIST images are standardized to 28x28 with no required domain preprocessing, the architecture should be lightweight (fewer than 5M parameters) to match the dataset's design intent for 'lightweight 2D images' and to prevent overfitting given the moderate class sizes (7.8K-12.9K per class). A shallow CNN backbone (3-5 conv blocks) with global average pooling is a strong baseline to beat.",
+          "idea_id": "medmnist_lightweight_design",
+          "source_id": "arxiv_2110_14795v2",
+          "status": "hypothesis_to_validate",
+          "target": "architecture"
+        },
+        {
+          "evidence_quote": "GhostNet-VGG is shown to be the most robust to overall performance drop at lower precision.",
+          "hypothesis": "GhostNet-VGG-style architecture (combining ghost modules for cheap feature generation with VGG-like depth) is a robust backbone for PathMNIST, as it was shown to be the most robust to performance degradation under quantization. Even without quantization, its efficient feature generation may provide a favorable bias-variance trade-off for the 28x28x3 pathology input with 9 classes.",
+          "idea_id": "ghostnet_vgg_robustness",
+          "source_id": "arxiv_2309_13866v2",
+          "status": "hypothesis_to_validate",
+          "target": "architecture"
+        },
+        {
+          "evidence_quote": "We find that temperature scaling can improve calibration error for quantized networks, with some caveats.",
+          "hypothesis": "Applying temperature scaling as a post-hoc calibration step during training on PathMNIST can improve the reliability of predicted class probabilities, which is important for medical decision support. This is a low-cost training modification that does not change the architecture and can be validated on the training split.",
+          "idea_id": "temperature_scaling_calibration",
+          "source_id": "arxiv_2309_13866v2",
+          "status": "hypothesis_to_validate",
+          "target": "training"
+        },
+        {
+          "evidence_quote": "Our findings highlight the trade-offs between computational speed and model accuracy, offering valuable insights for researchers and practitioners in medical image analysis.",
+          "hypothesis": "The choice of deep-learning framework (Keras vs PyTorch vs JAX) introduces measurable differences in training efficiency and convergence behavior on PathMNIST. Selecting the framework with the best accuracy-per-second trade-off for a 28x28x3, 9-class problem can reduce wall-clock training time without sacrificing final accuracy, which is relevant for iterative experimentation.",
+          "idea_id": "framework_training_efficiency",
+          "source_id": "arxiv_2507_12248v1",
+          "status": "hypothesis_to_validate",
+          "target": "training"
+        },
+        {
+          "evidence_quote": "We also analyse the impact of data augmentation on the quality of unlearning.",
+          "hypothesis": "Data augmentation (particularly horizontal flipping) serves as a critical regularizer for PathMNIST training, as evidenced by its measured impact on model quality in related medical image classification experiments. Given the moderate per-class sample sizes (7.8K-12.9K), augmentation can effectively double the training signal and reduce overfitting risk.",
+          "idea_id": "augmentation_regularization",
+          "source_id": "arxiv_2508_18509v1",
+          "status": "hypothesis_to_validate",
+          "target": "training"
+        }
+      ],
+      "proposals": [
+        {
+          "description": "Apply horizontal flip (hflip) as the sole geometric augmentation during PathMNIST training. Pathology tissue sections do not have a strict left-right asymmetry that would change the histological class (e.g., cell morphology, gland architecture, stromal pattern remain invariant under left-right mirroring). Vertical flip, 90-degree, and 180-degree rotations are excluded because tissue orientation (e.g., direction of collagen fibers, apical-basal polarity of epithelial cells, orientation of glandular structures) can be diagnostically meaningful and flipping/rotating may alter the visual signature of certain classes. This conservative augmentation strategy preserves label semantics while providing a 2x effective training set.",
+          "implementation_requirements": [],
+          "kind": "augmentation",
+          "label_preservation_rationale": "Horizontal mirroring preserves the morphological features that define pathology classes (cell shape, nuclear-to-cytoplasmic ratio, gland architecture, stromal density) because these features are not directionally encoded in the left-right axis. In contrast, vertical or rotational transforms could invert apical-basal polarity or alter the perceived orientation of tissue structures, potentially changing the visual appearance of class-specific patterns.",
+          "operations": [
+            "hflip"
+          ],
+          "proposal_id": "hflip_pathology_safe",
+          "source_ids": [
+            "arxiv_2508_18509v1",
+            "arxiv_2110_14795v2"
+          ]
+        },
+        {
+          "description": "A non-executable architecture specification for a compact transformer adapted to 28x28x3 PathMNIST input. (1) Convolutional tokenizer: a 3x3 conv (stride 2, 32 filters) followed by a 3x3 conv (stride 2, 64 filters) producing a 7x7x64 feature map, then reshaped to 49 tokens of dimension 64. (2) Positional encoding: learnable 49x64 positional embeddings added to tokens. (3) Transformer encoder: 3 layers, each with multi-head self-attention (4 heads, head_dim=16), layer norm, and a 2x64 FFN with GELU activation. (4) Classification head: global average pooling over the 49 tokens, a linear layer (64 to 128), ReLU, dropout (0.3), and a final linear layer (128 to 9) for the 9 PathMNIST classes. Total parameter budget approximately 1.5-2.5M. This design follows the CCT principle of convolutional tokenization to avoid the data-hungry nature of fixed patch embeddings while retaining self-attention for global context modeling on the small 28x28 input.",
+          "implementation_requirements": [
+            "Input tensor shape must be (batch, 28, 28, 3) with 3-channel RGB pathology images",
+            "Convolutional tokenizer must produce exactly 49 tokens of dimension 64 via two stride-2 convolutions",
+            "Learnable positional embeddings of shape (49, 64) must be added before the first attention layer",
+            "Each transformer layer must use pre-norm (LayerNorm before attention and FFN) with 4 attention heads of dimension 16",
+            "FFN intermediate dimension must be 2x the embedding dimension (128) with GELU activation",
+            "Classification head must use global average pooling over token dimension, then a single hidden linear layer with dropout 0.3",
+            "Total trainable parameters must not exceed 3M to maintain data efficiency on ~90K training samples",
+            "Output must be a (batch, 9) logit vector for the 9 PathMNIST classes",
+            "Training should use cross-entropy loss with class-weighted sampling to address the mild imbalance (7886-12885 per class)",
+            "Horizontal flip augmentation should be applied during training as the sole geometric transform"
+          ],
+          "kind": "architecture",
+          "label_preservation_rationale": "",
+          "operations": [],
+          "proposal_id": "compact_conv_token_transformer",
+          "source_ids": [
+            "arxiv_2104_05704v4",
+            "arxiv_2010_11929v2",
+            "arxiv_2110_14795v2"
+          ]
+        }
+      ],
+      "query": "all:PathMNIST OR (all:histology AND all:\"compact transformer\")",
+      "retrieval_errors": [],
+      "retrieval_mode": "online",
+      "schema_version": "1.0",
+      "source": "qwen3.8",
+      "sources": [
+        {
+          "origin": "arxiv_api",
+          "retrieved_at": "2026-10-01T16:05:04.566467+00:00",
+          "snapshot_path": "blobs/literature/source_277cb974de341c6ff2d50d1bb061f426a95e8b1296db93e21e6adf2f0b3498f6.json",
+          "snapshot_sha256": "565e371fb2f16b31a20ceedcd565d05bacd3a5495463bc2875e1264190e24a71",
+          "source_id": "arxiv_2010_11929v2",
+          "text": "While the Transformer architecture has become the de-facto standard for natural language processing tasks, its applications to computer vision remain limited. In vision, attention is either applied in conjunction with convolutional networks, or used to replace certain components of convolutional networks while keeping their overall structure in place. We show that this reliance on CNNs is not necessary and a pure transformer applied directly to sequences of image patches can perform very well on image classification tasks. When pre-trained on large amounts of data and transferred to multiple mid-sized or small image recognition benchmarks (ImageNet, CIFAR-100, VTAB, etc.), Vision Transformer (ViT) attains excellent results compared to state-of-the-art convolutional networks while requiring substantially fewer computational resources to train.",
+          "title": "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale",
+          "url": "https://arxiv.org/abs/2010.11929v2"
+        },
+        {
+          "origin": "arxiv_api",
+          "retrieved_at": "2026-10-01T16:05:04.567060+00:00",
+          "snapshot_path": "blobs/literature/source_2c4e532a966df3839a35dce73108265fb6bd1df376ae63c9b0498021f1cc2598.json",
+          "snapshot_sha256": "ff5bc99699b79473ffe5e523fc0ac114866567c82d3626d9d0955ff3a18e6437",
+          "source_id": "arxiv_2104_05704v4",
+          "text": "With the rise of Transformers as the standard for language processing, and their advancements in computer vision, there has been a corresponding growth in parameter size and amounts of training data. Many have come to believe that because of this, transformers are not suitable for small sets of data. This trend leads to concerns such as: limited availability of data in certain scientific domains and the exclusion of those with limited resource from research in the field. In this paper, we aim to present an approach for small-scale learning by introducing Compact Transformers. We show for the first time that with the right size, convolutional tokenization, transformers can avoid overfitting and outperform state-of-the-art CNNs on small datasets. Our models are flexible in terms of model size, and can have as little as 0.28M parameters while achieving competitive results. Our best model can reach 98% accuracy when training from scratch on CIFAR-10 with only 3.7M parameters, which is a significant improvement in data-efficiency over previous Transformer based models being over 10x smaller than other transformers and is 15% the size of ResNet50 while achieving similar performance. CCT also outperforms many modern CNN based approaches, and even some recent NAS-based approaches. Additionally, we obtain a new SOTA result on Flowers-102 with 99.76% top-1 accuracy, and improve upon the existing baseline on ImageNet (82.71% accuracy with 29% as many parameters as ViT), as well as NLP tasks. Our simple and compact design for transformers makes them more feasible to study for those with limited computing resources and/or dealing with small datasets, while extending existing research efforts in data efficient transformers. Our code and pre-trained models are publicly available at https://github.com/SHI-Labs/Compact-Transformers.",
+          "title": "Escaping the Big Data Paradigm with Compact Transformers",
+          "url": "https://arxiv.org/abs/2104.05704v4"
+        },
+        {
+          "origin": "arxiv_api",
+          "retrieved_at": "2026-10-01T16:05:04.567529+00:00",
+          "snapshot_path": "blobs/literature/source_60729d96f9a09c370e3f89aa3fcf855b32589cc38e77b59b208d881c82699686.json",
+          "snapshot_sha256": "f8d39b332e0733ba884efda4974fc5ba7e7c4ae44ee0c70962bbffebef07fc2c",
+          "source_id": "arxiv_2110_14795v2",
+          "text": "We introduce MedMNIST v2, a large-scale MNIST-like dataset collection of standardized biomedical images, including 12 datasets for 2D and 6 datasets for 3D. All images are pre-processed into a small size of 28x28 (2D) or 28x28x28 (3D) with the corresponding classification labels so that no background knowledge is required for users. Covering primary data modalities in biomedical images, MedMNIST v2 is designed to perform classification on lightweight 2D and 3D images with various dataset scales (from 100 to 100,000) and diverse tasks (binary/multi-class, ordinal regression, and multi-label). The resulting dataset, consisting of 708,069 2D images and 10,214 3D images in total, could support numerous research / educational purposes in biomedical image analysis, computer vision, and machine learning. We benchmark several baseline methods on MedMNIST v2, including 2D / 3D neural networks and open-source / commercial AutoML tools. The data and code are publicly available at https://medmnist.com/.",
+          "title": "MedMNIST v2 -- A large-scale lightweight benchmark for 2D and 3D biomedical image classification",
+          "url": "https://arxiv.org/abs/2110.14795v2"
+        },
+        {
+          "origin": "arxiv_api",
+          "retrieved_at": "2026-10-01T16:05:04.567955+00:00",
+          "snapshot_path": "blobs/literature/source_e0678a3e3ded7aba8cbaf38133cb239887995018e3593075650d45f9bcda7024.json",
+          "snapshot_sha256": "cf140a3ec48f6892b03d7228098f5571c405efc8fba446a432aed3aa150f2968",
+          "source_id": "arxiv_2309_13866v2",
+          "text": "We explore calibration properties at various precisions for three architectures: ShuffleNetv2, GhostNet-VGG, and MobileOne; and two datasets: CIFAR-100 and PathMNIST. The quality of calibration is observed to track the quantization quality; it is well-documented that performance worsens with lower precision, and we observe a similar correlation with poorer calibration. This becomes especially egregious at 4-bit activation regime. GhostNet-VGG is shown to be the most robust to overall performance drop at lower precision. We find that temperature scaling can improve calibration error for quantized networks, with some caveats. We hope that these preliminary insights can lead to more opportunities for explainable and reliable EdgeML.",
+          "title": "On Calibration of Modern Quantized Efficient Neural Networks",
+          "url": "https://arxiv.org/abs/2309.13866v2"
+        },
+        {
+          "origin": "arxiv_api",
+          "retrieved_at": "2026-10-01T16:05:04.568364+00:00",
+          "snapshot_path": "blobs/literature/source_b848db1a3f3a9f9b34761f01f306216b9cb2d9a6d47562ee98c4353b23ccc414.json",
+          "snapshot_sha256": "1062456f57a51db437f79143bcbfa20bcb2841345a1126667e6f1ed98e01ef6c",
+          "source_id": "arxiv_2507_12248v1",
+          "text": "Deep learning has significantly advanced the field of medical image classification, particularly with the adoption of Convolutional Neural Networks (CNNs). Various deep learning frameworks such as Keras, PyTorch and JAX offer unique advantages in model development and deployment. However, their comparative performance in medical imaging tasks remains underexplored. This study presents a comprehensive analysis of CNN implementations across these frameworks, using the PathMNIST dataset as a benchmark. We evaluate training efficiency, classification accuracy and inference speed to assess their suitability for real-world applications. Our findings highlight the trade-offs between computational speed and model accuracy, offering valuable insights for researchers and practitioners in medical image analysis.",
+          "title": "Comparative Analysis of CNN Performance in Keras, PyTorch and JAX on PathMNIST",
+          "url": "https://arxiv.org/abs/2507.12248v1"
+        },
+        {
+          "origin": "arxiv_api",
+          "retrieved_at": "2026-10-01T16:05:04.568816+00:00",
+          "snapshot_path": "blobs/literature/source_80c767fb43b246837d84b5b164eea94f57858361909ab7405bfbbefe1aa2c3bb.json",
+          "snapshot_sha256": "28aa5a689c22c58ce0c11179a8d6fa6b8e0e26d7fc8fe74fc5469e5550b0c3d8",
+          "source_id": "arxiv_2508_18509v1",
+          "text": "Machine unlearning aims to remove private or sensitive data from a pre-trained model while preserving the model's robustness. Despite recent advances, this technique has not been explored in medical image classification. This work evaluates the SalUn unlearning model by conducting experiments on the PathMNIST, OrganAMNIST, and BloodMNIST datasets. We also analyse the impact of data augmentation on the quality of unlearning. Results show that SalUn achieves performance close to full retraining, indicating an efficient solution for use in medical applications.",
+          "title": "Analise de Desaprendizado de Maquina em Modelos de Classificacao de Imagens Medicas",
+          "url": "https://arxiv.org/abs/2508.18509v1"
+        }
+      ],
+      "test_metrics_used": false
+    },
+    "reporting_status": {
+      "artefact_versions": 53,
+      "complete_through_stage": "comparison",
+      "decision_events": 126,
+      "dossier_path": "dossier.json",
+      "schema_version": "1.0"
+    },
+    "representation_plan": {
+      "augmentation_factor": 4,
+      "augmentations": [
+        "hflip",
+        "vflip",
+        "rotate180"
+      ],
+      "normalization": "standardize",
+      "rationale": "Builds on the best prior resnet18 result (0.9908) by increasing hidden 32→48 and depth 3→4 for ~30% more capacity, while raising dropout to 0.15 and lowering lr to 3e-4 to maintain stability. Enables class_weighting to explicitly address the 1.63× class imbalance (minority classes at 7.9K vs majority at 12.9K). Adds rotate180 as a third augmentation for broader spatial invariance. Label smoothing increased to 0.1 for better calibration on the 9-class problem. All other hyperparameters (batch 128, AdamW, cosine, standardize, wd=1e-4) match the proven best configuration.",
+      "schema_version": "1.0",
+      "source": "agentic_search:selected:qwen3.8",
+      "stats_source": "train",
+      "train_channel_mean_unit": [
+        0.740545,
+        0.53298219,
+        0.70582885
+      ],
+      "train_channel_std_unit": [
+        0.12368222,
+        0.17676253,
+        0.12443067
+      ]
+    },
+    "run_configuration": {
+      "extension_registry": [],
+      "frozen_best": null,
+      "parameters": {
+        "ablation_suite": false,
+        "acceptance_evidence": null,
+        "accuracy_tolerance": 0.005,
+        "data_root": null,
+        "device": "cuda",
+        "extension_approvals": null,
+        "keep_alive": "5m",
+        "literature_cache": null,
+        "llm_retries": 1,
+        "llm_timeout": 90.0,
+        "max_epochs": 15,
+        "no_download": false,
+        "no_search": false,
+        "offline": false,
+        "ollama_base": "http://localhost:11434",
+        "ollama_model": "qwen3.8",
+        "output_root": "runs",
+        "quick": false,
+        "replay_run": null,
+        "require_llm": true,
+        "require_research": false,
+        "research_limit": 6,
+        "research_online": true,
+        "research_query": "all:PathMNIST OR (all:histology AND all:\"compact transformer\")",
+        "search_epochs": 3,
+        "search_per_seed": true,
+        "search_rounds": 3,
+        "search_trials": 8,
+        "seeds": "42,47,72",
+        "stage_retries": 1,
+        "target_coverage": 0.8,
+        "test_limit": null,
+        "train_limit": null,
+        "val_limit": null,
+        "validation_evidence": "validation_evidence.json"
+      },
+      "schema_version": "1.0"
+    },
+    "run_manifest": {
+      "code_sha256": "01a825dee594ac232140dbbe6d53578f01a3ac4d0ecb4d5ed8a9e7a063105076",
+      "created_at": "2026-10-01T16:04:10.765602+00:00",
+      "dataset": "pathmnist",
+      "deterministic_torch": true,
+      "lightning_cli": true,
+      "llm_mode": "ollama",
+      "llm_model": "qwen3.8",
+      "llm_model_digest": null,
+      "package_versions": {
+        "jsonargparse": "4.52.0",
+        "lightning": "2.6.5",
+        "medmnist": "3.0.2",
+        "numpy": "2.4.6",
+        "pydantic": "2.13.5",
+        "scikit-learn": "1.9.0",
+        "torch": "2.14.0+cu126"
+      },
+      "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.35",
+      "python_version": "3.11.15",
+      "run_id": "seed_42",
+      "schema_version": "1.0",
+      "seed": 42
+    },
+    "search_plan": {
+      "accuracy_tolerance": 0.005,
+      "final_epochs": 15,
+      "framework": "lightning.pytorch",
+      "max_trials": 8,
+      "objective": "validation_accuracy_then_macro_f1",
+      "progressive_budget": true,
+      "round_epoch_budgets": [
+        3,
+        6,
+        9
+      ],
+      "rounds": 3,
+      "schema_version": "1.0",
+      "search_epochs": 3,
+      "test_locked": true
+    },
+    "search_report": {
+      "completed_trials": 8,
+      "failed_trials": 0,
+      "families_evaluated": [
+        "compact_transformer",
+        "residual_cnn",
+        "resnet18",
+        "tiny_cnn",
+        "vision_transformer"
+      ],
+      "missing_families": [],
+      "schema_version": "1.0",
+      "selected_candidate_id": "resnet18_capacity_wt",
+      "selected_config_hash": "a836389a52bcbde527ba7a79a781fe4d6d42bd19978cf9356feebcb1a2406734",
+      "selected_validation_accuracy": 0.994802,
+      "selected_validation_macro_f1": 0.994648,
+      "selection_rule": "highest_budget_accuracy_tolerance_then_macro_f1",
+      "test_metrics_used": false,
+      "trial_artefacts": [
+        "trial_compact_transformer_e4bc0782_e3_s001",
+        "trial_residual_balanced_be4afb0b_e3_s001",
+        "trial_resnet18_conservative_a48f20ec_e3_s001",
+        "trial_tiny_regularized_ee0112db_e6_s001",
+        "trial_vit_patch4_2c7c1bdc_e6_s001",
+        "trial_resnet18_conservative_a48f20ec_e6_s001",
+        "trial_resnet18_conservative_a48f20ec_e9_s001",
+        "trial_resnet18_capacity_wt_a836389a_e9_s001"
+      ]
+    },
+    "split_manifest": {
+      "augmented_train_size": 359984,
+      "dataset": "pathmnist",
+      "official_test_separate_center": true,
+      "schema_version": "1.0",
+      "seed": 42,
+      "selected_index_sha256": {
+        "test": "27ab586ecd9b4ac7278c6a91cf0b336a2ba742afe742d13eff51f702635791e8",
+        "train": "1478a96c1d8ad06d0a600d6c9b8d5c8dddd83fbda22307ab449764f013683b51",
+        "val": "a13f875ade8e54f5aee16ff205c36aa628396dddec09a33a175fcf9cbbb9d402"
+      },
+      "strategy": "official",
+      "test_size": 7180,
+      "train_size": 89996,
+      "train_stats_only": true,
+      "val_size": 10004
+    },
+    "train_config": {
+      "batch_size": 128,
+      "class_weighting": true,
+      "depth": 4,
+      "device": "cuda",
+      "dropout": 0.15,
+      "early_stopping_patience": 3,
+      "epochs": 15,
+      "gradient_clip_val": 1.0,
+      "hidden": 48,
+      "label_smoothing": 0.1,
+      "lr": 0.0003,
+      "mlp_ratio": 4,
+      "model_family": "resnet18",
+      "num_heads": 4,
+      "optimizer": "adamw",
+      "patch_size": 4,
+      "pooling": "cls",
+      "positional_encoding": "learned",
+      "rationale": "Selected from 8 validation-only trials. Builds on the best prior resnet18 result (0.9908) by increasing hidden 32→48 and depth 3→4 for ~30% more capacity, while raising dropout to 0.15 and lowering lr to 3e-4 to maintain stability. Enables class_weighting to explicitly address the 1.63× class imbalance (minority classes at 7.9K vs majority at 12.9K). Adds rotate180 as a third augmentation for broader spatial invariance. Label smoothing increased to 0.1 for better calibration on the 9-class problem. All other hyperparameters (batch 128, AdamW, cosine, standardize, wd=1e-4) match the proven best configuration.",
+      "scheduler": "cosine",
+      "schema_version": "1.0",
+      "seed": 42,
+      "source": "agentic_search:selected:qwen3.8",
+      "tokenizer_layers": 2,
+      "weight_decay": 0.0001
+    },
+    "train_result": {
+      "best_epoch": 15,
+      "best_val_accuracy": 0.995802,
+      "checkpoint_path": "blobs/agentic_model_v001.ckpt",
+      "checkpoint_sha256": "004d1368259a4ad642a9a284d57e99475ec2a4429cdd306bdfc4148e55ce45d8",
+      "device": "cuda",
+      "epochs_completed": 15,
+      "final_train_loss": 0.496095,
+      "final_val_accuracy": 0.995802,
+      "framework": "lightning.pytorch",
+      "history": [
+        {
+          "epoch": 1,
+          "learning_rate": 0.0002967221,
+          "train_loss": 0.703773,
+          "val_accuracy": 0.959216,
+          "val_loss": 0.592621,
+          "val_macro_f1": 0.95866
+        },
+        {
+          "epoch": 2,
+          "learning_rate": 0.0002870318,
+          "train_loss": 0.578847,
+          "val_accuracy": 0.966214,
+          "val_loss": 0.582323,
+          "val_macro_f1": 0.965585
+        },
+        {
+          "epoch": 3,
+          "learning_rate": 0.0002713525,
+          "train_loss": 0.552083,
+          "val_accuracy": 0.981707,
+          "val_loss": 0.538345,
+          "val_macro_f1": 0.981607
+        },
+        {
+          "epoch": 4,
+          "learning_rate": 0.0002503696,
+          "train_loss": 0.535716,
+          "val_accuracy": 0.986106,
+          "val_loss": 0.527612,
+          "val_macro_f1": 0.986055
+        },
+        {
+          "epoch": 5,
+          "learning_rate": 0.000225,
+          "train_loss": 0.526111,
+          "val_accuracy": 0.985706,
+          "val_loss": 0.527149,
+          "val_macro_f1": 0.985644
+        },
+        {
+          "epoch": 6,
+          "learning_rate": 0.0001963525,
+          "train_loss": 0.518222,
+          "val_accuracy": 0.990404,
+          "val_loss": 0.516049,
+          "val_macro_f1": 0.990412
+        },
+        {
+          "epoch": 7,
+          "learning_rate": 0.0001656793,
+          "train_loss": 0.512609,
+          "val_accuracy": 0.993203,
+          "val_loss": 0.509612,
+          "val_macro_f1": 0.993207
+        },
+        {
+          "epoch": 8,
+          "learning_rate": 0.0001343207,
+          "train_loss": 0.507434,
+          "val_accuracy": 0.989804,
+          "val_loss": 0.517525,
+          "val_macro_f1": 0.989602
+        },
+        {
+          "epoch": 9,
+          "learning_rate": 0.0001036475,
+          "train_loss": 0.503561,
+          "val_accuracy": 0.992503,
+          "val_loss": 0.511908,
+          "val_macro_f1": 0.992498
+        },
+        {
+          "epoch": 10,
+          "learning_rate": 7.5e-05,
+          "train_loss": 0.501146,
+          "val_accuracy": 0.993503,
+          "val_loss": 0.509299,
+          "val_macro_f1": 0.993367
+        },
+        {
+          "epoch": 11,
+          "learning_rate": 4.96304e-05,
+          "train_loss": 0.499119,
+          "val_accuracy": 0.995102,
+          "val_loss": 0.506469,
+          "val_macro_f1": 0.994952
+        },
+        {
+          "epoch": 12,
+          "learning_rate": 2.86475e-05,
+          "train_loss": 0.497398,
+          "val_accuracy": 0.994502,
+          "val_loss": 0.507067,
+          "val_macro_f1": 0.994362
+        },
+        {
+          "epoch": 13,
+          "learning_rate": 1.29682e-05,
+          "train_loss": 0.496684,
+          "val_accuracy": 0.995202,
+          "val_loss": 0.505305,
+          "val_macro_f1": 0.995081
+        },
+        {
+          "epoch": 14,
+          "learning_rate": 3.2779e-06,
+          "train_loss": 0.496207,
+          "val_accuracy": 0.995402,
+          "val_loss": 0.504861,
+          "val_macro_f1": 0.995292
+        },
+        {
+          "epoch": 15,
+          "learning_rate": 0.0,
+          "train_loss": 0.496095,
+          "val_accuracy": 0.995802,
+          "val_loss": 0.504708,
+          "val_macro_f1": 0.995625
+        }
+      ],
+      "lightning_config_path": "best_config_v001.yaml",
+      "lightning_csv_path": "blobs/lightning_logs/agentic_model_v001/version_0/metrics.csv",
+      "schema_version": "1.0",
+      "seed": 42,
+      "training_log_path": "blobs/agentic_model_v001.training.jsonl"
+    },
+    "trial_compact_transformer_e4bc0782_e3_s001": {
+      "best_epoch": 3,
+      "candidate_id": "compact_transformer",
+      "checkpoint_path": "blobs/search/trial_compact_transformer_e4bc0782_e3_s001.ckpt",
+      "checkpoint_sha256": "8c16fe5688f5cd19a73bbba5fa08359852420523491b123e5e2c2f05ea1f7c15",
+      "config": {
+        "batch_size": 128,
+        "class_weighting": false,
+        "depth": 2,
+        "device": "cuda",
+        "dropout": 0.1,
+        "early_stopping_patience": 2,
+        "epochs": 3,
+        "gradient_clip_val": 1.0,
+        "hidden": 48,
+        "label_smoothing": 0.05,
+        "lr": 0.0005,
+        "mlp_ratio": 3,
+        "model_family": "compact_transformer",
+        "num_heads": 4,
+        "optimizer": "adamw",
+        "patch_size": 4,
+        "pooling": "attention",
+        "positional_encoding": "learned",
+        "rationale": "Convolutional tokenization adds a useful local-image prior before attention.",
+        "scheduler": "cosine",
+        "schema_version": "1.0",
+        "seed": 42,
+        "source": "heuristic:coverage",
+        "tokenizer_layers": 2,
+        "weight_decay": 0.0001
+      },
+      "config_hash": "e4bc0782bc1687671903469a39ef5f9e1a07d32fc90def5b1460148e0a94e1a3",
+      "decision_source": "heuristic:coverage",
+      "duration_seconds": 50.6457,
+      "error": null,
+      "lightning_csv_path": "blobs/search/lightning_logs/trial_compact_transformer_e4bc0782_e3_s001/version_0/metrics.csv",
+      "representation": {
+        "augmentations": [
+          "hflip",
+          "contrast"
+        ],
+        "normalization": "standardize",
+        "rationale": "Convolutional tokenization adds a useful local-image prior before attention."
+      },
+      "round_index": 1,
+      "schema_version": "1.0",
+      "status": "completed",
+      "training_log_path": "blobs/search/trial_compact_transformer_e4bc0782_e3_s001.training.jsonl",
+      "validation_accuracy": 0.945522,
+      "validation_balanced_accuracy": 0.944077,
+      "validation_macro_f1": 0.94517
+    },
+    "trial_residual_balanced_be4afb0b_e3_s001": {
+      "best_epoch": 3,
+      "candidate_id": "residual_balanced",
+      "checkpoint_path": "blobs/search/trial_residual_balanced_be4afb0b_e3_s001.ckpt",
+      "checkpoint_sha256": "593593b09ec4ab9d469ca5472616255898ca12229b679af5c40d79c707012639",
+      "config": {
+        "batch_size": 128,
+        "class_weighting": false,
+        "depth": 3,
+        "device": "cuda",
+        "dropout": 0.1,
+        "early_stopping_patience": 2,
+        "epochs": 3,
+        "gradient_clip_val": 1.0,
+        "hidden": 32,
+        "label_smoothing": 0.05,
+        "lr": 0.001,
+        "mlp_ratio": 4,
+        "model_family": "residual_cnn",
+        "num_heads": 4,
+        "optimizer": "adamw",
+        "patch_size": 4,
+        "pooling": "cls",
+        "positional_encoding": "learned",
+        "rationale": "Residual blocks, light regularisation and the strongest prior ablation.",
+        "scheduler": "cosine",
+        "schema_version": "1.0",
+        "seed": 42,
+        "source": "heuristic:coverage",
+        "tokenizer_layers": 2,
+        "weight_decay": 0.0001
+      },
+      "config_hash": "be4afb0bba188f4143cc28c9e4062b200fbc04222b9729e435b313ea1e26c37e",
+      "decision_source": "heuristic:coverage",
+      "duration_seconds": 23.5621,
+      "error": null,
+      "lightning_csv_path": "blobs/search/lightning_logs/trial_residual_balanced_be4afb0b_e3_s001/version_0/metrics.csv",
+      "representation": {
+        "augmentations": [
+          "hflip"
+        ],
+        "normalization": "standardize",
+        "rationale": "Residual blocks, light regularisation and the strongest prior ablation."
+      },
+      "round_index": 1,
+      "schema_version": "1.0",
+      "status": "completed",
+      "training_log_path": "blobs/search/trial_residual_balanced_be4afb0b_e3_s001.training.jsonl",
+      "validation_accuracy": 0.971811,
+      "validation_balanced_accuracy": 0.969391,
+      "validation_macro_f1": 0.971486
+    },
+    "trial_resnet18_capacity_wt_a836389a_e9_s001": {
+      "best_epoch": 8,
+      "candidate_id": "resnet18_capacity_wt",
+      "checkpoint_path": "blobs/search/trial_resnet18_capacity_wt_a836389a_e9_s001.ckpt",
+      "checkpoint_sha256": "f427dd8d9a04a7e6b7b62eb77ecfc03da22aa5eea0bad690f711714311a3ecf3",
+      "config": {
+        "batch_size": 128,
+        "class_weighting": true,
+        "depth": 4,
+        "device": "cuda",
+        "dropout": 0.15,
+        "early_stopping_patience": 5,
+        "epochs": 9,
+        "gradient_clip_val": 1.0,
+        "hidden": 48,
+        "label_smoothing": 0.1,
+        "lr": 0.0003,
+        "mlp_ratio": 4,
+        "model_family": "resnet18",
+        "num_heads": 4,
+        "optimizer": "adamw",
+        "patch_size": 4,
+        "pooling": "cls",
+        "positional_encoding": "learned",
+        "rationale": "Builds on the best prior resnet18 result (0.9908) by increasing hidden 32→48 and depth 3→4 for ~30% more capacity, while raising dropout to 0.15 and lowering lr to 3e-4 to maintain stability. Enables class_weighting to explicitly address the 1.63× class imbalance (minority classes at 7.9K vs majority at 12.9K). Adds rotate180 as a third augmentation for broader spatial invariance. Label smoothing increased to 0.1 for better calibration on the 9-class problem. All other hyperparameters (batch 128, AdamW, cosine, standardize, wd=1e-4) match the proven best configuration.",
+        "scheduler": "cosine",
+        "schema_version": "1.0",
+        "seed": 42,
+        "source": "qwen3.8",
+        "tokenizer_layers": 2,
+        "weight_decay": 0.0001
+      },
+      "config_hash": "a836389a52bcbde527ba7a79a781fe4d6d42bd19978cf9356feebcb1a2406734",
+      "decision_source": "qwen3.8",
+      "duration_seconds": 281.6299,
+      "error": null,
+      "lightning_csv_path": "blobs/search/lightning_logs/trial_resnet18_capacity_wt_a836389a_e9_s001/version_0/metrics.csv",
+      "representation": {
+        "augmentations": [
+          "hflip",
+          "vflip",
+          "rotate180"
+        ],
+        "normalization": "standardize",
+        "rationale": "Builds on the best prior resnet18 result (0.9908) by increasing hidden 32→48 and depth 3→4 for ~30% more capacity, while raising dropout to 0.15 and lowering lr to 3e-4 to maintain stability. Enables class_weighting to explicitly address the 1.63× class imbalance (minority classes at 7.9K vs majority at 12.9K). Adds rotate180 as a third augmentation for broader spatial invariance. Label smoothing increased to 0.1 for better calibration on the 9-class problem. All other hyperparameters (batch 128, AdamW, cosine, standardize, wd=1e-4) match the proven best configuration."
+      },
+      "round_index": 3,
+      "schema_version": "1.0",
+      "status": "completed",
+      "training_log_path": "blobs/search/trial_resnet18_capacity_wt_a836389a_e9_s001.training.jsonl",
+      "validation_accuracy": 0.994802,
+      "validation_balanced_accuracy": 0.994731,
+      "validation_macro_f1": 0.994648
+    },
+    "trial_resnet18_conservative_a48f20ec_e3_s001": {
+      "best_epoch": 3,
+      "candidate_id": "resnet18_conservative",
+      "checkpoint_path": "blobs/search/trial_resnet18_conservative_a48f20ec_e3_s001.ckpt",
+      "checkpoint_sha256": "c9c8c7cf60b9452353772e3fcb3c907b379f9f8ddf735baf261c02ec4f116f6b",
+      "config": {
+        "batch_size": 128,
+        "class_weighting": false,
+        "depth": 3,
+        "device": "cuda",
+        "dropout": 0.1,
+        "early_stopping_patience": 2,
+        "epochs": 3,
+        "gradient_clip_val": 1.0,
+        "hidden": 32,
+        "label_smoothing": 0.05,
+        "lr": 0.0005,
+        "mlp_ratio": 4,
+        "model_family": "resnet18",
+        "num_heads": 4,
+        "optimizer": "adamw",
+        "patch_size": 4,
+        "pooling": "cls",
+        "positional_encoding": "learned",
+        "rationale": "A CIFAR-style ResNet-18 tests additional capacity without ImageNet assumptions.",
+        "scheduler": "cosine",
+        "schema_version": "1.0",
+        "seed": 42,
+        "source": "heuristic:coverage",
+        "tokenizer_layers": 2,
+        "weight_decay": 0.0001
+      },
+      "config_hash": "a48f20ec5b39dcfa521be0fd90b99b200968d5e692ce83238014c1a5fa5d2c82",
+      "decision_source": "heuristic:coverage",
+      "duration_seconds": 46.569,
+      "error": null,
+      "lightning_csv_path": "blobs/search/lightning_logs/trial_resnet18_conservative_a48f20ec_e3_s001/version_0/metrics.csv",
+      "representation": {
+        "augmentations": [
+          "hflip",
+          "vflip"
+        ],
+        "normalization": "standardize",
+        "rationale": "A CIFAR-style ResNet-18 tests additional capacity without ImageNet assumptions."
+      },
+      "round_index": 1,
+      "schema_version": "1.0",
+      "status": "completed",
+      "training_log_path": "blobs/search/trial_resnet18_conservative_a48f20ec_e3_s001.training.jsonl",
+      "validation_accuracy": 0.978908,
+      "validation_balanced_accuracy": 0.978883,
+      "validation_macro_f1": 0.979072
+    },
+    "trial_resnet18_conservative_a48f20ec_e6_s001": {
+      "best_epoch": 6,
+      "candidate_id": "resnet18_conservative",
+      "checkpoint_path": "blobs/search/trial_resnet18_conservative_a48f20ec_e6_s001.ckpt",
+      "checkpoint_sha256": "05c63ce8224070de93476da3e583ee5f27782a554ca331a271eec8413688160b",
+      "config": {
+        "batch_size": 128,
+        "class_weighting": false,
+        "depth": 3,
+        "device": "cuda",
+        "dropout": 0.1,
+        "early_stopping_patience": 2,
+        "epochs": 6,
+        "gradient_clip_val": 1.0,
+        "hidden": 32,
+        "label_smoothing": 0.05,
+        "lr": 0.0005,
+        "mlp_ratio": 4,
+        "model_family": "resnet18",
+        "num_heads": 4,
+        "optimizer": "adamw",
+        "patch_size": 4,
+        "pooling": "cls",
+        "positional_encoding": "learned",
+        "rationale": "A CIFAR-style ResNet-18 tests additional capacity without ImageNet assumptions.",
+        "scheduler": "cosine",
+        "schema_version": "1.0",
+        "seed": 42,
+        "source": "promotion:incumbent",
+        "tokenizer_layers": 2,
+        "weight_decay": 0.0001
+      },
+      "config_hash": "a48f20ec5b39dcfa521be0fd90b99b200968d5e692ce83238014c1a5fa5d2c82",
+      "decision_source": "promotion:incumbent",
+      "duration_seconds": 93.1633,
+      "error": null,
+      "lightning_csv_path": "blobs/search/lightning_logs/trial_resnet18_conservative_a48f20ec_e6_s001/version_0/metrics.csv",
+      "representation": {
+        "augmentations": [
+          "hflip",
+          "vflip"
+        ],
+        "normalization": "standardize",
+        "rationale": "A CIFAR-style ResNet-18 tests additional capacity without ImageNet assumptions."
+      },
+      "round_index": 2,
+      "schema_version": "1.0",
+      "status": "completed",
+      "training_log_path": "blobs/search/trial_resnet18_conservative_a48f20ec_e6_s001.training.jsonl",
+      "validation_accuracy": 0.990804,
+      "validation_balanced_accuracy": 0.990693,
+      "validation_macro_f1": 0.990802
+    },
+    "trial_resnet18_conservative_a48f20ec_e9_s001": {
+      "best_epoch": 9,
+      "candidate_id": "resnet18_conservative",
+      "checkpoint_path": "blobs/search/trial_resnet18_conservative_a48f20ec_e9_s001.ckpt",
+      "checkpoint_sha256": "18562668aa3306c90e0bcbc6b06c01bc769b1bfafe8fa1275aded4a8b39b91e6",
+      "config": {
+        "batch_size": 128,
+        "class_weighting": false,
+        "depth": 3,
+        "device": "cuda",
+        "dropout": 0.1,
+        "early_stopping_patience": 2,
+        "epochs": 9,
+        "gradient_clip_val": 1.0,
+        "hidden": 32,
+        "label_smoothing": 0.05,
+        "lr": 0.0005,
+        "mlp_ratio": 4,
+        "model_family": "resnet18",
+        "num_heads": 4,
+        "optimizer": "adamw",
+        "patch_size": 4,
+        "pooling": "cls",
+        "positional_encoding": "learned",
+        "rationale": "A CIFAR-style ResNet-18 tests additional capacity without ImageNet assumptions.",
+        "scheduler": "cosine",
+        "schema_version": "1.0",
+        "seed": 42,
+        "source": "promotion:incumbent",
+        "tokenizer_layers": 2,
+        "weight_decay": 0.0001
+      },
+      "config_hash": "a48f20ec5b39dcfa521be0fd90b99b200968d5e692ce83238014c1a5fa5d2c82",
+      "decision_source": "promotion:incumbent",
+      "duration_seconds": 140.9112,
+      "error": null,
+      "lightning_csv_path": "blobs/search/lightning_logs/trial_resnet18_conservative_a48f20ec_e9_s001/version_0/metrics.csv",
+      "representation": {
+        "augmentations": [
+          "hflip",
+          "vflip"
+        ],
+        "normalization": "standardize",
+        "rationale": "A CIFAR-style ResNet-18 tests additional capacity without ImageNet assumptions."
+      },
+      "round_index": 3,
+      "schema_version": "1.0",
+      "status": "completed",
+      "training_log_path": "blobs/search/trial_resnet18_conservative_a48f20ec_e9_s001.training.jsonl",
+      "validation_accuracy": 0.991104,
+      "validation_balanced_accuracy": 0.991005,
+      "validation_macro_f1": 0.991034
+    },
+    "trial_tiny_regularized_ee0112db_e6_s001": {
+      "best_epoch": 6,
+      "candidate_id": "tiny_regularized",
+      "checkpoint_path": "blobs/search/trial_tiny_regularized_ee0112db_e6_s001.ckpt",
+      "checkpoint_sha256": "c031358bc67d09def52daab4477ae1650bb7df7f2ea60753368dbcf6b25e9d76",
+      "config": {
+        "batch_size": 128,
+        "class_weighting": false,
+        "depth": 2,
+        "device": "cuda",
+        "dropout": 0.15,
+        "early_stopping_patience": 2,
+        "epochs": 6,
+        "gradient_clip_val": 1.0,
+        "hidden": 32,
+        "label_smoothing": 0.0,
+        "lr": 0.001,
+        "mlp_ratio": 4,
+        "model_family": "tiny_cnn",
+        "num_heads": 4,
+        "optimizer": "adamw",
+        "patch_size": 4,
+        "pooling": "cls",
+        "positional_encoding": "learned",
+        "rationale": "Low-cost control close to the best representation ablation.",
+        "scheduler": "cosine",
+        "schema_version": "1.0",
+        "seed": 42,
+        "source": "heuristic:coverage",
+        "tokenizer_layers": 2,
+        "weight_decay": 0.0001
+      },
+      "config_hash": "ee0112dbd7f76abe21f15f2c67d751ad56cbb19cee14dbf628ff821faa1f242a",
+      "decision_source": "heuristic:coverage",
+      "duration_seconds": 35.6523,
+      "error": null,
+      "lightning_csv_path": "blobs/search/lightning_logs/trial_tiny_regularized_ee0112db_e6_s001/version_0/metrics.csv",
+      "representation": {
+        "augmentations": [
+          "hflip"
+        ],
+        "normalization": "standardize",
+        "rationale": "Low-cost control close to the best representation ablation."
+      },
+      "round_index": 2,
+      "schema_version": "1.0",
+      "status": "completed",
+      "training_log_path": "blobs/search/trial_tiny_regularized_ee0112db_e6_s001.training.jsonl",
+      "validation_accuracy": 0.920832,
+      "validation_balanced_accuracy": 0.919422,
+      "validation_macro_f1": 0.919078
+    },
+    "trial_vit_patch4_2c7c1bdc_e6_s001": {
+      "best_epoch": 6,
+      "candidate_id": "vit_patch4",
+      "checkpoint_path": "blobs/search/trial_vit_patch4_2c7c1bdc_e6_s001.ckpt",
+      "checkpoint_sha256": "6c8a139b8797649d1fb19fcd59248124a409df81ff769ede55e8c10839fd2129",
+      "config": {
+        "batch_size": 128,
+        "class_weighting": false,
+        "depth": 3,
+        "device": "cuda",
+        "dropout": 0.1,
+        "early_stopping_patience": 2,
+        "epochs": 6,
+        "gradient_clip_val": 1.0,
+        "hidden": 64,
+        "label_smoothing": 0.05,
+        "lr": 0.0003,
+        "mlp_ratio": 3,
+        "model_family": "vision_transformer",
+        "num_heads": 8,
+        "optimizer": "adamw",
+        "patch_size": 2,
+        "pooling": "mean",
+        "positional_encoding": "sinusoidal",
+        "rationale": "A fine-grained patch-2 ViT tests global interactions over 196 tissue tokens.",
+        "scheduler": "cosine",
+        "schema_version": "1.0",
+        "seed": 42,
+        "source": "heuristic:coverage",
+        "tokenizer_layers": 2,
+        "weight_decay": 0.0001
+      },
+      "config_hash": "2c7c1bdc28e963e180253598010a9ae4e5d77863a501ea10b202bd2970bddb58",
+      "decision_source": "heuristic:coverage",
+      "duration_seconds": 174.9878,
+      "error": null,
+      "lightning_csv_path": "blobs/search/lightning_logs/trial_vit_patch4_2c7c1bdc_e6_s001/version_0/metrics.csv",
+      "representation": {
+        "augmentations": [
+          "hflip",
+          "vflip"
+        ],
+        "normalization": "standardize",
+        "rationale": "A fine-grained patch-2 ViT tests global interactions over 196 tissue tokens."
+      },
+      "round_index": 2,
+      "schema_version": "1.0",
+      "status": "completed",
+      "training_log_path": "blobs/search/trial_vit_patch4_2c7c1bdc_e6_s001.training.jsonl",
+      "validation_accuracy": 0.961515,
+      "validation_balanced_accuracy": 0.961074,
+      "validation_macro_f1": 0.961234
+    }
+  },
+  "run_id": "seed_42",
+  "status": "completed_with_warning",
+  "updated_at": "2026-10-01T16:37:29.355538+00:00"
+}

@@ -1,0 +1,147 @@
+{
+  "payload": {
+    "decision": {
+      "analysis": "PathMNIST presents a compact 28x28x3 classification problem with ~90K training samples across 9 moderately imbalanced classes (ratio 1.63x). The channel statistics reveal a notably higher-variance green channel (std 0.177 vs ~0.124 for R and B), suggesting tissue-specific spectral information concentrated there. The dataset was explicitly designed for lightweight models, and the small spatial extent (28x28) constrains both receptive-field depth and the number of meaningful spatial tokens for attention-based models.\n\nArchitecture selection should be guided by three constraints: (1) parameter budget under ~5M to match the dataset's lightweight design intent and prevent overfitting at 90K samples; (2) spatial resolution preservation\u2014aggressive downsampling (e.g., stride-2 pooling chains) wastes the limited 28x28 signal; (3) the ability to capture both local texture (nuclear morphology, gland boundaries) and global tissue context (architectural patterns) that distinguish the 9 pathology classes.\n\nFor CNNs, tiny_cnn (3-5 conv blocks, global average pooling) is the fastest-to-train baseline and the natural first point of comparison. residual_cnn adds skip connections at modest parameter cost, improving gradient flow for 4-6 block depths. resnet18, already configured with a CIFAR-style 3x3 stride-1 stem and no max-pooling, is a reasonable mid-depth option but its 18-block depth may be excessive for 28x28 inputs at 90K samples; it should be treated as an upper-bound capacity check rather than a primary candidate.\n\nFor transformers, compact_transformer with a convolutional tokenizer is strongly preferred over vision_transformer. The conv tokenizer (e.g., a 7x7 conv with stride 7 producing 16 tokens, or 14x14 stride 14 producing 4 tokens) preserves local spatial structure in each token while allowing self-attention to model inter-token relationships. With 2-4 attention layers, 4-6 heads, and a hidden dimension of 128-256, the total parameter count stays in the 1-4M range, consistent with CCT's demonstrated success on CIFAR-10 at 3.7M params. vision_transformer with fixed patch embedding is a valid ablation but offers no advantage over the conv-tokenized variant at this resolution and adds a non-learnable projection that is less adaptive to the pathology texture distribution.\n\nTraining architecture should emphasize: (a) channel-wise normalization using the provided mean/std; (b) horizontal-flip augmentation as a primary regularizer given moderate per-class counts (7.8K-12.9K); (c) class-weighted cross-entropy or focal loss to address the 1.63x imbalance; (d) cosine or step LR schedule with warmup; (e) weight decay in the 1e-4 to 1e-3 range; (f) batch size 128-256 to balance gradient noise and memory. Temperature scaling on the validation split is a low-cost post-hoc calibration step worth including in the pipeline.\n\nThe search should proceed in two phases: Phase 1 establishes the tiny_cnn and compact_transformer baselines with a tight hyperparameter grid (LR, weight decay, dropout, augmentation strength). Phase 2 introduces residual_cnn and resnet18 as capacity ablations, and vision_transformer as a tokenization ablation against compact_transformer. This ordering maximizes information per experiment and keeps wall-clock time bounded.",
+      "architecture_priorities": [
+        "tiny_cnn",
+        "compact_transformer",
+        "residual_cnn",
+        "resnet18",
+        "vision_transformer"
+      ],
+      "parametrization_priorities": [
+        "Total parameter budget: target 1-4M for compact_transformer, 0.5-2M for tiny_cnn/residual_cnn, up to 11M for resnet18 as an upper-bound check only",
+        "Learning rate: 1e-3 to 5e-4 for CNNs with AdamW; 1e-4 to 5e-4 for transformers with AdamW and 200-500 step linear warmup",
+        "Weight decay: 1e-4 to 1e-3 for CNNs; 0.05-0.1 for transformers (decoupled weight decay via AdamW)",
+        "Batch size: 128-256; use gradient accumulation if memory-constrained to maintain effective batch \u2265128",
+        "Transformer depth: 2-4 attention layers; hidden dim 128-256; 4-6 attention heads; FFN expansion ratio 2-4x",
+        "CNN depth: 3-5 conv blocks for tiny_cnn; 4-6 residual blocks for residual_cnn; resnet18 at full depth only as capacity ablation",
+        "Class imbalance handling: class-weighted cross-entropy with weights inversely proportional to class frequency, or focal loss with gamma=2.0",
+        "Training epochs: 50-100 with early stopping on validation loss (patience 10-15 epochs); cosine LR decay to 0 over the full schedule"
+      ],
+      "representation_priorities": [
+        "Channel-wise normalization using provided mean [0.741, 0.533, 0.706] and std [0.124, 0.177, 0.124]; the green channel's higher variance should be preserved, not suppressed",
+        "For compact_transformer: convolutional tokenizer with 7x7 kernel, stride 7, producing 16 spatial tokens of dimension (16, D); alternative 14x14 stride 14 yielding 4 tokens for a coarser ablation",
+        "For vision_transformer: 7x7 fixed patches yielding 16 tokens; avoid 14x14 (only 4 tokens) as primary config due to excessive information loss per token",
+        "For all CNNs: global average pooling over the final feature map rather than flattening + fully-connected, to reduce parameter count and overfitting risk",
+        "Preserve spatial resolution through the network: prefer stride-1 convolutions with 3x3 kernels over stride-2 pooling; at most 2-3 spatial downsampling steps for 28x28 input",
+        "Learnable positional encodings for transformer tokens; avoid sinusoidal fixed encodings which are less adaptive to pathology texture patterns",
+        "Dropout (0.1-0.3) on transformer attention outputs and CNN fully-connected heads; avoid dropout on early conv layers where it disrupts local feature learning",
+        "Horizontal flip augmentation as the primary spatial regularizer; consider mild random rotation (\u00b110 degrees) as a secondary augmentation given the 28x28 constraint"
+      ],
+      "risks": [
+        "Overfitting: 90K samples across 9 classes (~10K per class) is moderate; transformer architectures with >4M params or >4 layers risk memorizing training patterns, especially on the minority classes",
+        "Class imbalance (1.63x): without class-weighted loss or focal loss, the model will bias toward majority classes; validate per-class F1, not just macro accuracy",
+        "Spatial resolution loss: aggressive downsampling (stride-2 pooling, large patch sizes) on 28x28 inputs destroys fine nuclear morphology that distinguishes pathology classes",
+        "Channel variance asymmetry: the green channel (std 0.177) carries disproportionately more signal; uniform channel treatment or incorrect normalization may underweight this channel",
+        "Transformer training instability: at 28x28 with only 16 tokens, attention matrices are small but the limited token count means each token must carry substantial information; poor initialization or too-high LR can cause attention collapse",
+        "resnet18 depth mismatch: 18 residual blocks on a 28x28 input with 90K samples may over-parameterize relative to the signal available; treat as an upper-bound check, not a primary candidate",
+        "Augmentation domain shift: horizontal flip is safe for pathology, but rotation or elastic deformation may alter tissue architecture in ways that do not reflect real biological variation, potentially hurting generalization",
+        "Calibration gap: high accuracy does not guarantee well-calibrated probabilities; without temperature scaling or label smoothing, predicted confidences may be miscalibrated, which is critical for medical decision support"
+      ],
+      "transformer_guidance": "compact_transformer is the primary transformer candidate. Its convolutional tokenizer should be configured as a single 7x7 conv (stride 7, padding 0) mapping 28x28x3 \u2192 16 tokens of dimension D (128 or 256). This preserves local 7x7 texture in each token while allowing self-attention to model inter-token spatial relationships (e.g., gland-to-stroma context). An alternative 14x14 stride-14 tokenizer yielding 4 tokens should be tested as a coarser ablation but is not the primary config. Use 2-4 transformer blocks, each with multi-head self-attention (4-6 heads), layer norm, and a position-wise FFN (2-4x expansion). Total parameters should stay under 4M. Learnable positional encodings of shape (16, D) are preferred over sinusoidal. A classification head (mean-pool over tokens \u2192 linear \u2192 9 classes) is sufficient; avoid per-token classification heads which add parameters without clear benefit at this token count.\n\nvision_transformer serves as a tokenization ablation: replace the conv tokenizer with a fixed 7x7 patch linear projection (28/7=4, so 4x4=16 patches, each projected from 147 to D). This isolates the effect of learnable vs. fixed tokenization. Expect it to perform at or slightly below compact_transformer, since the conv tokenizer can adapt its receptive field to pathology texture while the fixed projection cannot.\n\nCritical training differences for transformers vs. CNNs: (1) use a longer warmup (200-500 steps) before the main LR schedule; (2) apply label smoothing (0.1) to the cross-entropy loss to prevent overconfident predictions on the 9-class problem; (3) use a smaller initial LR (1e-4 to 3e-4) than CNNs to avoid destabilizing the attention weights in early training; (4) apply dropout (0.1) to attention weight matrices and FFN outputs, but not to layer norm or positional encodings; (5) if training is unstable, reduce to 2 layers and D=128 before increasing depth.\n\nDo NOT use a 7x7 stride-2 ImageNet-style stem for any architecture. The resnet18 implementation already uses a 3x3 stride-1 stem appropriate for 28x28 inputs. All spatial downsampling should be explicit and limited to at most 2-3 steps across the full network depth."
+    },
+    "request": {
+      "fallback": {
+        "analysis": "PathMNIST has small 28x28 RGB tissue patches and a separate-centre test set. Compare convolutional inductive biases with compact global attention under identical validation-only budgets.",
+        "architecture_priorities": [
+          "compact_transformer",
+          "vision_transformer",
+          "residual_cnn",
+          "resnet18"
+        ],
+        "parametrization_priorities": [
+          "use AdamW, moderate decay and cosine scheduling for transformers",
+          "control capacity, regularization and batch size across families"
+        ],
+        "representation_priorities": [
+          "compare train-statistic standardization with unit scaling",
+          "use only label-preserving orientation augmentations"
+        ],
+        "risks": [
+          "pure ViT can be data-inefficient without pretraining",
+          "validation gains may not transfer to the external-centre test split"
+        ],
+        "transformer_guidance": "Explore 2x2, 4x4 or 7x7 ViT patches, compatible head counts, pooling and positional encodings; for CCT vary one to three tokenizer layers."
+      },
+      "model": "qwen3.8",
+      "schema": {
+        "additionalProperties": false,
+        "description": "Cross-cutting guidance spanning representation, tuning and architecture.",
+        "properties": {
+          "analysis": {
+            "maxLength": 12000,
+            "minLength": 3,
+            "title": "Analysis",
+            "type": "string"
+          },
+          "architecture_priorities": {
+            "items": {
+              "enum": [
+                "tiny_cnn",
+                "residual_cnn",
+                "resnet18",
+                "vision_transformer",
+                "compact_transformer"
+              ],
+              "type": "string"
+            },
+            "maxItems": 5,
+            "minItems": 1,
+            "title": "Architecture Priorities",
+            "type": "array"
+          },
+          "parametrization_priorities": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 8,
+            "minItems": 1,
+            "title": "Parametrization Priorities",
+            "type": "array"
+          },
+          "representation_priorities": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 8,
+            "minItems": 1,
+            "title": "Representation Priorities",
+            "type": "array"
+          },
+          "risks": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 8,
+            "title": "Risks",
+            "type": "array"
+          },
+          "transformer_guidance": {
+            "maxLength": 6000,
+            "minLength": 3,
+            "title": "Transformer Guidance",
+            "type": "string"
+          }
+        },
+        "required": [
+          "analysis",
+          "representation_priorities",
+          "parametrization_priorities",
+          "architecture_priorities",
+          "transformer_guidance"
+        ],
+        "title": "ArchitectureResearchDecision",
+        "type": "object"
+      },
+      "seed": 47,
+      "stage": "architecture_research",
+      "system": "You are the cross-cutting research architect for representation, hyperparameterization and training architecture. Produce bounded, actionable guidance for the downstream search. Never use test metrics. The available architectures are tiny_cnn, residual_cnn, resnet18, vision_transformer and compact_transformer. Implementation facts: inputs are 28x28 RGB; resnet18 already uses a CIFAR-style 3x3, stride-1 stem without max-pooling; compact_transformer uses a configurable convolutional tokenizer. Do not infer an ImageNet 7x7 stride-2 stem.",
+      "user": "image_shape=(28, 28, 3); train_samples=89996; val_samples=10004; imbalance=1.633908; channel_mean=[0.740545, 0.53298219, 0.70582885]; channel_std=[0.12368222, 0.17676253, 0.12443067]; evidence=['https://openreview.net/forum?id=YicbFdNTTy', 'https://arxiv.org/abs/2104.05704', 'https://doi.org/10.1038/s41597-022-01721-8']; cited_hypotheses=[{\"evidence_quote\": \"with the right size, convolutional tokenization, transformers can avoid overfitting and outperform state-of-the-art CNNs on small datasets\", \"hypothesis\": \"A compact transformer using convolutional tokenization (rather than fixed-size patch embedding) can be adapted to the 28x28x3 PathMNIST input, leveraging the fact that CCT demonstrated competitive accuracy on CIFAR-10 (32x32x3) with only 3.7M parameters. For PathMNIST's ~90K training samples across 9 classes, a similarly sized conv-tokenized transformer (1-4M params) with 2-4 attention layers may avoid overfitting while capturing inter-pixel dependencies that a plain CNN misses, particularly for subtle histological patterns.\", \"idea_id\": \"cct_conv_tokenization\", \"source_id\": \"arxiv_2104_05704v4\", \"status\": \"hypothesis_to_validate\", \"target\": \"architecture\"}, {\"evidence_quote\": \"a pure transformer applied directly to sequences of image patches can perform very well on image classification tasks\", \"hypothesis\": \"Applying a pure self-attention mechanism over a small number of spatial tokens (e.g., 4 tokens from 14x14 patches or 16 tokens from 7x7 patches) on the 28x28x3 PathMNIST input could model global tissue-context relationships (e.g., gland architecture, stromal patterns) that local convolutions struggle to capture, provided the token count is kept small to avoid overfitting on ~90K samples.\", \"idea_id\": \"vit_small_patch_attention\", \"source_id\": \"arxiv_2010_11929v2\", \"status\": \"hypothesis_to_validate\", \"target\": \"representation\"}, {\"evidence_quote\": \"All images are pre-processed into a small size of 28x28 (2D) or 28x28x28 (3D) with the corresponding classification labels so that no background knowledge is required for users.\", \"hypothesis\": \"Because PathMNIST images are standardized to 28x28 with no required domain preprocessing, the architecture should be lightweight (fewer than 5M parameters) to match the dataset's design intent for 'lightweight 2D images' and to prevent overfitting given the moderate class sizes (7.8K-12.9K per class). A shallow CNN backbone (3-5 conv blocks) with global average pooling is a strong baseline to beat.\", \"idea_id\": \"medmnist_lightweight_design\", \"source_id\": \"arxiv_2110_14795v2\", \"status\": \"hypothesis_to_validate\", \"target\": \"architecture\"}, {\"evidence_quote\": \"GhostNet-VGG is shown to be the most robust to overall performance drop at lower precision.\", \"hypothesis\": \"GhostNet-VGG-style architecture (combining ghost modules for cheap feature generation with VGG-like depth) is a robust backbone for PathMNIST, as it was shown to be the most robust to performance degradation under quantization. Even without quantization, its efficient feature generation may provide a favorable bias-variance trade-off for the 28x28x3 pathology input with 9 classes.\", \"idea_id\": \"ghostnet_vgg_robustness\", \"source_id\": \"arxiv_2309_13866v2\", \"status\": \"hypothesis_to_validate\", \"target\": \"architecture\"}, {\"evidence_quote\": \"We find that temperature scaling can improve calibration error for quantized networks, with some caveats.\", \"hypothesis\": \"Applying temperature scaling as a post-hoc calibration step during training on PathMNIST can improve the reliability of predicted class probabilities, which is important for medical decision support. This is a low-cost training modification that does not change the architecture and can be validated on the training split.\", \"idea_id\": \"temperature_scaling_calibration\", \"source_id\": \"arxiv_2309_13866v2\", \"status\": \"hypothesis_to_validate\", \"target\": \"training\"}, {\"evidence_quote\": \"Our findings highlight the trade-offs between computational speed and model accuracy, offering valuable insights for researchers and practitioners in medical image analysis.\", \"hypothesis\": \"The choice of deep-learning framework (Keras vs PyTorch vs JAX) introduces measurable differences in training efficiency and convergence behavior on PathMNIST. Selecting the framework with the best accuracy-per-second trade-off for a 28x28x3, 9-class problem can reduce wall-clock training time without sacrificing final accuracy, which is relevant for iterative experimentation.\", \"idea_id\": \"framework_training_efficiency\", \"source_id\": \"arxiv_2507_12248v1\", \"status\": \"hypothesis_to_validate\", \"target\": \"training\"}, {\"evidence_quote\": \"We also analyse the impact of data augmentation on the quality of unlearning.\", \"hypothesis\": \"Data augmentation (particularly horizontal flipping) serves as a critical regularizer for PathMNIST training, as evidenced by its measured impact on model quality in related medical image classification experiments. Given the moderate per-class sample sizes (7.8K-12.9K), augmentation can effectively double the training signal and reduce overfitting risk.\", \"idea_id\": \"augmentation_regularization\", \"source_id\": \"arxiv_2508_18509v1\", \"status\": \"hypothesis_to_validate\", \"target\": \"training\"}]"
+    },
+    "request_sha256": "e74d011c076f0552a87a8262910941287e677d37c9bc669212579b6d2609628b",
+    "source": "qwen3.8",
+    "used_fallback": false
+  },
+  "sha256": "50a40ebd99f9a66355d2087e50bef4d32aa3ad8176ea3010fee6971607ae306d"
+}

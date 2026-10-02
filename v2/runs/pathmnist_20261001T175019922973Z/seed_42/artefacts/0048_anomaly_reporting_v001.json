@@ -1,0 +1,28 @@
+{
+  "artefact": "anomaly_reporting",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T18:22:08.305571+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "Reporting stage is internally consistent and complete. All deterministic cross-checks pass: (1) abstain_rate × 7180 = 2711 matches human_review_count exactly; (2) test_coverage + abstain_rate = 1.0; (3) confusion matrix row sums equal per-class supports and total 7180; (4) macro_recall, macro_precision, macro_f1, and accuracy all reproduce from the confusion matrix; (5) selective_risk and threshold correspond to the 0.8 target_validation_coverage row in the risk_coverage_curve; (6) search completed 8/8 trials with 0 failures, test_metrics_used=false, test_locked=true. No deterministic findings are present, so no stop is warranted.\n\nWarnings carried forward (non-blocking): (a) Model family label 'resnet18' coexists with transformer-style config fields (patch_size, num_heads, positional_encoding, pooling=cls); this naming ambiguity propagates into the abstention report provenance and OOD evidence file and could confuse downstream consumers—recommend a clarifying note in the dossier. (b) Aggregate ood_auroc (0.823189) differs from the arithmetic mean of the six per-scenario test AUROCs (0.823539) by ~0.0004, consistent with pooled-data computation, but the method is not explicitly stated in the report. (c) Validation-test accuracy gap of ~10.7 pp (0.9965 vs 0.8896) and notably weak per-class performance for cancer-associated stroma (recall 0.551) and smooth muscle (precision 0.583) mean the 2,711 human-review samples are disproportionately drawn from these classes; this should be annotated in any downstream benchmark interpretation. (d) Augmentation set (hflip, vflip, rotate180) deviates from the research-recommended set without explicit justification. None of these constitute deterministic errors in the reporting artefacts; they are documentation and performance-observation warnings that should be surfaced in the final dossier narrative.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Model family label 'resnet18' combined with transformer-style config fields (patch_size, num_heads, positional_encoding, pooling=cls) creates naming ambiguity that propagates into abstention report provenance and OOD evidence file",
+      "Aggregate ood_auroc (0.823189) vs arithmetic mean of per-scenario test AUROCs (0.823539) differs by ~0.0004; pooled-data computation method not explicitly documented in the report",
+      "Validation-test accuracy gap of ~10.7 pp (0.9965 val vs 0.8896 test) suggests overfitting or distribution shift; warrants annotation in final dossier",
+      "Cancer-associated stroma (class 7) recall 0.551 and smooth muscle (class 5) precision 0.583 are the weakest per-class metrics; 2,711 human-review samples are disproportionately drawn from these classes",
+      "Augmentation set (hflip, vflip, rotate180) deviates from research-recommended set (hflip, rotation ±10°, translation ±2px) without explicit justification in rationale",
+      "config_hash shared between 9-epoch search trial and 15-epoch final training despite differing epochs and patience; hash scope should be documented in dossier"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "reporting"
+  },
+  "payload_sha256": "318e73187bd61b6f901dba483a25ceb91b1675a516197aea2c563ed3addc5eff",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 48,
+  "version": 1
+}

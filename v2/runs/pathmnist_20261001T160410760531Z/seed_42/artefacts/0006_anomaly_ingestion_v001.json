@@ -1,0 +1,23 @@
+{
+  "artefact": "anomaly_ingestion",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T16:04:31.165779+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Ingestion stage is clean. All deterministic checks pass: (1) Archive MD5 (a8b06965200029087d5bd730944a56c1) matches the verified hash; SHA256 is recorded. (2) Loaded split sizes (train=89996, val=10004, test=7180) exactly match the official PathMNIST split sizes. (3) Dataset is correctly identified as 28×28 RGB (n_channels=3), 9-class multi-class, consistent with the standard MedMNIST distribution. (4) All three selected_index_sha256 values are present. (5) No artefacts omitted. (6) Run manifest records seed=42, deterministic_torch=true, and a full package-version pin. (7) The test_domain_note (CRC-VAL-HE-7K from a different clinical center) is expected for PathMNIST and is properly documented. Minor observation (non-blocking): llm_model_digest is null, meaning the exact Ollama model weights for 'qwen3.8' are not content-addressed; this does not affect the ingestion stage but should be noted for downstream reproducibility auditing. No deterministic findings were raised. Proceed to the next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "llm_model_digest is null; the exact Ollama model artifact for 'qwen3.8' is not content-addressed, which weakens full reproducibility of any LLM-assisted steps downstream (informational, non-blocking)."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "ingestion"
+  },
+  "payload_sha256": "6115754fbdc15c0fda378915c82b74950cee5f25c3f66f8339530f98711ad135",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 6,
+  "version": 1
+}

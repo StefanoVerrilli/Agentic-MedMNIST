@@ -1,0 +1,24 @@
+{
+  "artefact": "anomaly_profiling",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T18:54:20.262279+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Profiling stage evidence is internally consistent and passes all deterministic checks. Verified specifics: (1) Split sizes (train=89996, val=10004, test=7180) match the official PathMNIST distribution; subsampled=false confirms full dataset. (2) Class counts sum correctly: train=89996, val=10004. (3) Class proportions between train and val differ by <0.001 across all 9 classes, confirming no split-level distribution shift. (4) Imbalance ratio 1.634 (12885/7886) is modest and consistent with the known PathMNIST distribution. (5) Image shape [28,28,3] matches the standard MedMNIST PathMNIST specification. (6) Channel means [0.741, 0.533, 0.706] and stds [0.124, 0.177, 0.124] are in [0,1] unit scale and reasonable for RGB histology patches. (7) Zero blank images, zero duplicate train samples. (8) Archive MD5/SHA-256 integrity confirmed. (9) 9-class label set matches the canonical PathMNIST taxonomy. (10) Ambiguity risks (background/debris/mucus overlap, adipose vs. background, smooth muscle vs. stroma, etc.) are well-documented and expected at 28×28 resolution; they are informational, not defects. (11) Test-domain note (CRC-VAL-HE-7K, different clinical center) is a known PathMNIST characteristic and is correctly recorded. Minor non-blocking note: llm_model_digest is null in the run manifest, meaning the exact qwen3.8 weight revision used by Ollama is not pinned; this is a reproducibility gap for any LLM-assisted downstream steps but does not affect the deterministic profiling results. No deterministic findings were raised. All evidence is consistent; proceed to the next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "llm_model_digest is null — the exact qwen3.8 weight revision used by Ollama is not pinned in the run manifest, creating a reproducibility gap for any LLM-assisted downstream steps (non-blocking for profiling).",
+      "test_imbalance_ratio is reported as 1.0 and test_to_train_prevalence_ratio is empty; the test split (7180 samples) was not included in the class-count profiling (samples_profiled=100000 = train+val only). This is acceptable as a held-out set but means test-set class balance is unverified at this stage."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "profiling"
+  },
+  "payload_sha256": "522ddb975aee6b32bc364fcf1c502326d8936225b90adb6714a9255b6c1ee298",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 8,
+  "version": 1
+}

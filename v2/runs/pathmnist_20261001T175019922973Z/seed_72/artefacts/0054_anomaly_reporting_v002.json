@@ -1,0 +1,29 @@
+{
+  "artefact": "anomaly_reporting",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-01T19:24:34.420304+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "The reporting stage is mechanically correct: all cross-referenced numbers are internally consistent (confusion-matrix row sums match per-class supports totalling 7,180; abstain rate 0.411003 × 7,180 = 2,951 matches human_review_count; base_test_accuracy 0.883426 is identical across evaluation and abstention reports; accuracy_delta 0.055292 is arithmetically correct; common seed 72 and split fingerprint 9afc9ed3… are identical across agentic and baseline reports). No deterministic findings are present.\n\nHowever, the three anomaly reports (abstention, comparison, reporting) consistently flag substantive concerns that the final report should address before it is considered complete:\n\n1. **OOD detection is anti-correlated at high noise.** At sigma_0.4, AUROC drops to 0.134 (max_softmax) and 0.125 (predictive_entropy), both below 0.5. The abstention mechanism will accept the most corrupted inputs. ood_pass=false is correctly reported, but the report should explicitly state that the selective-risk guarantee does not extend to this corruption regime and that the controlled-corruption proxy is insufficient for production OOD assurance.\n\n2. **Val-to-test transfer gap undermines the selective-risk guarantee.** At the 0.8 target operating point, validation coverage is 0.800 but test coverage is only 0.589 (~21 pp gap), and validation risk is 0.000375 while test risk is 0.030031 (~80× gap). The report should flag this as a material limitation of the threshold calibrated on validation and recommend re-calibration or conformal-style guarantees before any production deployment.\n\n3. **Per-class weakness is under-emphasised.** Class 7 (cancer-associated stroma) has test recall of only 49.4 % (208/421), with 94 misclassified as debris and 75 as smooth muscle. The headline accuracy comparison (88.34 % vs 82.81 %) masks this. The report should include macro-F1 or balanced-accuracy deltas and a per-class breakdown in the comparison section.\n\n4. **Config hygiene.** Both the ResNet18 train_config and the tiny_cnn baseline config contain transformer-specific fields (num_heads, patch_size, mlp_ratio, tokenizer_layers, pooling, positional_encoding) that are irrelevant to their respective architectures. This is a reproducibility/clarity issue that should be noted.\n\n5. **Val-to-test accuracy gap (~11.3 pp).** Validation accuracy is 99.59 % while test accuracy is 88.34 %. While some gap is expected, this magnitude warrants an explicit note in the report about potential distribution shift between splits and the implications for the reliability of the reported metrics.\n\n6. **Single abstention score.** Only max_softmax was evaluated. Given the sub-chance AUROC at high noise, the report should note that no ensemble, energy, or Mahalanobis-based alternative was explored, limiting the robustness of the abstention mechanism.\n\nNone of these issues constitute deterministic errors in the reporting pipeline. They are completeness and framing concerns that should be addressed in the final report narrative. The report is factually accurate but would benefit from the above contextual caveats before being considered production-ready.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "OOD AUROC at sigma_0.4 is below 0.5 for both max_softmax (0.134) and predictive_entropy (0.125); the abstention mechanism accepts the most corrupted inputs; report should explicitly state the selective-risk guarantee does not extend to this regime",
+      "Validation-to-test coverage gap of ~21 pp (0.800 val vs 0.589 test) and risk gap of ~80× (0.000375 val vs 0.030031 test) at the 0.8 target operating point; report should flag this as a material limitation of the validation-calibrated threshold",
+      "Class 7 test recall is only 49.4 % (208/421); the headline accuracy comparison masks this per-class weakness; report should include macro-F1 or balanced-accuracy deltas and per-class breakdown",
+      "Val-to-test accuracy gap of ~11.3 pp (99.59 % val vs 88.34 % test) warrants an explicit note about potential distribution shift between splits",
+      "Transformer-specific config fields (num_heads, patch_size, mlp_ratio, tokenizer_layers, pooling, positional_encoding) present in both ResNet18 and tiny_cnn configs; config hygiene issue for reproducibility",
+      "Only max_softmax evaluated as abstention score; no ensemble, energy, or Mahalanobis-based alternative explored despite sub-chance AUROC at high noise; report should note this limitation",
+      "Abstain rate of 41.1 % routes 2,951 test samples to human review; report should contextualise the practical selectivity trade-off"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "reporting"
+  },
+  "payload_sha256": "476dea5a526bf548cdeeed463add883c9e35528faa52b0d806491d0409224e90",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 54,
+  "version": 2
+}

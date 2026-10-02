@@ -1,0 +1,56 @@
+{
+  "artefact": "best_configuration",
+  "artefact_type": "BestConfiguration",
+  "created_at": "2026-10-01T18:43:28.497241+00:00",
+  "payload": {
+    "lightning_config_path": "best_config_v001.yaml",
+    "lightning_config_sha256": "95e032ed1005bf2c60a28cc42c8a18b8a56fa598137ee2cd4ddc6197c1cf43a4",
+    "representation": {
+      "augmentations": [
+        "hflip",
+        "vflip"
+      ],
+      "normalization": "standardize",
+      "rationale": "Extends the best prior result (resnet18, 0.9924 at epoch 6) by: (1) increasing hidden 32→48 and depth 3→4 for ~30% more capacity to capture finer nuclear/glandular morphology; (2) lowering LR 5e-4→3e-4 for more stable convergence with the added parameters; (3) enabling class_weighting to directly address the 1.63x imbalance (classes range 7.9K–12.9K samples), which was untested in all prior runs; (4) raising label_smoothing 0.05→0.1 for better-calibrated probabilities on the 9-class problem; (5) increasing dropout 0.1→0.15 as a mild regularizer for the extra capacity; (6) extending early_stopping_patience to 8 epochs since the prior best peaked at epoch 6, giving the model room to continue improving. Augmentations (hflip+vflip) and standardize normalization are retained from the winning config. Weight decay stays at 1e-4 to avoid over-regularizing the already well-performing architecture."
+    },
+    "schema_version": "1.0",
+    "selected_candidate_id": "resnet18_capacity_v2",
+    "selected_config_hash": "e26e17f88971b323c482c615959a48b1bb5b022b3d4f958bd8ba81de0193dfc4",
+    "selection_rule": "highest epoch budget, then accuracy within tolerance, then macro-F1; test locked",
+    "test_metrics_used": false,
+    "train_config": {
+      "batch_size": 128,
+      "class_weighting": true,
+      "depth": 4,
+      "device": "cuda",
+      "dropout": 0.15,
+      "early_stopping_patience": 3,
+      "epochs": 15,
+      "gradient_clip_val": 1.0,
+      "hidden": 48,
+      "label_smoothing": 0.1,
+      "lr": 0.0003,
+      "mlp_ratio": 4,
+      "model_family": "resnet18",
+      "num_heads": 4,
+      "optimizer": "adamw",
+      "patch_size": 4,
+      "pooling": "cls",
+      "positional_encoding": "learned",
+      "rationale": "Selected from 8 validation-only trials. Extends the best prior result (resnet18, 0.9924 at epoch 6) by: (1) increasing hidden 32→48 and depth 3→4 for ~30% more capacity to capture finer nuclear/glandular morphology; (2) lowering LR 5e-4→3e-4 for more stable convergence with the added parameters; (3) enabling class_weighting to directly address the 1.63x imbalance (classes range 7.9K–12.9K samples), which was untested in all prior runs; (4) raising label_smoothing 0.05→0.1 for better-calibrated probabilities on the 9-class problem; (5) increasing dropout 0.1→0.15 as a mild regularizer for the extra capacity; (6) extending early_stopping_patience to 8 epochs since the prior best peaked at epoch 6, giving the model room to continue improving. Augmentations (hflip+vflip) and standardize normalization are retained from the winning config. Weight decay stays at 1e-4 to avoid over-regularizing the already well-performing architecture.",
+      "scheduler": "cosine",
+      "schema_version": "1.0",
+      "seed": 47,
+      "source": "agentic_search:selected:qwen3.8",
+      "tokenizer_layers": 2,
+      "weight_decay": 0.0001
+    },
+    "validation_accuracy": 0.994602,
+    "validation_macro_f1": 0.994605
+  },
+  "payload_sha256": "37458e145d36f2e8e1a65d80f9a24af4520cfe93b79a7c297ca7bad027a6411e",
+  "producer": "model_search",
+  "run_id": "seed_47",
+  "sequence": 35,
+  "version": 1
+}
