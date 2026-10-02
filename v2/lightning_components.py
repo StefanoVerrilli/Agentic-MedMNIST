@@ -565,8 +565,8 @@ class PathMNISTDataModule(pl.LightningDataModule):
         num_workers: int = 0,
     ):
         super().__init__()
-        if batch_size not in {16, 32, 64, 128, 256}:
-            raise ValueError("batch_size must be one of 16, 32, 64, 128 or 256")
+        if not 4 <= batch_size <= 4096:
+            raise ValueError("batch_size must be between 4 and 4096")
         if seed < 0:
             raise ValueError("seed must be non-negative")
         selected_augmentations = augmentations or []

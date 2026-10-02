@@ -1,5 +1,8 @@
 # HAT-MedMNIST: robust sequential agents and LightningCLI on PathMNIST
 
+Per la descrizione completa in italiano di agenti, procedure, parametri,
+contratti e API, consultare il [manuale del codice](MANUALE_CODICE_AGENTI.md).
+
 This repository is a reproducible MVP of the HAT-MedMNIST proposal. It uses
 small, role-specialised agents to search and train bounded neural architectures
 on **PathMNIST**. PyTorch Lightning is the deterministic execution engine and

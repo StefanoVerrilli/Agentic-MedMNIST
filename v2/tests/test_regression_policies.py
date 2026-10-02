@@ -52,7 +52,7 @@ class PolicyRegressions(unittest.TestCase):
         from lightning.pytorch.callbacks import EarlyStopping
         from lightning_components import PathMNISTLitModule, PathMNISTDataModule
         candidate = CandidateProposal.model_validate({**default_candidates(1)[0].model_dump(),
-            "model_family": "residual_cnn", "epochs": 7, "early_stopping_patience": 40, "early_stopping_monitor": "val_macro_f1",
+            "model_family": "residual_cnn", "batch_size": 512, "epochs": 7, "early_stopping_patience": 40, "early_stopping_monitor": "val_macro_f1",
             "early_stopping_min_delta": .02, "optimizer": "sgd", "momentum": .7,
             "nesterov": False, "scheduler": "none", "channel_cap": 512})
         config = proposal_to_config(candidate, seed=42, device="cpu", epochs=100, source="test")
@@ -63,6 +63,7 @@ class PolicyRegressions(unittest.TestCase):
             cli = LightningCLI(PathMNISTLitModule, PathMNISTDataModule, args=payload,
                                run=False, save_config_callback=None)
             self.assertEqual(cli.trainer.max_epochs, 7)
+            self.assertEqual(cli.datamodule.hparams.batch_size, 512)
             stopping = next(c for c in cli.trainer.callbacks if isinstance(c, EarlyStopping))
             self.assertEqual((stopping.patience, stopping.monitor), (40, "val_macro_f1"))
             self.assertEqual(cli.trainer.checkpoint_callback.monitor, "val_accuracy")
