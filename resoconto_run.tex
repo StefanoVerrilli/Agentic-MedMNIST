@@ -1,0 +1,433 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[italian]{babel}
+\usepackage{lmodern}
+\usepackage[margin=2.4cm]{geometry}
+\usepackage{microtype}
+\usepackage{booktabs,tabularx,array}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{xurl}
+\usepackage{hyperref}
+\definecolor{accent}{HTML}{315A52}
+\hypersetup{colorlinks=true,linkcolor=accent,urlcolor=accent,pdftitle={Come hanno lavorato gli agenti nell'ultima run PathMNIST}}
+\setlist[itemize]{topsep=4pt,itemsep=2pt}
+\setlist[enumerate]{topsep=4pt,itemsep=3pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\newcommand{\artefatto}[1]{\nolinkurl{#1}}
+\newcommand{\file}[1]{\nolinkurl{#1}}
+\newcommand{\ruolo}[1]{\paragraph{#1}}
+
+\title{Come hanno lavorato gli agenti\\nell'ultima run PathMNIST}
+\author{Documento esplicativo del workflow HAT-MedMNIST}
+\date{Run del 2 ottobre 2026\\Analisi degli artefatti e dei log di esecuzione}
+
+\begin{document}
+\maketitle
+
+\begin{center}
+\small\file{v2/runs/pathmnist_20261002T083530607044Z}
+\end{center}
+
+\begin{abstract}
+Il documento ricostruisce il lavoro degli agenti nella run indicata, seguendo
+il percorso dai dati al dossier finale. Per ciascun ruolo distingue informazioni
+disponibili, decisioni, artefatti prodotti e controllo del Reviewer. La ricerca
+è stata eseguita sul seed 42; la configurazione vincente è stata congelata e
+allenata nuovamente sui seed 47 e 72. Il risultato è un workflow completo con
+accuracy media del 92,64\%, ma con warning aperti e comportamento OOD instabile.
+Completamento della pipeline e accettazione del progetto sono quindi due esiti distinti.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\section{Il principio di collaborazione}
+
+Gli agenti non si passano direttamente oggetti attraverso chiamate reciproche.
+Il punto di scambio è un \textbf{Blackboard}: ogni agente legge gli artefatti
+necessari e pubblica i propri risultati. Gli artefatti hanno un tipo, una
+versione, un produttore e un checksum. I dati pesanti, come immagini,
+checkpoint e predizioni, sono conservati in file referenziati dagli artefatti.
+
+L'\textbf{Orchestrator} stabilisce l'ordine di esecuzione. Dopo ogni fase invoca
+il \textbf{Reviewer}, che restituisce un rapporto di anomalie. Le decisioni e
+i passaggi sono registrati in \file{decision_log.jsonl}; richieste e risposte
+del reasoning sono conservate in \file{blobs/reasoning/}.
+
+\textbf{Ibrido} significa che il calcolo di dati, training e metriche è eseguito
+dal codice, mentre alcuni agenti usano il modello locale \artefatto{qwen3.8}
+per proporre o motivare decisioni. Il nome del modello è registrato; il digest
+dei suoi pesi è assente. Non è quindi possibile ricostruire la sua identità
+esatta dal solo manifest.
+
+\subsection{Le condizioni della run}
+
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+\textbf{Aspetto} & \textbf{Configurazione effettiva}\\
+\midrule
+Dataset & PathMNIST, nove classi, immagini RGB $28\times28$\\
+Split & 89.996 train; 10.004 validation; 7.180 test\\
+Ripetizioni & Seed 42, 47 e 72; dataset completo\\
+Ricerca & Otto trial, tre round, solo sul seed 42\\
+Budget dei round & 3, 6 e 9 epoche; training finale fino a 15 epoche\\
+Reasoning & Ollama locale, modello richiesto; chiamate sequenziali\\
+Letteratura & Estratti integrati; ricerca online disattivata\\
+Ablation & Non eseguite: \artefatto{ablation_suite=false}\\
+\bottomrule
+\end{tabularx}
+
+\section{La sequenza operativa}
+
+Sul seed 42 il flusso osservato è:
+\begin{enumerate}
+\item Ingestion: carica il dataset e registra gli split.
+\item Profiling / Ambiguity: descrive i dati e i rischi di ambiguità.
+\item Prior-Art Scout: costruisce un brief di ipotesi con fonti.
+\item Preprocessing: sceglie una prima rappresentazione.
+\item Data Audit: verifica i dati prima del training.
+\item Architecture Research: formula indicazioni per la ricerca.
+\item Model Search: allena e confronta candidati usando la validation.
+\item Training: riallena la configurazione selezionata.
+\item Evaluation: misura il risultato sul test.
+\item Abstention / OOD: calibra l'astensione e valuta le corruzioni.
+\item Reporting: raccoglie il dossier, poi aggiornato dopo il confronto baseline.
+\end{enumerate}
+
+Il Reviewer interviene fra gli stadi. Nei seed 47 e 72, il punto 7 è sostituito
+da \textbf{Frozen Configuration}: riprende il vincitore senza una nuova ricerca.
+Le fasi iniziali di profiling e reasoning vengono comunque eseguite; non
+possono cambiare la configurazione finale congelata.
+
+\section{Gli agenti che preparano il problema}
+
+\subsection{Ingestion: rendere disponibili dati e riferimenti}
+\ruolo{Informazioni e azione}
+Riceve dataset, seed e opzioni di caricamento. Carica PathMNIST preservando
+gli split ufficiali e registra forma, classi, dimensioni e riferimenti degli
+indici selezionati. In questa run non è attivo alcun sottocampionamento.
+
+\ruolo{Consegna al Blackboard}
+Pubblica \artefatto{dataset_manifest} e \artefatto{blob_raw_dataset}, con
+il riferimento a \file{blobs/raw_dataset_v001.npz}. Il manifest permette
+agli agenti successivi di conoscere il problema senza ricostruire il caricamento.
+
+\ruolo{Esito del controllo}
+Il Reviewer approva l'ingestion nei tre seed. Caricare e registrare il test
+non significa renderne disponibili le metriche alla ricerca: il suo uso
+valutativo è separato dalle decisioni iniziali.
+
+\subsection{Profiling / Ambiguity: descrivere dati e incertezze}
+\ruolo{Informazioni e azione}
+Usa train e validation per calcolare distribuzione delle classi e statistiche
+delle immagini. Il rapporto di sbilanciamento train è circa 1,63; le
+distribuzioni train/validation sono molto simili. I canali RGB hanno medie
+circa $(0,741;0,533;0,706)$ e deviazioni standard $(0,124;0,177;0,124)$.
+
+L'LLM interpreta queste informazioni e segnala sovrapposizioni plausibili:
+adipose/background, smooth muscle/stroma, debris e frammenti cellulari,
+oltre a patch che possono contenere tessuti diversi. Queste sono
+\textbf{ipotesi di ambiguità}, non errori di annotazione dimostrati.
+
+\ruolo{Consegna al Blackboard}
+Produce \artefatto{data_profile}, con statistiche, rischi e provenienza del
+reasoning. La valutazione delle ambiguità non usa il risultato del test.
+Il campo test imbalance presente nel profilo non va interpretato come una
+misura effettiva: il test non è stato profilato in questa fase.
+
+\subsection{Prior-Art Scout: trasformare fonti in ipotesi}
+\ruolo{Informazioni e azione}
+Legge il contesto del dataset e tre estratti integrati relativi a ViT,
+Compact Transformers e MedMNIST v2. In questa run non esegue una ricerca web.
+Le fonti hanno origine \artefatto{curated_excerpt}; il primo brief è
+\artefatto{bundled}, e i successivi utilizzano la cache.
+
+Sul seed 42 propone quattro idee: patch transformer, tokenizzazione
+convoluzionale compatta, scelta della granularità delle patch e training
+sensibile allo sbilanciamento. Le etichetta come ipotesi da validare.
+Propone anche una composizione di augmentation e una specifica di compact
+transformer. Sono proposte, non codice generato ed eseguito.
+
+\ruolo{Consegna al Blackboard e gate}
+Pubblica \artefatto{prior_art_brief}, snapshot delle fonti,
+\artefatto{extension_gate_report} e \artefatto{approved_extensions}.
+Le nuove proposte restano \artefatto{pending_review}: non diventano
+automaticamente nuove famiglie eseguibili. Le primitive già integrate
+restano utilizzabili senza approvare una nuova estensione.
+
+Il compact transformer provato dalla ricerca appartiene al registro esistente:
+\textbf{non dimostra la promozione della nuova specifica dello Scout}.
+Il Reviewer segnala correttamente che estratti citabili non dimostrano
+retrieval online né tutte le inferenze scientifiche sviluppate a partire da essi.
+
+\section{Gli agenti che progettano l'esperimento}
+
+\subsection{Preprocessing: proporre la rappresentazione iniziale}
+\ruolo{Informazioni e decisione}
+Legge il profilo e le ipotesi bibliografiche. Sceglie standardizzazione
+train-only e una prima combinazione di augmentation:
+\artefatto{hflip}, \artefatto{brightness}, \artefatto{rotate90}.
+Mantiene immagini RGB e risoluzione del benchmark.
+
+\ruolo{Consegna e aggiornamento successivo}
+Pubblica la prima versione di \artefatto{representation_plan},
+\artefatto{split_manifest} e del blob dei dati preparati.
+Questa decisione è un punto di partenza: la ricerca può proporre una
+combinazione diversa all'interno dei limiti ammessi. Il vincitore sostituisce
+\artefatto{rotate90} con \artefatto{rotate180}; il Blackboard conserva
+entrambe le versioni e rende esplicito il cambiamento.
+
+\subsection{Data Audit: autorizzare l'accesso al training}
+\ruolo{Informazioni e controlli}
+Il controllo è deterministico: verifica split ufficiali, indici, immagini,
+label, forme, valori e statistiche train-only; controlla la disgiunzione
+train/validation. Nei tre seed l'audit passa e non trova sovrapposizioni.
+
+\ruolo{Consegna e significato}
+Produce \artefatto{data_audit_report}. Model Search e Training richiedono
+un audit passato prima di iniziare. Un warning del Reviewer su documentazione
+o interpretazione può restare aperto anche quando l'audit dei dati è positivo:
+non sono lo stesso controllo.
+
+\subsection{Architecture Research: formulare indicazioni, non un vincitore}
+\ruolo{Informazioni e azione}
+Combina profilo, rappresentazione e prior art in un documento di indicazioni
+su famiglie, tokenizzazione, regolarizzazione e rischi. Sul seed 42 il
+reasoning considera promettente il compact transformer.
+
+\ruolo{Consegna e limite}
+Pubblica \artefatto{architecture_research}. Questo artefatto guida le proposte
+del search agent, ma \textbf{non seleziona il modello finale}. L'esito della
+ricerca sarà una ResNet18: la preferenza teorica non prevale sulle misure
+di validation. Le raccomandazioni bibliografiche sono inoltre fallibili e
+non costituiscono una prova sperimentale delle relative affermazioni.
+
+\section{La decisione centrale: ricerca e congelamento}
+
+\subsection{Model Search sul seed 42}
+L'agente legge metadati di training, indicazioni precedenti e risultati
+di validation già prodotti. L'LLM propone candidati; il codice impone
+schema, limiti, copertura delle famiglie e budget. La ricerca è quindi
+una collaborazione fra proposte motivate e vincoli deterministici.
+
+\begin{table}[htbp]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}Xrr@{}}
+\toprule
+\textbf{Trial} & \textbf{Epoche} & \textbf{Accuracy validation}\\
+\midrule
+Compact transformer & 3 & 94,5522\%\\
+Residual CNN bilanciata & 3 & 97,1811\%\\
+ResNet18 conservativa & 3 & 97,8908\%\\
+Tiny CNN regolarizzata & 6 & 92,0832\%\\
+Vision transformer & 6 & 96,1515\%\\
+ResNet18 conservativa & 6 & 99,0804\%\\
+ResNet18 conservativa & 9 & 99,1104\%\\
+ResNet18 più larga, class weighting & 9 & \textbf{99,4002\%}\\
+\bottomrule
+\end{tabularx}
+\caption{Trial effettivamente completati. I budget diversi non consentono
+un confronto a parità di costo fra famiglie.}
+\end{table}
+
+I trial sono training separati: riprovare una configurazione con più epoche
+non implica proseguire automaticamente dal precedente checkpoint.
+La scelta considera i trial al budget massimo; usa accuracy entro la
+tolleranza dichiarata e macro-F1 per il ranking. Le metriche del test
+sono escluse. Il vincitore è \artefatto{resnet18_wider_cw}.
+
+L'agente pubblica \artefatto{search_plan}, artefatti dei singoli trial,
+\artefatto{search_report}, \artefatto{train_config} e
+\artefatto{best_configuration}; aggiorna anche la rappresentazione definitiva
+e salva \file{best_config_v001.yaml}.
+
+\subsection{Frozen Configuration sui seed 47 e 72}
+L'agente riprende il \artefatto{best_configuration} del seed 42 e cambia
+il seed di training. Ricostruisce i dati preparati e il file YAML locale,
+senza fare altri trial. Questo è il meccanismo che rende confrontabili
+le tre ripetizioni del modello selezionato.
+
+Il valore di validation 99,4002\% riportato nella selezione dei tre seed
+rimane quello del trial originale. Le nuove validation finali appartengono
+invece ai rispettivi training. I file YAML locali hanno hash diversi
+perché cambia il seed; gli altri parametri sono uguali.
+
+\subsection{Quale agente non è intervenuto}
+\artefatto{ExperimentDesignAgent} è disponibile per il percorso senza
+ricerca iterativa, ma \textbf{non è stato eseguito in questa run}. La scelta
+è stata affidata a Model Search, poi ripresa da Frozen Configuration.
+Le ablation della rappresentazione, pur implementate come procedura,
+non sono state attivate.
+
+\section{Gli agenti che eseguono e misurano}
+
+\subsection{Training: eseguire la scelta congelata}
+Legge dati preparati, audit e configurazione finale. Allena il modello con
+Lightning fino al budget di 15 epoche; registra la storia delle metriche
+e conserva il checkpoint scelto sulla validation. Non propone una nuova
+architettura né adatta la scelta al test.
+
+Produce \artefatto{train_result} e il riferimento del modello.
+La migliore epoca è 15, 15 e 14 nei tre seed; tutti completano 15 epoche.
+Le migliori accuracy di validation finali sono rispettivamente
+99,4702\%, 99,6002\% e 99,5602\%.
+
+\subsection{Evaluation: aprire il test per la misura finale}
+Usa il checkpoint selezionato e produce probabilità, logits, predizioni
+e metriche del test: accuracy, macro-F1, balanced accuracy, AUC,
+matrice di confusione e risultati per classe. Pubblica
+\artefatto{prediction_artifact} e \artefatto{evaluation_report}.
+
+\begin{center}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+\textbf{Seed} & \textbf{Accuracy} & \textbf{Macro-F1} & \textbf{Balanced accuracy}\\
+\midrule
+42 & 92,2981\% & 0,898925 & 0,901332\\
+47 & 92,1448\% & 0,898564 & 0,897181\\
+72 & 93,4680\% & 0,917116 & 0,915932\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Il test resta fuori dalla ricerca, ma il suo risultato viene successivamente
+letto per valutazione, revisione e reporting. Il divario validation/test
+rimane di circa 6--7,5 punti. Lo stroma associato al tumore ha recall
+fra 56,53\% e 64,37\%: il risultato aggregato non elimina questa debolezza.
+
+\subsection{Abstention / OOD: decidere quando rinviare}
+L'agente confronta max-softmax ed entropia predittiva usando la validation
+e corruzioni gaussiane controllate. Sceglie lo score con migliore AUROC
+medio sulla validation e calibra una soglia per coprirne circa l'80\%.
+Applica poi score e soglia al test senza cambiarli in base al risultato.
+
+Produce \artefatto{abstention_report}, curve rischio/copertura, probabilità
+delle corruzioni e \artefatto{human_review_queue}. La coda registra indici
+dei campioni, predizione, confidenza e motivo del rinvio.
+
+\begin{center}\small
+\begin{tabular}{@{}llrrr@{}}
+\toprule
+\textbf{Seed} & \textbf{Score} & \textbf{Coverage} & \textbf{Acc. accettati} & \textbf{Rinvii}\\
+\midrule
+42 & Entropia & 67,37\% & 97,42\% & 2.343\\
+47 & Max-softmax & 65,29\% & 97,57\% & 2.492\\
+72 & Max-softmax & 68,70\% & 97,67\% & 2.247\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+L'astensione funziona sui campioni puliti nel senso di ridurre l'errore
+fra quelli accettati. Non garantisce però protezione OOD: sul seed 47
+l'AUROC medio è 0,3938 e alla corruzione forte è circa 0,0018. Il modello
+predice background con alta confidenza e accetta quasi tutti i casi corrotti.
+Il problema è già osservabile sulla validation; il selettore sceglie
+il migliore fra due score insufficienti e non restituisce un esito
+esplicito ``nessuno score idoneo''.
+
+Il Reviewer segnala questo fallimento. Il seed 72 passa il criterio AUROC
+minimo implementato, ma accetta circa metà dei casi con rumore forte.
+Queste misure riguardano un proxy di corruzione, non OOD clinico generale.
+La coda dimostra un handoff predisposto: non una revisione umana conclusa.
+
+\section{Reviewer e Orchestrator: controllo e gestione dei warning}
+
+Il Reviewer combina invarianti deterministiche con un esame LLM degli
+artefatti disponibili. Produce rapporti \artefatto{anomaly_*} e distingue
+\artefatto{continue}, \artefatto{revise} e \artefatto{stop}.
+Un finding critico deterministico può bloccare il flusso; le affermazioni
+LLM non sufficientemente dimostrate rimangono advisory.
+
+\artefatto{revise} non equivale a una modifica già eseguita. L'Orchestrator
+può ripetere lo stadio se è disponibile una remediation sicura; altrimenti
+registra \artefatto{review_unresolved} e promuove lo stadio con warning.
+Nei log compaiono 5, 6 e 2 eventi di questo tipo sui seed 42, 47 e 72.
+La run non mostra un ciclo di correzione che risolva tutti i rilievi.
+
+Fra i rilievi osservati figurano fonti integrate invece di retrieval web,
+inferenze che eccedono le citazioni, debolezza dello stroma, digest LLM
+assente e fallimento OOD del seed 47. Alcuni commenti sulle proposte di
+augmentation richiedono interpretazione: una ricetta nuova pending non
+impedisce di usare singolarmente primitive già integrate.
+
+\textbf{Il Reviewer segnala e rende tracciabile il problema; non è un agente
+che ripara autonomamente il modello.} L'Orchestrator permette il completamento
+operativo con warning. La procedura di accettazione finale mantiene però
+questi problemi aperti.
+
+\section{Reporting, baseline e accettazione}
+
+Reporting assembla \file{dossier.json}, registro degli artefatti e stato
+del workflow. Dopo la prima chiusura, il runner esegue una baseline
+convenzionale sullo stesso dataset e seed, pubblica
+\artefatto{baseline_report} e \artefatto{comparison_report}, richiama
+il Reviewer e aggiorna il dossier.
+
+\textbf{La baseline è una procedura del runner, non un ulteriore agente
+di reasoning.} L'accuracy media è 82,99\%, contro 92,64\% della pipeline.
+Il vantaggio di 9,65 punti riguarda però un sistema con 6,29 milioni di
+parametri contro una Tiny CNN di 5.433 parametri, oltre a rappresentazione
+e costi diversi. Non misura isolatamente il contributo degli agenti.
+
+La procedura di accettazione associa requisiti a evidenze e produce
+\artefatto{acceptance_report}. Tutti i seed risultano tecnicamente completi,
+ma non pronti per l'accettazione e senza evidenza TRL~7 completa.
+Passa ora il requisito di ripetizione con configurazione congelata.
+Restano assenti ablation, prova di retrieval online, fault evidence sul
+codice esatto, replay completo, mitigazioni approvate e sign-off indipendente.
+
+\section{Che cosa chiarisce questa run sul lavoro degli agenti}
+
+La collaborazione osservata è coerente con la separazione fra proposta,
+esecuzione e controllo. Gli agenti iniziali descrivono il problema;
+quelli di reasoning suggeriscono rappresentazioni e candidati; il search
+produce evidenze di validation; training ed evaluation eseguono e misurano;
+il Reviewer rende visibili limiti e incongruenze; reporting mantiene
+il dossier finale.
+
+La decisione architetturale più importante è stata presa sul seed 42 e
+conservata nei due successivi. L'accuracy migliora rispetto alla run
+precedente, ma l'instabilità OOD mostra che congelare gli iperparametri
+non basta a garantire stabilità di confidenza e rifiuto.
+
+Questa run documenta quindi \textbf{un workflow agentico operativo e auditabile},
+con decisioni effettive dell'LLM e risultati misurati. Non dimostra ancora
+che tutte le motivazioni siano scientificamente corrette, che l'OOD sia
+affidabile o che l'orchestrazione sia superiore a una ricerca convenzionale
+a parità di spazio e budget.
+
+\appendix
+\section{Mappa delle evidenze}
+
+I riferimenti seguenti sono relativi alla directory della run indicata
+in apertura. Gli artefatti versionati sono in \file{seed_*/artefacts/}.
+
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+\textbf{Domanda} & \textbf{Evidenza principale}\\
+\midrule
+Quali opzioni sono state usate? & \artefatto{run_configuration}, \artefatto{run_manifest}\\
+Che cosa è avvenuto e in quale ordine? & \file{seed_*/decision_log.jsonl}\\
+Che cosa ha detto l'LLM? & \file{seed_*/blobs/reasoning/}\\
+Quali dati e statistiche? & \artefatto{dataset_manifest}, \artefatto{data_profile}\\
+Quali fonti e proposte? & \artefatto{prior_art_brief}, \artefatto{extension_gate_report}\\
+Quali scelte di input? & Versioni di \artefatto{representation_plan}\\
+Quali candidati e vincitore? & Artefatti \artefatto{trial_*}, \artefatto{search_report}, \artefatto{best_configuration}\\
+Quale training finale? & \artefatto{train_result}, \file{best_config_v001.yaml}\\
+Quali risultati e rinvii? & \artefatto{evaluation_report}, \artefatto{abstention_report}, \artefatto{human_review_queue}\\
+Quali rilievi restano? & Rapporti \artefatto{anomaly_*}, \file{acceptance_report.json}\\
+Quale riepilogo fra seed? & \file{experiment_summary.json}\\
+\bottomrule
+\end{tabularx}
+
+La ricostruzione si basa sugli artefatti e sui log della run. Il codice corrente
+è stato consultato per interpretare i meccanismi, ma ha un hash diverso dal
+codice registrato nella run: non sostituisce lo snapshot originale.
+Le verifiche successive sono conservate in
+\file{v2/audits/pathmnist_20261002T083530607044Z/}; non sono eventi eseguiti dagli
+agenti durante la run. Il presente documento non modifica gli artefatti storici.
+
+\end{document}
