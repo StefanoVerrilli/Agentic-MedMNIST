@@ -1,0 +1,1004 @@
+{
+  "run": "D:\\Python Repository\\Agentic-MedMNIST\\v2\\runs\\pathmnist_20261002T083530607044Z",
+  "seeds": [
+    {
+      "seed": 42,
+      "integrity_problems": [],
+      "newline_only_changes": [],
+      "referenced_files_checked": 21,
+      "metrics_verified": true,
+      "checks": {
+        "accuracy": {
+          "actual": 0.9229805013927577,
+          "recorded": 0.922981,
+          "matched": true
+        },
+        "macro_f1": {
+          "actual": 0.8989247491318815,
+          "recorded": 0.898925,
+          "matched": true
+        },
+        "balanced_accuracy": {
+          "actual": 0.9013322138370982,
+          "recorded": 0.901332,
+          "matched": true
+        },
+        "prediction_array": {
+          "actual": 1.0,
+          "recorded": 1.0,
+          "matched": true
+        },
+        "val_array_consistency": {
+          "actual": 1.0,
+          "recorded": 1.0,
+          "matched": true
+        },
+        "val_target_consistency": {
+          "actual": 1.0,
+          "recorded": 1.0,
+          "matched": true
+        },
+        "val_normalized_probabilities": {
+          "actual": 1.0,
+          "recorded": 1.0,
+          "matched": true
+        },
+        "test_array_consistency": {
+          "actual": 1.0,
+          "recorded": 1.0,
+          "matched": true
+        },
+        "test_target_consistency": {
+          "actual": 1.0,
+          "recorded": 1.0,
+          "matched": true
+        },
+        "test_normalized_probabilities": {
+          "actual": 1.0,
+          "recorded": 1.0,
+          "matched": true
+        },
+        "threshold": {
+          "actual": 0.7361572953937867,
+          "recorded": 0.7361573,
+          "matched": true
+        },
+        "test_coverage": {
+          "actual": 0.6736768802228412,
+          "recorded": 0.673677,
+          "matched": true
+        },
+        "accuracy_on_covered": {
+          "actual": 0.9741575356626008,
+          "recorded": 0.974158,
+          "matched": true
+        },
+        "human_review_count": {
+          "actual": 2343.0,
+          "recorded": 2343.0,
+          "matched": true
+        },
+        "queue_indices": {
+          "actual": 1.0,
+          "recorded": 1.0,
+          "matched": true
+        },
+        "ood_validation_0.15_max_softmax": {
+          "actual": 0.9947245512031093,
+          "recorded": 0.994725,
+          "matched": true
+        },
+        "ood_test_0.15_max_softmax": {
+          "actual": 0.9514025050240145,
+          "recorded": 0.951403,
+          "matched": true
+        },
+        "ood_validation_0.15_predictive_entropy": {
+          "actual": 0.9965415573075048,
+          "recorded": 0.996542,
+          "matched": true
+        },
+        "ood_test_0.15_predictive_entropy": {
+          "actual": 0.9623097081804145,
+          "recorded": 0.96231,
+          "matched": true
+        },
+        "ood_validation_0.25_max_softmax": {
+          "actual": 0.995220074705024,
+          "recorded": 0.99522,
+          "matched": true
+        },
+        "ood_test_0.25_max_softmax": {
+          "actual": 0.9566578568602044,
+          "recorded": 0.956658,
+          "matched": true
+        },
+        "ood_validation_0.25_predictive_entropy": {
+          "actual": 0.9973745907474674,
+          "recorded": 0.997375,
+          "matched": true
+        },
+        "ood_test_0.25_predictive_entropy": {
+          "actual": 0.9705547171421698,
+          "recorded": 0.970555,
+          "matched": true
+        },
+        "ood_validation_0.4_max_softmax": {
+          "actual": 0.9916250363109453,
+          "recorded": 0.991625,
+          "matched": true
+        },
+        "ood_test_0.4_max_softmax": {
+          "actual": 0.9393184313436426,
+          "recorded": 0.939318,
+          "matched": true
+        },
+        "ood_validation_0.4_predictive_entropy": {
+          "actual": 0.9925534484327021,
+          "recorded": 0.992553,
+          "matched": true
+        },
+        "ood_test_0.4_predictive_entropy": {
+          "actual": 0.946572361325564,
+          "recorded": 0.946572,
+          "matched": true
+        },
+        "ood_aggregate": {
+          "actual": 0.9598122622160493,
+          "recorded": 0.959812,
+          "matched": true
+        },
+        "ood_pass": {
+          "actual": 1.0,
+          "recorded": 1.0,
+          "matched": true
+        }
+      },
+      "ood_scenarios": [
+        {
+          "sigma": "0.15",
+          "method": "max_softmax",
+          "validation_auroc": 0.9947245512031093,
+          "test_auroc": 0.9514025050240145,
+          "corrupted_mean_max_softmax": 0.654708981513977,
+          "corrupted_predicted_class_counts": [
+            0,
+            7026,
+            6,
+            0,
+            67,
+            0,
+            2,
+            78,
+            1
+          ],
+          "clean_mean_max_softmax": 0.8794312477111816
+        },
+        {
+          "sigma": "0.15",
+          "method": "predictive_entropy",
+          "validation_auroc": 0.9965415573075048,
+          "test_auroc": 0.9623097081804145,
+          "corrupted_mean_max_softmax": 0.654708981513977,
+          "corrupted_predicted_class_counts": [
+            0,
+            7026,
+            6,
+            0,
+            67,
+            0,
+            2,
+            78,
+            1
+          ],
+          "clean_mean_max_softmax": 0.8794312477111816
+        },
+        {
+          "sigma": "0.25",
+          "method": "max_softmax",
+          "validation_auroc": 0.995220074705024,
+          "test_auroc": 0.9566578568602044,
+          "corrupted_mean_max_softmax": 0.6258184313774109,
+          "corrupted_predicted_class_counts": [
+            0,
+            7173,
+            0,
+            0,
+            7,
+            0,
+            0,
+            0,
+            0
+          ],
+          "clean_mean_max_softmax": 0.8794312477111816
+        },
+        {
+          "sigma": "0.25",
+          "method": "predictive_entropy",
+          "validation_auroc": 0.9973745907474674,
+          "test_auroc": 0.9705547171421698,
+          "corrupted_mean_max_softmax": 0.6258184313774109,
+          "corrupted_predicted_class_counts": [
+            0,
+            7173,
+            0,
+            0,
+            7,
+            0,
+            0,
+            0,
+            0
+          ],
+          "clean_mean_max_softmax": 0.8794312477111816
+        },
+        {
+          "sigma": "0.4",
+          "method": "max_softmax",
+          "validation_auroc": 0.9916250363109453,
+          "test_auroc": 0.9393184313436426,
+          "corrupted_mean_max_softmax": 0.6953409910202026,
+          "corrupted_predicted_class_counts": [
+            0,
+            7180,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "clean_mean_max_softmax": 0.8794312477111816
+        },
+        {
+          "sigma": "0.4",
+          "method": "predictive_entropy",
+          "validation_auroc": 0.9925534484327021,
+          "test_auroc": 0.946572361325564,
+          "corrupted_mean_max_softmax": 0.6953409910202026,
+          "corrupted_predicted_class_counts": [
+            0,
+            7180,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "clean_mean_max_softmax": 0.8794312477111816
+        }
+      ],
+      "class_metrics": [
+        {
+          "name": "adipose",
+          "support": 1338,
+          "coverage": 0.7182361733931241,
+          "recall": 0.9103139013452914
+        },
+        {
+          "name": "background",
+          "support": 847,
+          "coverage": 1.0,
+          "recall": 1.0
+        },
+        {
+          "name": "debris",
+          "support": 339,
+          "coverage": 0.8466076696165191,
+          "recall": 0.8938053097345132
+        },
+        {
+          "name": "lymphocytes",
+          "support": 634,
+          "coverage": 0.9842271293375394,
+          "recall": 0.9968454258675079
+        },
+        {
+          "name": "mucus",
+          "support": 1035,
+          "coverage": 0.8830917874396135,
+          "recall": 0.9391304347826087
+        },
+        {
+          "name": "smooth muscle",
+          "support": 592,
+          "coverage": 0.4222972972972973,
+          "recall": 0.8243243243243243
+        },
+        {
+          "name": "normal colon mucosa",
+          "support": 741,
+          "coverage": 0.8879892037786775,
+          "recall": 0.9568151147098516
+        },
+        {
+          "name": "cancer-associated stroma",
+          "support": 421,
+          "coverage": 0.5748218527315915,
+          "recall": 0.6199524940617577
+        },
+        {
+          "name": "colorectal adenocarcinoma epithelium",
+          "support": 1233,
+          "coverage": 0.043795620437956206,
+          "recall": 0.9708029197080292
+        }
+      ],
+      "baseline_metrics_recomputed": false,
+      "limitations": [
+        "Stored baseline predictions are absent; baseline metrics not independently recomputed.",
+        "Checkpoint inference and retraining replay are separate checks."
+      ]
+    },
+    {
+      "seed": 47,
+      "integrity_problems": [
+        "checksum mismatch: best_config_v001.yaml",
+        "conflicting checksum: best_config_v001.yaml"
+      ],
+      "newline_only_changes": [],
+      "referenced_files_checked": 13,
+      "metrics_verified": true,
+      "checks": {
+        "accuracy": {
+          "actual": 0.9214484679665739,
+          "recorded": 0.921448,
+          "matched": true
+        },
+        "macro_f1": {
+          "actual": 0.8985644493973006,
+          "recorded": 0.898564,
+          "matched": true
+        },
+        "balanced_accuracy": {
+          "actual": 0.8971809360279942,
+          "recorded": 0.897181,
+          "matched": true
+        },
+        "prediction_array": {
+          "actual": 1.0,
+          "recorded": 1.0,
+          "matched": true
+        },
+        "val_array_consistency": {
+          "actual": 1.0,
+          "recorded": 1.0,
+          "matched": true
+        },
+        "val_target_consistency": {
+          "actual": 1.0,
+          "recorded": 1.0,
+          "matched": true
+        },
+        "val_normalized_probabilities": {
+          "actual": 1.0,
+          "recorded": 1.0,
+          "matched": true
+        },
+        "test_array_consistency": {
+          "actual": 1.0,
+          "recorded": 1.0,
+          "matched": true
+        },
+        "test_target_consistency": {
+          "actual": 1.0,
+          "recorded": 1.0,
+          "matched": true
+        },
+        "test_normalized_probabilities": {
+          "actual": 1.0,
+          "recorded": 1.0,
+          "matched": true
+        },
+        "threshold": {
+          "actual": 0.8883191347122192,
+          "recorded": 0.88831913,
+          "matched": true
+        },
+        "test_coverage": {
+          "actual": 0.6529247910863509,
+          "recorded": 0.652925,
+          "matched": true
+        },
+        "accuracy_on_covered": {
+          "actual": 0.9756825938566553,
+          "recorded": 0.975683,
+          "matched": true
+        },
+        "human_review_count": {
+          "actual": 2492.0,
+          "recorded": 2492.0,
+          "matched": true
+        },
+        "queue_indices": {
+          "actual": 1.0,
+          "recorded": 1.0,
+          "matched": true
+        },
+        "ood_validation_0.15_max_softmax": {
+          "actual": 0.9763216614593666,
+          "recorded": 0.976322,
+          "matched": true
+        },
+        "ood_test_0.15_max_softmax": {
+          "actual": 0.8788826902336263,
+          "recorded": 0.878883,
+          "matched": true
+        },
+        "ood_validation_0.15_predictive_entropy": {
+          "actual": 0.976656958168352,
+          "recorded": 0.976657,
+          "matched": true
+        },
+        "ood_test_0.15_predictive_entropy": {
+          "actual": 0.8822099068132621,
+          "recorded": 0.88221,
+          "matched": true
+        },
+        "ood_validation_0.25_max_softmax": {
+          "actual": 0.2977973994328698,
+          "recorded": 0.297797,
+          "matched": true
+        },
+        "ood_test_0.25_max_softmax": {
+          "actual": 0.300677737602905,
+          "recorded": 0.300678,
+          "matched": true
+        },
+        "ood_validation_0.25_predictive_entropy": {
+          "actual": 0.29343608418288025,
+          "recorded": 0.293436,
+          "matched": true
+        },
+        "ood_test_0.25_predictive_entropy": {
+          "actual": 0.29849298965712556,
+          "recorded": 0.298493,
+          "matched": true
+        },
+        "ood_validation_0.4_max_softmax": {
+          "actual": 0.0008173409964282979,
+          "recorded": 0.000817,
+          "matched": true
+        },
+        "ood_test_0.4_max_softmax": {
+          "actual": 0.0017705286271832152,
+          "recorded": 0.001771,
+          "matched": true
+        },
+        "ood_validation_0.4_predictive_entropy": {
+          "actual": 0.0007542864501540447,
+          "recorded": 0.000754,
+          "matched": true
+        },
+        "ood_test_0.4_predictive_entropy": {
+          "actual": 0.0015767452145777888,
+          "recorded": 0.001577,
+          "matched": true
+        },
+        "ood_aggregate": {
+          "actual": 0.3937769854879048,
+          "recorded": 0.393777,
+          "matched": true
+        },
+        "ood_pass": {
+          "actual": 0.0,
+          "recorded": 0.0,
+          "matched": true
+        }
+      },
+      "ood_scenarios": [
+        {
+          "sigma": "0.15",
+          "method": "max_softmax",
+          "validation_auroc": 0.9763216614593666,
+          "test_auroc": 0.8788826902336263,
+          "corrupted_mean_max_softmax": 0.82073575258255,
+          "corrupted_predicted_class_counts": [
+            0,
+            7169,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            11
+          ],
+          "clean_mean_max_softmax": 0.8754217028617859
+        },
+        {
+          "sigma": "0.15",
+          "method": "predictive_entropy",
+          "validation_auroc": 0.976656958168352,
+          "test_auroc": 0.8822099068132621,
+          "corrupted_mean_max_softmax": 0.82073575258255,
+          "corrupted_predicted_class_counts": [
+            0,
+            7169,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            11
+          ],
+          "clean_mean_max_softmax": 0.8754217028617859
+        },
+        {
+          "sigma": "0.25",
+          "method": "max_softmax",
+          "validation_auroc": 0.2977973994328698,
+          "test_auroc": 0.300677737602905,
+          "corrupted_mean_max_softmax": 0.9163377285003662,
+          "corrupted_predicted_class_counts": [
+            0,
+            7180,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "clean_mean_max_softmax": 0.8754217028617859
+        },
+        {
+          "sigma": "0.25",
+          "method": "predictive_entropy",
+          "validation_auroc": 0.29343608418288025,
+          "test_auroc": 0.29849298965712556,
+          "corrupted_mean_max_softmax": 0.9163377285003662,
+          "corrupted_predicted_class_counts": [
+            0,
+            7180,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "clean_mean_max_softmax": 0.8754217028617859
+        },
+        {
+          "sigma": "0.4",
+          "method": "max_softmax",
+          "validation_auroc": 0.0008173409964282979,
+          "test_auroc": 0.0017705286271832152,
+          "corrupted_mean_max_softmax": 0.9837990999221802,
+          "corrupted_predicted_class_counts": [
+            0,
+            7180,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "clean_mean_max_softmax": 0.8754217028617859
+        },
+        {
+          "sigma": "0.4",
+          "method": "predictive_entropy",
+          "validation_auroc": 0.0007542864501540447,
+          "test_auroc": 0.0015767452145777888,
+          "corrupted_mean_max_softmax": 0.9837990999221802,
+          "corrupted_predicted_class_counts": [
+            0,
+            7180,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "clean_mean_max_softmax": 0.8754217028617859
+        }
+      ],
+      "class_metrics": [
+        {
+          "name": "adipose",
+          "support": 1338,
+          "coverage": 0.7197309417040358,
+          "recall": 0.9364723467862481
+        },
+        {
+          "name": "background",
+          "support": 847,
+          "coverage": 0.807556080283353,
+          "recall": 1.0
+        },
+        {
+          "name": "debris",
+          "support": 339,
+          "coverage": 0.8436578171091446,
+          "recall": 0.9085545722713865
+        },
+        {
+          "name": "lymphocytes",
+          "support": 634,
+          "coverage": 0.9794952681388013,
+          "recall": 0.998422712933754
+        },
+        {
+          "name": "mucus",
+          "support": 1035,
+          "coverage": 0.8792270531400966,
+          "recall": 0.9091787439613527
+        },
+        {
+          "name": "smooth muscle",
+          "support": 592,
+          "coverage": 0.5405405405405406,
+          "recall": 0.8344594594594594
+        },
+        {
+          "name": "normal colon mucosa",
+          "support": 741,
+          "coverage": 0.8609986504723347,
+          "recall": 0.951417004048583
+        },
+        {
+          "name": "cancer-associated stroma",
+          "support": 421,
+          "coverage": 0.5154394299287411,
+          "recall": 0.5653206650831354
+        },
+        {
+          "name": "colorectal adenocarcinoma epithelium",
+          "support": 1233,
+          "coverage": 0.039740470397404706,
+          "recall": 0.9708029197080292
+        }
+      ],
+      "baseline_metrics_recomputed": false,
+      "limitations": [
+        "Stored baseline predictions are absent; baseline metrics not independently recomputed.",
+        "Checkpoint inference and retraining replay are separate checks."
+      ]
+    },
+    {
+      "seed": 72,
+      "integrity_problems": [
+        "checksum mismatch: best_config_v001.yaml",
+        "conflicting checksum: best_config_v001.yaml"
+      ],
+      "newline_only_changes": [],
+      "referenced_files_checked": 13,
+      "metrics_verified": true,
+      "checks": {
+        "accuracy": {
+          "actual": 0.9346796657381615,
+          "recorded": 0.93468,
+          "matched": true
+        },
+        "macro_f1": {
+          "actual": 0.9171155192694894,
+          "recorded": 0.917116,
+          "matched": true
+        },
+        "balanced_accuracy": {
+          "actual": 0.9159318424665253,
+          "recorded": 0.915932,
+          "matched": true
+        },
+        "prediction_array": {
+          "actual": 1.0,
+          "recorded": 1.0,
+          "matched": true
+        },
+        "val_array_consistency": {
+          "actual": 1.0,
+          "recorded": 1.0,
+          "matched": true
+        },
+        "val_target_consistency": {
+          "actual": 1.0,
+          "recorded": 1.0,
+          "matched": true
+        },
+        "val_normalized_probabilities": {
+          "actual": 1.0,
+          "recorded": 1.0,
+          "matched": true
+        },
+        "test_array_consistency": {
+          "actual": 1.0,
+          "recorded": 1.0,
+          "matched": true
+        },
+        "test_target_consistency": {
+          "actual": 1.0,
+          "recorded": 1.0,
+          "matched": true
+        },
+        "test_normalized_probabilities": {
+          "actual": 1.0,
+          "recorded": 1.0,
+          "matched": true
+        },
+        "threshold": {
+          "actual": 0.8889075517654419,
+          "recorded": 0.88890755,
+          "matched": true
+        },
+        "test_coverage": {
+          "actual": 0.6870473537604457,
+          "recorded": 0.687047,
+          "matched": true
+        },
+        "accuracy_on_covered": {
+          "actual": 0.9766876140279749,
+          "recorded": 0.976688,
+          "matched": true
+        },
+        "human_review_count": {
+          "actual": 2247.0,
+          "recorded": 2247.0,
+          "matched": true
+        },
+        "queue_indices": {
+          "actual": 1.0,
+          "recorded": 1.0,
+          "matched": true
+        },
+        "ood_validation_0.15_max_softmax": {
+          "actual": 0.9909046227570546,
+          "recorded": 0.990905,
+          "matched": true
+        },
+        "ood_test_0.15_max_softmax": {
+          "actual": 0.9195115261365134,
+          "recorded": 0.919512,
+          "matched": true
+        },
+        "ood_validation_0.15_predictive_entropy": {
+          "actual": 0.991794036084087,
+          "recorded": 0.991794,
+          "matched": true
+        },
+        "ood_test_0.15_predictive_entropy": {
+          "actual": 0.9252045297600112,
+          "recorded": 0.925205,
+          "matched": true
+        },
+        "ood_validation_0.25_max_softmax": {
+          "actual": 0.9741614249941768,
+          "recorded": 0.974161,
+          "matched": true
+        },
+        "ood_test_0.25_max_softmax": {
+          "actual": 0.90279781348686,
+          "recorded": 0.902798,
+          "matched": true
+        },
+        "ood_validation_0.25_predictive_entropy": {
+          "actual": 0.9709569291036084,
+          "recorded": 0.970957,
+          "matched": true
+        },
+        "ood_test_0.25_predictive_entropy": {
+          "actual": 0.9018312629479909,
+          "recorded": 0.901831,
+          "matched": true
+        },
+        "ood_validation_0.4_max_softmax": {
+          "actual": 0.6345517121020444,
+          "recorded": 0.634552,
+          "matched": true
+        },
+        "ood_test_0.4_max_softmax": {
+          "actual": 0.5777914995228157,
+          "recorded": 0.577791,
+          "matched": true
+        },
+        "ood_validation_0.4_predictive_entropy": {
+          "actual": 0.577337257819783,
+          "recorded": 0.577337,
+          "matched": true
+        },
+        "ood_test_0.4_predictive_entropy": {
+          "actual": 0.5286683258199424,
+          "recorded": 0.528668,
+          "matched": true
+        },
+        "ood_aggregate": {
+          "actual": 0.8000336130487297,
+          "recorded": 0.800034,
+          "matched": true
+        },
+        "ood_pass": {
+          "actual": 1.0,
+          "recorded": 1.0,
+          "matched": true
+        }
+      },
+      "ood_scenarios": [
+        {
+          "sigma": "0.15",
+          "method": "max_softmax",
+          "validation_auroc": 0.9909046227570546,
+          "test_auroc": 0.9195115261365134,
+          "corrupted_mean_max_softmax": 0.769058346748352,
+          "corrupted_predicted_class_counts": [
+            0,
+            7043,
+            137,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "clean_mean_max_softmax": 0.8807312250137329
+        },
+        {
+          "sigma": "0.15",
+          "method": "predictive_entropy",
+          "validation_auroc": 0.991794036084087,
+          "test_auroc": 0.9252045297600112,
+          "corrupted_mean_max_softmax": 0.769058346748352,
+          "corrupted_predicted_class_counts": [
+            0,
+            7043,
+            137,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "clean_mean_max_softmax": 0.8807312250137329
+        },
+        {
+          "sigma": "0.25",
+          "method": "max_softmax",
+          "validation_auroc": 0.9741614249941768,
+          "test_auroc": 0.90279781348686,
+          "corrupted_mean_max_softmax": 0.7735247015953064,
+          "corrupted_predicted_class_counts": [
+            0,
+            7179,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "clean_mean_max_softmax": 0.8807312250137329
+        },
+        {
+          "sigma": "0.25",
+          "method": "predictive_entropy",
+          "validation_auroc": 0.9709569291036084,
+          "test_auroc": 0.9018312629479909,
+          "corrupted_mean_max_softmax": 0.7735247015953064,
+          "corrupted_predicted_class_counts": [
+            0,
+            7179,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "clean_mean_max_softmax": 0.8807312250137329
+        },
+        {
+          "sigma": "0.4",
+          "method": "max_softmax",
+          "validation_auroc": 0.6345517121020444,
+          "test_auroc": 0.5777914995228157,
+          "corrupted_mean_max_softmax": 0.8791475296020508,
+          "corrupted_predicted_class_counts": [
+            0,
+            7180,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "clean_mean_max_softmax": 0.8807312250137329
+        },
+        {
+          "sigma": "0.4",
+          "method": "predictive_entropy",
+          "validation_auroc": 0.577337257819783,
+          "test_auroc": 0.5286683258199424,
+          "corrupted_mean_max_softmax": 0.8791475296020508,
+          "corrupted_predicted_class_counts": [
+            0,
+            7180,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "clean_mean_max_softmax": 0.8807312250137329
+        }
+      ],
+      "class_metrics": [
+        {
+          "name": "adipose",
+          "support": 1338,
+          "coverage": 0.7593423019431988,
+          "recall": 0.9551569506726457
+        },
+        {
+          "name": "background",
+          "support": 847,
+          "coverage": 0.9988193624557261,
+          "recall": 1.0
+        },
+        {
+          "name": "debris",
+          "support": 339,
+          "coverage": 0.8495575221238938,
+          "recall": 0.9351032448377581
+        },
+        {
+          "name": "lymphocytes",
+          "support": 634,
+          "coverage": 0.9842271293375394,
+          "recall": 1.0
+        },
+        {
+          "name": "mucus",
+          "support": 1035,
+          "coverage": 0.8879227053140096,
+          "recall": 0.9265700483091788
+        },
+        {
+          "name": "smooth muscle",
+          "support": 592,
+          "coverage": 0.41216216216216217,
+          "recall": 0.847972972972973
+        },
+        {
+          "name": "normal colon mucosa",
+          "support": 741,
+          "coverage": 0.9230769230769231,
+          "recall": 0.9811066126855601
+        },
+        {
+          "name": "cancer-associated stroma",
+          "support": 421,
+          "coverage": 0.5558194774346793,
+          "recall": 0.6437054631828979
+        },
+        {
+          "name": "colorectal adenocarcinoma epithelium",
+          "support": 1233,
+          "coverage": 0.06326034063260341,
+          "recall": 0.9537712895377128
+        }
+      ],
+      "baseline_metrics_recomputed": false,
+      "limitations": [
+        "Stored baseline predictions are absent; baseline metrics not independently recomputed.",
+        "Checkpoint inference and retraining replay are separate checks."
+      ]
+    }
+  ]
+}
