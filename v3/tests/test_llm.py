@@ -36,6 +36,64 @@ def autonomous_decision(epsilon=1e-7):
 
 
 class OllamaReasonerTests(unittest.TestCase):
+    def test_action_repair_names_conflicting_fields_and_preserves_latest_context(self):
+        invalid = {**autonomous_decision(), "candidate_id": "autonomous_t0001", "additional_epochs": 2}
+        calls, events = [], []
+
+        def transport(url, payload, timeout):
+            calls.append(len(payload["messages"]))
+            branches = {item["properties"]["action"]["const"]: item for item in payload["format"]["anyOf"]}
+            self.assertEqual(branches["new_trial"]["properties"]["candidate_id"]["type"], "null")
+            if len(calls) > 1:
+                feedback = payload["messages"][-1]["content"]
+                self.assertIn("candidate_id must be null or omitted", feedback)
+                self.assertIn("additional_epochs must be null or omitted", feedback)
+                self.assertIn("$: ", feedback)
+            return {"message": {"content": json.dumps(invalid if len(calls) < 3 else autonomous_decision())}}
+
+        result = OllamaReasoner("http://localhost:11434", retries=2, required=True,
+            transport=transport).decide(stage="test", system="test", user="test",
+            response_model=AutonomousSearchDecision,
+            fallback=dict(action="finish_search", rationale="No fallback permitted"),
+            audit=lambda event, **kw: events.append(kw))
+        self.assertEqual(result.value.action, "new_trial")
+        self.assertIsNone(result.value.candidate_id)
+        self.assertEqual(calls, [2, 4, 4])
+        self.assertEqual(len(events[-1]["rejected_responses"]), 2)
+
+    def test_epsilon_repair_can_reveal_and_then_repair_action_error(self):
+        invalid = {**autonomous_decision(.1), "candidate_id": "unassigned"}
+        calls = []
+
+        def transport(url, payload, timeout):
+            calls.append(payload["format"]["title"])
+            if len(calls) == 1:
+                content = invalid
+            elif len(calls) == 2:
+                content = {"optimizer_eps": "2e-7"}
+            else:
+                previous = json.loads(payload["messages"][-2]["content"])
+                self.assertEqual(previous["experiment"]["training"]["optimizer_eps"], 2e-7)
+                self.assertEqual(previous["candidate_id"], "unassigned")
+                self.assertIn("candidate_id must be null", payload["messages"][-1]["content"])
+                content = autonomous_decision(2e-7)
+            return {"message": {"content": json.dumps(content)}}
+
+        result = OllamaReasoner("http://localhost:11434", retries=2, required=True,
+            transport=transport).decide(stage="test", system="test", user="test",
+            response_model=AutonomousSearchDecision,
+            fallback=dict(action="finish_search", rationale="No fallback permitted"))
+        self.assertEqual(calls, ["AutonomousSearchDecision", "_OptimizerEpsilonRepair", "AutonomousSearchDecision"])
+        self.assertEqual(result.value.experiment.training.optimizer_eps, 2e-7)
+        self.assertIsNone(result.value.candidate_id)
+
+    def test_length_stop_rejects_even_syntactically_valid_json(self):
+        reasoner = OllamaReasoner("http://localhost:11434", retries=0, required=True,
+            transport=lambda *args: {"message": {"content": json.dumps(SAFE_CONFIG)}, "done_reason": "length"})
+        with self.assertRaisesRegex(OllamaDecisionError, "partial decision.*llm-num-predict"):
+            reasoner.decide(stage="test", system="test", user="test",
+                response_model=ExperimentDecision, fallback=SAFE_CONFIG)
+
     def test_timeout_does_not_consume_autonomous_validation_repair(self):
         valid = autonomous_decision()
         invalid = json.loads(json.dumps(valid))

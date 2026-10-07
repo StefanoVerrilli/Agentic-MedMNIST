@@ -66,6 +66,39 @@ class AutonomousTests(unittest.TestCase):
     def setUp(self):
         SimulatedWorker.calls = []
 
+    def test_action_schema_requires_only_the_selected_action_arguments(self):
+        schema = AutonomousSearchDecision.model_json_schema()
+        branches = {branch["properties"]["action"]["const"]: branch for branch in schema["anyOf"]}
+        self.assertEqual(set(branches), {"new_trial", "continue_trial", "finish_search"})
+        self.assertIn("experiment", branches["new_trial"]["required"])
+        self.assertIn("$ref", branches["new_trial"]["properties"]["experiment"])
+        self.assertEqual(branches["continue_trial"]["properties"]["experiment"]["type"], "null")
+        self.assertTrue({"candidate_id", "additional_epochs"} <= set(branches["continue_trial"]["required"]))
+        self.assertEqual(branches["continue_trial"]["properties"]["additional_epochs"]["minimum"], 1)
+        for name in ("experiment", "candidate_id", "additional_epochs"):
+            self.assertEqual(branches["finish_search"]["properties"][name]["type"], "null")
+        # This contract is also embedded in persisted AutonomousSearchEvent.
+        from contracts import AutonomousSearchEvent
+        nested = AutonomousSearchEvent.model_json_schema()
+        self.assertEqual(len(nested["$defs"]["AutonomousSearchDecision"]["anyOf"]), 3)
+
+    def test_action_validation_explains_missing_and_conflicting_arguments(self):
+        for payload, message in (
+            (dict(action="new_trial"), "experiment must be a complete"),
+            (dict(action="new_trial", experiment=experiment(), candidate_id="assigned"), "candidate_id must be null"),
+            (dict(action="continue_trial"), "additional_epochs must be a positive integer"),
+            (dict(action="continue_trial", candidate_id="candidate", additional_epochs=1, experiment=experiment()), "experiment must be null"),
+            (dict(action="finish_search", additional_epochs=2), "additional_epochs must be null"),
+        ):
+            with self.subTest(payload=payload), self.assertRaisesRegex(ValueError, message):
+                AutonomousSearchDecision(rationale="Test invalid action", **payload)
+
+    def test_autonomous_training_rejects_invalid_optimizer_scheduler_combinations(self):
+        for options in (dict(optimizer="sgd", momentum=0., nesterov=True),
+                        dict(scheduler="cosine", cosine_eta_min=.1)):
+            with self.subTest(options=options), self.assertRaises(ValueError):
+                experiment(**options)
+
     def populate(self, directory):
         return generated_test_support.GeneratedTests().populate(Path(directory) / "run")[0]
 
@@ -172,6 +205,11 @@ class AutonomousTests(unittest.TestCase):
             bb = self.populate(directory)
             reasoner = ScriptedReasoner(self.actions())
             AutonomousSearchAgent(reasoner, worker=WORKER, seed=42, device="cpu").run(bb)
+            initial_context = json.loads(reasoner.calls[0]["user"])
+            self.assertEqual(initial_context["available_actions"], ["new_trial"])
+            self.assertEqual(initial_context["resumable_candidate_ids"], [])
+            continuation_context = json.loads(reasoner.calls[1]["user"])
+            self.assertEqual(continuation_context["resumable_candidate_ids"], ["autonomous_t0001"])
             best = bb.get("best_configuration")
             self.assertEqual(best.train_config.epochs, 5)
             self.assertEqual(best.train_config.segment_targets, [2, 5])

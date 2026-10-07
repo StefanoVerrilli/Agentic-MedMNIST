@@ -41,6 +41,58 @@ class PipelineTests(unittest.TestCase):
             self.assertFalse(research.test_metrics_used)
             self.assertIn("compact_transformer", research.architecture_priorities)
             self.assertGreaterEqual(len(research.evidence_sources), 3)
+            self.assertEqual(set(research.evidence_provenance.values()), {"unverified_external_reference"})
+
+    def test_research_revision_receives_previous_brief_and_review(self):
+        from llm import ReasonedDecision
+        calls = []
+
+        class Capture:
+            enabled = True
+
+            def decide(self, **kwargs):
+                calls.append(kwargs)
+                return ReasonedDecision(kwargs["fallback"], "test", False, 1, None)
+
+        class Reviewer:
+            def review(self, bb, stage, *, attempt=1):
+                report = AnomalyReport(stage=stage, attempt=attempt,
+                    severity="warning" if attempt == 1 else "ok",
+                    action="revise" if attempt == 1 else "continue",
+                    comment="Clarify contingent proposals" if attempt == 1 else "Complete", source="test")
+                bb.put("anomaly_architecture_research", report, producer="reviewer")
+                return report
+
+        with tempfile.TemporaryDirectory() as directory:
+            bb = Blackboard(directory)
+            IngestionAgent(loader=lambda **kwargs: make_bundle()).run(bb)
+            ProfilingAmbiguityAgent(OllamaReasoner(base_url=None)).run(bb)
+            Orchestrator([ArchitectureResearchAgent(Capture())], Reviewer(), max_stage_retries=1).run(bb)
+            self.assertEqual(len(calls), 2)
+            self.assertIn("Clarify contingent proposals", calls[1]["user"])
+            self.assertIn("previous_research", calls[1]["user"])
+            self.assertIn("immediately available", calls[1]["system"])
+            self.assertEqual(bb.get("execution_status").status, "completed")
+
+    def test_stateful_stage_is_not_restarted_after_exception(self):
+        from autonomous import AutonomousSearchAgent
+        calls = []
+
+        class Stateful:
+            name = "model_search"
+            retry_on_exception = AutonomousSearchAgent.retry_on_exception
+
+            def run(self, bb):
+                calls.append("run")
+                raise RuntimeError("exhausted decision retries after a completed trial")
+
+        with tempfile.TemporaryDirectory() as directory:
+            bb = Blackboard(directory)
+            with self.assertRaisesRegex(RuntimeError, "exhausted decision"):
+                Orchestrator([Stateful()], None, max_stage_retries=3).run(bb)
+            self.assertEqual(calls, ["run"])
+            self.assertEqual(bb.get("execution_status").status, "failed:model_search")
+            self.assertFalse(any(row["event"] == "stage_retry" for row in bb.log))
 
     def test_official_validation_split_is_preserved(self) -> None:
         bundle = make_bundle()

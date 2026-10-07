@@ -11,6 +11,7 @@ import hashlib
 import json
 import os
 import re
+from copy import deepcopy
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Annotated, Any, Literal
@@ -621,6 +622,10 @@ class AutonomousTrainingOptions(ExecutionOptions):
         missing = required - self.model_fields_set
         if missing:
             raise ValueError(f"agent must explicitly choose active options: {sorted(missing)}")
+        if self.optimizer == "sgd" and self.nesterov and self.momentum <= 0:
+            raise ValueError("Nesterov requires positive momentum")
+        if self.scheduler == "cosine" and self.cosine_eta_min > self.lr:
+            raise ValueError("cosine_eta_min cannot exceed lr")
         return self
 
 
@@ -630,23 +635,55 @@ class AutonomousExperimentDecision(GeneratedCodeDecision):
     training: AutonomousTrainingOptions
 
 
+def _autonomous_action_schema(schema: dict[str, Any]) -> None:
+    """Expose the same action-specific arguments to JSON generators and Python."""
+    properties = schema.pop("properties")
+    schema.pop("required", None)
+    schema.pop("additionalProperties", None)
+    branches = []
+    for action, active in {
+        "new_trial": {"experiment"},
+        "continue_trial": {"candidate_id", "additional_epochs"},
+        "finish_search": set(),
+    }.items():
+        fields = deepcopy(properties)
+        fields["action"] = {"type": "string", "const": action}
+        for name in ("experiment", "candidate_id", "additional_epochs"):
+            fields[name] = (next(item for item in fields[name]["anyOf"] if item.get("type") != "null")
+                            if name in active else {"type": "null", "default": None})
+        branches.append({"type": "object", "properties": fields,
+                         "required": ["action", "rationale", *sorted(active)],
+                         "additionalProperties": False})
+    schema["anyOf"] = branches
+
+
 class AutonomousSearchDecision(StrictModel):
+    model_config = ConfigDict(json_schema_extra=_autonomous_action_schema)
+
     action: Literal["new_trial", "continue_trial", "finish_search"]
     rationale: str = Field(min_length=3, max_length=6000)
     experiment: AutonomousExperimentDecision | None = None
-    candidate_id: str | None = None
+    candidate_id: str | None = Field(default=None, min_length=1)
     additional_epochs: int | None = Field(default=None, ge=1, strict=True)
 
     @model_validator(mode="after")
     def action_arguments(self):
+        issues = []
         if self.action == "new_trial":
-            if self.experiment is None or self.candidate_id is not None or self.additional_epochs is not None:
-                raise ValueError("new_trial requires only an experiment")
+            if self.experiment is None:
+                issues.append("experiment must be a complete experiment object")
+            inactive = ("candidate_id", "additional_epochs")
         elif self.action == "continue_trial":
-            if not self.candidate_id or self.additional_epochs is None or self.experiment is not None:
-                raise ValueError("continue_trial requires candidate_id and additional_epochs, with no configuration changes")
-        elif any(value is not None for value in (self.experiment, self.candidate_id, self.additional_epochs)):
-            raise ValueError("finish_search cannot contain trial arguments")
+            if not self.candidate_id:
+                issues.append("candidate_id must identify an existing resumable trial")
+            if self.additional_epochs is None:
+                issues.append("additional_epochs must be a positive integer")
+            inactive = ("experiment",)
+        else:
+            inactive = ("experiment", "candidate_id", "additional_epochs")
+        issues.extend(f"{name} must be null or omitted" for name in inactive if getattr(self, name) is not None)
+        if issues:
+            raise ValueError(f"{self.action}: " + "; ".join(issues))
         return self
 
 
@@ -812,6 +849,8 @@ class ArchitectureResearch(Artefact):
     transformer_guidance: str
     risks: list[str] = Field(default_factory=list, max_length=8)
     evidence_sources: list[str] = Field(min_length=1, max_length=8)
+    evidence_provenance: dict[str, Literal["retrieved_abstract_only", "unverified_curated_excerpt",
+                                         "unverified_external_reference"]] = Field(default_factory=dict)
     test_metrics_used: Literal[False] = False
     source: str
 
@@ -1204,7 +1243,8 @@ class Blackboard:
             "prior_art": ["prior_art_brief", "extension_gate_report", "data_profile"],
             "data_audit": ["data_audit_report", "split_manifest", "data_profile"],
             "preprocessing": ["representation_plan", "split_manifest", "data_profile"],
-            "architecture_research": ["architecture_research", "data_profile"],
+            "architecture_research": ["architecture_research", "extension_gate_report",
+                                      "representation_plan", "data_profile"],
             "experiment_design": [
                 "train_config",
                 "representation_plan",
@@ -1241,6 +1281,7 @@ class Blackboard:
                   and not name.startswith("blob_")]
         ordered = list(dict.fromkeys([*preferred, *newest]))
         selected: dict[str, Any] = {}
+        compacted: list[dict[str, Any]] = []
         omitted: list[str] = []
         for name in ordered:
             artefact = self.artefacts.get(name)
@@ -1253,21 +1294,29 @@ class Blackboard:
                     vars(artefact) if hasattr(artefact, "__dict__") else artefact
                 )
             )
-            selected[name] = _compact_for_review(raw)
+            changes: list[dict[str, Any]] = []
+            # Research prose is the subject of this gate, not a preview. The
+            # primary artefact may exceed the soft context budget to stay intact.
+            selected[name] = (raw if stage == "architecture_research" and name == "architecture_research"
+                              else _compact_for_review(raw, path=name, changes=changes))
             candidate = {
                 "stage": stage,
                 "artefacts": selected,
                 "omitted_artefacts": omitted,
+                "compacted_fields": [*compacted, *changes],
             }
             text = json.dumps(candidate, ensure_ascii=False, sort_keys=True)
             if len(text) > max_chars and len(selected) > 1:
                 selected.pop(name)
                 omitted.append(name)
+            else:
+                compacted.extend(changes)
         return json.dumps(
             {
                 "stage": stage,
                 "artefacts": selected,
                 "omitted_artefacts": omitted,
+                "compacted_fields": compacted,
             },
             ensure_ascii=False,
             sort_keys=True,
@@ -1324,12 +1373,20 @@ def _json_safe(data: Any) -> Any:
     return json.loads(json.dumps(data, ensure_ascii=False, default=str))
 
 
-def _compact_for_review(data: Any) -> Any:
+def _compact_for_review(data: Any, *, path: str = "", changes: list | None = None) -> Any:
     """Bound verbose prose while preserving all structured numeric evidence."""
     if isinstance(data, str):
-        return data if len(data) <= 400 else data[:397] + "..."
+        if len(data) > 400:
+            if changes is not None:
+                changes.append({"path": path, "original_chars": len(data), "shown_chars": 397})
+            return data[:397] + "..."
+        return data
     if isinstance(data, list):
-        return [_compact_for_review(item) for item in data[:20]]
+        if len(data) > 20 and changes is not None:
+            changes.append({"path": path, "original_items": len(data), "shown_items": 20})
+        return [_compact_for_review(item, path=f"{path}[{index}]", changes=changes)
+                for index, item in enumerate(data[:20])]
     if isinstance(data, dict):
-        return {str(key): _compact_for_review(value) for key, value in data.items()}
+        return {str(key): _compact_for_review(value, path=f"{path}.{key}", changes=changes)
+                for key, value in data.items()}
     return data

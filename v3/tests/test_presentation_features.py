@@ -10,7 +10,7 @@ from unittest.mock import patch
 
 import numpy as np
 
-from agents import (DataAuditAgent, IngestionAgent, PreprocessingAgent, PriorArtScoutAgent,
+from agents import (ArchitectureResearchAgent, DataAuditAgent, IngestionAgent, PreprocessingAgent, PriorArtScoutAgent,
                     ProfilingAmbiguityAgent, ReviewerConsistencyAgent)
 from contracts import (Blackboard, ExtensionProposal, HumanReviewQueue, LiteratureDecision,
                        PriorArtBrief, RepresentationDecision, sha256_file)
@@ -41,6 +41,10 @@ class PresentationFeaturesTests(unittest.TestCase):
             brief = bb.get("prior_art_brief")
             self.assertEqual(citation_issues(brief, bb.root), [])
             self.assertEqual(brief.retrieval_mode, "bundled")
+            ArchitectureResearchAgent(reasoner).run(bb)
+            research = bb.get("architecture_research")
+            self.assertEqual(set(research.evidence_provenance), {source.url for source in brief.sources})
+            self.assertEqual(set(research.evidence_provenance.values()), {"unverified_curated_excerpt"})
             calls = []
             class Capture:
                 seed = 42

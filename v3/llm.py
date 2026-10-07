@@ -162,6 +162,8 @@ class OllamaReasoner:
             },
             {"role": "user", "content": user},
         ]
+        full_messages = list(messages)
+        base_messages = full_messages
         payload = {
             "model": self.model,
             "messages": messages,
@@ -191,6 +193,7 @@ class OllamaReasoner:
             started = time.monotonic()
             response = None
             content = None
+            feedback_content = None
             parsed = None
             try:
                 with _GLOBAL_OLLAMA_LOCK:
@@ -210,8 +213,11 @@ class OllamaReasoner:
                             f"{self.base_url}/api/chat", payload, self.timeout
                         )
                 content = response["message"]["content"]
+                feedback_content = content
                 if not isinstance(content, str) or not content.strip():
                     raise ValueError("Ollama returned no JSON message content")
+                if response.get("done_reason") == "length":
+                    raise ValueError("Ollama exhausted its output budget; a partial decision cannot be accepted")
                 parsed = json.loads(content)
                 if epsilon_document is not None:
                     correction = _OptimizerEpsilonRepair.model_validate(parsed)
@@ -220,6 +226,17 @@ class OllamaReasoner:
                     for key in epsilon_path[:-1]:
                         target = target[key]
                     target[epsilon_path[-1]] = float(correction.optimizer_eps)
+                    field_repairs[-1]["replacement_value"] = float(correction.optimizer_eps)
+                    # Nested errors can hide action-level errors. Once epsilon is
+                    # corrected, allow a subsequent retry to repair the full action.
+                    epsilon_document = None
+                    epsilon_path = None
+                    base_messages = full_messages
+                    messages = list(base_messages)
+                    payload["messages"] = messages
+                    if payload["format"] != "json":
+                        payload["format"] = schema
+                    feedback_content = json.dumps(parsed, ensure_ascii=False)
                 decision = response_model.model_validate(parsed)
                 _audit(
                     audit,
@@ -237,6 +254,9 @@ class OllamaReasoner:
                     output_format="json" if payload["format"] == "json" else "json_schema",
                     format_negotiation=format_negotiation,
                     field_repairs=field_repairs,
+                    error_types=",".join(errors),
+                    error_details=error_details,
+                    rejected_responses=rejected_responses,
                     decision=decision.model_dump(mode="json"),
                 )
                 return ReasonedDecision(
@@ -246,7 +266,7 @@ class OllamaReasoner:
                 errors.append(type(exc).__name__)
                 if isinstance(exc, ValidationError):
                     detail = "; ".join(
-                        f"{'.'.join(map(str, row['loc']))}: {row['msg']}"
+                        f"{'.'.join(map(str, row['loc'])) or '$'}: {row['msg']}"
                         for row in exc.errors(include_url=False)[:8]
                     )
                     validation_errors = exc.errors(include_url=False)
@@ -305,14 +325,18 @@ class OllamaReasoner:
                             })},
                         ]
                         payload["messages"] = messages
+                        base_messages = list(messages)
                         if payload["format"] != "json":
                             payload["format"] = repair_schema
                         field_repairs.append({"after_attempt": attempt,
                             "field": ".".join(epsilon_path),
                             "rejected_value": validation_errors[0]["input"]})
                         continue
-                    if isinstance(content, str) and content.strip():
-                        messages.append({"role": "assistant", "content": content})
+                    # Retain only the latest rejection, not every generated source
+                    # file from earlier attempts (which can crowd out the prompt).
+                    messages[:] = base_messages
+                    if isinstance(feedback_content, str) and feedback_content.strip():
+                        messages.append({"role": "assistant", "content": feedback_content})
                     messages.append(
                         {
                             "role": "user",

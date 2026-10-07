@@ -7,7 +7,7 @@ from pathlib import Path
 
 from pydantic import ValidationError
 
-from contracts import Blackboard, ExperimentDecision, RunManifest
+from contracts import ArchitectureResearch, Blackboard, ExperimentDecision, RunManifest
 
 
 def manifest(run_id: str = "test") -> RunManifest:
@@ -25,6 +25,25 @@ def manifest(run_id: str = "test") -> RunManifest:
 
 
 class ContractTests(unittest.TestCase):
+    def test_research_review_gets_full_prose_and_other_previews_are_labelled(self):
+        research = ArchitectureResearch(
+            analysis="Complete analysis. " * 400,
+            transformer_guidance="Complete transformer guidance. " * 150,
+            representation_priorities=["unit scaling"], parametrization_priorities=["control capacity"],
+            architecture_priorities=["resnet18", "compact_transformer"],
+            evidence_sources=["https://arxiv.org/abs/2104.05704"], source="test")
+        with tempfile.TemporaryDirectory() as directory:
+            bb = Blackboard(directory)
+            bb.put("architecture_research", research, producer="test")
+            context = json.loads(bb.review_context("architecture_research", max_chars=1000))
+            self.assertEqual(context["artefacts"]["architecture_research"]["analysis"], research.analysis)
+            self.assertEqual(context["artefacts"]["architecture_research"]["transformer_guidance"], research.transformer_guidance)
+            self.assertEqual(context["compacted_fields"], [])
+            preview = json.loads(bb.review_context("general"))
+            self.assertTrue(preview["artefacts"]["architecture_research"]["analysis"].endswith("..."))
+            self.assertIn("architecture_research.analysis", [row["path"] for row in preview["compacted_fields"]])
+            self.assertEqual(bb.get("architecture_research").analysis, research.analysis)
+
     def test_conditional_architecture_options_are_enforced(self) -> None:
         from contracts import CandidateProposal
 

@@ -1015,6 +1015,20 @@ class ArchitectureResearchAgent:
     def run(self, bb: Blackboard) -> None:
         profile = _profile(bb)
         manifest = _manifest(bb)
+        brief = bb.get_optional("prior_art_brief")
+        evidence_provenance = (
+            {source.url: ("retrieved_abstract_only" if source.origin == "arxiv_api"
+                          else "unverified_curated_excerpt") for source in brief.sources}
+            if isinstance(brief, PriorArtBrief) else
+            {url: "unverified_external_reference" for url in self.EVIDENCE_SOURCES}
+        )
+        gate = bb.get_optional("extension_gate_report")
+        previous_review = bb.get_optional("anomaly_architecture_research")
+        revision = None
+        if previous_review is not None and previous_review.action == "revise":
+            previous = bb.get_optional("architecture_research")
+            revision = {"review": previous_review.model_dump(mode="json"),
+                        "previous_research": previous.model_dump(mode="json") if previous else None}
         fallback = ArchitectureResearchDecision(
             analysis=(
                 "PathMNIST has small 28x28 RGB tissue patches and a separate-centre "
@@ -1053,7 +1067,17 @@ class ArchitectureResearchAgent:
                 "inputs are 28x28 RGB; resnet18 already uses a CIFAR-style 3x3, "
                 "stride-1 stem without max-pooling; compact_transformer uses a "
                 "configurable convolutional tokenizer. Do not infer an ImageNet "
-                "7x7 stride-2 stem."
+                "7x7 stride-2 stem. All seven listed families are implemented built-ins "
+                "and immediately available; they do not require extension approval. "
+                "Mark guidance that depends on a pending new extension as 'pending extension approval', "
+                "including its representation and parametrization entries. A reviewed architecture "
+                "specification still requires implementation. Order immediately actionable choices "
+                "ahead of contingent proposals, without treating built-in transformers as pending. "
+                "Respect the supplied evidence provenance: curated excerpts and bare external URLs "
+                "are unverified external evidence; retrieved abstracts do not verify performance claims. "
+                "Return complete analysis and transformer_guidance within their length limits, "
+                "without placeholders or ellipses standing in for missing analysis. "
+                "If revision feedback is supplied, correct the previous brief using these implementation facts."
             ),
             user=(
                 f"image_shape={profile.image_shape_hwc}; train_samples="
@@ -1061,8 +1085,9 @@ class ArchitectureResearchAgent:
                 f"{manifest.loaded_split_sizes['val']}; imbalance="
                 f"{profile.imbalance_ratio}; channel_mean="
                 f"{profile.train_channel_mean_unit}; channel_std="
-                f"{profile.train_channel_std_unit}; evidence={self.EVIDENCE_SOURCES}; "
-                f"cited_hypotheses={_literature_context(bb)}"
+                f"{profile.train_channel_std_unit}; evidence_provenance={json.dumps(evidence_provenance)}; "
+                f"extension_gate={gate.model_dump_json() if gate else 'unavailable'}; "
+                f"cited_hypotheses={_literature_context(bb)}; revision={json.dumps(revision)}"
             ),
             response_model=ArchitectureResearchDecision,
             fallback=fallback,
@@ -1073,15 +1098,17 @@ class ArchitectureResearchAgent:
             "architecture_research",
             ArchitectureResearch(
                 **value.model_dump(),
-                evidence_sources=(
-                    [source.url for source in bb.get('prior_art_brief').sources]
-                    if isinstance(bb.get_optional('prior_art_brief'), PriorArtBrief)
-                    else self.EVIDENCE_SOURCES
-                ),
+                evidence_sources=list(evidence_provenance),
+                evidence_provenance=evidence_provenance,
                 source=decision.source,
             ),
             producer=self.name,
         )
+
+    def revise(self, bb: Blackboard, report: AnomalyReport) -> bool:
+        # The orchestrator reruns this stage with its persisted review and the
+        # complete previous brief. No automatic editing of scientific claims.
+        return self.reasoner.enabled or bool(getattr(self.reasoner, "replay_root", None))
 
 
 class FrozenConfigurationAgent:
@@ -1605,6 +1632,14 @@ class ReviewerConsistencyAgent:
                 "them transformer hybrids. Built-in augmentations (hflip, vflip, "
                 "rotate90, rotate180, brightness, contrast) do not require extension "
                 "approval; pending new proposals do not invalidate these primitives. "
+                "All seven built-in families (tiny_cnn, residual_cnn, resnet18, vision_transformer, "
+                "compact_transformer, multi_scale_transformer, feature_pyramid_transformer) are "
+                "implemented and need no extension approval. Gate status applies only to the "
+                "specific new proposals. Respect evidence_provenance: curated excerpts and bare "
+                "URLs are unverified external evidence, while retrieved abstracts alone do not "
+                "verify performance claims. Entries in compacted_fields identify preview truncation "
+                "performed for this review, not incomplete persisted artefacts. Do not request "
+                "regeneration solely because of these previews or omitted_artefacts. "
                 "A cited quote establishes traceability, not support for every "
                 "scientific inference: assess that support separately. The OOD "
                 "aggregate is the arithmetic mean of the selected score's AUROCs "

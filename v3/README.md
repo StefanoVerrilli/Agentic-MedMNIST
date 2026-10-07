@@ -40,10 +40,27 @@ chiede a Ollama soltanto quel valore, espresso come stringa in notazione scienti
 con uno schema che ne vincola l'intervallo. Il codice e gli altri parametri della
 proposta vengono conservati; la decisione completa viene nuovamente validata.
 Il log registra il valore rifiutato e la correzione mirata in `field_repairs`.
+Lo schema distingue `new_trial`, `continue_trial` e `finish_search`: i campi
+inattivi devono essere assenti o null. Per `new_trial` l'identificativo del trial
+viene assegnato dal framework. Le correzioni successive ricevono la proposta più
+recente e gli errori precisi, anche quando una correzione di epsilon rende visibile
+un errore negli argomenti dell'azione. I tentativi rifiutati restano nel log anche
+in caso di recupero riuscito. Esauriti i retry, la ricerca autonoma non viene
+riavviata dall'orchestratore, evitando di perdere la storia o riusare i checkpoint.
 Per generazioni lente si configura `--llm-timeout` (default 90 secondi). Se Ollama
 segnala `done_reason=length`, si aumenta `--llm-num-predict` (default 16384 token,
 anche tramite `AGENTIC_LLM_NUM_PREDICT`). Sono limiti delle chiamate LLM;
 le epoche di training restano scelte dagli agenti.
+Una risposta terminata con `done_reason=length` viene rifiutata anche se il JSON
+risulta sintatticamente valido.
+
+Il revisore della ricerca riceve `analysis` e `transformer_guidance` completi;
+le anteprime abbreviate degli altri artefatti sono segnalate in `compacted_fields`.
+Le richieste di revisione della ricerca includono il testo precedente e i rilievi.
+`evidence_provenance` distingue abstract recuperati, estratti curati non verificati
+e riferimenti esterni non verificati. Tutte le sette architetture integrate,
+inclusi i transformer, sono già disponibili: l'approvazione riguarda soltanto
+le nuove proposte di estensione e non impone una priorità artificiale alle CNN.
 
 Split ufficiali, metriche, seed e protocollo di valutazione restano gestiti dal
 framework. La ricerca vede solo training e validation; il test viene utilizzato

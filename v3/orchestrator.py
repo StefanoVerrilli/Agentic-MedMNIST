@@ -41,7 +41,7 @@ class Orchestrator:
                         error_type=type(exc).__name__,
                         error=str(exc)[:500],
                     )
-                    if attempt <= self.max_stage_retries:
+                    if attempt <= self.max_stage_retries and getattr(agent, "retry_on_exception", True):
                         bb.record_event(
                             "stage_retry",
                             stage=agent.name,

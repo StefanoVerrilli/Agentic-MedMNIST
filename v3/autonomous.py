@@ -22,8 +22,10 @@ all search actions. No allocated epoch ceiling, trial count or round count exist
 Choose new_trial (complete experiment, explicit training options and initial epochs),
 continue_trial (existing candidate_id and positive additional_epochs), or finish_search.
 For new_trial, experiment is required; candidate_id and additional_epochs must be null.
+The framework assigns the new candidate_id; do not invent one for new_trial.
 For continue_trial, experiment must be null. For finish_search, all three arguments
 must be null. Do not include fields belonging to another action.
+Choose only from available_actions and resumable_candidate_ids supplied in the request.
 In experiment.training, explicitly supply every active optimizer and scheduler option:
 sgd requires momentum and nesterov; adam/adamw require adam_beta1, adam_beta2 and
 optimizer_eps.
@@ -76,6 +78,9 @@ def experiment_config(experiment, reference, worker, seed, device, source):
 
 class AutonomousSearchAgent:
     name = "model_search"
+    # Decisions already have bounded retries. Restarting the entire stage would
+    # discard its in-memory history and reuse checkpoint/candidate identifiers.
+    retry_on_exception = False
 
     def __init__(self, reasoner, *, worker, seed, device, accuracy_tolerance=0.005):
         self.reasoner, self.worker, self.seed, self.device = reasoner, worker, seed, device
@@ -93,6 +98,9 @@ class AutonomousSearchAgent:
         sequence, candidate_sequence = 0, 0
         while True:
             sequence += 1
+            resumable = sorted(candidate_id for candidate_id, trial in latest.items()
+                               if trial.resume_path and trial.stop_reason != "early_stopping"
+                               and trial.config.scheduler != "one_cycle")
             evidence = [{"candidate_id": t.candidate_id, "status": t.status,
                 "validation_accuracy": t.validation_accuracy, "validation_macro_f1": t.validation_macro_f1,
                 "epochs_completed": t.epochs_completed, "requested_target": t.config.epochs,
@@ -104,6 +112,9 @@ class AutonomousSearchAgent:
                 user=json.dumps({"profile": bb.get("data_profile").model_dump(mode="json"),
                     "research": bb.get("architecture_research").model_dump(mode="json"),
                     "validation_evidence": evidence, "test_split": "locked",
+                    "available_actions": (["new_trial"] + (["continue_trial"] if resumable else [])
+                                          + (["finish_search"] if latest else [])),
+                    "resumable_candidate_ids": resumable,
                     "resources": {"operation_timeout_seconds": self.worker.timeout_seconds,
                                   "backend": "local.subprocess", "memory_limit_enforced": False}}, ensure_ascii=False, sort_keys=True),
                 response_model=AutonomousSearchDecision,
@@ -130,7 +141,7 @@ class AutonomousSearchAgent:
                 candidate_id = f"autonomous_t{candidate_sequence:04d}"
             else:
                 parent = latest.get(action.candidate_id)
-                if parent is None or not parent.resume_path or parent.stop_reason == "early_stopping":
+                if action.candidate_id not in resumable:
                     raise ValueError("continuation requires a successful resumable trial without early stopping")
                 config = parent.config.model_copy(update={"epochs": parent.epochs_completed + action.additional_epochs})
                 candidate_id = parent.candidate_id
