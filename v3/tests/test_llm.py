@@ -23,17 +23,21 @@ SAFE_CONFIG = {
 }
 
 
-class OllamaReasonerTests(unittest.TestCase):
-    def test_timeout_does_not_consume_autonomous_validation_repair(self):
-        training = dict(lr=.002, weight_decay=.0001, class_weighting=False,
+def autonomous_decision(epsilon=1e-7):
+    training = dict(lr=.002, weight_decay=.0001, class_weighting=False,
             optimizer="adamw", scheduler="none", label_smoothing=0.,
             early_stopping_patience=0, early_stopping_monitor="val_accuracy",
             early_stopping_min_delta=0., gradient_clip_val=1.,
-            adam_beta1=.85, adam_beta2=.995, optimizer_eps=1e-7)
-        valid = dict(action="new_trial", rationale="Test a compact model",
+            adam_beta1=.85, adam_beta2=.995, optimizer_eps=epsilon)
+    return dict(action="new_trial", rationale="Test a compact model",
             experiment=dict(bundle_id="compact_experiment", hypothesis="Test a compact model",
                 files=[dict(path="experiment.py", code="def build_model(context):\n    pass\n")],
                 parameters={}, epochs=2, batch_size=64, training=training))
+
+
+class OllamaReasonerTests(unittest.TestCase):
+    def test_timeout_does_not_consume_autonomous_validation_repair(self):
+        valid = autonomous_decision()
         invalid = json.loads(json.dumps(valid))
         invalid["experiment"]["training"]["optimizer_eps"] = .1
         calls, events = [], []
@@ -44,9 +48,9 @@ class OllamaReasonerTests(unittest.TestCase):
                 raise TimeoutError("timed out")
             if len(calls) == 2:
                 return {"message": {"content": json.dumps(invalid)}}
-            self.assertEqual(json.loads(payload["messages"][-2]["content"]), invalid)
             self.assertIn("experiment.training.optimizer_eps", payload["messages"][-1]["content"])
-            return {"message": {"content": json.dumps(valid)}}
+            self.assertEqual(payload["format"]["properties"]["optimizer_eps"]["type"], "string")
+            return {"message": {"content": '{"optimizer_eps": "1e-7"}'}}
 
         reasoner = OllamaReasoner("http://localhost:11434", transport=transport,
                                  retries=1, required=True)
@@ -58,8 +62,63 @@ class OllamaReasonerTests(unittest.TestCase):
         self.assertEqual(result.attempts, 3)
         self.assertEqual(result.value.experiment.training.optimizer_eps, 1e-7)
         self.assertEqual(result.value.experiment.training.adam_beta1, .85)
-        self.assertEqual(calls, [2, 2, 4])
+        self.assertEqual(calls, [2, 2, 2])
         self.assertEqual(events[-1]["attempts"], 3)
+        expected = AutonomousSearchDecision.model_validate(valid)
+        self.assertEqual(result.value, expected)
+        self.assertEqual(events[-1]["field_repairs"][0]["rejected_value"], .1)
+
+    def test_focused_epsilon_repair_enforces_bounds_and_preserves_experiment(self):
+        for replacement in ("1e-12", "9.9e-12", "2.5e-7", "9.99e-3", "1e-2"):
+            for original in (.1, 1e-13):
+                with self.subTest(replacement=replacement, original=original):
+                    calls = []
+
+                    def transport(url, payload, timeout):
+                        calls.append(payload["format"])
+                        content = autonomous_decision(original) if len(calls) == 1 else {"optimizer_eps": replacement}
+                        return {"message": {"content": json.dumps(content)}}
+
+                    result = OllamaReasoner("http://localhost:11434", transport=transport,
+                        retries=1, required=True).decide(stage="test", system="test", user="test",
+                        response_model=AutonomousSearchDecision,
+                        fallback=dict(action="finish_search", rationale="No fallback permitted"))
+                    self.assertEqual(result.value, AutonomousSearchDecision.model_validate(
+                        autonomous_decision(float(replacement))))
+                    self.assertFalse(result.used_fallback)
+
+    def test_focused_epsilon_repair_rejects_invalid_values_and_extra_changes(self):
+        for correction in ({"optimizer_eps": "1e-1"}, {"optimizer_eps": "1e-13"},
+                           {"optimizer_eps": "NaN"}, {"optimizer_eps": .1},
+                           {"optimizer_eps": "1e-7", "lr": .1}):
+            with self.subTest(correction=correction):
+                responses = iter((autonomous_decision(.1), correction, correction))
+                events = []
+                reasoner = OllamaReasoner("http://localhost:11434", retries=2, required=True,
+                    transport=lambda *args: {"message": {"content": json.dumps(next(responses))}})
+                with self.assertRaisesRegex(OllamaDecisionError, "after 3 attempts"):
+                    reasoner.decide(stage="test", system="test", user="test",
+                        response_model=AutonomousSearchDecision,
+                        fallback=dict(action="finish_search", rationale="No fallback permitted"),
+                        audit=lambda event, **kw: events.append(kw))
+                self.assertIsNone(events[-1]["decision"])
+                self.assertEqual(events[-1]["field_repairs"][0]["rejected_value"], .1)
+
+    def test_multiple_errors_require_full_decision_repair(self):
+        invalid = autonomous_decision(.1)
+        invalid["experiment"]["training"]["lr"] = -1
+        calls = []
+
+        def transport(url, payload, timeout):
+            calls.append(payload["format"]["title"])
+            return {"message": {"content": json.dumps(invalid if len(calls) == 1 else autonomous_decision())}}
+
+        result = OllamaReasoner("http://localhost:11434", retries=1, required=True,
+            transport=transport).decide(stage="test", system="test", user="test",
+            response_model=AutonomousSearchDecision,
+            fallback=dict(action="finish_search", rationale="No fallback permitted"))
+        self.assertEqual(calls, ["AutonomousSearchDecision"] * 2)
+        self.assertFalse(result.used_fallback)
 
     def test_mixed_failures_remain_bounded_and_report_actual_attempts(self):
         for required in (True, False):

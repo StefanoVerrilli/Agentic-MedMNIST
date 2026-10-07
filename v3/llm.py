@@ -17,15 +17,26 @@ import urllib.request
 import urllib.error
 import uuid
 from collections.abc import Callable
+from copy import deepcopy
 from dataclasses import dataclass
 from typing import Any, Generic, Protocol, TypeVar
 
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 DecisionT = TypeVar("DecisionT", bound=BaseModel)
 AuditSink = Callable[..., Any]
 Transport = Callable[[str, dict[str, Any], float], dict[str, Any]]
 _GLOBAL_OLLAMA_LOCK = threading.Lock()
+
+
+class _OptimizerEpsilonRepair(BaseModel):
+    """String grammar encodes the numeric bounds for a focused LLM repair."""
+
+    model_config = ConfigDict(extra="forbid")
+    optimizer_eps: str = Field(
+        pattern=r"^(?:[1-9](?:\.[0-9]+)?e-(?:[3-9]|1[0-2])|1(?:\.0+)?e-2)$",
+        description="Choose epsilon from 1e-12 to 1e-2 inclusive, as a scientific-notation string.",
+    )
 
 
 class OllamaDecisionError(RuntimeError):
@@ -168,6 +179,9 @@ class OllamaReasoner:
         error_details: list[str] = []
         rejected_responses: list[dict[str, Any]] = []
         format_negotiation: list[str] = []
+        epsilon_document = None
+        epsilon_path = None
+        field_repairs: list[dict[str, Any]] = []
         # A transport failure produces no decision to repair. Keep its retry
         # budget separate so a timeout cannot consume JSON correction attempts.
         transport_failures = validation_failures = 0
@@ -177,6 +191,7 @@ class OllamaReasoner:
             started = time.monotonic()
             response = None
             content = None
+            parsed = None
             try:
                 with _GLOBAL_OLLAMA_LOCK:
                     try:
@@ -198,6 +213,13 @@ class OllamaReasoner:
                 if not isinstance(content, str) or not content.strip():
                     raise ValueError("Ollama returned no JSON message content")
                 parsed = json.loads(content)
+                if epsilon_document is not None:
+                    correction = _OptimizerEpsilonRepair.model_validate(parsed)
+                    parsed = deepcopy(epsilon_document)
+                    target = parsed
+                    for key in epsilon_path[:-1]:
+                        target = target[key]
+                    target[epsilon_path[-1]] = float(correction.optimizer_eps)
                 decision = response_model.model_validate(parsed)
                 _audit(
                     audit,
@@ -214,6 +236,7 @@ class OllamaReasoner:
                     total_duration_ns=response.get("total_duration"),
                     output_format="json" if payload["format"] == "json" else "json_schema",
                     format_negotiation=format_negotiation,
+                    field_repairs=field_repairs,
                     decision=decision.model_dump(mode="json"),
                 )
                 return ReasonedDecision(
@@ -226,6 +249,10 @@ class OllamaReasoner:
                         f"{'.'.join(map(str, row['loc']))}: {row['msg']}"
                         for row in exc.errors(include_url=False)[:8]
                     )
+                    validation_errors = exc.errors(include_url=False)
+                    for row in validation_errors[:8]:
+                        if row["loc"] and row["loc"][-1] == "optimizer_eps":
+                            detail += f" (rejected optimizer_eps={str(row.get('input'))[:120]})"
                 else:
                     detail = _error_detail(exc)
                 if isinstance(exc, TimeoutError):
@@ -253,6 +280,37 @@ class OllamaReasoner:
                     validation_failures += 1
                     retry = validation_failures <= self.retries
                 if retry and not isinstance(exc, OSError):
+                    if (epsilon_document is None and isinstance(exc, ValidationError)
+                            and len(validation_errors) == 1
+                            and validation_errors[0]["loc"] == ("experiment", "training", "optimizer_eps")
+                            and validation_errors[0]["type"] in {"less_than_equal", "greater_than_equal"}
+                            and isinstance(parsed, dict)):
+                        epsilon_document = deepcopy(parsed)
+                        epsilon_path = validation_errors[0]["loc"]
+                        repair_schema = _OptimizerEpsilonRepair.model_json_schema()
+                        # Keep code and all other agent choices intact. Request only
+                        # epsilon, with bounds encoded in a string grammar instead
+                        # of relying on the backend to enforce numeric inequalities.
+                        messages = [
+                            {"role": "system", "content": (
+                                "Correct only the optimizer numerical stability epsilon. "
+                                "Choose the value yourself. Return only JSON conforming to: "
+                                + json.dumps(repair_schema))},
+                            {"role": "user", "content": json.dumps({
+                                "field": ".".join(epsilon_path),
+                                "validation_error": detail,
+                                "training": parsed["experiment"]["training"],
+                                "instruction": "Return only optimizer_eps as a scientific-notation string, "
+                                    "with a one-digit mantissa before the decimal point and a negative exponent.",
+                            })},
+                        ]
+                        payload["messages"] = messages
+                        if payload["format"] != "json":
+                            payload["format"] = repair_schema
+                        field_repairs.append({"after_attempt": attempt,
+                            "field": ".".join(epsilon_path),
+                            "rejected_value": validation_errors[0]["input"]})
+                        continue
                     if isinstance(content, str) and content.strip():
                         messages.append({"role": "assistant", "content": content})
                     messages.append(
@@ -285,6 +343,7 @@ class OllamaReasoner:
             num_predict=self.num_predict,
             output_format="json" if payload["format"] == "json" else "json_schema",
             format_negotiation=format_negotiation,
+            field_repairs=field_repairs,
             decision=(
                 None if self.required else validated_fallback.model_dump(mode="json")
             ),

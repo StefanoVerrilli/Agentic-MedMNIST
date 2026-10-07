@@ -35,6 +35,11 @@ e alle risposte non valide: un timeout non consuma la possibilità di correggere
 il JSON. Con il default di 1 retry si effettuano al massimo 3 chiamate logiche
 per decisione. La validazione resta obbligatoria, incluso `optimizer_eps`
 nell'intervallo da `1e-12` a `0.01`.
+Se l'unico errore è `experiment.training.optimizer_eps` fuori intervallo, il retry
+chiede a Ollama soltanto quel valore, espresso come stringa in notazione scientifica
+con uno schema che ne vincola l'intervallo. Il codice e gli altri parametri della
+proposta vengono conservati; la decisione completa viene nuovamente validata.
+Il log registra il valore rifiutato e la correzione mirata in `field_repairs`.
 Per generazioni lente si configura `--llm-timeout` (default 90 secondi). Se Ollama
 segnala `done_reason=length`, si aumenta `--llm-num-predict` (default 16384 token,
 anche tramite `AGENTIC_LLM_NUM_PREDICT`). Sono limiti delle chiamate LLM;
