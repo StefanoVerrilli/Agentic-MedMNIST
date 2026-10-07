@@ -1,0 +1,24 @@
+{
+  "artefact": "anomaly_profiling",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-07T12:19:51.702922+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Profiling stage is clean and internally consistent. PathMNIST (9-class, 28×28 RGB, standard MedMNIST distribution) loaded with exact official split sizes (train=89996, val=10004, test=7180), no subsampling, archive MD5 verified. Data profile is thorough: modest class imbalance (ratio 1.63), no blank images, no duplicates, train/val class proportions closely aligned (max deviation <0.001), and channel statistics in expected [0,1] range. Ambiguity risks for visually similar histology classes at 28×28 resolution are well-identified and realistic. The test-domain note (CRC-VAL-HE-7K from a different clinical center) is a known dataset property relevant to OOD evaluation, not a defect. Two minor LLM-flagged items are non-blocking: (1) worker image_digest is null, expected at this stage but should be populated before training for full reproducibility; (2) isolation.enforced=false with local_subprocess execution, acceptable but noted for audit trail. No deterministic findings. Compacted-field previews (ambiguity_note, anomaly_ingestion.comment) are preview truncations only, not incomplete artefacts. Proceed to next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "worker image_digest is null; verify it is populated before training begins for full reproducibility audit trail",
+      "isolation.enforced=false with local_subprocess execution; acceptable but noted for reproducibility audit trail"
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8:latest",
+    "stage": "profiling"
+  },
+  "payload_sha256": "00ad5612914fa31ad76a3da7a595421791103240e082d810c83f144e8da289b7",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 9,
+  "version": 1
+}

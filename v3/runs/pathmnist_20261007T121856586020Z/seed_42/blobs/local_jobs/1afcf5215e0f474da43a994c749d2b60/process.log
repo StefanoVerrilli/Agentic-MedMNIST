@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/media/neurone-pc11/Volume1/Giuseppe/Agentic-MedMNIST/v3/runs/pathmnist_20261007T121856586020Z/seed_42/blobs/local_jobs/1afcf5215e0f474da43a994c749d2b60/input/framework/worker_runtime.py", line 225, in <module>
+    main()
+  File "/media/neurone-pc11/Volume1/Giuseppe/Agentic-MedMNIST/v3/runs/pathmnist_20261007T121856586020Z/seed_42/blobs/local_jobs/1afcf5215e0f474da43a994c749d2b60/input/framework/worker_runtime.py", line 194, in main
+    result = train(context)
+             ^^^^^^^^^^^^^^
+  File "/media/neurone-pc11/Volume1/Giuseppe/Agentic-MedMNIST/v3/runs/pathmnist_20261007T121856586020Z/seed_42/blobs/local_jobs/1afcf5215e0f474da43a994c749d2b60/input/bundle/experiment.py", line 240, in train
+    imgs = _normalize(imgs)
+           ^^^^^^^^^^^^^^^^
+  File "/media/neurone-pc11/Volume1/Giuseppe/Agentic-MedMNIST/v3/runs/pathmnist_20261007T121856586020Z/seed_42/blobs/local_jobs/1afcf5215e0f474da43a994c749d2b60/input/bundle/experiment.py", line 81, in _normalize
+    return (images - mean) / std
+            ~~~~~~~^~~~~~
+ValueError: operands could not be broadcast together with shapes (9,3,28,28) (1,1,1,3) 

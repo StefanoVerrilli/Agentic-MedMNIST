@@ -1,0 +1,30 @@
+{
+  "artefact": "generated_compact_resnet_pathmnist_v4",
+  "artefact_type": "GeneratedBundle",
+  "created_at": "2026-10-07T12:29:25.846430+00:00",
+  "payload": {
+    "author": "experimental_development",
+    "files": {
+      "experiment.py": "04b4b638ffe949d80130c30f06d55987b10649d30a1a3d6b59aa5025d96e1dd2"
+    },
+    "hypothesis": "A compact ResNet-style CNN with CIFAR-style 3x3 stride-1 stem (preserving 28x28 spatial resolution), progressive channel expansion (64→128→256), residual connections, and dataset-specific normalization will effectively capture both local nuclear morphology and tissue-level texture in 28x28 histopathology patches. With ~2.5M parameters it has sufficient capacity for 90k samples while fitting in limited GPU memory. The residual architecture enables deeper feature hierarchies without vanishing gradients, and the global average pooling + dropout head provides regularization against overfitting on small patches. Class-weighted CE (1.63:1 imbalance) and label smoothing (0.1) address the mild imbalance and label ambiguity risks.",
+    "parent_sha256": null,
+    "reference": {
+      "bundle_id": "compact_resnet_pathmnist_v4",
+      "parameters": {
+        "base_channels": 64,
+        "dropout": 0.3
+      },
+      "path": "generated/compact_resnet_pathmnist_v4/v001/manifest.json",
+      "sha256": "fd04e16dd4a2bac945d18448b9c69583a2827fca77aed4f4d945ca7aa141da61",
+      "version": 1
+    },
+    "schema_version": "1.0",
+    "source": "qwen3.8:latest"
+  },
+  "payload_sha256": "71da413cd4075a35d63ece63bf6873813fe1e84f9effe79b69df361d1eb54821",
+  "producer": "experimental_development",
+  "run_id": "seed_42",
+  "sequence": 33,
+  "version": 1
+}

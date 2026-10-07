@@ -1,0 +1,28 @@
+{
+  "artefact": "anomaly_prior_art",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-07T12:20:49.079693+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "Prior-art stage is internally consistent and appropriately scoped. Data profile confirms PathMNIST 9-class 28×28 RGB with exact official split sizes (89996/10004/7180), modest imbalance (1.63×), no blanks or duplicates, and well-aligned train/val class proportions. The three literature sources are all curated excerpts (not live retrieval), which the deterministic warning correctly flags; the four derived ideas are appropriately labelled 'hypothesis_to_validate' rather than as verified performance claims, so no unsupported inference is being carried forward. The two proposals are correctly handled by the extension gate: (1) tissue_geometric_aug proposes hflip and vflip, which are built-in augmentations that do not require extension approval per pipeline rules—its 'pending_review' gate status is therefore unnecessary but harmless; the label-preservation rationale for histopathology is sound. (2) compact_conv_stem_transformer is a genuinely new architecture (conv stem + 2 transformer blocks, 49 tokens of dim 64) not among the seven built-in families, so its 'pending_review' gate status is correct and it must clear hash-bound independent review before use. The compacted-field previews (proposals, ambiguity note, stage comments) are expected truncation for this review and do not indicate incomplete persisted artefacts; omitted dataset_manifest and run_manifest are likewise not a basis for regeneration. Worker image_digest remains null and isolation.enforced=false, both noted in prior stages as acceptable for local execution but worth confirming before training. No critical or blocking issues identified. Proceed to the next stage; ensure the compact_conv_stem_transformer proposal completes its independent review before any training run references it, and confirm image_digest is populated at the training stage.",
+    "deterministic_issues": [
+      "warning:curated excerpts are not live retrieval evidence"
+    ],
+    "llm_issues": [
+      "Deterministic warning: all three prior-art sources are curated excerpts, not live retrieval; evidence quotes establish traceability only, not performance support—hypotheses must remain unvalidated until empirical testing.",
+      "tissue_geometric_aug (hflip, vflip) is a built-in augmentation that does not require extension approval; its 'pending_review' gate entry is redundant and could be cleared to avoid confusion.",
+      "compact_conv_stem_transformer is a new architecture outside the seven built-in families and is correctly gated as pending_review; it must not be used in any training run until hash-bound independent review is completed.",
+      "Worker image_digest is null and isolation.enforced=false; acceptable for local execution but should be verified as populated before the training stage for full reproducibility audit trail."
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8:latest",
+    "stage": "prior_art"
+  },
+  "payload_sha256": "faa3c835cb11f57281b187b6c670d56030194114302f9085372122f572c4da7b",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 13,
+  "version": 1
+}

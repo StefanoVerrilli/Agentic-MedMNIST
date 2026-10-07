@@ -1,0 +1,1 @@
+{"bundle_id": "compact_resnet_pathmnist_v4", "entrypoint": "experiment.py", "files": {"experiment.py": "04b4b638ffe949d80130c30f06d55987b10649d30a1a3d6b59aa5025d96e1dd2"}, "version": 1}

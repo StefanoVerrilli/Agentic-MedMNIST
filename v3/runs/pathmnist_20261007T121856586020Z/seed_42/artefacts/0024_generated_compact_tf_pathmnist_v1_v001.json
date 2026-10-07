@@ -1,0 +1,33 @@
+{
+  "artefact": "generated_compact_tf_pathmnist_v1",
+  "artefact_type": "GeneratedBundle",
+  "created_at": "2026-10-07T12:24:26.035392+00:00",
+  "payload": {
+    "author": "experimental_development",
+    "files": {
+      "experiment.py": "8286837cfbc08b46bbced6351f70a8f2fb143e52d8107ef63949e1efa9531d6a"
+    },
+    "hypothesis": "A compact transformer with convolutional tokenization (4x4 patches, 49 tokens) will outperform pure CNN baselines on 28x28 histopathology by capturing both local nuclear morphology (via conv tokenizer) and global tissue context (via self-attention), while the short sequence length prevents overfitting on ~90k samples. Dataset-specific normalization and mild class weighting address the domain-specific color distribution and 1.63:1 imbalance.",
+    "parent_sha256": null,
+    "reference": {
+      "bundle_id": "compact_tf_pathmnist_v1",
+      "parameters": {
+        "depth": 4,
+        "dropout": 0.1,
+        "hidden": 256,
+        "num_heads": 4,
+        "patch_size": 4
+      },
+      "path": "generated/compact_tf_pathmnist_v1/v001/manifest.json",
+      "sha256": "fb5a29c202eb3450080213cc28da347b75b00cd86cdbe72dfca60002e7b2775a",
+      "version": 1
+    },
+    "schema_version": "1.0",
+    "source": "qwen3.8:latest"
+  },
+  "payload_sha256": "89f416e6f7e5ca751e61f0b1eeb5b8b67a0cbf3f1adbf4addeb1874d5b8e2bbc",
+  "producer": "experimental_development",
+  "run_id": "seed_42",
+  "sequence": 24,
+  "version": 1
+}

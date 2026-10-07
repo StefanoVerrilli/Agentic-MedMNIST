@@ -1,0 +1,15 @@
+[W1007 14:27:00.493455882 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 5928648704 bytes (free: 2945449984, total: 25225789440).
+[W1007 14:27:00.493996894 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 5928648704 bytes (free: 2945449984, total: 25225789440).
+Traceback (most recent call last):
+  File "/media/neurone-pc11/Volume1/Giuseppe/Agentic-MedMNIST/v3/runs/pathmnist_20261007T121856586020Z/seed_42/blobs/local_jobs/c5555e1422ca4821b31fe0bd4fb9cdfc/input/framework/worker_runtime.py", line 225, in <module>
+    main()
+  File "/media/neurone-pc11/Volume1/Giuseppe/Agentic-MedMNIST/v3/runs/pathmnist_20261007T121856586020Z/seed_42/blobs/local_jobs/c5555e1422ca4821b31fe0bd4fb9cdfc/input/framework/worker_runtime.py", line 204, in main
+    result = train(context)
+             ^^^^^^^^^^^^^^
+  File "/media/neurone-pc11/Volume1/Giuseppe/Agentic-MedMNIST/v3/runs/pathmnist_20261007T121856586020Z/seed_42/blobs/local_jobs/c5555e1422ca4821b31fe0bd4fb9cdfc/input/bundle/experiment.py", line 190, in train
+    train_x = _to_tensor(train_images, device)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/media/neurone-pc11/Volume1/Giuseppe/Agentic-MedMNIST/v3/runs/pathmnist_20261007T121856586020Z/seed_42/blobs/local_jobs/c5555e1422ca4821b31fe0bd4fb9cdfc/input/bundle/experiment.py", line 115, in _to_tensor
+    return t.to(device)
+           ^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 5.52 GiB. GPU 0 has a total capacity of 23.49 GiB of which 2.74 GiB is free. Process 7314 has 19.71 GiB memory in use. Including non-PyTorch memory, this process has 384.00 MiB memory in use. Of the allocated memory 0 bytes is allocated by PyTorch, and 0 bytes is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)

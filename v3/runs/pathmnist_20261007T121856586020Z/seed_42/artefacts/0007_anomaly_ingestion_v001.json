@@ -1,0 +1,24 @@
+{
+  "artefact": "anomaly_ingestion",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-07T12:19:27.251307+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Ingestion stage is clean. PathMNIST (9-class, 3-channel RGB, 28×28 standard MedMNIST distribution) loaded with split sizes matching official values exactly (train=89996, val=10004, test=7180), no subsampling. Archive MD5 verified (a8b06965…56c1 matches), SHA256 recorded, selected-index SHA256s present for all three splits. Run manifest is internally consistent: deterministic_torch=true, seed=42, code SHA256 recorded, package versions pinned (torch 2.14.0+cu126, lightning 2.6.5, medmnist 3.0.2). No deterministic findings were raised. Two minor observations that do not block progression: (1) worker image_digest is null, which is expected at the ingestion stage before image-level processing; (2) isolation is not enforced (local_subprocess), a configuration choice rather than an error. The test-domain note (CRC-VAL-HE-7K from a different clinical center) is correctly recorded and is part of the standard PathMNIST OOD evaluation design; it does not constitute a defect. No compacted fields or omitted artefacts. Ready to proceed to the next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "worker image_digest is null (expected at ingestion; verify it is populated before training)",
+      "isolation.enforced=false with local_subprocess execution; acceptable but worth noting for reproducibility audit trail"
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8:latest",
+    "stage": "ingestion"
+  },
+  "payload_sha256": "642086c3d428449004269f84e186fbc2a2299bc64ae4f70e535106f45719c00e",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 7,
+  "version": 1
+}
