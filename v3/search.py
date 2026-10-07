@@ -497,7 +497,7 @@ def lightning_config_payload(
 ) -> dict[str, Any]:
     """Return a JSON-compatible configuration accepted by LightningCLI."""
     if config.model_family == "run_generated":
-        return {"format": "isolated-experiment-v1",
+        return {"format": "run-experiment-v1",
                 "train_config": config.model_dump(mode="json"),
                 "representation": representation.model_dump(mode="json")}
     return {

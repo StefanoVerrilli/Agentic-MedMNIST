@@ -552,20 +552,17 @@ class GeneratedBundleReference(StrictModel):
 
 
 class WorkerConfiguration(StrictModel):
-    host: str = Field(pattern=r"^[a-zA-Z0-9_][a-zA-Z0-9_.@-]*$")
-    root: str = Field(pattern=r"^/[a-zA-Z0-9_./-]+$")
-    image: str = Field(pattern=r"^[a-zA-Z0-9][a-zA-Z0-9_./:@-]+$")
-    python: str = Field(default="python3", pattern=r"^[a-zA-Z0-9_./-]+$")
+    """Local subprocess execution controls, using the running Python environment."""
     timeout_seconds: int = Field(default=3600, ge=1)
-    memory_gib: int = Field(default=16, ge=1)
     max_bundles: int = Field(default=32, ge=1, le=1024)
 
-    @model_validator(mode="after")
-    def safe_root(self) -> WorkerConfiguration:
-        from pathlib import PurePosixPath
-        if ".." in PurePosixPath(self.root).parts or self.root == "/":
-            raise ValueError("worker root must be an explicit non-root directory")
-        return self
+    @model_validator(mode="before")
+    @classmethod
+    def read_previous_configuration(cls, value):
+        if isinstance(value, dict):
+            return {key: item for key, item in value.items()
+                    if key not in {"host", "root", "image", "python", "memory_gib"}}
+        return value
 
 
 class GeneratedSource(StrictModel):
@@ -671,8 +668,9 @@ class GeneratedVerification(Artefact):
 
 class WorkerEvidence(Artefact):
     configuration: WorkerConfiguration
-    image_digest: str
+    image_digest: str | None = None  # Historical metadata only; never used to run jobs.
     isolation: dict[str, Any]
+    python_executable: str | None = None
 
 
 class TrainConfig(Artefact, ExecutionOptions):
@@ -721,8 +719,10 @@ class TrainConfig(Artefact, ExecutionOptions):
         if self.execution_mode == "legacy" and self.early_stopping_patience > 500:
             raise ValueError("legacy patience cannot exceed 500")
         _validate_model_options(self)
-        if self.model_family == "run_generated" and (self.generated_bundle is None or self.worker is None):
-            raise ValueError("run_generated requires a run bundle and isolated worker")
+        if self.model_family == "run_generated" and self.generated_bundle is None:
+            raise ValueError("run_generated requires a run-scoped bundle")
+        if self.model_family == "run_generated" and self.worker is None:
+            object.__setattr__(self, "worker", WorkerConfiguration())
         if self.model_family != "run_generated" and self.generated_bundle is not None:
             raise ValueError("generated bundles belong only to run_generated models")
         return self
@@ -753,7 +753,7 @@ class TrainResult(Artefact):
     lightning_csv_path: str | None = None
     seed: int = Field(ge=0)
     device: Literal["cpu", "cuda"]
-    framework: Literal["lightning.pytorch", "isolated.python"] = "lightning.pytorch"
+    framework: Literal["lightning.pytorch", "isolated.python", "local.python"] = "lightning.pytorch"
     lightning_config_path: str | None = None
 
     @model_validator(mode="after")
@@ -779,7 +779,7 @@ class SearchPlan(Artefact):
         "validation_accuracy_then_macro_f1"
     )
     test_locked: Literal[True] = True
-    framework: Literal["lightning.pytorch", "isolated.python"] = "lightning.pytorch"
+    framework: Literal["lightning.pytorch", "isolated.python", "local.python"] = "lightning.pytorch"
     progressive_budget: bool = True
     round_epoch_budgets: list[int] = Field(default_factory=list, max_length=16)
 

@@ -9,7 +9,7 @@ from contracts import (BestConfiguration, GeneratedCodeDecision, GeneratedDevelo
                        GeneratedSource, GeneratedVerification, SearchPlan, SearchReport,
                        TrainConfig, TrialResult, sha256_file)
 from ml import train_model, evaluate_probabilities, predict_probabilities
-from remote import archive_bundle, validate_bundle, SSHWorker
+from remote import archive_bundle, validate_bundle, LocalWorker
 from research import canonical_hash
 from search import rank_trials
 
@@ -18,11 +18,11 @@ CODE_INTERFACE = '''Write a complete run-scoped Python experiment, never modify 
 experiment.py must expose build_model(context), train(context), predict(context).
 build_model returns torch.nn.Module producing finite float logits [batch,9] for float NCHW 28x28 RGB.
 context is a dict: config (seed/device/batch_size/lr/epochs/early_stopping...);
-parameters (your free JSON parameters); data (numpy arrays); output='/output';
-checkpoint (read-only input checkpoint); epochs (hard allocated epoch ceiling).
+parameters (your free JSON parameters); data (numpy arrays); output (absolute job output directory);
+checkpoint (input checkpoint path); epochs (allocated epoch horizon).
 Training data keys: train_images, train_targets, val_images, val_targets.
-Inference data keys: images only. No test targets, network, credentials, pip, or host paths.
-train must save /output/model.ckpt and return final_train_loss, final_val_accuracy,
+Inference data keys: images only. Test targets must never enter training or search.
+train must save Path(context['output']) / 'model.ckpt' and return final_train_loss, final_val_accuracy,
 best_val_accuracy, best_epoch, epochs_completed, history.
 history rows: epoch (contiguous starting at 1), train_loss, val_accuracy;
 optional val_loss, val_macro_f1, learning_rate. Never exceed context['epochs'].
@@ -35,8 +35,9 @@ feature_pyramid_transformer (hidden=256, depth=1, four ResNet stages, ST dot-pro
 Optional propose(context) implements your own search strategy. It sees context['evidence']
 (prior validation results only), no datasets, and returns a list of objects containing
 'parameters' (JSON object), optional 'epochs' (1..1000) and 'batch_size' (4..4096).
-All code executes in disposable containers; preserve preprocessing parameters in your
-checkpoint when they are learned. You may use only installed image dependencies.
+Code executes in local subprocesses using the current Python environment. Use context
+paths, never hardcode /input or /output. Write new code and artifacts only within this run.
+Preserve learned preprocessing in checkpoints. Use installed Python dependencies.
 '''
 
 
@@ -124,7 +125,7 @@ class GeneratedSearchAgent:
                         update={"timeout_seconds": remaining})})
                 validate_bundle(bb.root, reference)
                 operation_config = budgeted_config()
-                verified = SSHWorker(operation_config.worker).execute(bb.root, operation_config, "verify", {}, epochs=1)
+                verified = LocalWorker(operation_config.worker).execute(bb.root, operation_config, "verify", {}, epochs=1)
                 if json.loads((verified / "result.json").read_text(encoding="utf-8")) != {"verified": True}:
                     raise ValueError("worker did not confirm verification")
                 bb.put(f"generated_verification_{sequence:03d}", GeneratedVerification(
@@ -182,7 +183,7 @@ class GeneratedSearchAgent:
                     for index in range(1, self.rounds + 1)]
         bb.put("search_plan", SearchPlan(max_trials=self.max_trials, rounds=self.rounds,
             search_epochs=self.search_epochs, final_epochs=self.final_epochs,
-            framework="isolated.python",
+            framework="local.python",
             accuracy_tolerance=self.accuracy_tolerance, round_epoch_budgets=ceilings), producer=self.name)
         trials, names, decisions = [], [], {}
         seen = set()
@@ -207,7 +208,7 @@ class GeneratedSearchAgent:
             if not final:
                 try:
                     config = generated_config(decision, reference, self.worker, self.seed, self.device, ceiling, source)
-                    result = SSHWorker(self.worker).execute(bb.root, config, "strategy", {}, evidence=_evidence(trials))
+                    result = LocalWorker(self.worker).execute(bb.root, config, "strategy", {}, evidence=_evidence(trials))
                     strategies = json.loads((result / "strategy.json").read_text(encoding="utf-8"))
                     if not isinstance(strategies, list) or len(strategies) > 256:
                         raise ValueError("propose must return at most 256 suggestions")
@@ -255,7 +256,7 @@ class GeneratedSearchAgent:
                 bb.put(name, trial, producer=self.name)
         finalist = [trial for trial in trials if trial.round_index == self.rounds and trial.status == "completed"]
         selected = rank_trials(finalist, accuracy_tolerance=self.accuracy_tolerance)
-        payload = {"format": "isolated-experiment-v1", "train_config": selected.config.model_dump(mode="json"),
+        payload = {"format": "run-experiment-v1", "train_config": selected.config.model_dump(mode="json"),
                    "representation": selected.representation.model_dump(mode="json")}
         settings = bb.get_optional("run_configuration")
         if settings:

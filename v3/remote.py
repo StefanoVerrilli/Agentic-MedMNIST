@@ -1,16 +1,15 @@
-"""Run-scoped code storage and fail-closed SSH/container transport."""
+"""Run-scoped code storage and local subprocess execution."""
 from __future__ import annotations
 
 import ast
 from dataclasses import dataclass
 import json
 from pathlib import Path, PurePosixPath
-import shlex
+import os
+import sys
 import shutil
 import subprocess
-import time
 import uuid
-import zipfile
 
 from contracts import (GeneratedBundle, GeneratedBundleReference, GeneratedCodeDecision,
                        TrainConfig, TrainResult, WorkerConfiguration, sha256_file)
@@ -100,97 +99,80 @@ def copy_bundle(origin: Path, destination: Path, reference: GeneratedBundleRefer
     validate_bundle(destination, reference)
 
 
-class SSHWorker:
-    def __init__(self, configuration: WorkerConfiguration):
-        self.configuration = configuration
+class LocalWorker:
+    """Run generated code in a child of the current Python environment."""
 
-    def _ssh(self, command: str, *, stdin=None, timeout=None):
-        result = subprocess.run(["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=10",
-            "-o", "StrictHostKeyChecking=yes", self.configuration.host, command],
-            input=stdin, capture_output=True, text=True,
-            timeout=timeout or self.configuration.timeout_seconds + 60, check=False)
-        if result.returncode:
-            raise RuntimeError("worker SSH failure: " + result.stderr[-8000:])
-        return result.stdout
-
-    def _service(self, operation: str, device: str, *extra, timeout_seconds=None):
-        seconds = timeout_seconds or self.configuration.timeout_seconds
-        argv = [operation, "--image", self.configuration.image, "--device", device,
-                "--memory", str(self.configuration.memory_gib),
-                "--timeout", str(seconds), *extra]
-        source = Path(__file__).with_name("worker_service.py").read_text(encoding="utf-8")
-        command = shlex.join([self.configuration.python, "-", *argv])
-        return json.loads(self._ssh(command, stdin=source,
-                         timeout=150 if operation == "preflight" else seconds + 120))
+    def __init__(self, configuration: WorkerConfiguration | None = None):
+        self.configuration = configuration or WorkerConfiguration()
 
     def preflight(self, device: str):
-        result = self._service("preflight", device)
-        self.configuration = self.configuration.model_copy(update={"image": result["image_digest"]})
-        return result
+        import torch
+        if device == "cuda" and not torch.cuda.is_available():
+            raise RuntimeError("CUDA is not available in the current Python environment; use --device cpu")
+        return {"backend": "local.subprocess", "python_executable": sys.executable,
+                "isolation": {"enforced": False, "execution": "local_subprocess"}}
 
     def execute(self, root: Path, config: TrainConfig, operation: str, arrays: dict,
                 *, checkpoint: Path | None = None, epochs: int | None = None, evidence=None,
                 resume: Path | None = None, start_epoch: int = 0):
         import numpy as np
-        deadline = time.monotonic() + self.configuration.timeout_seconds
-        def remaining():
-            value = int(deadline - time.monotonic())
-            if value < 1:
-                raise TimeoutError("worker operation exhausted its wall-clock budget")
-            return value
-        identifier = uuid.uuid4().hex
-        job = root / "blobs" / "worker_jobs" / identifier
-        inputs = job / "input"
+        if operation not in {"verify", "train", "infer", "strategy"}:
+            raise ValueError("unsupported local operation")
+        root = root.resolve()
+        job = root / "blobs" / "local_jobs" / uuid.uuid4().hex
+        inputs, output = job / "input", job / "output"
         framework = inputs / "framework"
         framework.mkdir(parents=True, exist_ok=False)
+        output.mkdir()
+        work = job / "work"
+        work.mkdir()
         for path in Path(__file__).parent.glob("*.py"):
             shutil.copyfile(path, framework / path.name)
         if config.generated_bundle:
-            source = validate_bundle(root, config.generated_bundle)
-            shutil.copytree(source, inputs / "bundle")
+            shutil.copytree(validate_bundle(root, config.generated_bundle), inputs / "bundle")
         if checkpoint:
             shutil.copyfile(checkpoint, inputs / "model.ckpt")
         if resume:
             shutil.copyfile(resume, inputs / "resume.pt")
         np.savez(inputs / "data.npz", **arrays)
         request = {"operation": operation, "config": config.model_dump(mode="json"),
-                   "epochs": epochs or config.epochs, "evidence": evidence or [],
-                   "start_epoch": start_epoch, "resume": resume is not None}
+                   "epochs": epochs if epochs is not None else config.epochs,
+                   "evidence": evidence or [], "start_epoch": start_epoch, "resume": resume is not None}
         (inputs / "request.json").write_text(json.dumps(request) + "\n", encoding="utf-8")
-        remote_job = self.configuration.root.rstrip("/") + "/" + identifier
-        self._ssh(shlex.join(["mkdir", "-p", "--", remote_job]), timeout=min(30, remaining()))
-        options = ["-o", "BatchMode=yes", "-o", "StrictHostKeyChecking=yes", "-o", "ConnectTimeout=10"]
-        upload = subprocess.run(["scp", *options, "-r", str(inputs),
-                                 f"{self.configuration.host}:{remote_job}/"],
-                                capture_output=True, text=True, timeout=remaining(), check=False)
-        if upload.returncode:
-            raise RuntimeError("worker input upload failed: " + upload.stderr[-2000:])
-        result = self._service("execute", config.device, "--job", remote_job, timeout_seconds=remaining())
-        if result["image_digest"] != self.configuration.image:
-            raise ValueError("worker image changed during execution")
-        archive = job / "response.zip"
-        download = subprocess.run(["scp", *options,
-            f"{self.configuration.host}:{remote_job}/response.zip", str(archive)],
-            capture_output=True, text=True, timeout=remaining(), check=False)
-        if download.returncode:
-            raise RuntimeError("worker output download failed: " + download.stderr[-2000:])
-        output = job / "output"
-        output.mkdir()
-        limits = {"result.json": 2_000_000, "logits.npy": 100_000_000,
-                  "resume.pt": 1_073_741_824,
-                  "model.ckpt": 1_073_741_824, "training.jsonl": 2_000_000,
-                  "strategy.json": 200_000, "container.log": 8_000_000}
-        with zipfile.ZipFile(archive) as stored:
-            names = stored.namelist()
-            if len(names) != len(set(names)):
-                raise ValueError("duplicate worker outputs")
-            for item in stored.infolist():
-                if item.filename not in limits or item.file_size > limits[item.filename]:
-                    raise ValueError("unexpected or oversized worker output")
-                with stored.open(item) as src, (output / item.filename).open("xb") as dst:
-                    shutil.copyfileobj(src, dst)
+        command = [sys.executable, str(framework / "worker_runtime.py"), "--job", str(job)]
+        environment = os.environ.copy()
+        environment["PYTHONUTF8"] = "1"
+        environment["PYTHONDONTWRITEBYTECODE"] = "1"
+        options = ({"creationflags": subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP}
+                   if os.name == "nt" else {"start_new_session": True})
+        log = job / "process.log"
+        with log.open("wb") as handle:
+            process = subprocess.Popen(command, cwd=work, env=environment,
+                                       stdout=handle, stderr=subprocess.STDOUT, **options)
+            try:
+                code = process.wait(timeout=self.configuration.timeout_seconds)
+            except subprocess.TimeoutExpired as exc:
+                if os.name == "nt":
+                    subprocess.run(["taskkill", "/PID", str(process.pid), "/T", "/F"],
+                                   capture_output=True, check=False, timeout=30)
+                else:
+                    import signal
+                    try:
+                        os.killpg(process.pid, signal.SIGKILL)
+                    except ProcessLookupError:
+                        pass
+                if process.poll() is None:
+                    process.kill()
+                process.wait(timeout=30)
+                raise TimeoutError("local operation exceeded its timeout") from exc
+        if code:
+            with log.open("rb") as handle:
+                handle.seek(max(0, log.stat().st_size - 8000))
+                detail = handle.read().decode("utf-8", "replace")
+            raise RuntimeError(f"local process exit {code}: {detail}")
+        if config.generated_bundle:
+            validate_bundle(root, config.generated_bundle)
         return output
-
 
 def prepared_arrays(prepared, splits, batch_size=128, *, seed=42, corruption_sigma=None):
     import numpy as np
@@ -218,11 +200,11 @@ class RemoteModel:
     def predict(self, prepared, split, batch_size, *, seed=42, corruption_sigma=None):
         import numpy as np
         if sha256_file(self.checkpoint) != self.checkpoint_sha256:
-            raise ValueError("remote checkpoint checksum mismatch")
+            raise ValueError("run checkpoint checksum mismatch")
         data = prepared_arrays(prepared, [split], batch_size, seed=seed,
                                corruption_sigma=corruption_sigma)
         targets = data.pop(f"{split}_targets")
-        output = SSHWorker(self.config.worker).execute(self.root, self.config, "infer",
+        output = LocalWorker(self.config.worker).execute(self.root, self.config, "infer",
             {"images": data[f"{split}_images"]}, checkpoint=self.checkpoint)
         logits = np.load(output / "logits.npy", allow_pickle=False)
         if logits.shape != (len(targets), 9) or not np.issubdtype(logits.dtype, np.floating) or not np.isfinite(logits).all():
@@ -239,10 +221,10 @@ def train_remote(prepared, config: TrainConfig, checkpoint: Path):
     while root.name != "blobs" and root != root.parent:
         root = root.parent
     if root.name != "blobs":
-        raise ValueError("remote checkpoints must reside in run/blobs")
+        raise ValueError("run checkpoints must reside in run/blobs")
     root = root.parent
     arrays = prepared_arrays(prepared, ["train", "val"], config.batch_size, seed=config.seed)
-    worker = SSHWorker(config.worker)
+    worker = LocalWorker(config.worker)
     resume, previous, start_epoch, previous_history = None, None, 0, []
     targets = config.segment_targets if config.execution_mode == "agent_autonomous" and config.segment_targets else [config.epochs]
     for target in targets:
@@ -278,7 +260,7 @@ def train_remote(prepared, config: TrainConfig, checkpoint: Path):
     shutil.copyfile(output / "training.jsonl", log)
     result_data.update(checkpoint_path=str(checkpoint.resolve()),
         checkpoint_sha256=sha256_file(checkpoint), training_log_path=str(log.resolve()),
-        seed=config.seed, device=config.device, framework="isolated.python")
+        seed=config.seed, device=config.device, framework="local.python")
     if config.execution_mode == "agent_autonomous":
         resume_target = checkpoint.with_suffix(".resume.pt")
         shutil.copyfile(resume, resume_target)

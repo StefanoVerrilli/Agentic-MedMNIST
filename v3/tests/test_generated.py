@@ -20,7 +20,7 @@ from llm import OllamaReasoner
 from remote import RemoteModel, archive_bundle, copy_bundle, validate_bundle
 from tests.helpers import make_bundle
 
-WORKER = WorkerConfiguration(host="test-worker", root="/srv/test-jobs", image="sha256:" + "a" * 64)
+WORKER = WorkerConfiguration()
 
 
 class SimulatedWorker:
@@ -31,7 +31,7 @@ class SimulatedWorker:
         self.configuration = configuration
 
     def preflight(self, device):
-        return {"image_digest": self.configuration.image, "isolation": {"network": "none"}}
+        return {"python_executable": "simulated-python", "isolation": {"enforced": False}}
 
     def execute(self, root, config, operation, arrays, **kwargs):
         self.calls.append((operation, tuple(arrays), config.generated_bundle, kwargs))
@@ -67,7 +67,7 @@ class GeneratedTests(unittest.TestCase):
         bb = Blackboard(path)
         reasoner = OllamaReasoner(base_url=None)
         bb.put("worker_evidence", WorkerEvidence(configuration=WORKER,
-            image_digest=WORKER.image, isolation={"network": "none"}), producer="test")
+            isolation={"enforced": False}), producer="test")
         IngestionAgent(loader=lambda **kw: make_bundle()).run(bb)
         ProfilingAmbiguityAgent(reasoner).run(bb)
         PreprocessingAgent(reasoner).run(bb)
@@ -113,7 +113,7 @@ class GeneratedTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             bb = Blackboard(Path(directory) / "one")
             worker = WORKER.model_copy(update={"max_bundles": 1})
-            bb.put("worker_evidence", WorkerEvidence(configuration=worker, image_digest=WORKER.image,
+            bb.put("worker_evidence", WorkerEvidence(configuration=worker,
                 isolation={}), producer="test")
             ref = archive_bundle(bb, fallback_decision(), "test")
             with self.assertRaises(ValueError):
@@ -128,14 +128,9 @@ class GeneratedTests(unittest.TestCase):
             TrainConfig(model_family="run_generated", lr=0.001, epochs=1, hidden=16,
                 batch_size=8, weight_decay=0.0, class_weighting=False,
                 seed=42, device="cpu", rationale="test", source="test")
-        for payload in ({"host": "-oProxyCommand=bad"}, {"root": "/"}, {"root": "/safe/../bad"},
-                        {"image": "image;touch bad"}):
-            with self.subTest(payload=payload), self.assertRaises(ValueError):
-                WorkerConfiguration.model_validate({**WORKER.model_dump(), **payload})
-
     def test_search_freezes_actual_bundle_and_never_transmits_test_targets(self):
-        with tempfile.TemporaryDirectory() as directory, patch("remote.SSHWorker", SimulatedWorker), \
-                patch("generated_agents.SSHWorker", SimulatedWorker):
+        with tempfile.TemporaryDirectory() as directory, patch("remote.LocalWorker", SimulatedWorker), \
+                patch("generated_agents.LocalWorker", SimulatedWorker):
             bb, reasoner = self.populate(Path(directory) / "run")
             ExperimentalDevelopmentAgent(reasoner).run(bb)
             GeneratedSearchAgent(reasoner, worker=WORKER, seed=42, device="cpu", max_trials=4,
@@ -148,7 +143,7 @@ class GeneratedTests(unittest.TestCase):
             self.assertEqual(selected.epoch_budget, 2)
             validate_bundle(bb.root, best.train_config.generated_bundle)
             self.assertFalse(bb.get("search_report").test_metrics_used)
-            self.assertEqual(bb.get("search_plan").framework, "isolated.python")
+            self.assertEqual(bb.get("search_plan").framework, "local.python")
             self.assertTrue(all("test_images" not in keys and "test_targets" not in keys
                                 for _, keys, _, _ in SimulatedWorker.calls))
             for operation, keys, _, _ in SimulatedWorker.calls:
@@ -158,8 +153,8 @@ class GeneratedTests(unittest.TestCase):
             self.assertEqual(ReviewerConsistencyAgent(reasoner).review(bb, "model_search").severity, "ok")
 
     def test_final_budget_failure_cannot_select_earlier_success(self):
-        with tempfile.TemporaryDirectory() as directory, patch("remote.SSHWorker", SimulatedWorker), \
-                patch("generated_agents.SSHWorker", SimulatedWorker):
+        with tempfile.TemporaryDirectory() as directory, patch("remote.LocalWorker", SimulatedWorker), \
+                patch("generated_agents.LocalWorker", SimulatedWorker):
             bb, reasoner = self.populate(Path(directory) / "run")
             ExperimentalDevelopmentAgent(reasoner).run(bb)
             execute = SimulatedWorker.execute
@@ -173,8 +168,8 @@ class GeneratedTests(unittest.TestCase):
             self.assertIsNone(bb.get_optional("best_configuration"))
 
     def test_remote_model_refuses_changed_checkpoint_and_invalid_logits(self):
-        with tempfile.TemporaryDirectory() as directory, patch("remote.SSHWorker", SimulatedWorker), \
-                patch("generated_agents.SSHWorker", SimulatedWorker):
+        with tempfile.TemporaryDirectory() as directory, patch("remote.LocalWorker", SimulatedWorker), \
+                patch("generated_agents.LocalWorker", SimulatedWorker):
             bb, reasoner = self.populate(Path(directory) / "run")
             ExperimentalDevelopmentAgent(reasoner).run(bb)
             GeneratedSearchAgent(reasoner, worker=WORKER, seed=42, device="cpu", max_trials=1,
@@ -188,7 +183,7 @@ class GeneratedTests(unittest.TestCase):
 
     def test_nonfinite_and_wrong_shape_predictions_are_rejected(self):
         from generated_agents import generated_config
-        with tempfile.TemporaryDirectory() as directory, patch("remote.SSHWorker", SimulatedWorker):
+        with tempfile.TemporaryDirectory() as directory, patch("remote.LocalWorker", SimulatedWorker):
             bb, _ = self.populate(Path(directory) / "run")
             decision = fallback_decision()
             reference = archive_bundle(bb, decision, "test")
@@ -221,8 +216,8 @@ class GeneratedTests(unittest.TestCase):
             if operation == "verify" and config.generated_bundle.version == 1:
                 raise RuntimeError("broken first version")
             return execute(self, root, config, operation, arrays, **kwargs)
-        with tempfile.TemporaryDirectory() as directory, patch("remote.SSHWorker", SimulatedWorker), \
-                patch("generated_agents.SSHWorker", SimulatedWorker), patch.object(SimulatedWorker, "execute", needs_repair):
+        with tempfile.TemporaryDirectory() as directory, patch("remote.LocalWorker", SimulatedWorker), \
+                patch("generated_agents.LocalWorker", SimulatedWorker), patch.object(SimulatedWorker, "execute", needs_repair):
             bb, _ = self.populate(Path(directory) / "run")
             reasoner = RepairReasoner()
             ExperimentalDevelopmentAgent(reasoner).run(bb)
@@ -244,8 +239,8 @@ class GeneratedTests(unittest.TestCase):
             if operation == "verify":
                 raise RuntimeError("unrepairable module")
             return execute(self, root, config, operation, arrays, **kwargs)
-        with tempfile.TemporaryDirectory() as directory, patch("remote.SSHWorker", SimulatedWorker), \
-                patch("generated_agents.SSHWorker", SimulatedWorker), patch.object(SimulatedWorker, "execute", always_broken):
+        with tempfile.TemporaryDirectory() as directory, patch("remote.LocalWorker", SimulatedWorker), \
+                patch("generated_agents.LocalWorker", SimulatedWorker), patch.object(SimulatedWorker, "execute", always_broken):
             bb, _ = self.populate(Path(directory) / "run")
             reasoner = AlwaysRepair()
             ExperimentalDevelopmentAgent(reasoner).run(bb)
@@ -257,10 +252,9 @@ class GeneratedTests(unittest.TestCase):
 
     def test_full_autonomous_pipeline_frozen_seed_and_replay(self):
         from run import build_parser, run_once, resolve_limits
-        with tempfile.TemporaryDirectory() as directory, patch("remote.SSHWorker", SimulatedWorker), \
-                patch("generated_agents.SSHWorker", SimulatedWorker), contextlib.redirect_stdout(io.StringIO()):
+        with tempfile.TemporaryDirectory() as directory, patch("remote.LocalWorker", SimulatedWorker), \
+                patch("generated_agents.LocalWorker", SimulatedWorker), contextlib.redirect_stdout(io.StringIO()):
             args = build_parser().parse_args(["--offline", "--device", "cpu", "--allow-generated-code",
-                "--worker-host", WORKER.host, "--worker-root", WORKER.root, "--worker-image", WORKER.image,
                 "--search-trials", "1", "--search-rounds", "1", "--search-epochs", "1", "--max-epochs", "1"])
             root = Path(directory)
             def ingestion(**kwargs):
@@ -285,11 +279,11 @@ class GeneratedTests(unittest.TestCase):
                 validate_bundle(root / "original" / "seed_47", ref)
                 self.assertEqual(check_integrity(replay), [])
 
-    def test_missing_worker_is_fail_closed_before_experiment_creation(self):
+    def test_failed_local_preflight_does_not_create_experiment(self):
         from run import main
-        with tempfile.TemporaryDirectory() as directory, patch("remote.SSHWorker.preflight",
-                side_effect=RuntimeError("SSH unavailable")):
+        with tempfile.TemporaryDirectory() as directory, patch("remote.LocalWorker.preflight",
+                side_effect=RuntimeError("Local interpreter unavailable")):
             with self.assertRaises(RuntimeError):
-                main(["--allow-generated-code", "--worker-host", "missing", "--worker-root", "/srv/jobs",
+                main(["--allow-generated-code",
                       "--offline", "--device", "cpu", "--output-root", directory])
             self.assertEqual(list(Path(directory).iterdir()), [])

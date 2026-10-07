@@ -73,13 +73,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--research-query", default=DEFAULT_QUERY)
     parser.add_argument("--research-limit", type=int, default=6)
     parser.add_argument("--extension-approvals", default=None, help="hash-bound reviewed extension manifest")
-    parser.add_argument("--allow-generated-code", action="store_true", help="run autonomous experiments exclusively on an isolated Linux worker")
-    parser.add_argument("--worker-host", help="SSH host or configured alias (key authentication)")
-    parser.add_argument("--worker-root", help="absolute Linux directory for isolated run jobs")
-    parser.add_argument("--worker-image", default="agentic-medmnist:v3", help="preinstalled Linux container image; pinned to its digest at preflight")
-    parser.add_argument("--worker-python", default="python3", help="trusted worker service interpreter")
-    parser.add_argument("--worker-timeout", type=int, default=3600)
-    parser.add_argument("--worker-memory-gib", type=int, default=16)
+    parser.add_argument("--allow-generated-code", action="store_true", help="run experiments in local subprocesses with run-scoped source code")
+    parser.add_argument("--operation-timeout", "--worker-timeout", dest="worker_timeout", type=int, default=3600)
     parser.add_argument("--max-generated-bundles", type=int, default=32, action=ExternalBudgetAction)
     parser.add_argument("--replay-run", default=None, help="replay a seed directory with zero LLM/retrieval requests")
     parser.add_argument("--validation-evidence", default=None, help="checksummed fault-injection and test evidence")
@@ -218,11 +213,10 @@ def main(argv: list[str] | None = None) -> int:
         if ollama_model_digest(args.ollama_base, args.ollama_model, timeout=min(args.llm_timeout, 5.0)) is None:
             parser.error("autonomous preflight cannot resolve the configured Ollama model; check server and model availability")
     if args.allow_generated_code:
-        from remote import SSHWorker
-        worker = SSHWorker(worker_configuration(args))
-        print("Verifying isolated Linux worker and container image...", flush=True)
+        from remote import LocalWorker
+        worker = LocalWorker(worker_configuration(args))
+        print("Checking local Python environment...", flush=True)
         worker_preflight = worker.preflight(args.device)
-        args.worker_image = worker.configuration.image
 
     experiment_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     experiment_root = Path(args.output_root) / f"pathmnist_{experiment_id}"
@@ -343,10 +337,10 @@ def run_once(
         if evidence_path.exists():
             worker_evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
         else:
-            from remote import SSHWorker
-            worker_evidence = SSHWorker(worker_configuration(args)).preflight(args.device)
+            from remote import LocalWorker
+            worker_evidence = LocalWorker(worker_configuration(args)).preflight(args.device)
         bb.put("worker_evidence", WorkerEvidence(configuration=worker_configuration(args),
-            image_digest=worker_evidence["image_digest"], isolation=worker_evidence["isolation"]), producer="run")
+            python_executable=worker_evidence.get("python_executable"), isolation=worker_evidence["isolation"]), producer="run")
     reasoner = OllamaReasoner(
         base_url=args.ollama_base,
         model=args.ollama_model,
@@ -679,8 +673,6 @@ def validate_args(args: argparse.Namespace) -> None:
         args.allow_generated_code, args.skip_baseline = True, True
         args.require_llm = not bool(args.replay_run)
     if args.allow_generated_code:
-        if not args.worker_host or not args.worker_root:
-            raise ValueError("--allow-generated-code requires --worker-host and --worker-root")
         if args.no_search:
             raise ValueError("generated-code mode requires search; remove --no-search")
         worker_configuration(args)
@@ -727,9 +719,7 @@ def validate_args(args: argparse.Namespace) -> None:
 
 def worker_configuration(args):
     from contracts import WorkerConfiguration
-    return WorkerConfiguration(host=args.worker_host, root=args.worker_root,
-        image=args.worker_image, python=args.worker_python, timeout_seconds=args.worker_timeout,
-        memory_gib=args.worker_memory_gib, max_bundles=args.max_generated_bundles)
+    return WorkerConfiguration(timeout_seconds=args.worker_timeout, max_bundles=args.max_generated_bundles)
 
 
 def package_versions() -> dict[str, str]:

@@ -1,7 +1,4 @@
-"""Container entrypoint and optional training helpers for experiment authors.
-
-This module imports generated code only inside the isolated worker container.
-"""
+"""Local subprocess entrypoint and optional run-scoped training helpers."""
 from __future__ import annotations
 
 import importlib.util
@@ -142,17 +139,22 @@ def builtin_predict(context):
 
 
 def main() -> None:
-    request = json.loads(Path("/input/request.json").read_text(encoding="utf-8"))
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--job", type=Path, required=True)
+    job = parser.parse_args().job.resolve()
+    inputs, output = job / "input", job / "output"
+    request = json.loads((inputs / "request.json").read_text(encoding="utf-8"))
     config = TrainConfig.model_validate(request["config"]).model_dump(mode="json")
     from ml import seed_everything
     seed_everything(config["seed"])
-    with np.load("/input/data.npz", allow_pickle=False) as stored:
+    with np.load(inputs / "data.npz", allow_pickle=False) as stored:
         data = {name: stored[name] for name in stored.files}
     context = {"config": config, "parameters": (config.get("generated_bundle") or {}).get("parameters", {}),
-               "data": data, "output": "/output", "checkpoint": "/input/model.ckpt",
+               "data": data, "output": str(output), "checkpoint": str(inputs / "model.ckpt"),
                "epochs": min(request["epochs"], config["epochs"])}
     context.update(start_epoch=request.get("start_epoch", 0),
-                   resume="/input/resume.pt" if request.get("resume") else None)
+                   resume=str(inputs / "resume.pt") if request.get("resume") else None)
     if config.get("execution_mode") == "agent_autonomous":
         if request["operation"] == "train" and request["epochs"] != config["epochs"]:
             raise ValueError("autonomous request must preserve the agent-selected epoch target")
@@ -161,15 +163,14 @@ def main() -> None:
     context["evidence"] = request.get("evidence", [])
     custom = config["model_family"] == "run_generated"
     if custom:
-        sys.path.insert(0, "/input/bundle")
-        spec = importlib.util.spec_from_file_location("run_experiment", "/input/bundle/experiment.py")
+        sys.path.insert(0, str(inputs / "bundle"))
+        spec = importlib.util.spec_from_file_location("run_experiment", inputs / "bundle" / "experiment.py")
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         build, train, predict = module.build_model, module.train, module.predict
     else:
         build, train, predict = builtin_model, builtin_train, builtin_predict
     operation = request["operation"]
-    output = Path("/output")
     if operation == "strategy":
         callback = getattr(module, "propose", None) if custom else None
         result = callback(context) if callback else []
@@ -191,7 +192,7 @@ def main() -> None:
         context["epochs"] = 1
         context.update(start_epoch=0, segment_epochs=1, resume=None)
         result = train(context)
-        context["checkpoint"] = "/output/model.ckpt"
+        context["checkpoint"] = str(output / "model.ckpt")
         context["data"] = {"images": context["data"]["val_images"]}
         values = np.asarray(predict(context))
         if values.shape != (9, 9) or not np.issubdtype(values.dtype, np.floating) or not np.isfinite(values).all():
@@ -208,7 +209,7 @@ def main() -> None:
         (output / "training.jsonl").write_text("".join(json.dumps(row, allow_nan=False) + "\n"
             for row in result["history"]), encoding="utf-8")
         if not (output / "model.ckpt").is_file():
-            raise ValueError("train must save /output/model.ckpt")
+            raise ValueError("train must save model.ckpt inside context['output']")
     elif operation == "infer":
         if set(data) != {"images"}:
             raise ValueError("inference receives images only, never targets")

@@ -1,4 +1,4 @@
-"""Offline generated-code template; imported only by isolated containers."""
+"""Offline experiment template; imported only by run-scoped child processes."""
 import torch
 from lightning_components import build_network
 from worker_runtime import fit_model, batched_logits

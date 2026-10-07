@@ -76,7 +76,7 @@ class AutonomousTests(unittest.TestCase):
 
     def test_cli_rejects_external_budgets_and_requires_live_decisions(self):
         from run import build_parser, validate_args
-        base = ["--execution-mode", "agent_autonomous", "--worker-host", "worker", "--worker-root", "/srv/jobs",
+        base = ["--execution-mode", "agent_autonomous",
                 "--ollama-base", "http://localhost:11434"]
         args = build_parser().parse_args(base)
         validate_args(args)
@@ -111,9 +111,8 @@ class AutonomousTests(unittest.TestCase):
                 patch("run.ollama_model_digest", return_value="a" * 64), \
                 patch("run.IngestionAgent", side_effect=ingestion), \
                 patch("run.run_baseline", side_effect=AssertionError("baseline must not execute")), \
-                patch("autonomous.SSHWorker", AdaptiveWorker), patch("remote.SSHWorker", AdaptiveWorker):
+                patch("autonomous.LocalWorker", AdaptiveWorker), patch("remote.LocalWorker", AdaptiveWorker):
             args = build_parser().parse_args(["--execution-mode", "agent_autonomous", "--device", "cpu",
-                "--worker-host", WORKER.host, "--worker-root", WORKER.root, "--worker-image", WORKER.image,
                 "--ollama-base", "http://simulated-llm"])
             validate_args(args)
             root = Path(directory)
@@ -158,7 +157,7 @@ class AutonomousTests(unittest.TestCase):
                 TrainConfig.model_validate({**config.model_dump(), "execution_mode": "legacy"})
 
     def test_agent_search_continues_exact_requested_target_and_freezes(self):
-        with tempfile.TemporaryDirectory() as directory, patch("autonomous.SSHWorker", AdaptiveWorker), patch("remote.SSHWorker", AdaptiveWorker):
+        with tempfile.TemporaryDirectory() as directory, patch("autonomous.LocalWorker", AdaptiveWorker), patch("remote.LocalWorker", AdaptiveWorker):
             bb = self.populate(directory)
             reasoner = ScriptedReasoner(self.actions())
             AutonomousSearchAgent(reasoner, worker=WORKER, seed=42, device="cpu").run(bb)
@@ -179,7 +178,7 @@ class AutonomousTests(unittest.TestCase):
 
     def test_repeated_seed_uses_recorded_segments(self):
         from ml import train_model
-        with tempfile.TemporaryDirectory() as directory, patch("autonomous.SSHWorker", AdaptiveWorker), patch("remote.SSHWorker", AdaptiveWorker):
+        with tempfile.TemporaryDirectory() as directory, patch("autonomous.LocalWorker", AdaptiveWorker), patch("remote.LocalWorker", AdaptiveWorker):
             bb = self.populate(directory)
             AutonomousSearchAgent(ScriptedReasoner(self.actions()), worker=WORKER, seed=42, device="cpu").run(bb)
             config = bb.get("best_configuration").train_config.model_copy(update={"seed": 43})
@@ -190,7 +189,7 @@ class AutonomousTests(unittest.TestCase):
             self.assertEqual(output.result.epochs_completed, 5)
 
     def test_decision_transcript_replays_without_backend_calls(self):
-        with tempfile.TemporaryDirectory() as directory, patch("autonomous.SSHWorker", AdaptiveWorker), patch("remote.SSHWorker", AdaptiveWorker):
+        with tempfile.TemporaryDirectory() as directory, patch("autonomous.LocalWorker", AdaptiveWorker), patch("remote.LocalWorker", AdaptiveWorker):
             first = self.populate(Path(directory) / "first")
             backend = ScriptedReasoner(self.actions())
             recorded = CachedReasoner(backend, first.root)
@@ -206,7 +205,7 @@ class AutonomousTests(unittest.TestCase):
     def test_fallback_and_unknown_continuation_fail_without_training(self):
         for actions, fallback in (([dict(action="finish_search", rationale="fallback")], True),
                                   ([dict(action="continue_trial", rationale="invalid parent", candidate_id="missing", additional_epochs=1)], False)):
-            with tempfile.TemporaryDirectory() as directory, patch("autonomous.SSHWorker", side_effect=AssertionError("no job should start")):
+            with tempfile.TemporaryDirectory() as directory, patch("autonomous.LocalWorker", side_effect=AssertionError("no job should start")):
                 bb = self.populate(directory)
                 with self.assertRaises(ValueError):
                     AutonomousSearchAgent(ScriptedReasoner(actions, fallback=fallback), worker=WORKER, seed=42, device="cpu").run(bb)
@@ -218,7 +217,7 @@ class AutonomousTests(unittest.TestCase):
                     raise TimeoutError("worker time exhausted")
                 return super().execute(root, config, operation, arrays, **kwargs)
         actions = [self.actions()[0], self.actions()[-1]]
-        with tempfile.TemporaryDirectory() as directory, patch("autonomous.SSHWorker", TimeoutWorker):
+        with tempfile.TemporaryDirectory() as directory, patch("autonomous.LocalWorker", TimeoutWorker):
             bb = self.populate(directory)
             with self.assertRaisesRegex(ValueError, "without a successful trial"):
                 AutonomousSearchAgent(ScriptedReasoner(actions), worker=WORKER, seed=42, device="cpu").run(bb)
@@ -229,15 +228,15 @@ class AutonomousTests(unittest.TestCase):
         class MemoryWorker(AdaptiveWorker):
             def execute(self, root, config, operation, arrays, **kwargs):
                 if operation == "train":
-                    raise RuntimeError("container exit 137: memory limit")
+                    raise RuntimeError("local process exit 137: out of memory")
                 return super().execute(root, config, operation, arrays, **kwargs)
-        with tempfile.TemporaryDirectory() as directory, patch("autonomous.SSHWorker", MemoryWorker):
+        with tempfile.TemporaryDirectory() as directory, patch("autonomous.LocalWorker", MemoryWorker):
             bb = self.populate(directory)
             with self.assertRaises(ValueError):
                 AutonomousSearchAgent(ScriptedReasoner([self.actions()[0], self.actions()[-1]]),
                     worker=WORKER, seed=42, device="cpu").run(bb)
             self.assertEqual(bb.get("trial_0001").stop_reason, "memory")
-        with tempfile.TemporaryDirectory() as directory, patch("autonomous.SSHWorker", AdaptiveWorker), patch("remote.SSHWorker", AdaptiveWorker):
+        with tempfile.TemporaryDirectory() as directory, patch("autonomous.LocalWorker", AdaptiveWorker), patch("remote.LocalWorker", AdaptiveWorker):
             from governance import check_integrity
             bb = self.populate(directory)
             AutonomousSearchAgent(ScriptedReasoner(self.actions()), worker=WORKER, seed=42, device="cpu").run(bb)
@@ -249,7 +248,7 @@ class AutonomousTests(unittest.TestCase):
         from search import rank_trials
         actions = [self.actions()[0], dict(action="new_trial", rationale="Alternative architecture",
                     experiment=experiment(3).model_copy(update={"parameters": {"hidden": 32}}).model_dump()), self.actions()[-1]]
-        with tempfile.TemporaryDirectory() as directory, patch("autonomous.SSHWorker", AdaptiveWorker), patch("remote.SSHWorker", AdaptiveWorker):
+        with tempfile.TemporaryDirectory() as directory, patch("autonomous.LocalWorker", AdaptiveWorker), patch("remote.LocalWorker", AdaptiveWorker):
             bb = self.populate(directory)
             AutonomousSearchAgent(ScriptedReasoner(actions), worker=WORKER, seed=42, device="cpu").run(bb)
             trials = [bb.get("trial_0001"), bb.get("trial_0002")]

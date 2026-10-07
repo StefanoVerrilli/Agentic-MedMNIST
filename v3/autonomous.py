@@ -11,19 +11,19 @@ from contracts import (AutonomousSearchDecision, AutonomousSearchEvent, BestConf
                        SearchPlan, SearchReport, TrainConfig, TrainResult, TrialResult, sha256_file)
 from generated_agents import CODE_INTERFACE, _representation, configuration_hash
 from ml import evaluate_probabilities, predict_probabilities
-from remote import RemoteModel, SSHWorker, archive_bundle, prepared_arrays
+from remote import RemoteModel, LocalWorker, archive_bundle, prepared_arrays
 from search import rank_trials
 
 
 AUTONOMOUS_INTERFACE = CODE_INTERFACE.split("Optional propose(context)")[0].replace(
-    "epochs (hard allocated epoch ceiling)", "epochs (agent-selected cumulative target)") + '''
+    "epochs (allocated epoch horizon)", "epochs (agent-selected cumulative target)") + '''
 This run is agent_autonomous. YOU choose every active experimental parameter and
 all search actions. No allocated epoch ceiling, trial count or round count exists.
 Choose new_trial (complete experiment, explicit training options and initial epochs),
 continue_trial (existing candidate_id and positive additional_epochs), or finish_search.
 Use validation only. Justify every choice and stop when further research is not useful.
 Experiments must support exact continuation. train(context) saves BOTH model.ckpt
-(best checkpoint) and resume.pt (latest state). context['epochs'] is the cumulative
+(best checkpoint) and resume.pt (latest state), both inside context['output']. context['epochs'] is the cumulative
 agent-selected target; segment_epochs is the newly requested duration, start_epoch is
 the previously completed epoch, resume is a read-only input state or None.
 History is cumulative. Return stop_reason='segment_complete' or 'early_stopping'.
@@ -35,10 +35,10 @@ worker_runtime.fit_model supports this protocol and selects the explicitly suppl
 optimizer/scheduler/loss controls. A custom loop must preserve equivalent state.
 Continuation must not change code, parameters, optimizer or preprocessing. Create a
 new trial for changes. A scheduler with an exhausted fixed horizon cannot be extended.
-Operational limits are one hour per operation and the configured worker memory;
+The local subprocess timeout is configurable (default one hour per operation);
 resource interruption is a failed segment, never a completed trial. Decisions must
 account for observed runtime and memory. Epochs have no fixed upper bound.
-Use only dependencies already installed in the worker image. Preserve learned
+Use only dependencies already installed in the current Python environment. Preserve learned
 preprocessing parameters in the checkpoint. All source code belongs to this run.
 '''
 
@@ -75,7 +75,7 @@ class AutonomousSearchAgent:
         if not self.reasoner.enabled and not getattr(self.reasoner, "replay_root", None):
             raise ValueError("autonomous search requires live decisions or recorded replay")
         bb.put("search_plan", SearchPlan(policy="agent_autonomous", progressive_budget=False,
-            framework="isolated.python", accuracy_tolerance=self.accuracy_tolerance), producer=self.name)
+            framework="local.python", accuracy_tolerance=self.accuracy_tolerance), producer=self.name)
         prepared = bb.get_blob("prepared_data")
         latest, results, trials, names, identities = {}, {}, [], [], set()
         sequence, candidate_sequence = 0, 0
@@ -93,7 +93,7 @@ class AutonomousSearchAgent:
                     "research": bb.get("architecture_research").model_dump(mode="json"),
                     "validation_evidence": evidence, "test_split": "locked",
                     "resources": {"operation_timeout_seconds": self.worker.timeout_seconds,
-                                  "memory_gib": self.worker.memory_gib}}, ensure_ascii=False, sort_keys=True),
+                                  "backend": "local.subprocess", "memory_limit_enforced": False}}, ensure_ascii=False, sort_keys=True),
                 response_model=AutonomousSearchDecision,
                 fallback=AutonomousSearchDecision(action="finish_search", rationale="No fallback is permitted."),
                 audit=bb.record_event)
@@ -138,7 +138,7 @@ class AutonomousSearchAgent:
         checkpoint.parent.mkdir(parents=True, exist_ok=True)
         result, validation, error, failure_kind = None, None, None, None
         try:
-            worker = SSHWorker(config.worker)
+            worker = LocalWorker(config.worker)
             if parent is None:
                 verified = worker.execute(bb.root, config, "verify", {}, epochs=1)
                 if json.loads((verified / "result.json").read_text(encoding="utf-8")) != {"verified": True}:
@@ -165,7 +165,7 @@ class AutonomousSearchAgent:
             data.update(checkpoint_path=checkpoint.relative_to(bb.root).as_posix(),
                 checkpoint_sha256=sha256_file(checkpoint), resume_path=resume_target.relative_to(bb.root).as_posix(),
                 resume_sha256=sha256_file(resume_target), training_log_path=log.relative_to(bb.root).as_posix(),
-                seed=config.seed, device=config.device, framework="isolated.python")
+                seed=config.seed, device=config.device, framework="local.python")
             result = TrainResult.model_validate(data)
             if not start_epoch < result.epochs_completed <= config.epochs:
                 raise ValueError("autonomous segment has invalid completed epoch count")
@@ -181,7 +181,7 @@ class AutonomousSearchAgent:
             result = None
             error = str(exc)[:8000]
             failure_kind = ("timeout" if isinstance(exc, (TimeoutError, subprocess.TimeoutExpired)) else
-                            "memory" if isinstance(exc, MemoryError) or "container exit 137" in error or "out of memory" in error.lower()
+                            "memory" if isinstance(exc, MemoryError) or "out of memory" in error.lower()
                             else "training_failure")
             bb.record_event("autonomous_segment_failed", candidate_id=candidate_id, error=error,
                 interrupted=failure_kind in {"timeout", "memory"}, failure_kind=failure_kind)
@@ -206,7 +206,7 @@ class AutonomousSearchAgent:
         targets = [trial.config.epochs for trial in trials
                    if trial.candidate_id == selected.candidate_id and trial.status == "completed"]
         selected = selected.model_copy(update={"config": selected.config.model_copy(update={"segment_targets": targets})})
-        payload = {"format": "isolated-experiment-v1", "train_config": selected.config.model_dump(mode="json"),
+        payload = {"format": "run-experiment-v1", "train_config": selected.config.model_dump(mode="json"),
                    "representation": selected.representation.model_dump(mode="json"),
                    "search_policy": "agent_autonomous", "checkpoint": selected.checkpoint_path}
         settings = bb.get_optional("run_configuration")
