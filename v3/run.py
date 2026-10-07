@@ -393,7 +393,7 @@ def run_once(
             llm_mode="ollama" if reasoner.enabled else "heuristic",
             llm_model=reasoner.model if reasoner.enabled else "none",
             llm_model_digest=ollama_model_digest(
-                args.ollama_base if reasoner.enabled else None,
+                args.ollama_base if reasoner.enabled and not args.replay_run else None,
                 reasoner.model, timeout=min(args.llm_timeout, 5.0)),
             code_sha256=code_tree_sha256(Path(__file__).resolve().parent),
             code_hash_algorithm="canonical-text-v2")
@@ -502,7 +502,11 @@ def run_once(
         pipeline, reviewer, max_stage_retries=0 if args.execution_mode == "agent_autonomous" else args.stage_retries
     )
     print(f"\n=== Agentic PathMNIST pipeline | seed={seed} ===")
-    orchestrator.run(bb)
+    from resources import RunResources
+    resources = RunResources(bb.root, base_url=args.ollama_base if reasoner.enabled else None,
+                             model=reasoner.model, audit=bb.record_event, replay=bool(args.replay_run))
+    with resources.activate():
+        orchestrator.run(bb)
     execution_status = bb.get("execution_status").status
     if execution_status != "completed":
         return {
@@ -520,14 +524,11 @@ def run_once(
     post_reviews = []
     if not args.skip_baseline:
         print("\n=== Conventional baseline on the same split ===")
-        baseline = run_baseline(
-            bundle,
-            bb.root,
-            seed=seed,
-            device=config.device,
-            epochs=config.epochs,
-            worker=config.worker,
-        )
+        with resources.activate():
+            baseline = run_baseline(
+                bundle, bb.root, seed=seed, device=config.device,
+                epochs=config.epochs, worker=config.worker,
+            )
         bb.put("baseline_report", baseline, producer="baseline")
         fingerprint = common_split_fingerprint(bundle)
         comparison = ComparisonReport(
@@ -551,7 +552,8 @@ def run_once(
 
     if args.ablation_suite:
         print("\n=== Three-scenario representation ablation ===")
-        ablation = run_representation_ablations(bundle, bb.root, template_config=config)
+        with resources.activate():
+            ablation = run_representation_ablations(bundle, bb.root, template_config=config)
         bb.put("ablation_report", ablation, producer="ablation")
         ablation_review = reviewer.review(bb, "ablation")
         post_reviews.append(ablation_review)

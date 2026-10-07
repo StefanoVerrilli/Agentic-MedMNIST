@@ -22,6 +22,7 @@ from dataclasses import dataclass
 from typing import Any, Generic, Protocol, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from failures import is_timeout
 
 DecisionT = TypeVar("DecisionT", bound=BaseModel)
 AuditSink = Callable[..., Any]
@@ -188,6 +189,22 @@ class OllamaReasoner:
         # budget separate so a timeout cannot consume JSON correction attempts.
         transport_failures = validation_failures = 0
         attempt = 0
+        decision_started = time.monotonic()
+
+        def request():
+            request_started = time.monotonic()
+            _audit(audit, "llm_request_started", stage=stage, request_id=request_id, attempt=attempt)
+            try:
+                response = self._transport(f"{self.base_url}/api/chat", payload, self.timeout)
+            except Exception as exc:
+                _audit(audit, "llm_request_failed", stage=stage, request_id=request_id, attempt=attempt,
+                       elapsed_seconds=time.monotonic() - request_started, error_type=type(exc).__name__,
+                       error=str(exc)[:4000], failure_kind="llm_timeout" if is_timeout(exc) else "llm_error")
+                raise
+            _audit(audit, "llm_request_finished", stage=stage, request_id=request_id, attempt=attempt,
+                   elapsed_seconds=time.monotonic() - request_started,
+                   load_duration_ns=response.get("load_duration") if isinstance(response, dict) else None)
+            return response
         while True:
             attempt += 1
             started = time.monotonic()
@@ -198,9 +215,7 @@ class OllamaReasoner:
             try:
                 with _GLOBAL_OLLAMA_LOCK:
                     try:
-                        response = self._transport(
-                            f"{self.base_url}/api/chat", payload, self.timeout
-                        )
+                        response = request()
                     except OSError as exc:
                         # Some Ollama backends cannot compile a nested schema.
                         # JSON mode remains model reasoning: Pydantic still
@@ -209,9 +224,7 @@ class OllamaReasoner:
                             raise
                         format_negotiation.append(_error_detail(exc))
                         payload["format"] = "json"
-                        response = self._transport(
-                            f"{self.base_url}/api/chat", payload, self.timeout
-                        )
+                        response = request()
                 content = response["message"]["content"]
                 feedback_content = content
                 if not isinstance(content, str) or not content.strip():
@@ -247,7 +260,9 @@ class OllamaReasoner:
                     source=self.model,
                     attempts=attempt,
                     request_id=request_id,
-                    elapsed_seconds=round(time.monotonic() - started, 4),
+                    elapsed_seconds=round(time.monotonic() - decision_started, 4),
+                    attempt_elapsed_seconds=round(time.monotonic() - started, 4),
+                    load_duration_ns=response.get("load_duration"),
                     prompt_tokens=response.get("prompt_eval_count"),
                     completion_tokens=response.get("eval_count"),
                     total_duration_ns=response.get("total_duration"),
@@ -275,7 +290,7 @@ class OllamaReasoner:
                             detail += f" (rejected optimizer_eps={str(row.get('input'))[:120]})"
                 else:
                     detail = _error_detail(exc)
-                if isinstance(exc, TimeoutError):
+                if is_timeout(exc):
                     detail += f" (request timeout={self.timeout}s; increase --llm-timeout for slow generation)"
                 if isinstance(response, dict):
                     rejected_responses.append({
@@ -368,6 +383,7 @@ class OllamaReasoner:
             output_format="json" if payload["format"] == "json" else "json_schema",
             format_negotiation=format_negotiation,
             field_repairs=field_repairs,
+            elapsed_seconds=round(time.monotonic() - decision_started, 4),
             decision=(
                 None if self.required else validated_fallback.model_dump(mode="json")
             ),

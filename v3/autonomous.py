@@ -4,7 +4,6 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import shutil
-import subprocess
 import time
 
 from contracts import (AutonomousSearchDecision, AutonomousSearchEvent, BestConfiguration,
@@ -13,6 +12,8 @@ from generated_agents import CODE_INTERFACE, _representation, configuration_hash
 from ml import evaluate_probabilities, predict_probabilities
 from remote import RemoteModel, LocalWorker, archive_bundle, prepared_arrays
 from search import rank_trials
+from failures import (SearchCircuitBreaker, TERMINAL_FAILURES,
+                      failure_kind as classify_failure, failure_signature, is_timeout)
 
 
 AUTONOMOUS_INTERFACE = CODE_INTERFACE.split("Optional propose(context)")[0].replace(
@@ -40,7 +41,12 @@ Experiments must support exact continuation. train(context) saves BOTH model.ckp
 (best checkpoint) and resume.pt (latest state), both inside context['output']. context['epochs'] is the cumulative
 agent-selected target; segment_epochs is the newly requested duration, start_epoch is
 the previously completed epoch, resume is a read-only input state or None.
+resume is a filesystem path string, NOT a state dictionary. Load it with
+torch.load(context['resume'], map_location='cpu', weights_only=False), or use fit_model.
 History is cumulative. Return stop_reason='segment_complete' or 'early_stopping'.
+Verification trains a synthetic epoch, then resumes into a new output directory for
+epoch two. Honour context['start_epoch']; use context.get('scheduler_horizon', context['epochs'])
+for a custom fixed-horizon scheduler. Verification disables early stopping for this probe.
 The resume.pt dictionary must contain format='agent-resume-v1', identity, data_identity,
 epochs_completed, model, optimizer, scheduler, rng, loader_rng, history, best,
 best_epoch, stale, stopped. Obtain identity using autonomous.continuation_identity(config)
@@ -54,7 +60,8 @@ resource interruption is a failed segment, never a completed trial. Decisions mu
 account for observed runtime and memory. Epochs have no fixed upper bound.
 Use only dependencies already installed in the current Python environment. Preserve learned
 preprocessing parameters in the checkpoint. All source code belongs to this run.
-'''
+''' + "\nHelper-based starting example (adapt build_model to your hypothesis):\n" + \
+    Path(__file__).with_name("default_experiment.py").read_text(encoding="utf-8")
 
 
 def continuation_identity(config):
@@ -82,9 +89,14 @@ class AutonomousSearchAgent:
     # discard its in-memory history and reuse checkpoint/candidate identifiers.
     retry_on_exception = False
 
-    def __init__(self, reasoner, *, worker, seed, device, accuracy_tolerance=0.005):
+    def __init__(self, reasoner, *, worker, seed, device, accuracy_tolerance=0.005,
+                 max_consecutive_failures=3, max_same_signature_failures=2):
         self.reasoner, self.worker, self.seed, self.device = reasoner, worker, seed, device
         self.accuracy_tolerance = accuracy_tolerance
+        if min(max_consecutive_failures, max_same_signature_failures) < 1:
+            raise ValueError("failure thresholds must be positive")
+        self.max_consecutive_failures = max_consecutive_failures
+        self.max_same_signature_failures = max_same_signature_failures
 
     def run(self, bb):
         if not bb.get("data_audit_report").passed:
@@ -96,6 +108,8 @@ class AutonomousSearchAgent:
         prepared = bb.get_blob("prepared_data")
         latest, results, trials, names, identities = {}, {}, [], [], set()
         sequence, candidate_sequence = 0, 0
+        consecutive_failures = same_failures = 0
+        last_signature = None
         while True:
             sequence += 1
             resumable = sorted(candidate_id for candidate_id, trial in latest.items()
@@ -105,24 +119,54 @@ class AutonomousSearchAgent:
                 "validation_accuracy": t.validation_accuracy, "validation_macro_f1": t.validation_macro_f1,
                 "epochs_completed": t.epochs_completed, "requested_target": t.config.epochs,
                 "duration_seconds": t.duration_seconds, "stop_reason": t.stop_reason, "error": t.error,
+                "failed_operation": t.failed_operation, "failure_kind": t.failure_kind,
+                "failure_signature": t.failure_signature,
                 "configuration": t.config.model_dump(mode="json", exclude={"worker"}),
                 "learning_curve": [row.model_dump(mode="json") for row in t.learning_curve]} for t in trials]
-            decision = self.reasoner.decide(stage=f"autonomous_search.action_{sequence}",
-                system=AUTONOMOUS_INTERFACE,
-                user=json.dumps({"profile": bb.get("data_profile").model_dump(mode="json"),
-                    "research": bb.get("architecture_research").model_dump(mode="json"),
-                    "validation_evidence": evidence, "test_split": "locked",
-                    "available_actions": (["new_trial"] + (["continue_trial"] if resumable else [])
-                                          + (["finish_search"] if latest else [])),
-                    "resumable_candidate_ids": resumable,
-                    "resources": {"operation_timeout_seconds": self.worker.timeout_seconds,
-                                  "backend": "local.subprocess", "memory_limit_enforced": False}}, ensure_ascii=False, sort_keys=True),
-                response_model=AutonomousSearchDecision,
-                fallback=AutonomousSearchDecision(action="finish_search", rationale="No fallback is permitted."),
-                audit=bb.record_event)
+            repair = None
+            if trials and trials[-1].failure_kind == "code_validation":
+                from remote import validate_bundle
+                reference = trials[-1].config.generated_bundle
+                directory = validate_bundle(bb.root, reference)
+                repair = {"instruction": "Repair the existing program, do not redesign the experiment.",
+                          "previous_sources": {p.relative_to(directory).as_posix(): p.read_text(encoding="utf-8")
+                                               for p in sorted(directory.rglob("*.py"))},
+                          "traceback": trials[-1].error, "operation": trials[-1].failed_operation,
+                          "input_shapes": {"train_images": [9, 3, 28, 28], "val_images": [9, 3, 28, 28]},
+                          "contract": AUTONOMOUS_INTERFACE}
+            available = (["new_trial"] + (["continue_trial"] if resumable else [])
+                         + (["finish_search"] if latest else [])) if not repair else ["new_trial"]
+            decision_started = time.monotonic()
+            bb.record_event("autonomous_decision_started", decision_sequence=sequence,
+                completed_trials=sum(t.status == "completed" for t in trials),
+                failed_trials=sum(t.status == "failed" for t in trials),
+                consecutive_failures=consecutive_failures, resumable_candidate_ids=resumable,
+                available_actions=available)
+            try:
+                decision = self.reasoner.decide(stage=f"autonomous_search.action_{sequence}",
+                    system=AUTONOMOUS_INTERFACE,
+                    user=json.dumps({"profile": bb.get("data_profile").model_dump(mode="json"),
+                        "research": bb.get("architecture_research").model_dump(mode="json"),
+                        "validation_evidence": evidence, "test_split": "locked",
+                        "available_actions": available, "repair": repair,
+                        "resumable_candidate_ids": resumable,
+                        "resources": {"operation_timeout_seconds": self.worker.timeout_seconds,
+                                      "backend": "local.subprocess", "memory_limit_enforced": False}}, ensure_ascii=False, sort_keys=True),
+                    response_model=AutonomousSearchDecision,
+                    fallback=AutonomousSearchDecision(action="finish_search", rationale="No fallback is permitted."),
+                    audit=bb.record_event)
+            except Exception as exc:
+                bb.record_event("autonomous_decision_failed", decision_sequence=sequence,
+                    elapsed_seconds=time.monotonic() - decision_started, error=str(exc)[:8000],
+                    failure_kind="llm_timeout" if is_timeout(exc) else "llm_error")
+                raise
+            bb.record_event("autonomous_decision_finished", decision_sequence=sequence,
+                elapsed_seconds=time.monotonic() - decision_started, selected_action=decision.value.action)
             if decision.used_fallback:
                 raise ValueError("autonomous decisions cannot use heuristic fallback")
             action = decision.value
+            if repair and action.action != "new_trial":
+                raise ValueError("code validation failure requires repair before another search action")
             bb.put(f"autonomous_action_{sequence:04d}", AutonomousSearchEvent(decision=action,
                 source=decision.source), producer=self.name)
             if action.action == "finish_search":
@@ -131,7 +175,11 @@ class AutonomousSearchAgent:
                 break
             parent = None
             if action.action == "new_trial":
-                reference = archive_bundle(bb, action.experiment, decision.source)
+                previous_reference = trials[-1].config.generated_bundle if repair else None
+                experiment = action.experiment
+                if previous_reference:
+                    experiment = experiment.model_copy(update={"bundle_id": previous_reference.bundle_id})
+                reference = archive_bundle(bb, experiment, decision.source, parent=previous_reference)
                 config = experiment_config(action.experiment, reference, self.worker, self.seed, self.device, decision.source)
                 identity = continuation_identity(config)
                 if identity in identities:
@@ -152,6 +200,20 @@ class AutonomousSearchAgent:
             bb.put(name, trial, producer=self.name)
             if result is not None:
                 latest[candidate_id], results[candidate_id] = trial, result
+                consecutive_failures = same_failures = 0
+                last_signature = None
+            else:
+                consecutive_failures += 1
+                same_failures = same_failures + 1 if trial.failure_signature == last_signature else 1
+                last_signature = trial.failure_signature
+                if (trial.failure_kind in TERMINAL_FAILURES or
+                        consecutive_failures >= self.max_consecutive_failures or
+                        same_failures >= self.max_same_signature_failures):
+                    bb.record_event("autonomous_circuit_breaker", candidate_id=candidate_id,
+                        failure_kind=trial.failure_kind, failure_signature=last_signature,
+                        consecutive_failures=consecutive_failures, same_signature_failures=same_failures)
+                    raise SearchCircuitBreaker(f"autonomous search stopped after {consecutive_failures} "
+                                               f"consecutive failures ({trial.failure_kind})")
         selected = rank_trials(latest.values(), accuracy_tolerance=self.accuracy_tolerance, equal_epoch_budgets=False)
         self._freeze(bb, selected, results[selected.candidate_id], trials, names)
 
@@ -160,20 +222,30 @@ class AutonomousSearchAgent:
         checkpoint = bb.blob_dir / "search" / f"{candidate_id}_s{sequence:04d}.ckpt"
         checkpoint.parent.mkdir(parents=True, exist_ok=True)
         result, validation, error, failure_kind = None, None, None, None
+        operation, signature = "verify", None
+        representation = {"normalization": prepared.normalization, "augmentations": list(prepared.augmentations),
+                          "mean": list(prepared.mean), "std": list(prepared.std),
+                          "layout": "NCHW", "already_prepared": True}
         try:
             worker = LocalWorker(config.worker)
             if parent is None:
-                verified = worker.execute(bb.root, config, "verify", {}, epochs=1)
+                verified = worker.execute(bb.root, config, "verify", {}, epochs=1,
+                                          candidate_id=candidate_id, representation=representation)
                 if json.loads((verified / "result.json").read_text(encoding="utf-8")) != {"verified": True}:
                     raise ValueError("worker verification failed")
+            operation = "result_validation"
             resume = bb.root / parent.resume_path if parent else None
             previous = bb.root / parent.checkpoint_path if parent else None
             if parent and (sha256_file(resume) != parent.resume_sha256 or sha256_file(previous) != parent.checkpoint_sha256):
                 raise ValueError("continuation input checksum mismatch")
             start_epoch = parent.epochs_completed if parent else 0
-            output = worker.execute(bb.root, config, "train",
-                prepared_arrays(prepared, ["train", "val"], config.batch_size, seed=config.seed),
-                checkpoint=previous, resume=resume, start_epoch=start_epoch)
+            operation = "preparation"
+            arrays = prepared_arrays(prepared, ["train", "val"], config.batch_size, seed=config.seed)
+            operation = "train"
+            output = worker.execute(bb.root, config, "train", arrays,
+                checkpoint=previous, resume=resume, start_epoch=start_epoch,
+                candidate_id=candidate_id, representation=representation)
+            operation = "result_validation"
             data = json.loads((output / "result.json").read_text(encoding="utf-8"))
             if data.get("stop_reason") not in {"segment_complete", "early_stopping"}:
                 raise ValueError("autonomous training must report its stop reason")
@@ -197,21 +269,25 @@ class AutonomousSearchAgent:
             if parent and result.history[:start_epoch] != parent.learning_curve:
                 raise ValueError("continuation rewrote prior history")
             model = RemoteModel(bb.root, checkpoint, result.checkpoint_sha256, config)
+            operation = "infer"
             probabilities, targets = predict_probabilities(model, prepared, "val", config.batch_size,
                 device=config.device, seed=config.seed)
             validation = evaluate_probabilities(probabilities, targets, prepared.bundle.labels, split="val")
         except Exception as exc:
             result = None
             error = str(exc)[:8000]
-            failure_kind = ("timeout" if isinstance(exc, (TimeoutError, subprocess.TimeoutExpired)) else
-                            "memory" if isinstance(exc, MemoryError) or "out of memory" in error.lower()
-                            else "training_failure")
+            operation = getattr(exc, "operation", operation)
+            failure_kind = classify_failure(exc, operation)
+            signature = getattr(exc, "failure_signature", None) or failure_signature(error, failure_kind)
             bb.record_event("autonomous_segment_failed", candidate_id=candidate_id, error=error,
-                interrupted=failure_kind in {"timeout", "memory"}, failure_kind=failure_kind)
+                interrupted=failure_kind in {"timeout", "oom"}, failure_kind=failure_kind,
+                operation=operation, failure_signature=signature)
         trial = TrialResult(candidate_id=candidate_id, config_hash=configuration_hash(config),
             round_index=sequence, epoch_budget=None, requested_epochs=config.epochs,
             parent_candidate_id=parent.candidate_id if parent else None,
             status="completed" if result else "failed", config=config, representation=_representation(bb),
+            failed_operation=operation if not result else None,
+            failure_kind=failure_kind, failure_signature=signature,
             validation_accuracy=validation.accuracy if result else None,
             validation_macro_f1=validation.macro_f1 if result else None,
             validation_balanced_accuracy=validation.balanced_accuracy if result else None,
@@ -220,7 +296,7 @@ class AutonomousSearchAgent:
             checkpoint_path=result.checkpoint_path if result else None,
             checkpoint_sha256=result.checkpoint_sha256 if result else None,
             resume_path=result.resume_path if result else None, resume_sha256=result.resume_sha256 if result else None,
-            stop_reason=result.stop_reason if result else failure_kind,
+            stop_reason=result.stop_reason if result else {"oom": "memory", "training_error": "training_failure"}.get(failure_kind, failure_kind),
             training_log_path=result.training_log_path if result else None,
             duration_seconds=time.monotonic() - started, decision_source=config.source, error=error)
         return trial, result

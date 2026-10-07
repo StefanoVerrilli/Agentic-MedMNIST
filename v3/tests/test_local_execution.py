@@ -1,5 +1,6 @@
 """Small synthetic subprocess checks; never launch a dataset pipeline."""
 import json
+import os
 from pathlib import Path
 import sys
 import tempfile
@@ -18,6 +19,50 @@ from tests.helpers import make_bundle
 
 
 class LocalExecutionTests(unittest.TestCase):
+    def test_timeout_terminates_spawned_descendant_and_records_process_exit(self):
+        from generated_agents import generated_config
+        from resources import RunResources
+        source = ("import subprocess, sys, time\n"
+                  "flags = subprocess.CREATE_NO_WINDOW if sys.platform == 'win32' else 0\n"
+                  "child = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(60)'], creationflags=flags)\n"
+                  "print('DESCENDANT_PID=' + str(child.pid), flush=True)\n"
+                  "time.sleep(60)\n")
+        with tempfile.TemporaryDirectory() as directory:
+            bb = Blackboard(Path(directory) / "run")
+            decision = fallback_decision().model_copy(update={"files": [GeneratedSource(path="experiment.py", code=source)]})
+            reference = archive_bundle(bb, decision, "test")
+            configuration = WorkerConfiguration(timeout_seconds=15)
+            config = generated_config(decision, reference, configuration, 42, "cpu", 1, "test")
+            resources = RunResources(bb.root, audit=bb.record_event)
+            with resources.activate(), self.assertRaises(TimeoutError):
+                LocalWorker(configuration).execute(bb.root, config, "verify", {})
+            log = next((bb.blob_dir / "local_jobs").glob("*/process.log")).read_text(encoding="utf-8")
+            pid_line = next(row for row in log.splitlines() if row.startswith("DESCENDANT_PID="))
+            descendant_pid = int(pid_line.split("=")[1])
+            if os.name == "nt":
+                import ctypes
+                from ctypes import wintypes
+                api = ctypes.WinDLL("kernel32", use_last_error=True)
+                api.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+                api.OpenProcess.restype = wintypes.HANDLE
+                api.WaitForSingleObject.argtypes = [wintypes.HANDLE, wintypes.DWORD]
+                api.WaitForSingleObject.restype = wintypes.DWORD
+                api.CloseHandle.argtypes = [wintypes.HANDLE]
+                handle = api.OpenProcess(0x1000 | 0x100000, False, descendant_pid)
+                if handle:
+                    try:
+                        self.assertEqual(api.WaitForSingleObject(handle, 5000), 0)
+                    finally:
+                        api.CloseHandle(handle)
+                else:
+                    self.assertEqual(ctypes.get_last_error(), 87)  # PID no longer exists
+            else:
+                status = Path(f"/proc/{descendant_pid}/stat")
+                if status.exists():
+                    self.assertEqual(status.read_text().split(")", 1)[1].split()[0], "Z")
+            events = [json.loads(row) for row in (bb.root / "decision_log.jsonl").read_text().splitlines()]
+            self.assertTrue(any(row["event"] == "local_job_process_exited" and row["timed_out"] for row in events))
+
     def test_no_remote_arguments_or_worker_are_required(self):
         from run import build_parser, validate_args, worker_configuration
         args = build_parser().parse_args(["--execution-mode", "agent_autonomous", "--device", "cpu",
@@ -35,7 +80,8 @@ class LocalExecutionTests(unittest.TestCase):
     def test_same_interpreter_and_run_scoped_working_directory(self):
         config = TrainConfig(lr=.001, epochs=1, hidden=16, batch_size=8, weight_decay=0,
             class_weighting=False, seed=42, device="cpu", rationale="test", source="test")
-        with tempfile.TemporaryDirectory() as directory, patch("remote.subprocess.Popen") as launch:
+        with tempfile.TemporaryDirectory() as directory, patch("remote.subprocess.Popen") as launch, \
+                patch("process_control.WindowsProcessTree"):
             process = MagicMock()
             process.wait.return_value = 0
             launch.return_value = process
@@ -57,6 +103,9 @@ class LocalExecutionTests(unittest.TestCase):
             config = generated_config(decision, reference, WorkerConfiguration(), 42, "cpu", 1, "test")
             with self.assertRaisesRegex(RuntimeError, "local child failure pid="):
                 LocalWorker().execute(bb.root, config, "verify", {})
+            failure = json.loads(next((bb.blob_dir / "local_jobs").glob("*/output/failure.json")).read_text())
+            self.assertEqual(failure["failure_kind"], "code_validation")
+            self.assertEqual(failure["operation"], "verify")
             self.assertEqual((bb.root / "generated" / decision.bundle_id / "v001" / "experiment.py").read_text(), decision.files[0].code)
 
     def test_timeout_stops_child_and_preserves_job_log(self):

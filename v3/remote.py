@@ -9,11 +9,14 @@ import os
 import sys
 import shutil
 import subprocess
+import time
 import uuid
 
 from contracts import (GeneratedBundle, GeneratedBundleReference, GeneratedCodeDecision,
                        TrainConfig, TrainResult, WorkerConfiguration, sha256_file)
 from research import canonical_hash, contained_path
+from failures import WorkerOperationError, failure_kind
+from resources import current_resources
 
 
 def archive_bundle(bb, decision: GeneratedCodeDecision, source: str, *, parent=None):
@@ -102,8 +105,9 @@ def copy_bundle(origin: Path, destination: Path, reference: GeneratedBundleRefer
 class LocalWorker:
     """Run generated code in a child of the current Python environment."""
 
-    def __init__(self, configuration: WorkerConfiguration | None = None):
+    def __init__(self, configuration: WorkerConfiguration | None = None, *, coordinator=None):
         self.configuration = configuration or WorkerConfiguration()
+        self.coordinator = coordinator or current_resources()
 
     def preflight(self, device: str):
         import torch
@@ -114,12 +118,37 @@ class LocalWorker:
 
     def execute(self, root: Path, config: TrainConfig, operation: str, arrays: dict,
                 *, checkpoint: Path | None = None, epochs: int | None = None, evidence=None,
-                resume: Path | None = None, start_epoch: int = 0):
+                resume: Path | None = None, start_epoch: int = 0, candidate_id=None,
+                representation=None):
+        root = root.resolve()
+        job = root / "blobs" / "local_jobs" / uuid.uuid4().hex
+        started = time.monotonic()
+        coordinator = self.coordinator
+        if coordinator and coordinator.root != root:
+            raise ValueError("worker resource coordinator belongs to another run")
+        def event(name, **details):
+            if coordinator:
+                coordinator.record(name, job_id=job.name, operation=operation, candidate_id=candidate_id,
+                                   elapsed_seconds=time.monotonic() - started, **details)
+        event("local_job_created", array_shapes={key: list(value.shape) for key, value in arrays.items()},
+              array_bytes=sum(value.nbytes for value in arrays.values()))
+        try:
+            output = self._execute(root, config, operation, arrays, job=job, event=event,
+                                   checkpoint=checkpoint, epochs=epochs, evidence=evidence,
+                                   resume=resume, start_epoch=start_epoch, representation=representation)
+            event("local_job_completed")
+            return output
+        except Exception as exc:
+            event("local_job_failed", error=str(exc)[:8000], failure_kind=failure_kind(exc, operation))
+            raise
+
+    def _execute(self, root, config, operation, arrays, *, job, event,
+                 checkpoint=None, epochs=None, evidence=None, resume=None, start_epoch=0,
+                 representation=None):
         import numpy as np
         if operation not in {"verify", "train", "infer", "strategy"}:
             raise ValueError("unsupported local operation")
         root = root.resolve()
-        job = root / "blobs" / "local_jobs" / uuid.uuid4().hex
         inputs, output = job / "input", job / "output"
         framework = inputs / "framework"
         framework.mkdir(parents=True, exist_ok=False)
@@ -134,42 +163,93 @@ class LocalWorker:
             shutil.copyfile(checkpoint, inputs / "model.ckpt")
         if resume:
             shutil.copyfile(resume, inputs / "resume.pt")
+        event("local_job_arrays_saving")
         np.savez(inputs / "data.npz", **arrays)
+        event("local_job_arrays_saved", data_npz_bytes=(inputs / "data.npz").stat().st_size)
         request = {"operation": operation, "config": config.model_dump(mode="json"),
                    "epochs": epochs if epochs is not None else config.epochs,
-                   "evidence": evidence or [], "start_epoch": start_epoch, "resume": resume is not None}
+                   "evidence": evidence or [], "start_epoch": start_epoch, "resume": resume is not None,
+                   "representation": representation or getattr(self.coordinator, "representation", None)}
         (inputs / "request.json").write_text(json.dumps(request) + "\n", encoding="utf-8")
         command = [sys.executable, str(framework / "worker_runtime.py"), "--job", str(job)]
         environment = os.environ.copy()
         environment["PYTHONUTF8"] = "1"
         environment["PYTHONDONTWRITEBYTECODE"] = "1"
-        options = ({"creationflags": subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP}
+        # CREATE_SUSPENDED prevents descendants escaping before Job Object assignment.
+        options = ({"creationflags": subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP | 0x4}
                    if os.name == "nt" else {"start_new_session": True})
         log = job / "process.log"
+        if self.coordinator:
+            self.coordinator.release_for_worker(config.device, job_id=job.name, operation=operation)
+        event("local_job_process_starting")
         with log.open("wb") as handle:
-            process = subprocess.Popen(command, cwd=work, env=environment,
-                                       stdout=handle, stderr=subprocess.STDOUT, **options)
+            tree = None
+            if os.name == "nt":
+                from process_control import WindowsProcessTree
+                try:
+                    tree = WindowsProcessTree()
+                except Exception as exc:
+                    raise WorkerOperationError(f"Cannot create worker process tree: {exc}",
+                                               operation=operation, kind="controller_invariant") from exc
             try:
-                code = process.wait(timeout=self.configuration.timeout_seconds)
-            except subprocess.TimeoutExpired as exc:
-                if os.name == "nt":
-                    subprocess.run(["taskkill", "/PID", str(process.pid), "/T", "/F"],
-                                   capture_output=True, check=False, timeout=30)
-                else:
-                    import signal
+                process = subprocess.Popen(command, cwd=work, env=environment,
+                                           stdout=handle, stderr=subprocess.STDOUT, **options)
+                deadline = time.monotonic() + self.configuration.timeout_seconds
+                try:
+                    if tree:
+                        try:
+                            tree.assign(process)
+                        except Exception as exc:
+                            raise WorkerOperationError(f"Cannot attach worker process tree: {exc}",
+                                                       operation=operation, kind="controller_invariant") from exc
+                    event("local_job_process_started", child_pid=process.pid)
+                    while True:
+                        remaining = deadline - time.monotonic()
+                        if remaining <= 0:
+                            raise subprocess.TimeoutExpired(command, self.configuration.timeout_seconds)
+                        try:
+                            code = process.wait(timeout=min(15.0, remaining))
+                            break
+                        except subprocess.TimeoutExpired:
+                            if time.monotonic() >= deadline:
+                                raise
+                            event("local_job_process_heartbeat", child_pid=process.pid)
+                except BaseException as exc:
                     try:
-                        os.killpg(process.pid, signal.SIGKILL)
-                    except ProcessLookupError:
-                        pass
-                if process.poll() is None:
-                    process.kill()
-                process.wait(timeout=30)
-                raise TimeoutError("local operation exceeded its timeout") from exc
+                        if tree:
+                            tree.terminate()
+                        else:
+                            import signal
+                            try:
+                                os.killpg(process.pid, signal.SIGKILL)
+                            except ProcessLookupError:
+                                pass
+                    finally:
+                        if process.poll() is None:
+                            process.kill()
+                        process.wait(timeout=30)
+                    event("local_job_process_exited", child_pid=process.pid, return_code=process.returncode,
+                          timed_out=isinstance(exc, subprocess.TimeoutExpired))
+                    if isinstance(exc, subprocess.TimeoutExpired):
+                        raise TimeoutError("local operation exceeded its timeout") from exc
+                    raise
+            finally:
+                if tree:
+                    try:
+                        tree.terminate()
+                    finally:
+                        tree.close()
+        event("local_job_process_exited", child_pid=process.pid, return_code=code)
         if code:
             with log.open("rb") as handle:
                 handle.seek(max(0, log.stat().st_size - 8000))
                 detail = handle.read().decode("utf-8", "replace")
-            raise RuntimeError(f"local process exit {code}: {detail}")
+            report = output / "failure.json"
+            failure = json.loads(report.read_text(encoding="utf-8")) if report.exists() else {}
+            raise WorkerOperationError(f"local process exit {code}: {detail}",
+                operation=failure.get("operation", operation),
+                kind=failure.get("failure_kind") or failure_kind(RuntimeError(detail), operation),
+                signature=failure.get("failure_signature"))
         if config.generated_bundle:
             validate_bundle(root, config.generated_bundle)
         return output
@@ -178,6 +258,10 @@ def prepared_arrays(prepared, splits, batch_size=128, *, seed=42, corruption_sig
     import numpy as np
     from ml import make_loader
     arrays = {}
+    coordinator = current_resources()
+    started = time.monotonic()
+    if coordinator:
+        coordinator.record("local_job_arrays_preparing", splits=splits)
     for split in splits:
         loader = make_loader(prepared, split=split, batch_size=batch_size, shuffle=False,
                              seed=seed, corruption_sigma=corruption_sigma)
@@ -187,6 +271,13 @@ def prepared_arrays(prepared, splits, batch_size=128, *, seed=42, corruption_sig
             targets.append(target.numpy())
         arrays[f"{split}_images"] = np.concatenate(images)
         arrays[f"{split}_targets"] = np.concatenate(targets)
+    if coordinator:
+        coordinator.representation = {"normalization": prepared.normalization,
+            "augmentations": list(prepared.augmentations), "mean": list(prepared.mean), "std": list(prepared.std),
+            "layout": "NCHW", "already_prepared": True}
+        coordinator.record("local_job_arrays_prepared", elapsed_seconds=time.monotonic() - started,
+            array_shapes={key: list(value.shape) for key, value in arrays.items()},
+            array_bytes=sum(value.nbytes for value in arrays.values()))
     return arrays
 
 
@@ -196,6 +287,11 @@ class RemoteModel:
     checkpoint: Path
     checkpoint_sha256: str
     config: TrainConfig
+    coordinator: object = None
+
+    def __post_init__(self):
+        if self.coordinator is None:
+            self.coordinator = current_resources()
 
     def predict(self, prepared, split, batch_size, *, seed=42, corruption_sigma=None):
         import numpy as np
@@ -204,7 +300,8 @@ class RemoteModel:
         data = prepared_arrays(prepared, [split], batch_size, seed=seed,
                                corruption_sigma=corruption_sigma)
         targets = data.pop(f"{split}_targets")
-        output = LocalWorker(self.config.worker).execute(self.root, self.config, "infer",
+        options = {"coordinator": self.coordinator} if self.coordinator else {}
+        output = LocalWorker(self.config.worker, **options).execute(self.root, self.config, "infer",
             {"images": data[f"{split}_images"]}, checkpoint=self.checkpoint)
         logits = np.load(output / "logits.npy", allow_pickle=False)
         if logits.shape != (len(targets), 9) or not np.issubdtype(logits.dtype, np.floating) or not np.isfinite(logits).all():

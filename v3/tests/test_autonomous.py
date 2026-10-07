@@ -306,6 +306,135 @@ class AutonomousTests(unittest.TestCase):
             rank_trials(trials, accuracy_tolerance=.005, equal_epoch_budgets=False)
 
 
+class FailurePolicyTests(unittest.TestCase):
+    def test_llm_timeout_is_bounded_and_writes_terminal_state_without_worker(self):
+        import urllib.error
+        from llm import OllamaReasoner, OllamaDecisionError
+        from orchestrator import Orchestrator
+        with tempfile.TemporaryDirectory() as directory, patch("autonomous.LocalWorker") as worker:
+            bb = self.populate(directory)
+            transport = unittest.mock.Mock(side_effect=urllib.error.URLError(TimeoutError("timed out")))
+            backend = OllamaReasoner("http://localhost:11434", required=True, retries=1, transport=transport)
+            reasoner = CachedReasoner(backend, bb.root)
+            agent = AutonomousSearchAgent(reasoner, worker=WORKER, seed=42, device="cpu")
+            with self.assertRaises(OllamaDecisionError):
+                Orchestrator([agent], unittest.mock.Mock()).run(bb)
+            self.assertEqual(transport.call_count, 2)
+            worker.assert_not_called()
+            self.assertEqual(bb.get("execution_status").status, "failed:model_search")
+            events = [json.loads(row) for row in (bb.root / "decision_log.jsonl").read_text().splitlines()]
+            failures = [row for row in events if row["event"] == "llm_decision_failed"]
+            self.assertEqual(failures[-1]["failure_kind"], "llm_timeout")
+
+    def test_breaker_preserves_prior_success_without_promoting_incomplete_search(self):
+        from failures import SearchCircuitBreaker
+        probes = iter([False, True, True])
+        class Worker(AdaptiveWorker):
+            def execute(self, root, config, operation, arrays, **kwargs):
+                if operation == "verify" and next(probes):
+                    raise ValueError("repeated shape defect")
+                return super().execute(root, config, operation, arrays, **kwargs)
+        with tempfile.TemporaryDirectory() as directory, patch("autonomous.LocalWorker", Worker), \
+                patch("remote.LocalWorker", AdaptiveWorker):
+            bb = self.populate(directory)
+            reasoner = ScriptedReasoner(self.actions(4))
+            with self.assertRaises(SearchCircuitBreaker):
+                AutonomousSearchAgent(reasoner, worker=WORKER, seed=42, device="cpu").run(bb)
+            self.assertEqual(len(reasoner.calls), 3)
+            self.assertEqual(bb.get("trial_0001").status, "completed")
+            self.assertTrue((bb.root / bb.get("trial_0001").checkpoint_path).is_file())
+            self.assertIsNone(bb.get_optional("best_configuration"))
+
+    def populate(self, directory):
+        return generated_test_support.GeneratedTests().populate(Path(directory) / "run")[0]
+
+    def actions(self, count):
+        return [dict(action="new_trial", rationale="Probe a repair",
+                     experiment=experiment().model_copy(update={"parameters": {"revision": i}}).model_dump())
+                for i in range(count)]
+
+    def test_identical_shape_errors_trigger_repair_then_terminal_status(self):
+        from failures import SearchCircuitBreaker
+        from orchestrator import Orchestrator
+        class BrokenWorker(AdaptiveWorker):
+            def execute(self, root, config, operation, arrays, **kwargs):
+                raise ValueError('File "/run/bundle/experiment.py", line 87, in _normalize\n'
+                                 'ValueError: operands could not be broadcast together with shapes (9,28,3,28) (1,3,1,1)')
+        with tempfile.TemporaryDirectory() as directory, patch("autonomous.LocalWorker", BrokenWorker):
+            bb = self.populate(directory)
+            reasoner = ScriptedReasoner(self.actions(3))
+            agent = AutonomousSearchAgent(reasoner, worker=WORKER, seed=42, device="cpu")
+            reviewer = unittest.mock.Mock()
+            with self.assertRaises(SearchCircuitBreaker):
+                Orchestrator([agent], reviewer).run(bb)
+            self.assertEqual(len(reasoner.calls), 2)
+            self.assertEqual(bb.get("execution_status").status, "failed:model_search")
+            self.assertEqual(bb.get("trial_0002").failure_kind, "code_validation")
+            self.assertEqual(bb.get("trial_0002").failed_operation, "verify")
+            request = json.loads(reasoner.calls[1]["user"])
+            self.assertIn("experiment.py", request["repair"]["previous_sources"])
+            self.assertEqual(request["available_actions"], ["new_trial"])
+            first = bb.get("trial_0001").config.generated_bundle
+            second = bb.get("trial_0002").config.generated_bundle
+            self.assertEqual(first.bundle_id, second.bundle_id)
+            self.assertEqual(second.version, 2)
+            self.assertEqual(bb.get("generated_"+first.bundle_id).parent_sha256, first.sha256)
+            reviewer.review.assert_not_called()
+
+    def test_three_different_failures_stop_without_fourth_decision(self):
+        from failures import SearchCircuitBreaker
+        errors = iter(["bad shape", "bad import", "bad checkpoint"])
+        class BrokenWorker(AdaptiveWorker):
+            def execute(self, *args, **kwargs):
+                raise ValueError(next(errors))
+        with tempfile.TemporaryDirectory() as directory, patch("autonomous.LocalWorker", BrokenWorker):
+            bb = self.populate(directory)
+            reasoner = ScriptedReasoner(self.actions(4))
+            with self.assertRaises(SearchCircuitBreaker):
+                AutonomousSearchAgent(reasoner, worker=WORKER, seed=42, device="cpu").run(bb)
+            self.assertEqual(len(reasoner.calls), 3)
+            self.assertEqual(bb.get("trial_0003").status, "failed")
+
+    def test_success_resets_counters_and_remains_available_after_later_failure(self):
+        failures = iter([True, True, False, True, True, False])
+        class FlakyWorker(AdaptiveWorker):
+            def execute(self, root, config, operation, arrays, **kwargs):
+                if operation == "verify" and next(failures):
+                    raise ValueError(f"defect in revision {config.generated_bundle.parameters['revision']}")
+                return super().execute(root, config, operation, arrays, **kwargs)
+        # Permit pairs of failures so both counters must reset after success.
+        with tempfile.TemporaryDirectory() as directory, patch("autonomous.LocalWorker", FlakyWorker), \
+                patch("remote.LocalWorker", AdaptiveWorker):
+            bb = self.populate(directory)
+            reasoner = ScriptedReasoner(self.actions(6)+[dict(action="finish_search", rationale="Enough evidence")])
+            AutonomousSearchAgent(reasoner, worker=WORKER, seed=42, device="cpu",
+                                  max_same_signature_failures=3).run(bb)
+            self.assertEqual(bb.get("search_report").completed_trials, 2)
+            self.assertEqual(bb.get("search_report").failed_trials, 4)
+
+    def test_infrastructure_failure_aborts_immediately(self):
+        import errno
+        from failures import SearchCircuitBreaker, WorkerOperationError
+        for error in (OSError(errno.ENOSPC, "no space"),
+                      WorkerOperationError("unload failed", operation="resource_handoff", kind="resource_handoff")):
+            with self.subTest(error=error), tempfile.TemporaryDirectory() as directory, \
+                    patch("autonomous.LocalWorker") as worker:
+                worker.return_value.execute.side_effect = error
+                bb = self.populate(directory)
+                reasoner = ScriptedReasoner(self.actions(2))
+                with self.assertRaises(SearchCircuitBreaker):
+                    AutonomousSearchAgent(reasoner, worker=WORKER, seed=42, device="cpu").run(bb)
+                self.assertEqual(len(reasoner.calls), 1)
+
+    def test_signatures_ignore_run_ids_lines_and_shapes(self):
+        from failures import failure_signature
+        first = 'File "/old/blobs/local_jobs/abc/bundle/experiment.py", line 87, in _normalize\nValueError: operands could not be broadcast together with shapes (9,28,3,28) (1,3,1,1)'
+        second = 'File "/new/blobs/local_jobs/xyz/bundle/experiment.py", line 81, in _normalize\nValueError: operands could not be broadcast together with shapes (9,3,28,28) (1,1,1,3)'
+        self.assertEqual(failure_signature(first, "code_validation"), failure_signature(second, "code_validation"))
+        self.assertNotEqual(failure_signature(first, "code_validation"),
+                            failure_signature(second.replace("ValueError", "TypeError"), "code_validation"))
+
+
 class AdaptiveTrainingTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

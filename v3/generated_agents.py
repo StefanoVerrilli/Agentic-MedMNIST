@@ -21,6 +21,13 @@ context is a dict: config (seed/device/batch_size/lr/epochs/early_stopping...);
 parameters (your free JSON parameters); data (numpy arrays); output (absolute job output directory);
 checkpoint (input checkpoint path); epochs (allocated epoch horizon).
 Training data keys: train_images, train_targets, val_images, val_targets.
+All image arrays (including inference) are finite float32 NCHW [N,3,28,28],
+already normalized and augmented by the framework's representation plan.
+Do not transpose NCHW inputs or apply channel normalization again. context['representation']
+describes the applied transformation. Keep arrays on CPU and transfer only batches
+to context['config']['device']; never silently force CPU or move the full dataset to CUDA.
+Use worker_runtime.fit_model and batched_logits by default; custom loops are allowed
+only if they preserve the same device, input, checkpoint and continuation contracts.
 Inference data keys: images only. Test targets must never enter training or search.
 train must save Path(context['output']) / 'model.ckpt' and return final_train_loss, final_val_accuracy,
 best_val_accuracy, best_epoch, epochs_completed, history.
@@ -30,7 +37,10 @@ predict returns numpy logits in original image order, loading context['checkpoin
 Custom preprocessing, losses, optimizers, training loops and analysis are allowed.
 worker_runtime.fit_model(context, model, loss_fn=None, optimizer=None) and
 worker_runtime.batched_logits(model, images, config) are optional helpers.
-lightning_components.build_network provides the seven built-in model families, including
+lightning_components.build_network provides the seven built-in model families.
+Its signature is build_network(model_family, *, in_channels, n_classes, hidden, depth,
+dropout, patch_size=4, num_heads=4, mlp_ratio=4, pooling='cls', ...).
+Use n_classes=9 (not num_classes); no image_size argument exists. Families include
 feature_pyramid_transformer (hidden=256, depth=1, four ResNet stages, ST dot-product MoS(2), GT negative Euclidean MoS(4), convolutional channel rendering RT), and multi_scale_transformer with scales=(2,4,7), hidden=64, depth=2, num_heads=4, pooling='mean'.
 Optional propose(context) implements your own search strategy. It sees context['evidence']
 (prior validation results only), no datasets, and returns a list of objects containing

@@ -855,6 +855,9 @@ class ArchitectureResearch(Artefact):
     source: str
 
 class TrialResult(Artefact):
+    failed_operation: str | None = None
+    failure_kind: str | None = None
+    failure_signature: str | None = None
     epoch_budget: int | None = Field(default=None, ge=1)
     requested_epochs: int | None = Field(default=None, ge=1)
     epochs_completed: int | None = Field(default=None, ge=1)

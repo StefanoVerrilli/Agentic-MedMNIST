@@ -2,14 +2,95 @@
 from __future__ import annotations
 
 import importlib.util
+from contextlib import contextmanager
 import json
 from pathlib import Path
 import sys
+import traceback
 
 import numpy as np
 import torch
 
 from contracts import TrainConfig
+from failures import failure_kind, failure_signature
+
+
+@contextmanager
+def enforce_model_device(device):
+    """Reject custom model execution that silently changes the requested device."""
+    def check(module, args):
+        if any(parameter.device.type != device for parameter in module.parameters(recurse=False)):
+            raise ValueError(f"model execution must use configured device {device}")
+    hook = torch.nn.modules.module.register_module_forward_pre_hook(check)
+    try:
+        yield
+    finally:
+        hook.remove()
+
+
+def validate_image_data(data):
+    """The framework boundary is prepared float32 NCHW, never raw NHWC."""
+    for key, images in data.items():
+        if key != "images" and not key.endswith("_images"):
+            continue
+        if not isinstance(images, np.ndarray) or images.ndim != 4 or images.shape[1:] != (3, 28, 28):
+            raise ValueError(f"{key}: expected NCHW [N,3,28,28], got {getattr(images, 'shape', None)}")
+        if images.dtype != np.float32 or any(not np.isfinite(images[start:start+1024]).all()
+                                             for start in range(0, len(images), 1024)):
+            raise ValueError(f"{key}: expected finite float32 prepared images")
+        targets = data.get(key.replace("_images", "_targets")) if key != "images" else None
+        if targets is not None and (targets.shape != (len(images),) or
+                not np.issubdtype(targets.dtype, np.integer) or np.any((targets < 0) | (targets >= 9))):
+            raise ValueError(f"{key}: expected matching integer targets in [0,8]")
+
+
+def verify_experiment(context, build, train, predict):
+    config = context["config"]
+    inputs = torch.randn(4, 3, 28, 28, device=config["device"])
+    model = build(context).to(config["device"])
+    logits = model(inputs)
+    if logits.shape != (4, 9) or not torch.isfinite(logits).all():
+        raise ValueError("build_model must produce finite batch x 9 logits")
+    torch.nn.functional.cross_entropy(logits, torch.arange(4, device=config["device"])).backward()
+    if not any(parameter.grad is not None and torch.isfinite(parameter.grad).all()
+               for parameter in model.parameters()):
+        raise ValueError("model must support finite gradients")
+    # Release the verification model before training another model on CUDA.
+    del model, logits, inputs
+    rng = np.random.default_rng(config["seed"])
+    context["data"] = {"train_images": rng.normal(size=(9, 3, 28, 28)).astype("float32"),
+                       "val_images": rng.normal(size=(9, 3, 28, 28)).astype("float32"),
+                       "train_targets": np.arange(9), "val_targets": np.arange(9)}
+    validate_image_data(context["data"])
+    autonomous = config.get("execution_mode") == "agent_autonomous"
+    if autonomous:
+        context["config"] = {**config, "epochs": 2, "early_stopping_patience": 0}
+        context["scheduler_horizon"] = 2
+    context["epochs"] = 1
+    context.update(start_epoch=0, segment_epochs=1, resume=None)
+    first = train(context)
+    output = Path(context["output"])
+    context["checkpoint"] = str(output / "model.ckpt")
+    if autonomous:
+        from adaptive_training import validate_resume
+        validate_resume(context, first)
+        if first["epochs_completed"] != 1:
+            raise ValueError("verification must train exactly one initial epoch")
+        # New output directory: continuation must use input paths, not leftover files.
+        resumed = output / "continuation_probe"
+        resumed.mkdir()
+        context.update(output=str(resumed), epochs=2, start_epoch=1, segment_epochs=1,
+                       resume=str(output / "resume.pt"))
+        second = train(context)
+        validate_resume(context, second)
+        if second["epochs_completed"] != 2 or second["history"][:1] != first["history"]:
+            raise ValueError("verification continuation must preserve history and reach epoch two")
+        context["checkpoint"] = str(resumed / "model.ckpt")
+    context["data"] = {"images": context["data"]["val_images"]}
+    values = np.asarray(predict(context))
+    if values.shape != (9, 9) or not np.issubdtype(values.dtype, np.floating) or not np.isfinite(values).all():
+        raise ValueError("checkpoint inference failed verification")
+    (output / "result.json").write_text(json.dumps({"verified": True}, allow_nan=False), encoding="utf-8")
 
 
 def fit_model(context: dict, model, *, loss_fn=None, optimizer=None, scheduler=None) -> dict:
@@ -138,11 +219,35 @@ def builtin_predict(context):
     return batched_logits(model, context["data"]["images"], context["config"])
 
 
+def execute_job(job):
+    """Only this process imports generated sources or deserializes training state."""
+    try:
+        request = json.loads((job / "input" / "request.json").read_text(encoding="utf-8"))
+        with enforce_model_device(request["config"]["device"]):
+            _execute_job(job)
+    except Exception as exc:
+        operation = "controller_invariant"
+        try:
+            operation = json.loads((job / "input" / "request.json").read_text(encoding="utf-8"))["operation"]
+        except (OSError, ValueError, KeyError):
+            pass
+        detail = traceback.format_exc()
+        kind = failure_kind(exc, operation)
+        (job / "output" / "failure.json").write_text(json.dumps({"operation": operation,
+            "failure_kind": kind, "failure_signature": failure_signature(detail, kind),
+            "error": detail[-8000:]}, allow_nan=False), encoding="utf-8")
+        raise
+
+
 def main() -> None:
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--job", type=Path, required=True)
     job = parser.parse_args().job.resolve()
+    execute_job(job)
+
+
+def _execute_job(job):
     inputs, output = job / "input", job / "output"
     request = json.loads((inputs / "request.json").read_text(encoding="utf-8"))
     config = TrainConfig.model_validate(request["config"]).model_dump(mode="json")
@@ -150,9 +255,11 @@ def main() -> None:
     seed_everything(config["seed"])
     with np.load(inputs / "data.npz", allow_pickle=False) as stored:
         data = {name: stored[name] for name in stored.files}
+    validate_image_data(data)
     context = {"config": config, "parameters": (config.get("generated_bundle") or {}).get("parameters", {}),
                "data": data, "output": str(output), "checkpoint": str(inputs / "model.ckpt"),
-               "epochs": min(request["epochs"], config["epochs"])}
+               "epochs": min(request["epochs"], config["epochs"]),
+               "representation": request.get("representation") or {"layout": "NCHW", "already_prepared": True}}
     context.update(start_epoch=request.get("start_epoch", 0),
                    resume=str(inputs / "resume.pt") if request.get("resume") else None)
     if config.get("execution_mode") == "agent_autonomous":
@@ -176,28 +283,7 @@ def main() -> None:
         result = callback(context) if callback else []
         (output / "strategy.json").write_text(json.dumps(result, allow_nan=False), encoding="utf-8")
     elif operation == "verify":
-        inputs = torch.randn(4, 3, 28, 28, device=config["device"])
-        model = build(context).to(config["device"])
-        logits = model(inputs)
-        if logits.shape != (4, 9) or not torch.isfinite(logits).all():
-            raise ValueError("build_model must produce finite batch x 9 logits")
-        torch.nn.functional.cross_entropy(logits, torch.arange(4, device=config["device"])).backward()
-        if not any(parameter.grad is not None and torch.isfinite(parameter.grad).all()
-                   for parameter in model.parameters()):
-            raise ValueError("model must support finite gradients")
-        rng = np.random.default_rng(config["seed"])
-        context["data"] = {"train_images": rng.normal(size=(9, 3, 28, 28)).astype("float32"),
-                           "val_images": rng.normal(size=(9, 3, 28, 28)).astype("float32"),
-                           "train_targets": np.arange(9), "val_targets": np.arange(9)}
-        context["epochs"] = 1
-        context.update(start_epoch=0, segment_epochs=1, resume=None)
-        result = train(context)
-        context["checkpoint"] = str(output / "model.ckpt")
-        context["data"] = {"images": context["data"]["val_images"]}
-        values = np.asarray(predict(context))
-        if values.shape != (9, 9) or not np.issubdtype(values.dtype, np.floating) or not np.isfinite(values).all():
-            raise ValueError("checkpoint inference failed verification")
-        (output / "result.json").write_text(json.dumps({"verified": True}, allow_nan=False), encoding="utf-8")
+        verify_experiment(context, build, train, predict)
     elif operation == "train":
         if set(data) != {"train_images", "train_targets", "val_images", "val_targets"}:
             raise ValueError("training input must contain train and validation only")

@@ -6,6 +6,7 @@ optimizer/RNG state have separate files and separate purposes.
 from __future__ import annotations
 
 import hashlib
+import json
 from pathlib import Path
 import random
 import shutil
@@ -91,7 +92,7 @@ def fit_adaptive(context, model, *, loss_fn=None, optimizer=None, scheduler=None
             raise ValueError("continuation state/configuration/data are incompatible")
     elif start:
         raise ValueError("continuation requires a latest-state checkpoint")
-    initial_horizon = state["initial_horizon"] if state else target
+    initial_horizon = state["initial_horizon"] if state else context.get("scheduler_horizon", target)
     scheduler = scheduler if scheduler is not None else make_scheduler(config, optimizer, len(loader), initial_horizon)
     history, best, best_epoch, stale = [], None, 0, 0
     output = Path(context["output"])
@@ -151,6 +152,9 @@ def fit_adaptive(context, model, *, loss_fn=None, optimizer=None, scheduler=None
             "rng": capture_rng(), "loader_rng": generator.get_state(), "history": history,
             "best": best, "best_epoch": best_epoch, "stale": stale, "stopped": stopped}
         torch.save(state, output / "resume.pt")
+        with (output / "training.jsonl").open("a", encoding="utf-8") as log:
+            log.write(json.dumps(row, allow_nan=False) + "\n")
+        print(json.dumps(row, allow_nan=False), flush=True)
         if stopped:
             break
     return {"final_train_loss": history[-1]["train_loss"], "final_val_accuracy": history[-1]["val_accuracy"],

@@ -27,8 +27,9 @@ class SimulatedWorker:
     """Transport double: never imports or executes bundle sources."""
     calls = []
 
-    def __init__(self, configuration):
+    def __init__(self, configuration, *, coordinator=None):
         self.configuration = configuration
+        self.coordinator = coordinator
 
     def preflight(self, device):
         return {"python_executable": "simulated-python", "isolation": {"enforced": False}}

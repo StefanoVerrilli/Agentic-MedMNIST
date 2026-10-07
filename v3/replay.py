@@ -4,11 +4,13 @@ from __future__ import annotations
 import json
 import re
 import threading
+import time
 from pathlib import Path
 from typing import Any
 
 from llm import ReasonedDecision, Reasoner
 from research import canonical_hash
+from failures import is_timeout
 
 
 def stable_prompt(value: str, root: Path) -> str:
@@ -43,6 +45,24 @@ class CachedReasoner:
 
     def decide(self, *, stage: str, system: str, user: str, response_model: Any,
                fallback: Any, audit: Any = None) -> Any:
+        started = time.monotonic()
+        if audit:
+            audit("llm_decision_started", stage=stage, replay=bool(self.replay_root))
+        try:
+            result = self._decide(stage=stage, system=system, user=user, response_model=response_model,
+                                  fallback=fallback, audit=audit)
+        except Exception as exc:
+            if audit:
+                audit("llm_decision_failed", stage=stage, elapsed_seconds=time.monotonic() - started,
+                      error_type=type(exc).__name__, error=str(exc)[:8000],
+                      failure_kind="llm_timeout" if is_timeout(exc) else "llm_error")
+            raise
+        if audit:
+            audit("llm_decision_finished", stage=stage, elapsed_seconds=time.monotonic() - started,
+                  used_fallback=result.used_fallback)
+        return result
+
+    def _decide(self, *, stage, system, user, response_model, fallback, audit):
         with self._lock:
             self._sequence += 1
             filename = f"{self._sequence:04d}.json"
