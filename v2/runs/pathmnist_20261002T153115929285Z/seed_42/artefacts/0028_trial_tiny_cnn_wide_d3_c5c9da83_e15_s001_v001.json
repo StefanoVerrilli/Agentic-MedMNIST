@@ -1,0 +1,201 @@
+{
+  "artefact": "trial_tiny_cnn_wide_d3_c5c9da83_e15_s001",
+  "artefact_type": "TrialResult",
+  "created_at": "2026-10-02T15:46:47.005261+00:00",
+  "payload": {
+    "best_epoch": 14,
+    "candidate_id": "tiny_cnn_wide_d3",
+    "checkpoint_path": "blobs/search/trial_tiny_cnn_wide_d3_c5c9da83_e15_s001.ckpt",
+    "checkpoint_sha256": "a96d8c9a3656faec39532c2e87d91cdb18a1a7eaa846e5b8bdc3b5962b089b61",
+    "config": {
+      "adam_beta1": 0.9,
+      "adam_beta2": 0.999,
+      "batch_size": 128,
+      "channel_cap": 256,
+      "class_weighting": true,
+      "cosine_eta_min": 0.0,
+      "depth": 3,
+      "device": "cuda",
+      "dropout": 0.15,
+      "early_stopping_min_delta": 0.0,
+      "early_stopping_monitor": "val_accuracy",
+      "early_stopping_patience": 3,
+      "epochs": 15,
+      "gradient_clip_val": 1.0,
+      "hidden": 96,
+      "label_smoothing": 0.05,
+      "lr": 0.001,
+      "mlp_ratio": 4,
+      "model_family": "tiny_cnn",
+      "momentum": 0.9,
+      "nesterov": true,
+      "num_heads": 4,
+      "one_cycle_pct_start": 0.1,
+      "optimizer": "adamw",
+      "optimizer_eps": 1e-08,
+      "patch_size": 4,
+      "plateau_factor": 0.5,
+      "plateau_patience": 1,
+      "pooling": "cls",
+      "positional_encoding": "learned",
+      "rationale": "Refined tiny_cnn building on the best round-1 result (0.9762). Depth reduced to 3 (max valid for 28x28) to avoid over-downsampling while retaining 3 conv-pool stages. Hidden widened from 64 to 96 for ~50% more channel capacity without overfitting at 90K samples. Dropout relaxed to 0.15 since the wider channels provide implicit regularization. Added contrast augmentation alongside hflip+brightness for stronger photometric diversity. Patience increased to 3 (from 2) because the round-1 curve was still rising at epoch 3, indicating the model needs more epochs to converge. Cosine schedule with eta_min=0 ensures the LR decays smoothly over the 6-epoch budget. Class weighting retained for the 1.63x imbalance.",
+      "scheduler": "cosine",
+      "schema_version": "1.0",
+      "seed": 42,
+      "source": "promotion:finalist",
+      "tokenizer_layers": 2,
+      "weight_decay": 0.0001
+    },
+    "config_hash": "c5c9da83046282417b572a9054cbe5b9b9eec13ac6550020df13a304ca863df5",
+    "decision_source": "promotion:finalist",
+    "duration_seconds": 244.9785,
+    "epoch_budget": 15,
+    "epochs_completed": 15,
+    "error": null,
+    "learning_curve": [
+      {
+        "epoch": 1,
+        "learning_rate": 0.0009890738,
+        "train_loss": 0.559453,
+        "val_accuracy": 0.939724,
+        "val_loss": 0.465048,
+        "val_macro_f1": 0.939735
+      },
+      {
+        "epoch": 2,
+        "learning_rate": 0.0009567727,
+        "train_loss": 0.428642,
+        "val_accuracy": 0.956018,
+        "val_loss": 0.415995,
+        "val_macro_f1": 0.956512
+      },
+      {
+        "epoch": 3,
+        "learning_rate": 0.0009045085,
+        "train_loss": 0.390321,
+        "val_accuracy": 0.968513,
+        "val_loss": 0.392946,
+        "val_macro_f1": 0.968047
+      },
+      {
+        "epoch": 4,
+        "learning_rate": 0.0008345653,
+        "train_loss": 0.36621,
+        "val_accuracy": 0.956917,
+        "val_loss": 0.411457,
+        "val_macro_f1": 0.957152
+      },
+      {
+        "epoch": 5,
+        "learning_rate": 0.00075,
+        "train_loss": 0.349971,
+        "val_accuracy": 0.97521,
+        "val_loss": 0.371274,
+        "val_macro_f1": 0.975686
+      },
+      {
+        "epoch": 6,
+        "learning_rate": 0.0006545085,
+        "train_loss": 0.338512,
+        "val_accuracy": 0.981407,
+        "val_loss": 0.353137,
+        "val_macro_f1": 0.981491
+      },
+      {
+        "epoch": 7,
+        "learning_rate": 0.0005522642,
+        "train_loss": 0.329938,
+        "val_accuracy": 0.983707,
+        "val_loss": 0.349148,
+        "val_macro_f1": 0.983838
+      },
+      {
+        "epoch": 8,
+        "learning_rate": 0.0004477358,
+        "train_loss": 0.322716,
+        "val_accuracy": 0.984206,
+        "val_loss": 0.350151,
+        "val_macro_f1": 0.984052
+      },
+      {
+        "epoch": 9,
+        "learning_rate": 0.0003454915,
+        "train_loss": 0.317866,
+        "val_accuracy": 0.987405,
+        "val_loss": 0.336609,
+        "val_macro_f1": 0.987395
+      },
+      {
+        "epoch": 10,
+        "learning_rate": 0.00025,
+        "train_loss": 0.313683,
+        "val_accuracy": 0.987605,
+        "val_loss": 0.334424,
+        "val_macro_f1": 0.98763
+      },
+      {
+        "epoch": 11,
+        "learning_rate": 0.0001654347,
+        "train_loss": 0.31049,
+        "val_accuracy": 0.987105,
+        "val_loss": 0.334206,
+        "val_macro_f1": 0.987004
+      },
+      {
+        "epoch": 12,
+        "learning_rate": 9.54915e-05,
+        "train_loss": 0.308028,
+        "val_accuracy": 0.988904,
+        "val_loss": 0.330616,
+        "val_macro_f1": 0.988826
+      },
+      {
+        "epoch": 13,
+        "learning_rate": 4.32273e-05,
+        "train_loss": 0.306324,
+        "val_accuracy": 0.989104,
+        "val_loss": 0.329237,
+        "val_macro_f1": 0.988881
+      },
+      {
+        "epoch": 14,
+        "learning_rate": 1.09262e-05,
+        "train_loss": 0.305226,
+        "val_accuracy": 0.991004,
+        "val_loss": 0.326545,
+        "val_macro_f1": 0.990943
+      },
+      {
+        "epoch": 15,
+        "learning_rate": 0.0,
+        "train_loss": 0.304558,
+        "val_accuracy": 0.989804,
+        "val_loss": 0.327127,
+        "val_macro_f1": 0.989777
+      }
+    ],
+    "lightning_csv_path": "blobs/search/lightning_logs/trial_tiny_cnn_wide_d3_c5c9da83_e15_s001/version_0/metrics.csv",
+    "representation": {
+      "augmentations": [
+        "hflip",
+        "brightness",
+        "contrast"
+      ],
+      "normalization": "standardize",
+      "rationale": "Refined tiny_cnn building on the best round-1 result (0.9762). Depth reduced to 3 (max valid for 28x28) to avoid over-downsampling while retaining 3 conv-pool stages. Hidden widened from 64 to 96 for ~50% more channel capacity without overfitting at 90K samples. Dropout relaxed to 0.15 since the wider channels provide implicit regularization. Added contrast augmentation alongside hflip+brightness for stronger photometric diversity. Patience increased to 3 (from 2) because the round-1 curve was still rising at epoch 3, indicating the model needs more epochs to converge. Cosine schedule with eta_min=0 ensures the LR decays smoothly over the 6-epoch budget. Class weighting retained for the 1.63x imbalance."
+    },
+    "requested_epochs": 100,
+    "round_index": 3,
+    "schema_version": "1.0",
+    "status": "completed",
+    "training_log_path": "blobs/search/trial_tiny_cnn_wide_d3_c5c9da83_e15_s001.training.jsonl",
+    "validation_accuracy": 0.991004,
+    "validation_balanced_accuracy": 0.991111,
+    "validation_macro_f1": 0.990943
+  },
+  "payload_sha256": "e2eb997cae56a0d5f8c76d79916b29eff30de798936bb5a0f5c80a750196f533",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 28,
+  "version": 1
+}

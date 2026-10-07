@@ -1,0 +1,25 @@
+{
+  "artefact": "anomaly_prior_art",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T15:33:40.424756+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Prior-art brief is internally consistent and well-structured. All seven ideas are properly framed as hypotheses-to-validate with traceable arxiv citations; the two proposals (hflip augmentation, compact conv-token transformer) are well-specified and internally coherent. Specific checks: (1) Resolution is consistently 28×28×3 RGB throughout, matching the standard MedMNIST distribution. (2) The hflip proposal correctly uses a built-in augmentation primitive and provides a sound label-preservation rationale; its exclusion of vflip/rotate90/rotate180 is a design choice, not an invalidation of those built-in primitives. (3) The compact_conv_token_transformer proposal is arithmetically consistent: two stride-2 convs on 28×28 yield 7×7×64 → 49 tokens of dim 64; 4 heads × 16 dim = 64 embedding; FFN 64→128→64; rough parameter count (~130K) is well under the 3M cap; output is (batch, 9) logits. (4) No ResNet18 topology or CNN/transformer-hybrid confusion is present. (5) No clinical claims are made. (6) No deterministic findings are reported. Minor traceability observations (not blocking): the augmentation_regularization idea extrapolates from a machine-unlearning paper's augmentation analysis to general regularization; the ghostnet_vgg_robustness idea extrapolates from quantization-robustness findings to general architecture suitability; the temperature_scaling_calibration idea extrapolates from quantized-network calibration to non-quantized training. In each case the cited quote establishes source traceability, and the broader inference is explicitly framed as a hypothesis to validate rather than an established result, which is appropriate for this stage. All six sources carry snapshot SHA-256 hashes and retrieval timestamps, supporting reproducibility. No issues warrant revision or stop.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Traceability note: augmentation_regularization idea cites a machine-unlearning paper (arxiv_2508_18509v1) whose augmentation analysis is in the context of unlearning quality, not general training regularization; the inference to general overfitting mitigation is a hypothesis beyond the quoted scope.",
+      "Traceability note: ghostnet_vgg_robustness idea cites a quantization-calibration paper (arxiv_2309_13866v2) and infers general architecture suitability from quantization-robustness findings; the bias-variance trade-off claim is not directly supported by the cited quote.",
+      "Traceability note: temperature_scaling_calibration idea cites the same quantization paper and applies temperature scaling to non-quantized PathMNIST training; the original finding is specific to quantized networks with stated caveats."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "prior_art"
+  },
+  "payload_sha256": "5beae15f091cf5de3655c6dc94a9f42416bf449ccfc992c26bcd269f9b56c859",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 12,
+  "version": 1
+}

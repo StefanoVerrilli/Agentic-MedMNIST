@@ -1,0 +1,200 @@
+{
+  "artefact": "acceptance_report",
+  "artefact_type": "AcceptanceReport",
+  "created_at": "2026-10-02T15:59:36.378849+00:00",
+  "payload": {
+    "acceptance_ready": false,
+    "criteria": [
+      {
+        "detail": "Every persisted payload and referenced file is checksummed.",
+        "evidence": [
+          "artefacts/",
+          "blobs/"
+        ],
+        "requirement": "WP1_TYPED_VERSIONED_HANDOFFS",
+        "status": "passed"
+      },
+      {
+        "detail": "AST check of direct agent-class calls.",
+        "evidence": [
+          "agents.py"
+        ],
+        "requirement": "WP1_ZERO_DIRECT_AGENT_CALLS",
+        "status": "passed"
+      },
+      {
+        "detail": "Actual train/validation evidence audited before any training.",
+        "evidence": [
+          "data_audit_report",
+          "decision_log.jsonl"
+        ],
+        "requirement": "WP2_PRETRAINING_LEAKAGE_AUDIT",
+        "status": "passed"
+      },
+      {
+        "detail": "Exact supporting quotes resolve to checksummed snapshots; recommendations remain hypotheses.",
+        "evidence": [
+          "prior_art_brief",
+          "blobs/literature/"
+        ],
+        "requirement": "WP2_CITED_IDEAS",
+        "status": "passed"
+      },
+      {
+        "detail": "Curated excerpts alone do not demonstrate web retrieval.",
+        "evidence": [
+          "prior_art_brief"
+        ],
+        "requirement": "WP2_WEB_RETRIEVAL",
+        "status": "passed"
+      },
+      {
+        "detail": "Test metrics are excluded from search and configuration selection.",
+        "evidence": [
+          "best_configuration",
+          "search_report"
+        ],
+        "requirement": "WP3_VALIDATION_ONLY_SELECTION",
+        "status": "passed"
+      },
+      {
+        "detail": "Conventional baseline uses the same seed and selected splits; negative deltas are retained.",
+        "evidence": [
+          "comparison_report",
+          "baseline_report"
+        ],
+        "requirement": "WP4_BASELINE_COMPARISON",
+        "status": "passed"
+      },
+      {
+        "detail": "Three bounded representation scenarios.",
+        "evidence": [
+          "ablation_report"
+        ],
+        "requirement": "WP4_REPRESENTATION_ABLATIONS",
+        "status": "passed"
+      },
+      {
+        "detail": "At least three completed seeds, with a shared validation-selected configuration.",
+        "evidence": [
+          "../experiment_summary.json"
+        ],
+        "requirement": "WP4_FROZEN_CONFIGURATION_SEED_VARIANCE",
+        "status": "pending"
+      },
+      {
+        "detail": "Validation-calibrated abstention with a persistent benchmark review queue.",
+        "evidence": [
+          "abstention_report",
+          "human_review_queue"
+        ],
+        "requirement": "WP5_ABSTENTION_AND_HANDOFF",
+        "status": "passed"
+      },
+      {
+        "detail": "Every promoted stage has an independent reviewer report.",
+        "evidence": [
+          "anomaly_*",
+          "decision_log.jsonl"
+        ],
+        "requirement": "WP6_STAGE_REVIEWS",
+        "status": "passed"
+      },
+      {
+        "detail": "Decision source and stage are recorded; exact prompts/schema/results are retained.",
+        "evidence": [
+          "decision_log.jsonl",
+          "blobs/reasoning/"
+        ],
+        "requirement": "WP6_DECISION_PROVENANCE",
+        "status": "passed"
+      },
+      {
+        "detail": "Requires passing tests and measured fault injection for this exact source tree.",
+        "evidence": [],
+        "requirement": "WP6_FAULT_DETECTION_GE_90_PERCENT",
+        "status": "pending"
+      },
+      {
+        "detail": "A transcript alone is not proof that retraining reproduces predictions and metrics.",
+        "evidence": [],
+        "requirement": "WP5_FULL_RUN_REPLAY",
+        "status": "pending"
+      },
+      {
+        "detail": "completed_with_warning",
+        "evidence": [
+          "dossier.json"
+        ],
+        "requirement": "WP5_END_TO_END",
+        "status": "passed"
+      },
+      {
+        "detail": "Every unresolved reviewer issue requires an explicit approved mitigation.",
+        "evidence": [
+          "anomaly_*"
+        ],
+        "requirement": "WP6_APPROVED_RISK_MITIGATIONS",
+        "status": "failed"
+      },
+      {
+        "detail": "Requires named independent demonstrator/reviewer, bound predictions and checksummed environment evidence.",
+        "evidence": [],
+        "requirement": "TRL7_INDEPENDENT_DEMONSTRATION_AND_SIGNOFF",
+        "status": "pending"
+      }
+    ],
+    "independent_signoff": null,
+    "kpis": {
+      "cited_idea_fraction": 1.0,
+      "decision_provenance_fraction": 1.0,
+      "decisions_logged": 20,
+      "fault_detection_rate": null,
+      "live_source_fraction": 1.0,
+      "reasoning_snapshots": 20,
+      "unresolved_citation_issues": 0,
+      "unresolved_reviewer_issues": [
+        "Abstention mechanism is non-functional: abstain_rate=1.0, coverage=0.0 at all thresholds, selective_risk=1.0 — provides zero selective-prediction benefit over blanket human review",
+        "All 7,180 test samples routed to human review; no samples are selectively accepted or rejected with differential confidence",
+        "Architecture coverage incomplete: residual_cnn and resnet18 never evaluated in 8-trial budget (carried warning from model_search)",
+        "Architecture coverage incomplete: residual_cnn and resnet18 never evaluated in the 8-trial search budget (carried warning)",
+        "Architecture coverage incomplete: residual_cnn and resnet18 were never evaluated across 8 trials (carried from model_search warning; not a deterministic finding)",
+        "Architecture research suggested ±10° random rotation as secondary augmentation; representation plan uses only hflip/brightness/contrast — traceability gap, not a conflict",
+        "Architecture research suggests ±10° random rotation as secondary augmentation, but the representation plan uses only hflip/brightness/contrast; not a conflict but a traceability gap worth documenting",
+        "Cancer-associated stroma (class 7) recall is only 0.458 (F1 0.602); smooth muscle and debris also below 0.85 F1 – histologically similar classes drive most errors",
+        "Cancer-associated stroma recall 0.458 and smooth muscle recall 0.838 suggest the model's confidence is least reliable on the hardest classes, likely driving the inverted OOD signal",
+        "Deterministic warning: architecture coverage incomplete — residual_cnn and resnet18 were never evaluated despite being in the architecture_research priority list and the 8-trial budget being fully consumed by only 3 families",
+        "Model is more confident on Gaussian-noise-corrupted inputs than on clean in-distribution inputs, indicating a fundamental confidence-calibration defect under this corruption family",
+        "No OOD / corruption-severity AUROC evaluation present in the supplied evidence; if required by the pipeline, this component is missing",
+        "No OOD detector qualified on validation (best val AUROC 0.555 < 0.65 threshold); automatic acceptance correctly disabled",
+        "OOD AUROC 0.183 is below random chance (0.5); max_softmax confidence is anti-correlated with OOD-ness across all three corruption severities",
+        "Predictive entropy AUROC is also below chance (mean ≈ 0.140), confirming the issue is not score-specific but model-calibration-related",
+        "Prior-art traceability: augmentation_regularization, ghostnet_vgg_robustness, and temperature_scaling_calibration ideas infer beyond the quoted scope of their cited papers; treat as unconfirmed hypotheses",
+        "Risk-coverage curve is degenerate: (coverage=0, risk=1.0) at every target coverage level from 0.5 to 0.9",
+        "Test set (CRC-VAL-HE-7K) is from a different clinical center; OOD AUROC aggregates must be interpreted as cross-center domain shift, not in-distribution performance",
+        "Transformer-specific config fields (num_heads, patch_size, pooling, positional_encoding, tokenizer_layers, mlp_ratio) are present in the tiny_cnn config but are inactive for CNN families; no functional impact, noted for clarity",
+        "Transformer-specific config fields (num_heads, patch_size, pooling, positional_encoding, tokenizer_layers, mlp_ratio) present in tiny_cnn config; inactive for CNN families, noted for clarity",
+        "Validation-to-test accuracy gap of ~7.3 pp (0.9910 val vs 0.9175 test) may reflect distributional shift that also degrades OOD detection reliability",
+        "Validation-to-test accuracy gap of ~7.3 pp (0.9910 val vs 0.9175 test); likely distributional shift rather than overfitting, but should be documented",
+        "llm_model_digest is null despite llm_model='qwen3.8' specified; populate before training/evaluation stages for full reproducibility of LLM-in-the-loop decisions",
+        "llm_model_digest is null in run_manifest despite llm_model='qwen3.8' – reproducibility traceability gap",
+        "llm_model_digest is null in run_manifest despite llm_model='qwen3.8' — reproducibility traceability gap (carried warning)",
+        "llm_model_digest is null in run_manifest despite llm_model='qwen3.8' — reproducibility traceability gap for LLM-in-the-loop decisions",
+        "llm_model_digest is null in run_manifest despite llm_model='qwen3.8'; should be populated before training/evaluation stages for full reproducibility of LLM-in-the-loop decisions",
+        "tiny_cnn received 5 of 8 trials (62.5%), leaving no budget for the two remaining proposed families; a more balanced allocation would have covered all 5",
+        "warning:OOD AUROC is below random chance",
+        "warning:abstention did not lower covered-set error",
+        "warning:architecture coverage is incomplete despite a budget of at least five trials: ['residual_cnn', 'resnet18']",
+        "warning:no OOD detector qualified on validation; automatic acceptance disabled"
+      ]
+    },
+    "schema_version": "1.0",
+    "technical_complete": true,
+    "trl7_evidence_complete": false
+  },
+  "payload_sha256": "631404b6f23c295ba03c33339ac51f90ebf643ab08887aec1ed1f632f659cdc1",
+  "producer": "acceptance",
+  "run_id": "seed_42",
+  "sequence": 57,
+  "version": 1
+}

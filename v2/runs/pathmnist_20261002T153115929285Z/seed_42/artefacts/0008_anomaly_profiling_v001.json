@@ -1,0 +1,24 @@
+{
+  "artefact": "anomaly_profiling",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T15:32:05.901885+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Profiling stage is complete and internally consistent. PathMNIST (9-class, 3-channel, 28×28 RGB MedMNIST distribution) is fully loaded with no subsampling; split sizes (train=89996, val=10004, test=7180) match official sizes exactly. Archive MD5/SHA256 verified and consistent; selected-index SHA256 hashes present for all three splits. No blank images, no duplicate train samples, imbalance ratio 1.634 is modest, and train/val class proportions are nearly identical (max absolute deviation < 0.0001), indicating no split-level distribution shift. Ambiguity risks among visually similar histology classes at 28×28 resolution are appropriately documented and are inherent to the task, not a data defect. The test-domain note (CRC-VAL-HE-7K, different clinical center) is correctly flagged for OOD evaluation awareness. No deterministic findings were raised. One minor reproducibility observation: llm_model_digest is null despite llm_model='qwen3.8' being specified in the run manifest; this should be populated before any training or evaluation stage that relies on LLM-in-the-loop decisions to ensure full auditability of model-weight provenance. This does not affect the validity of the profiling artefacts themselves. All schema versions are 1.0, package versions are pinned, deterministic_torch is enabled, and seed=42 is set. The stage is ready to proceed.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "llm_model_digest is null despite llm_model='qwen3.8' specified; populate before training/evaluation stages for full reproducibility of LLM-in-the-loop decisions",
+      "Test set originates from a different clinical center (CRC-VAL-HE-7K); ensure OOD evaluation protocol accounts for this domain shift when interpreting AUROC aggregates"
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "profiling"
+  },
+  "payload_sha256": "1858bac7b76ed4d48dbc5360d6d66f87d245748f773faba61d5a06933efe3dd9",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 8,
+  "version": 1
+}

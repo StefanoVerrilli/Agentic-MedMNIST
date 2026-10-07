@@ -1,0 +1,28 @@
+{
+  "artefact": "anomaly_model_search",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T15:48:26.042265+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "The model_search stage completed all 8 allocated trials with zero failures and selected tiny_cnn_wide_d3 at 0.9910 validation accuracy / 0.9909 macro-F1, which is a strong result. However, the deterministic finding flags that architecture coverage is incomplete: two of the five families proposed in the architecture_research artefact (residual_cnn, resnet18) were never evaluated. The search_report confirms families_evaluated = [compact_transformer, tiny_cnn, vision_transformer] and missing_families = [residual_cnn, resnet18]. This is a legitimate gap: the architecture research explicitly prioritized all five candidates, and the search plan's max_trials budget of 8 was consumed entirely by three families (tiny_cnn received 5 of 8 trials, compact_transformer 2, vision_transformer 1), leaving no budget for the remaining two. Without at least one trial each for residual_cnn and resnet18, the selection cannot be confirmed as the best architecture within the proposed search space. Note that ResNet18 has fixed topology (hidden controls base width; depth is ignored), so a single well-configured trial is sufficient for that family. A residual_cnn trial with 4-6 residual blocks at the recommended 0.5-2M parameter range would complete the coverage. Recommend extending the search by 2 additional trials (one per missing family) at the final epoch budget (15 epochs) before promoting the selected configuration to the training/evaluation stage. All other aspects are sound: test metrics are locked, selection rule is transparent, augmentations (hflip, brightness, contrast) are built-in primitives requiring no extension approval, transformer-specific fields in the train_config are correctly inactive for the CNN family, and the two pending extension proposals do not invalidate the current plan. The null llm_model_digest in run_manifest is a minor reproducibility gap to populate before downstream stages.",
+    "deterministic_issues": [
+      "warning:architecture coverage is incomplete despite a budget of at least five trials: ['residual_cnn', 'resnet18']"
+    ],
+    "llm_issues": [
+      "Deterministic warning: architecture coverage incomplete — residual_cnn and resnet18 were never evaluated despite being in the architecture_research priority list and the 8-trial budget being fully consumed by only 3 families",
+      "tiny_cnn received 5 of 8 trials (62.5%), leaving no budget for the two remaining proposed families; a more balanced allocation would have covered all 5",
+      "llm_model_digest is null in run_manifest despite llm_model='qwen3.8'; should be populated before training/evaluation stages for full reproducibility of LLM-in-the-loop decisions",
+      "Architecture research suggests ±10° random rotation as secondary augmentation, but the representation plan uses only hflip/brightness/contrast; not a conflict but a traceability gap worth documenting"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "model_search"
+  },
+  "payload_sha256": "faeef065d7bd62119dfb60f87dcfa9fc559f606f00f49e8033e3a909b7e947b5",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 36,
+  "version": 1
+}

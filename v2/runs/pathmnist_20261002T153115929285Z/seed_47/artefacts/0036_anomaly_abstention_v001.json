@@ -1,0 +1,28 @@
+{
+  "artefact": "anomaly_abstention",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T16:10:07.566295+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Abstention stage is internally consistent and passes all deterministic checks. No deterministic findings are present.\n\n**Arithmetic verification (all pass):**\n- OOD aggregate: arithmetic mean of max_softmax test AUROCs across 3 severities = (0.866988 + 0.793296 + 0.724554)/3 = 0.794946, matching reported ood_auroc. ood_pass=true is correct (0.794946 > 0.65 minimum_scenario_auroc).\n- abstain_rate (0.50585) + test_coverage (0.49415) = 1.00000 ✓\n- selective_risk (0.005919) = 1 − accuracy_on_covered (0.994081) ✓\n- base_test_accuracy (0.925348) matches evaluation_report accuracy exactly ✓\n- human_review_count (3632) matches human_review_queue.count ✓\n- prediction_artifact test_samples (7180) matches evaluation_report n_samples ✓\n- Risk-coverage curve at target_validation_coverage=0.8: test_coverage=0.49415, test_risk=0.005919, threshold=0.92155516 — all consistent with top-level fields ✓\n- Validation coverage (0.80008) ≈ target (0.8) ✓\n\n**OOD scenario coherence:** Validation AUROCs exceed test AUROCs at every severity (expected for OOD). False-accept rates monotonically increase with noise sigma for both scores. predictive_entropy degrades faster than max_softmax at σ=0.4 (test AUROC 0.555 vs 0.725), consistent with entropy being less discriminative under strong corruption. All within expected behavior.\n\n**Coverage gap (noted, not a defect):** Validation coverage 0.800 vs test coverage 0.494 reflects the cross-center OOD nature of the test set (official_test_separate_center=true). The threshold calibrated on validation is more conservative on a shifted distribution. This is a known and documented limitation, not an arithmetic or configuration error.\n\n**Cross-stage consistency:** All prior stages (configuration_replay, training, evaluation) report action=continue, severity=ok, zero deterministic findings. LLM-identified issues (null LLM digest for qwen3.8/Oollama, hflip_only_aug pending_review redundancy, compact_conv_token_transformer pending hash-bound review, 28×28 class-ambiguity risks, cross-center OOD annotation) are traceability and reporting recommendations carried forward consistently. None constitute deterministic defects.\n\n**Carried-forward warnings (non-blocking):**\n1. LLM model digest is null across all artefacts; a verifiable model snapshot should be recorded in subsequent stages for full traceability.\n2. hflip_only_aug extension remains pending_review despite hflip being a built-in primitive; administratively redundant—recommend closing or annotating the registry entry.\n3. compact_conv_token_transformer remains pending hash-bound independent review; no architecture change referencing it may be applied until review completes (current tiny_cnn config is unaffected).\n4. Class 7 (cancer-associated stroma) F1=0.608, recall=0.463 is the weakest class; confusion pattern is consistent with 28×28 resolution ambiguity. Downstream reporting should include per-class metrics.\n5. Cross-center OOD gap (val ≈0.99 vs test 0.925) should be explicitly annotated in any downstream evaluation to distinguish OOD generalization from overfitting.\n\nNo action-blocking issues identified. Proceed.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "LLM model digest is null (qwen3.8/Oollama) across all artefacts; LLM-component traceability is incomplete—recommend recording a verifiable model snapshot or digest in subsequent stages.",
+      "hflip_only_aug extension (spec_sha256=3541e66a…) remains pending_review despite hflip being a built-in primitive; administratively redundant—recommend closing or annotating the registry entry.",
+      "compact_conv_token_transformer (spec_sha256=4004d69e…) remains pending hash-bound independent review; no architecture change referencing it may be applied until review completes (current tiny_cnn config is unaffected).",
+      "Cross-center OOD gap (validation ≈0.99 vs test 0.925, ~6.4 pp) should be explicitly annotated in downstream reporting to distinguish OOD generalization from overfitting.",
+      "Class 7 (cancer-associated stroma) F1=0.608, recall=0.463 is the weakest class; confusion pattern (debris, smooth muscle, adenocarcinoma) is consistent with 28×28 resolution ambiguity—flag for any clinical-utility interpretation.",
+      "Test coverage (0.494) is substantially below validation coverage (0.800) due to cross-center distribution shift; this is expected but should be explicitly documented in the abstention report narrative to avoid misinterpretation as a calibration failure."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "abstention"
+  },
+  "payload_sha256": "e42c1a2f10de7a000ba6887afbe0a73f70c388ffb6bd9557cb836c058c9167d0",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 36,
+  "version": 1
+}

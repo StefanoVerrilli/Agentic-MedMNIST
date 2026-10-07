@@ -1,0 +1,29 @@
+{
+  "artefact": "anomaly_data_audit",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T16:02:49.829895+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Data audit stage is clean. All 11 deterministic checks pass (official split, train/val indices, labels, pixels, shape, disjointness). Archive MD5 (a8b06965200029087d5bd730944a56c1) matches the verified hash. Split sizes (train=89996, val=10004, test=7180) exactly match official PathMNIST. 28×28×3 RGB / 9-class schema confirmed. Zero blank images, zero duplicates, zero train-val overlap. Class imbalance ratio is modest (1.63) with near-identical train/val proportions. The representation plan uses only built-in augmentation primitives (hflip, vflip, rotate90, rotate180, brightness, contrast) which do not require extension approval; augmented train size 629,972 = 89,996 × 7 is arithmetically correct. Normalization (z-score) is well-justified by the asymmetric channel variance (G σ≈0.177 vs R/B σ≈0.124). The test set OOD characteristic (CRC-VAL-HE-7K, different clinical center) is properly documented in the manifest and split manifest. Two extension proposals remain pending_review: hflip_only_aug is redundant since hflip is already a built-in primitive, and compact_conv_token_transformer is correctly gated pending hash-bound review. No deterministic findings exist to justify stop or revise. Minor advisory notes: (1) llm_model_digest is null for qwen3.8 across all artefacts—recommend recording a verifiable model snapshot identifier for full traceability; (2) two prior-art ideas have weak logical bridges (quantization→imbalance generalization; machine-unlearning→augmentation quality) but are correctly tagged hypothesis_to_validate and do not block the pipeline; (3) 28×28 resolution ambiguity risks (background/debris/mucus, adipose/background, smooth muscle/stroma, lymphocytes/debris) are well-documented and should be surfaced via per-class metrics in downstream evaluation. All findings are consistent and non-blocking. Proceed to next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "llm_model_digest is null for qwen3.8 (Oollama) across all artefacts; LLM-component traceability is incomplete—recommend recording a verifiable model snapshot or digest in subsequent stages",
+      "Test set (CRC-VAL-HE-7K) originates from a different clinical center; this documented OOD characteristic must be explicitly flagged in downstream evaluation reporting to avoid conflating in-distribution and cross-center performance",
+      "Extension proposal hflip_only_aug (spec_sha256=3541e66a…) is pending_review but hflip is already a built-in augmentation primitive and does not require this approval; the pending status is redundant and should be noted to avoid confusion",
+      "Extension proposal compact_conv_token_transformer (spec_sha256=4004d69e…) is correctly gated pending hash-bound independent review; no architecture change may be applied until review completes",
+      "Prior-art idea ghostnet_vgg_robustness draws a class-imbalance generalization inference from quantization-robustness evidence; the logical bridge is weak—correctly tagged hypothesis_to_validate but should not be treated as supported without additional evidence",
+      "Prior-art idea augmentation_model_quality cites arxiv_2508_18509v1 (a machine-unlearning paper) as primary evidence for a tissue-polarity augmentation-quality claim; the source is tangential—verify or replace with a more directly relevant citation",
+      "28×28 RGB resolution introduces documented ambiguity risks (background/debris/mucus overlap, adipose vs. background, smooth muscle vs. stroma, lymphocytes vs. debris) that will constrain achievable accuracy; downstream evaluation should report per-class metrics to surface these confusions"
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "data_audit"
+  },
+  "payload_sha256": "55b8214c7d356b91ae95213a884462a4042b9c4da4d7b47b953651a673c70379",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 18,
+  "version": 1
+}

@@ -1,0 +1,34 @@
+{
+  "artefact": "anomaly_reporting",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T15:54:37.435935+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "The reporting stage synthesises a pipeline that is internally consistent but operationally limited. No deterministic findings are present, so a stop is not warranted. However, several issues require the final report to be revised for clarity and completeness before it can be considered a reliable deliverable.\n\n**OOD / Abstention (most critical limitation):**\nThe OOD AUROC of 0.183 is below random chance (0.5), meaning max-softmax confidence is *anti-correlated* with OOD-ness across all three Gaussian-noise severities (σ=0.15: 0.426, σ=0.25: 0.108, σ=0.40: 0.014). Predictive entropy is similarly below chance (mean ≈ 0.140). This is not a score-specific issue but a fundamental confidence-calibration defect: the model is more confident on corrupted inputs than on clean in-distribution inputs. No detector qualified on validation (best val AUROC 0.555 < 0.65 threshold), so automatic acceptance was correctly disabled. The consequence is that the abstention mechanism is entirely non-functional: abstain_rate = 1.0, coverage = 0.0 at every target level (0.5–0.9), selective_risk = 1.0, and all 7,180 test samples are routed to human review. The risk-coverage curve is degenerate at (0, 1.0) for every point. The final report must state unambiguously that the selective-prediction component provides zero operational benefit and that the model cannot be deployed with any automated acceptance gate under this corruption family.\n\n**Evaluation metrics (internally consistent):**\nTest accuracy 0.9175 (CI95 0.9110–0.9237), macro-F1 0.8849, ROC-AUC (OVR macro) 0.9755 on 7,180 samples. Confusion matrix rows sum to the reported per-class supports and the total is 7,180. The reported accuracy (6,588/7,180 = 0.91755) matches. These are sound. However, cancer-associated stroma (class 7) recall is only 0.458 (F1 0.602) and smooth muscle recall is 0.838 (F1 0.802); these histologically similar classes drive the majority of misclassifications and should be highlighted as a known weakness.\n\n**Search / model selection:**\n8 trials completed, 0 failed, test_locked = true, test_metrics_used = false — selection discipline is correct. The selected candidate (tiny_cnn_wide_d3) achieved 0.9910 validation accuracy. However, residual_cnn and resnet18 were never evaluated within the 8-trial budget. This is a carried warning and should be explicitly noted in the final report as a coverage gap that may affect the generality of the architecture conclusion.\n\n**Reproducibility / traceability:**\nllm_model_digest is null in the run manifest despite llm_model = 'qwen3.8'. This is a traceability gap that should be flagged in the reporting. All artefact SHA-256 hashes are present and the OOD evidence blob is referenced with its hash.\n\n**Validation-to-test gap:**\n~7.3 pp (0.9910 val vs 0.9175 test). This is within a plausible range for distributional shift on a 28×28 MedMNIST distribution but should be documented as a known limitation rather than left implicit.\n\n**Recommended revisions to the report:**\n1. Add a prominent 'Operational Limitations' section stating that the OOD/abstention pipeline is non-functional and the model must not be deployed with automated acceptance.\n2. Explicitly note the architecture coverage gap (residual_cnn, resnet18 unevaluated).\n3. Flag the llm_model_digest null as a reproducibility caveat.\n4. Document the validation-to-test gap and the per-class weaknesses (especially cancer-associated stroma).\n5. Clarify that the OOD evaluation used a controlled Gaussian-noise corruption proxy, not a true distributional shift, and that the anti-correlation finding may not generalise to other OOD families.\n\nNone of these issues are deterministic findings that would mandate a stop, but the reporting must be revised to ensure the final deliverable does not overstate the model's operational readiness.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "OOD AUROC 0.183 is below random chance (0.5); max-softmax confidence is anti-correlated with OOD-ness across all three corruption severities — fundamental calibration defect",
+      "Predictive entropy AUROC also below chance (mean ≈ 0.140), confirming the issue is model-level, not score-specific",
+      "Abstention mechanism is non-functional: abstain_rate=1.0, coverage=0.0 at all thresholds, selective_risk=1.0; zero selective-prediction benefit over blanket human review",
+      "Risk-coverage curve is degenerate: (coverage=0, risk=1.0) at every target coverage level from 0.5 to 0.9",
+      "No OOD detector qualified on validation (best val AUROC 0.555 < 0.65 threshold); automatic acceptance correctly disabled but the report must state this is a hard operational limitation",
+      "All 7,180 test samples routed to human review; no samples are selectively accepted or rejected with differential confidence",
+      "Architecture coverage incomplete: residual_cnn and resnet18 never evaluated in the 8-trial search budget (carried warning)",
+      "Cancer-associated stroma (class 7) recall is only 0.458 (F1 0.602); smooth muscle recall 0.838 (F1 0.802) — histologically similar classes drive most errors",
+      "Validation-to-test accuracy gap of ~7.3 pp (0.9910 val vs 0.9175 test) should be documented as a known limitation",
+      "llm_model_digest is null in run_manifest despite llm_model='qwen3.8' — reproducibility traceability gap",
+      "OOD evaluation used controlled Gaussian-noise corruption proxy only; anti-correlation finding may not generalise to other OOD families; report should scope this limitation explicitly",
+      "Transformer-specific config fields (num_heads, patch_size, pooling, positional_encoding, tokenizer_layers, mlp_ratio) present in tiny_cnn config; inactive for CNN families but noted for clarity in the report"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "reporting"
+  },
+  "payload_sha256": "ad1fb8fc871a1ee1bb2430813b8ddbae7a2ae0e0d6ecccfbdca9be840203e202",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 48,
+  "version": 1
+}

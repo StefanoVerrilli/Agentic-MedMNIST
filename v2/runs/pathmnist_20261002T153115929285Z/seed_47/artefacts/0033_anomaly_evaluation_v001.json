@@ -1,0 +1,28 @@
+{
+  "artefact": "anomaly_evaluation",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T16:09:39.176275+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Evaluation stage is internally consistent and complete. No deterministic findings. Key verifications: (1) Confusion matrix row sums match per-class support values exactly (total 7180); accuracy 6644/7180=0.925348 confirmed. (2) Per-class precision/recall/F1 values are arithmetically consistent with the confusion matrix (spot-checked classes 0 and 7). (3) test_metrics_used=false and selection_rule confirms no test-dependent adaptation; test split was locked. (4) Data audit passed all checks with zero train-validation overlap. (5) Model family tiny_cnn (CNN) correctly renders transformer fields (num_heads, patch_size, positional_encoding, tokenizer_layers, mlp_ratio, pooling) inert; no hybrid concern. (6) All augmentations (hflip, brightness, contrast) are built-in primitives. (7) Training history shows monotonic loss decrease and converging val accuracy over 15 epochs with cosine schedule; no divergence or instability. (8) Prediction artifact includes logits, probabilities, and targets with verifiable sha256. Observations carried as warnings: (a) Validation accuracy 0.9898 vs test accuracy 0.9253 (~6.4 pp gap) is consistent with the documented cross-center OOD characteristic (official_test_separate_center=true) and should be explicitly annotated in any downstream summary to avoid misreading as overfitting. (b) Class 7 (cancer-associated stroma) shows the weakest performance (F1=0.608, recall=0.463) with substantial confusion into debris (64), smooth muscle (85), and adenocarcinoma (68); this is consistent with 28×28 RGB resolution ambiguity and is properly surfaced by the per-class report. (c) LLM model digest remains null (qwen3.8/Oollama) across all artefacts—traceability gap; recommend recording a verifiable snapshot in subsequent stages. (d) hflip_only_aug extension (spec_sha256=3541e66a…) is pending_review despite hflip being a built-in primitive; administratively redundant. (e) compact_conv_token_transformer (spec_sha256=4004d69e…) remains correctly gated pending hash-bound review; no architecture change referencing it may be applied. None of these observations constitute deterministic defects in the evaluation artefacts.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Cross-center OOD gap (val 0.9898 vs test 0.9253, ~6.4 pp) should be explicitly annotated in downstream reporting to distinguish OOD generalization from overfitting.",
+      "Class 7 (cancer-associated stroma) F1=0.608, recall=0.463 is the weakest class; confusion pattern (debris, smooth muscle, adenocarcinoma) is consistent with 28×28 resolution ambiguity—flag for any clinical-utility interpretation.",
+      "LLM model digest is null (qwen3.8/Oollama) across all artefacts; LLM-component traceability is incomplete—recommend recording a verifiable model snapshot or digest.",
+      "hflip_only_aug extension (spec_sha256=3541e66a…) remains pending_review despite hflip being a built-in primitive; administratively redundant—recommend closing or annotating the registry entry.",
+      "compact_conv_token_transformer (spec_sha256=4004d69e…) remains pending hash-bound independent review; no architecture change referencing it may be applied until review completes (current tiny_cnn config is unaffected).",
+      "best_configuration validation_accuracy (0.991004) and train_result best_val_accuracy (0.989804) differ by ~0.12%; within expected run-to-run variance but noted for audit trail."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "evaluation"
+  },
+  "payload_sha256": "2b63411284bac4b657289e51146d336b0369dd216966bf249ae337f8b9a20a7b",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 33,
+  "version": 1
+}

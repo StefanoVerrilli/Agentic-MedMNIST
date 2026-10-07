@@ -1,0 +1,28 @@
+{
+  "artefact": "anomaly_reporting",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T16:31:14.347195+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "Reporting stage is internally consistent and complete. All cross-artefact references verified:\n\n1) **Arithmetic**: OOD aggregate AUROC 0.670601 = mean(0.755522, 0.648461, 0.607821)/3 ✓. Comparison delta 0.919777 − 0.828134 = 0.091643 ✓. Validation/test coverage 0.0 at all risk levels is consistent with threshold 0.9197 exceeding all observed max_softmax values.\n\n2) **Control validity**: Common split fingerprint 9afc9ed3…7505 and seed 72 are identical across ablation, baseline, and comparison artefacts. No drift.\n\n3) **Abstention & OOD**: 100% abstention (7,180/7,180 routed to human review) and OOD failure (min scenario AUROC 0.608 < 0.65 floor) are correctly flagged; automatic acceptance is properly disabled. These are operational warnings, not pipeline defects.\n\n4) **Model quality**: Class 7 recall 0.439 (CI 0.393–0.487) is a legitimate observation, correctly labelled as model-quality rather than pipeline error.\n\n5) **Traceability**: llm_model_digest null for qwen3.8 is a non-blocking reproducibility gap, correctly noted.\n\n6) **Built-in augmentations**: hflip in ablation is a standard primitive requiring no extension approval. Transformer-family fields in the tiny_cnn baseline config are inactive per CNN-family rules.\n\n7) **Resolution**: 28×28×3 RGB confirmed; no substitution to source-dataset or MedMNIST+ resolution.\n\nNo deterministic findings. All warnings are correctly identified, appropriately scoped, and do not invalidate the reporting artefact. The reporting is complete through the ablation stage with 45 artefact versions and 98 decision events. Proceed.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "warning: abstention mechanism non-functional in practice — threshold 0.9197 exceeds all observed max_softmax values, yielding 100% abstention, 0% coverage, unit selective risk; all 7,180 test samples routed to human review (operational concern, correctly handled)",
+      "warning: no OOD detector qualified on validation; max_softmax fails at σ=0.4 (AUROC 0.608 < 0.65 floor, FAR 0.287 > 0.20 cap); predictive_entropy fails both criteria; automatic acceptance correctly disabled",
+      "warning: class 7 (cancer-associated stroma) recall 0.439 (CI 0.393–0.487) substantially below all other classes; 87 misclassified as smooth muscle, 71 as debris — model-quality observation",
+      "warning: llm_model_digest is null for qwen3.8 (ollama) across LLM-assisted stages; exact model weights not pinned (traceability gap, non-blocking)",
+      "informational: ~0.23 pp discrepancy between best_configuration.validation_accuracy (0.991004) and train_result.best_val_accuracy (0.988705) attributable to stochastic variance between replay and training runs",
+      "informational: cosmetic record-hygiene items — typo 'E channel'→'G channel'; compact_conv_token_transformer proposal description truncated; ingestion comment labels task 'multi-label' instead of 'multi-class' (non-blocking)"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8",
+    "stage": "reporting"
+  },
+  "payload_sha256": "82d5cc2b3895c43b836351018d4b89b6f179ad7d5fe39addf7656e846705a6b0",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 46,
+  "version": 2
+}

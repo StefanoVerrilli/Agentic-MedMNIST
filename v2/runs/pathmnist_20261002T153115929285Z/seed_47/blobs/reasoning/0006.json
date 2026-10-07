@@ -1,0 +1,68 @@
+{
+  "payload": {
+    "decision": {
+      "augmentations": [
+        "hflip",
+        "vflip",
+        "rotate90",
+        "rotate180",
+        "brightness",
+        "contrast"
+      ],
+      "normalization": "standardize",
+      "rationale": "Normalization: I select 'standardize' (z-score: (x - channel_mean) / channel_std) over 'unit' scaling. The provided channel statistics (R: \u03bc=0.741, \u03c3=0.124; G: \u03bc=0.533, \u03c3=0.177; B: \u03bc=0.706, \u03c3=0.124) reveal that the green channel carries ~43% more variance than the red and blue channels, a hallmark of H&E staining where hematoxylin (blue-purple) and eosin (pink) produce asymmetric intensity distributions. Standardizing equalizes per-channel variance to unit scale and centers data at zero, which improves gradient conditioning for the lightweight backbones (3-5 conv blocks or 1-4M-param conv-tokenized transformers) discussed in the cited hypotheses. Unit normalization would leave the G channel's larger spread uncorrected, potentially causing the network to under-weight green-channel cues (nuclear morphology) relative to eosinophilic cytoplasmic signals. Given the moderate class imbalance (ratio 1.63, range 7886\u201312885), well-conditioned inputs reduce the risk that the minority classes (e.g., 7886-sample class) are dominated by high-variance channel noise.\n\nAugmentations: I select six transforms\u2014hflip, vflip, rotate90, rotate180, brightness, contrast\u2014applied train-only. The problem statement confirms all four geometric transforms are orientation-safe for tissue-type labels, and the cited hypothesis (arxiv_2508_18509v1) warns that excessive augmentation can blur class-discriminative spatial cues in pathology. My selection is deliberately conservative: (1) hflip and vflip are the most standard spatial augmentations and are safe because tissue-type identity (e.g., glandular vs. stromal vs. necrotic) is invariant to mirroring; (2) rotate90 adds genuine rotational diversity not achievable via flips alone, helping the model learn orientation-invariant texture features; (3) rotate180, while geometrically equivalent to hflip\u2218vflip, is included as a single atomic transform to ensure the augmentation pipeline treats it as one stochastic event rather than a composition, reducing the probability of any single sample receiving the full 180\u00b0 rotation in a given epoch; (4) brightness and contrast address the well-known inter-scanner and inter-stain variability in H&E preparation, where global intensity shifts and contrast differences do not alter tissue-type identity. I deliberately exclude any additional geometric or photometric transforms (e.g., elastic deformation, color jitter) to honor the conservative-augmentation principle from the cited evidence and to avoid distorting the fine-grained histological architecture (gland shape, stromal pattern, nuclear-to-cytoplasmic ratio) that discriminates the 9 tissue classes. Six augmentations provide a 6\u00d7 effective training set expansion (from ~90K to ~540K augmented views) without over-augmenting, which is well-matched to the dataset scale and the lightweight-architecture hypotheses (MedMNIST v2, CCT conv-tokenization) that emphasize parameter efficiency over data volume."
+    },
+    "request": {
+      "fallback": {
+        "augmentations": [
+          "hflip"
+        ],
+        "normalization": "standardize",
+        "rationale": "Use train-only per-channel standardization. Horizontal flips preserve PathMNIST tissue identity and provide one tracked enrichment scenario."
+      },
+      "model": "qwen3.8",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "augmentations": {
+            "items": {
+              "pattern": "^(hflip|vflip|rotate90|rotate180|brightness|contrast|approved_[a-z][a-z0-9_]{2,31})$",
+              "type": "string"
+            },
+            "maxItems": 8,
+            "title": "Augmentations",
+            "type": "array"
+          },
+          "normalization": {
+            "enum": [
+              "unit",
+              "standardize"
+            ],
+            "title": "Normalization",
+            "type": "string"
+          },
+          "rationale": {
+            "maxLength": 6000,
+            "minLength": 3,
+            "title": "Rationale",
+            "type": "string"
+          }
+        },
+        "required": [
+          "normalization",
+          "rationale"
+        ],
+        "title": "RepresentationDecision",
+        "type": "object"
+      },
+      "seed": 47,
+      "stage": "preprocessing.representation",
+      "system": "You design the input representation for 28x28 H&E tissue patch classification. Choose only from the schema guardrails. The listed flips and 90-degree rotation are orientation-safe for tissue-type labels; application will be train-only.",
+      "user": "classes=9; train_counts=[9366, 9509, 10360, 10401, 8006, 12182, 7886, 9401, 12885]; imbalance=1.633908; channel_mean=[0.740545, 0.53298219, 0.70582885]; channel_std=[0.12368222, 0.17676253, 0.12443067]; design_evidence=train_only; cited_hypotheses=[{\"evidence_quote\": \"with the right size, convolutional tokenization, transformers can avoid overfitting and outperform state-of-the-art CNNs on small datasets\", \"hypothesis\": \"A compact transformer using convolutional tokenization (rather than fixed-size patch embedding) can be adapted to the 28x28x3 PathMNIST input, leveraging the fact that CCT demonstrated competitive accuracy on CIFAR-10 (32x32x3) with only 3.7M parameters. For PathMNIST's ~90K training samples across 9 classes, a similarly sized conv-tokenized transformer (1-4M params) with 2-4 attention layers may avoid overfitting while capturing inter-pixel dependencies that a plain CNN misses, especially for subtle histological patterns.\", \"idea_id\": \"cct_conv_tokenization\", \"source_id\": \"arxiv_2104_05704v4\", \"status\": \"hypothesis_to_validate\", \"target\": \"architecture\"}, {\"evidence_quote\": \"a pure transformer applied directly to sequences of image patches can perform very well on image classification tasks\", \"hypothesis\": \"Applying a pure self-attention mechanism over a small number of spatial tokens (e.g., 4 tokens from 14x14 patches or 16 tokens from 7x7 patches) on the 28x28x3 PathMNIST input could model global tissue context (e.g., gland arrangement, stromal pattern) that local convolutions struggle to capture, provided the token count is kept small to avoid overfitting on ~90K samples.\", \"idea_id\": \"vit_small_patch_attention\", \"source_id\": \"arxiv_2010_11929v2\", \"status\": \"hypothesis_to_validate\", \"target\": \"representation\"}, {\"evidence_quote\": \"All images are pre-processed into a small size of 28x28 (2D) or 28x28x28 (3D) with the corresponding classification labels so that no background knowledge is required for users.\", \"hypothesis\": \"Because PathMNIST images are standardized to 28x28 with no required domain preprocessing, the architecture should be lightweight (fewer than 5M parameters) to match the dataset scale (~90K images, 9 classes). A shallow CNN backbone (3-5 conv blocks) with global average pooling and a small MLP head is well-matched to this regime, as validated by the MedMNIST v2 benchmarking of lightweight 2D networks.\", \"idea_id\": \"medmnist_lightweight_design\", \"source_id\": \"arxiv_2110_14795v2\", \"status\": \"hypothesis_to_validate\", \"target\": \"architecture\"}, {\"evidence_quote\": \"GhostNet-VGG is shown to be the most robust to overall performance drop at lower precision.\", \"hypothesis\": \"GhostNet-VGG-style architecture (combining ghost modules for cheap feature generation with VGG-like depth) is a strong candidate for PathMNIST because it was shown to be the most robust to performance degradation under quantization, suggesting its feature representations are inherently more stable. This stability may translate to better generalization on the imbalanced PathMNIST class distribution (7886-12885 samples per class).\", \"idea_id\": \"ghostnet_vgg_robustness\", \"source_id\": \"arxiv_2309_13866v2\", \"status\": \"hypothesis_to_validate\", \"target\": \"architecture\"}, {\"evidence_quote\": \"We find that temperature scaling can improve calibration error for quantized networks, with some caveats.\", \"hypothesis\": \"Applying temperature scaling as a post-hoc calibration step during training on PathMNIST can improve the reliability of predicted class probabilities, which is critical in a medical pathology context where confidence thresholds may drive downstream decisions. This is a low-cost training modification that does not change the architecture.\", \"idea_id\": \"temp_scaling_calibration\", \"source_id\": \"arxiv_2309_13866v2\", \"status\": \"hypothesis_to_validate\", \"target\": \"training\"}, {\"evidence_quote\": \"Our findings highlight the trade-offs between computational speed and model accuracy, offering valuable insights for researchers and practitioners in medical image analysis.\", \"hypothesis\": \"The choice of deep-learning framework (Keras vs PyTorch vs JAX) introduces measurable differences in training efficiency and inference speed on PathMNIST. For iterative experimentation on this small 28x28x3 dataset, selecting the framework with the best accuracy-per-second trade-off can accelerate the research cycle without changing the model itself.\", \"idea_id\": \"framework_training_efficiency\", \"source_id\": \"arxiv_2507_12248v1\", \"status\": \"hypothesis_to_validate\", \"target\": \"training\"}, {\"evidence_quote\": \"We also analyse the impact of data augmentation on the quality of unlearning.\", \"hypothesis\": \"The type and extent of data augmentation applied during PathMNIST training directly affects model quality and robustness. Conservative augmentation (e.g., horizontal flip only) may be preferable to aggressive geometric transforms for pathology images where tissue orientation carries diagnostic information, as excessive augmentation could blur class-discriminative spatial cues.\", \"idea_id\": \"augmentation_model_quality\", \"source_id\": \"arxiv_2508_18509v1\", \"status\": \"hypothesis_to_validate\", \"target\": \"training\"}]; approved_augmentations=['brightness', 'contrast', 'hflip', 'rotate180', 'rotate90', 'vflip']"
+    },
+    "request_sha256": "d2ed46591f32a140b4f52acc817377ef657e7fe535f93cfc3c81066754ef27d2",
+    "source": "qwen3.8",
+    "used_fallback": false
+  },
+  "sha256": "21e72c6ff002635632a697dbe1dae8fda6517afb336c9d46167eafa1e985e9d0"
+}

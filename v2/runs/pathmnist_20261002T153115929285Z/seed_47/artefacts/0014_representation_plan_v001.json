@@ -1,0 +1,36 @@
+{
+  "artefact": "representation_plan",
+  "artefact_type": "RepresentationPlan",
+  "created_at": "2026-10-02T16:02:03.142879+00:00",
+  "payload": {
+    "augmentation_factor": 7,
+    "augmentations": [
+      "hflip",
+      "vflip",
+      "rotate90",
+      "rotate180",
+      "brightness",
+      "contrast"
+    ],
+    "normalization": "standardize",
+    "rationale": "Normalization: I select 'standardize' (z-score: (x - channel_mean) / channel_std) over 'unit' scaling. The provided channel statistics (R: μ=0.741, σ=0.124; G: μ=0.533, σ=0.177; B: μ=0.706, σ=0.124) reveal that the green channel carries ~43% more variance than the red and blue channels, a hallmark of H&E staining where hematoxylin (blue-purple) and eosin (pink) produce asymmetric intensity distributions. Standardizing equalizes per-channel variance to unit scale and centers data at zero, which improves gradient conditioning for the lightweight backbones (3-5 conv blocks or 1-4M-param conv-tokenized transformers) discussed in the cited hypotheses. Unit normalization would leave the G channel's larger spread uncorrected, potentially causing the network to under-weight green-channel cues (nuclear morphology) relative to eosinophilic cytoplasmic signals. Given the moderate class imbalance (ratio 1.63, range 7886–12885), well-conditioned inputs reduce the risk that the minority classes (e.g., 7886-sample class) are dominated by high-variance channel noise.\n\nAugmentations: I select six transforms—hflip, vflip, rotate90, rotate180, brightness, contrast—applied train-only. The problem statement confirms all four geometric transforms are orientation-safe for tissue-type labels, and the cited hypothesis (arxiv_2508_18509v1) warns that excessive augmentation can blur class-discriminative spatial cues in pathology. My selection is deliberately conservative: (1) hflip and vflip are the most standard spatial augmentations and are safe because tissue-type identity (e.g., glandular vs. stromal vs. necrotic) is invariant to mirroring; (2) rotate90 adds genuine rotational diversity not achievable via flips alone, helping the model learn orientation-invariant texture features; (3) rotate180, while geometrically equivalent to hflip∘vflip, is included as a single atomic transform to ensure the augmentation pipeline treats it as one stochastic event rather than a composition, reducing the probability of any single sample receiving the full 180° rotation in a given epoch; (4) brightness and contrast address the well-known inter-scanner and inter-stain variability in H&E preparation, where global intensity shifts and contrast differences do not alter tissue-type identity. I deliberately exclude any additional geometric or photometric transforms (e.g., elastic deformation, color jitter) to honor the conservative-augmentation principle from the cited evidence and to avoid distorting the fine-grained histological architecture (gland shape, stromal pattern, nuclear-to-cytoplasmic ratio) that discriminates the 9 tissue classes. Six augmentations provide a 6× effective training set expansion (from ~90K to ~540K augmented views) without over-augmenting, which is well-matched to the dataset scale and the lightweight-architecture hypotheses (MedMNIST v2, CCT conv-tokenization) that emphasize parameter efficiency over data volume.",
+    "schema_version": "1.0",
+    "source": "qwen3.8",
+    "stats_source": "train",
+    "train_channel_mean_unit": [
+      0.740545,
+      0.53298219,
+      0.70582885
+    ],
+    "train_channel_std_unit": [
+      0.12368222,
+      0.17676253,
+      0.12443067
+    ]
+  },
+  "payload_sha256": "8e1434c6b032200578bfb56f09b888ac24cdab8ac7039b39aa42639233d1c851",
+  "producer": "preprocessing",
+  "run_id": "seed_47",
+  "sequence": 14,
+  "version": 1
+}

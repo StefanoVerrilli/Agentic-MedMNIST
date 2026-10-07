@@ -1,0 +1,24 @@
+{
+  "artefact": "anomaly_prior_art",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T16:01:39.478378+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Prior-art stage is internally consistent and well-structured. All seven ideas are correctly tagged hypothesis_to_validate with traceable evidence quotes to their cited arXiv sources. The two proposals (hflip_only_aug and compact_conv_token_transformer) are coherent: the augmentation proposal uses a built-in primitive (hflip) that requires no extension approval, and its label-preservation rationale for excluding vflip/rotations in a pathology context is well-argued. The architecture proposal's dimension arithmetic checks out (28→14→7 with two stride-2 3×3 convs yields 7×7×128 = 49 tokens; 4 heads × head_dim 32 = 128 matches the token width; estimated parameter count ≈ 350 K is well under the stated 2 M ceiling). The 28×28×3 RGB MedMNIST resolution is used consistently throughout, matching the pipeline standard. No test-set metrics are referenced (test_metrics_used = false). No deterministic findings are present. Minor observations (not blocking): (1) the ghostnet_vgg_robustness idea extrapolates from quantization-robustness evidence to class-imbalance generalization, a logical stretch that is appropriately flagged as a hypothesis needing validation; (2) the augmentation_model_quality idea draws its evidence quote from a machine-unlearning paper, a somewhat tangential source, though the inference about conservative augmentation for tissue polarity is reasonable. Neither issue undermines the stage output. All six sources carry snapshot paths and SHA-256 hashes for reproducibility. No retrieval errors. The stage is ready to proceed.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "ghostnet_vgg_robustness idea infers class-imbalance generalization benefit from quantization-robustness evidence; the logical bridge is weak but the idea is correctly marked hypothesis_to_validate",
+      "augmentation_model_quality idea cites a machine-unlearning paper (arxiv_2508_18509v1) as primary evidence for an augmentation-quality claim; the source is tangential to the specific inference about tissue-polarity preservation"
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "prior_art"
+  },
+  "payload_sha256": "a3f5d2a4843ccde2ddbdc9a45979b2e6129d17d024caa5745d99b3389947e618",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 12,
+  "version": 1
+}

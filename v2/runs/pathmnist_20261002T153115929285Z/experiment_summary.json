@@ -1,0 +1,75 @@
+{
+  "agentic_accuracy_mean": 0.920891,
+  "agentic_accuracy_population_std": 0.00328,
+  "aggregate_note": "All requested seeds completed.",
+  "aggregate_valid": true,
+  "baseline_accuracy_mean": 0.829898,
+  "completed_seeds": [
+    42,
+    47,
+    72
+  ],
+  "created_at": "2026-10-02T16:31:14.794305+00:00",
+  "dataset": "pathmnist",
+  "experiment_id": "20261002T153115929285Z",
+  "incomplete_seeds": [],
+  "requested_seeds": [
+    42,
+    47,
+    72
+  ],
+  "runs": [
+    {
+      "accuracy_delta": 0.09624,
+      "agentic_accuracy": 0.917549,
+      "agentic_macro_f1": 0.884912,
+      "baseline_accuracy": 0.821309,
+      "baseline_macro_f1": 0.750857,
+      "best_config_hash": "c5c9da83046282417b572a9054cbe5b9b9eec13ac6550020df13a304ca863df5",
+      "best_config_path": "/media/neurone-pc11/Volume1/Giuseppe/Agentic-MedMNIST/v2/runs/pathmnist_20261002T153115929285Z/seed_42/best_config_v001.yaml",
+      "best_validation_accuracy": 0.991004,
+      "best_validation_macro_f1": 0.990943,
+      "run_root": "runs/pathmnist_20261002T153115929285Z/seed_42",
+      "seed": 42,
+      "status": "completed_with_warning"
+    },
+    {
+      "accuracy_delta": 0.085097,
+      "agentic_accuracy": 0.925348,
+      "agentic_macro_f1": 0.892274,
+      "baseline_accuracy": 0.840251,
+      "baseline_macro_f1": 0.784172,
+      "best_config_hash": "c5c9da83046282417b572a9054cbe5b9b9eec13ac6550020df13a304ca863df5",
+      "best_config_path": "/media/neurone-pc11/Volume1/Giuseppe/Agentic-MedMNIST/v2/runs/pathmnist_20261002T153115929285Z/seed_47/best_config_v001.yaml",
+      "best_validation_accuracy": 0.991004,
+      "best_validation_macro_f1": 0.990943,
+      "run_root": "runs/pathmnist_20261002T153115929285Z/seed_47",
+      "seed": 47,
+      "status": "completed_with_warning"
+    },
+    {
+      "accuracy_delta": 0.091643,
+      "agentic_accuracy": 0.919777,
+      "agentic_macro_f1": 0.883702,
+      "baseline_accuracy": 0.828134,
+      "baseline_macro_f1": 0.757331,
+      "best_config_hash": "c5c9da83046282417b572a9054cbe5b9b9eec13ac6550020df13a304ca863df5",
+      "best_config_path": "/media/neurone-pc11/Volume1/Giuseppe/Agentic-MedMNIST/v2/runs/pathmnist_20261002T153115929285Z/seed_72/best_config_v001.yaml",
+      "best_validation_accuracy": 0.991004,
+      "best_validation_macro_f1": 0.990943,
+      "run_root": "runs/pathmnist_20261002T153115929285Z/seed_72",
+      "seed": 72,
+      "status": "completed_with_warning"
+    }
+  ],
+  "sequential_ollama_calls": true,
+  "task_best_configuration": {
+    "path": "runs/pathmnist_20261002T153115929285Z/best_task_config.yaml",
+    "selected_from_seed": 42,
+    "selection_basis": "validation_accuracy_then_macro_f1",
+    "sha256": "55b51f38e0ec635c826d6641d76027a8dcb68526b37d3bae3168f5d0b3bbb5c8",
+    "test_metrics_used": false,
+    "validation_accuracy": 0.991004,
+    "validation_macro_f1": 0.990943
+  }
+}

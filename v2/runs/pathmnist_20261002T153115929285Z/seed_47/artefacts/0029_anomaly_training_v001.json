@@ -1,0 +1,28 @@
+{
+  "artefact": "anomaly_training",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T16:09:02.552684+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Training stage is clean and internally consistent. No deterministic findings. Key verifications: (1) Model family is tiny_cnn (CNN); transformer-specific fields (num_heads, patch_size, positional_encoding, tokenizer_layers, mlp_ratio, pooling) are present in the config but are inert for CNN families and do not constitute a hybrid. (2) All augmentations in use (hflip, brightness, contrast) are built-in primitives requiring no extension approval. (3) Data audit passed all checks: official split, disjoint train/val (overlap=0), test not inspected, train_stats_only=true. (4) Training converged over the full 15-epoch budget: train loss decreased monotonically (0.563→0.305), val accuracy rose from 0.954 to 0.990 with expected epoch-to-epoch noise; no overfitting signal. (5) Cosine LR schedule correctly anneals from 0.001 to 0.0 over 15 epochs. (6) Early stopping (patience=3, min_delta=0.0) did not trigger because the model continued to achieve marginal improvements each epoch—consistent with the low-LR tail of the cosine schedule. (7) The best_configuration search-phase validation_accuracy (0.991004) differs from the final training run's best_val_accuracy (0.989804) by ~0.12%, which is within expected single-run variance (CUDA non-determinism, data-shuffle ordering) and does not indicate a defect. (8) The architecture_research stage carries action=revise with traceability gaps (tangential arxiv citation, null LLM digest, truncated text), but these are prior-stage administrative items that do not block the current training run; the configuration_replay stage independently confirmed the tiny_cnn config is sound. (9) official_test_separate_center=true is correctly flagged; downstream evaluation must report OOD/cross-center metrics separately from in-distribution results. (10) 28×28 RGB resolution class-ambiguity risks (background/debris/mucus, adipose vs. background, smooth muscle vs. stroma, lymphocytes vs. debris) should be surfaced via per-class metrics in the evaluation stage. No action-blocking issues identified; proceed to evaluation.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "best_configuration validation_accuracy (0.991004) and train_result best_val_accuracy (0.989804) differ by ~0.12%; within expected run-to-run variance but should be noted for audit trail",
+      "architecture_research stage action=revise with null LLM digest (qwen3.8/Oollama) and truncated analysis text—traceability gaps carried forward; recommend recording a verifiable model snapshot in subsequent stages",
+      "official_test_separate_center=true: downstream evaluation must explicitly separate in-distribution and cross-center OOD metrics to avoid conflating performance",
+      "28×28 RGB class-ambiguity risks (background/debris/mucus, adipose vs. background, smooth muscle vs. stroma, lymphocytes vs. debris) require per-class confusion analysis in evaluation",
+      "hflip_only_aug extension (spec_sha256=3541e66a…) remains pending_review despite hflip being a built-in primitive; administratively redundant—recommend closing or annotating the registry entry",
+      "compact_conv_token_transformer (spec_sha256=4004d69e…) remains pending hash-bound review; no architecture change referencing it may be applied until review completes (current tiny_cnn config is unaffected)"
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "training"
+  },
+  "payload_sha256": "fa0f2260ccd3113f42dbf11d5111cb69c5142d749e3b2b7af681ca6e1eeee7a8",
+  "producer": "reviewer",
+  "run_id": "seed_47",
+  "sequence": 29,
+  "version": 1
+}

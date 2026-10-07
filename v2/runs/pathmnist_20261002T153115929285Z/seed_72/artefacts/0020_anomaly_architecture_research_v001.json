@@ -1,0 +1,25 @@
+{
+  "artefact": "anomaly_architecture_research",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T16:19:57.601466+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Architecture research stage is internally consistent and well-grounded. Verification summary:\n\n(1) Dataset fidelity: 28×28×3 RGB, 9-class multi-class, ~90K train / 10K val / 7.2K test — all consistent with the standard MedMNIST PathMNIST distribution. No resolution substitution detected.\n\n(2) Architecture set: tiny_cnn, compact_transformer, residual_cnn, resnet18, vision_transformer — a reasonable spread from lightweight to upper-bound. ResNet18 is correctly treated as a fixed-topology capacity ablation (2+2+2+2 blocks, ~11.7M params), not a tunable-depth variant. Generic transformer fields are not conflated with CNN entries.\n\n(3) Token math: 28/7=4 → 4×4=16 tokens (7×7 stride-7); 28/14=2 → 2×2=4 tokens (14×14 stride-14). Both correct. The recommendation to prefer 16-token over 4-token configuration for 28×28 inputs is well-justified.\n\n(4) Parameter budgets: 0.5–2M (tiny/residual CNN), 1–4M (compact transformer), ≤11M (ResNet18 upper bound) — all within expected ranges for 28×28 inputs.\n\n(5) Augmentations: hflip, vflip, rotate90, rotate180, brightness, contrast — all built-in primitives requiring no extension approval. Factor 7 (6 augmentations + original) × 89,996 = 629,972 matches the split manifest's augmented_train_size exactly.\n\n(6) Normalization: z-score with train-channel stats [0.741, 0.533, 0.706] / [0.124, 0.177, 0.124]. The green channel's higher variance (0.177) is correctly identified and preserved. Minor wording: the rationale references an 'E channel' where 'G channel' (green) is intended — cosmetic typo, no functional impact.\n\n(7) Hyperparameter ranges (LR, weight decay, batch size, dropout, epochs, early-stopping patience) are within commonly reported ranges for small-image classification and are internally consistent across CNN and transformer entries.\n\n(8) Risk register is thorough: overfitting, class imbalance (1.63×), spatial resolution loss, channel asymmetry, transformer instability at 16 tokens, ResNet18 over-parameterization, augmentation domain shift, calibration gap. All are legitimate concerns for this task.\n\n(9) Evidence sources: 6 arXiv references provide traceability. The architectural choices and hyperparameter ranges are standard in the literature; no unsupported scientific inferences detected.\n\n(10) Carried-forward LLM issues (llm_model_digest null for qwen3.8/ollama; 'multi-label' vs 'multi-class' wording; truncated compact_conv_token_transformer proposal) are all non-functional, warning-level, and do not block this stage. The architecture research provides a complete, separate compact_transformer specification, so the truncated proposal does not create a gap.\n\nNo deterministic findings. No critical or blocking issues. Proceed to next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Minor typo in normalization rationale: 'E channel' should read 'G channel' (green); cosmetic only, no functional impact.",
+      "llm_model_digest remains null for qwen3.8 (ollama) across all LLM-assisted stages; exact model weights are not pinned, creating a traceability gap for full reproducibility of LLM-assisted decisions (warning-level, non-blocking).",
+      "compact_conv_token_transformer proposal description is truncated in the artefact record; the architecture research provides a complete separate compact_transformer specification, so this is non-blocking, but the truncated entry should be completed or formally retired for record hygiene."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "architecture_research"
+  },
+  "payload_sha256": "22c5bb6a3f46ed570bb4d69e668e34666fb7a48c7615a00338e8f9b93c85f89d",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 20,
+  "version": 1
+}

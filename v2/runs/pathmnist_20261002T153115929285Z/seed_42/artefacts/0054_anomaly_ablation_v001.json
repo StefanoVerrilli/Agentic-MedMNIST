@@ -1,0 +1,25 @@
+{
+  "artefact": "anomaly_ablation",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T15:59:06.803699+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "The ablation stage is internally consistent and methodologically sound. Verification: (1) All three scenarios share the common split fingerprint 9afc9ed3…c7505 and seed 42, confirming a fair same-split comparison. (2) The stepwise design correctly isolates normalization (unit→standardize: +12.9 pp accuracy) and then hflip on top of standardize (−0.8 pp), a reasonable decomposition of the representation pipeline. (3) Checkpoint SHA-256s, Lightning CSV paths, and training-log paths are all distinct per scenario. (4) The hflip augmentation is a built-in primitive requiring no extension approval. (5) The ablation's best scenario (standardize_hflip, 0.897772) is below the full-pipeline best (0.917549), consistent with the remaining ~2 pp attributable to brightness and contrast augmentations not tested in this ablation. (6) The slight negative delta from hflip (−0.8 pp vs standardize_only) is within single-seed variance and does not constitute a deterministic defect. No deterministic findings are present. Carried warnings from prior stages (OOD AUROC below chance, non-functional abstention, architecture coverage gap, llm_model_digest null, class-7 recall, validation-test gap) are already documented in the comparison, evaluation, and reporting stages and do not require new action here. The ablation report is a valid, traceable artefact and the pipeline may proceed.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Ablation does not isolate brightness or contrast contributions individually; the ~2 pp gap between standardize_hflip (0.8978) and the full pipeline (0.9175) is attributed jointly to both. Acceptable as a design choice but noted for completeness.",
+      "hflip shows a slight negative effect (−0.8 pp) relative to standardize_only under seed 42; with a single seed this is within expected variance and not a deterministic finding, but multi-seed confirmation would strengthen the conclusion.",
+      "Carried warnings remain: OOD AUROC 0.183 below chance, abstention non-functional (coverage=0.0), residual_cnn/resnet18 never evaluated, llm_model_digest null, class-7 recall 0.458, validation-to-test gap ~7.3 pp. All previously documented; no new action required at this stage."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "ablation"
+  },
+  "payload_sha256": "cea272e58ea5c6fde2cf3ab999170ab93354fbf2cb9978d41b005f12e3902665",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 54,
+  "version": 1
+}

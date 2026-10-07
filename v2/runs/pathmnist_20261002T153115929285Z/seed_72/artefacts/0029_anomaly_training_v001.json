@@ -1,0 +1,26 @@
+{
+  "artefact": "anomaly_training",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T16:24:54.356514+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Training stage is internally consistent and passes all integrity checks. Verification summary:\n\n(1) Dataset fidelity: 28×28×3 RGB, 9-class multi-class, splits 89,996 / 10,004 / 7,180 — consistent with standard MedMNIST PathMNIST. No resolution substitution. Data audit passed all 11 checks; train/val overlap = 0; test not inspected.\n\n(2) Architecture: tiny_cnn (CNN family) with depth=3, hidden=96. Transformer-specific fields present in config (num_heads, patch_size, pooling, positional_encoding, tokenizer_layers, mlp_ratio) are inert for CNN families per pipeline rules and do not constitute a hybrid. No ResNet18 topology concerns apply.\n\n(3) Augmentations: hflip, brightness, contrast — all built-in primitives; no extension approval required. approved_extensions list is empty, consistent.\n\n(4) Training dynamics: 15/15 epochs completed. Train loss decreased monotonically (0.569 → 0.305). Val accuracy rose to a peak of 0.988705 at epoch 13, with minor non-monotonic dips at epochs 7 and 12 (within normal variance). Cosine LR schedule from 0.001 to 0.0 verified across all 15 epochs. Early stopping (patience=3 on val_accuracy) did not trigger before max epochs; only 2 non-improving epochs (14, 15) followed the best (13), so running to epoch 15 is correct.\n\n(5) Configuration consistency: train_config matches best_configuration.train_config field-by-field. Selection rule is validation-only (test_metrics_used=false). Seed 72, optimizer AdamW, scheduler cosine, gradient clipping 1.0, label smoothing 0.05, class weighting enabled — all coherent.\n\n(6) Artefact integrity: checkpoint SHA-256 present (06d39fc2…); lightning config SHA-256 present (a92f38d0…); training log path and metrics CSV path recorded. No missing hashes.\n\n(7) Minor non-deterministic observations (warning-level, non-blocking): (a) llm_model_digest is null for qwen3.8 (ollama) across LLM-assisted stages — exact model weights unpinned, a traceability gap for full reproducibility of LLM-assisted decisions; (b) best_configuration.validation_accuracy (0.991004) differs slightly from train_result.best_val_accuracy (0.988705), attributable to run-to-run stochastic variance (augmentation randomization, init) between the replay selection run and the training run — within expected tolerance; (c) cosmetic typo 'E channel' → 'G channel' in architecture research; (d) 'multi-label' vs 'multi-class' wording inconsistency in ingestion comment; (e) compact_conv_token_transformer proposal description truncated (non-executable, pending review).\n\nNo deterministic findings. No blocking issues. Training converged to a strong validation accuracy (0.9887) with clean loss curves. Proceed to next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "llm_model_digest is null for qwen3.8 (ollama) across all LLM-assisted stages; exact model weights are not pinned, creating a traceability gap for full reproducibility of LLM-assisted decisions (warning-level, non-blocking).",
+      "best_configuration.validation_accuracy (0.991004) differs from train_result.best_val_accuracy (0.988705) by ~0.23 pp; attributable to stochastic variance between replay and training runs, within expected tolerance (informational).",
+      "Cosmetic: typo in architecture research ('E channel' should read 'G channel'); compact_conv_token_transformer proposal description is truncated in the artefact record (non-blocking, record hygiene).",
+      "Ingestion comment labels the task 'multi-label' but the dataset manifest and profiling confirm a single-label multi-class task; wording inconsistency only, no functional impact."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "training"
+  },
+  "payload_sha256": "68040dd3444cc4a4434722aa8f7fc8b43db974b7260528da090630d7543e602e",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 29,
+  "version": 1
+}

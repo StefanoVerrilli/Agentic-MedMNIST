@@ -1,0 +1,40 @@
+{
+  "artefact": "search_report",
+  "artefact_type": "SearchReport",
+  "created_at": "2026-10-02T15:48:03.768612+00:00",
+  "payload": {
+    "completed_trials": 8,
+    "failed_trials": 0,
+    "families_evaluated": [
+      "compact_transformer",
+      "tiny_cnn",
+      "vision_transformer"
+    ],
+    "missing_families": [
+      "residual_cnn",
+      "resnet18"
+    ],
+    "schema_version": "1.0",
+    "selected_candidate_id": "tiny_cnn_wide_d3",
+    "selected_config_hash": "c5c9da83046282417b572a9054cbe5b9b9eec13ac6550020df13a304ca863df5",
+    "selected_validation_accuracy": 0.991004,
+    "selected_validation_macro_f1": 0.990943,
+    "selection_rule": "highest_budget_accuracy_tolerance_then_macro_f1",
+    "test_metrics_used": false,
+    "trial_artefacts": [
+      "trial_compact_transformer_e1b215dc_e3_s001",
+      "trial_tiny_cnn_baseline_867a1b76_e3_s001",
+      "trial_vit_patch7_ablation_23167ca4_e3_s001",
+      "trial_tiny_cnn_baseline_867a1b76_e6_s001",
+      "trial_tiny_cnn_wide_d3_c5c9da83_e6_s001",
+      "trial_compact_tf_128_3l_adfe71dc_e6_s001",
+      "trial_tiny_cnn_wide_d3_c5c9da83_e15_s001",
+      "trial_tiny_cnn_baseline_867a1b76_e15_s001"
+    ]
+  },
+  "payload_sha256": "1b5c2f931366578af5c5e7cb0d2f6438fbdfe0afc67837f33bfdb9c6e0fb4f5c",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 34,
+  "version": 1
+}

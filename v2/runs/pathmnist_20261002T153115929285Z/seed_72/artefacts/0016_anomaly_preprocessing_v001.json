@@ -1,0 +1,25 @@
+{
+  "artefact": "anomaly_preprocessing",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-02T16:18:36.163303+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Preprocessing stage is clean and internally consistent. Key verifications: (1) Archive integrity confirmed — MD5 a8b0696529087d5bd730944a56c1 matches verified_archive_md5; SHA256 present. (2) Split sizes (train=89996, val=10004, test=7180) match official sizes exactly; no subsampling. (3) Image shape 28×28×3 RGB is consistent with the standard MedMNIST distribution. (4) 9-class multi-class task confirmed by dataset manifest; class proportions are nearly identical between train and val (imbalance ratio 1.63, modest). (5) No blank images, no duplicate train samples. (6) Representation plan is sound: 6 built-in augmentations (hflip, vflip, rotate90, rotate180, brightness, contrast) are all primitives that do not require extension approval; augmentation_factor 7 (original + 6 augmented) is consistent with augmented_train_size 629972 = 89996 × 7. (7) Normalization via per-channel z-score is well-justified given the differing channel means (0.74, 0.53, 0.71) and stds (0.124, 0.177, 0.124). (8) Test set originates from a different clinical center (OOD), appropriately flagged. (9) The two pending extension proposals (hflip_pathology_safe, compact_conv_token_transformer) are correctly in pending_review status and do not invalidate the built-in augmentation primitives already in use. (10) No deterministic findings. Minor non-blocking notes: (a) llm_model_digest is null for qwen3.8 across all LLM-assisted stages, creating a traceability gap for exact model-weight reproducibility; (b) the ingestion comment uses 'multi-label' while the manifest and profiling confirm 'multi-class' — a wording inconsistency with no functional impact; (c) the compact_conv_token_transformer description is slightly truncated in the prior-art artefact, leaving layer count implicit (non-blocking, proposal is non-executable). None of these issues warrant revision or stop. Proceed to the next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "llm_model_digest is null for qwen3.8 (ollama) across all LLM-assisted stages; exact model weights are not pinned, creating a traceability gap for full reproducibility of LLM-assisted decisions (non-functional, warning-level).",
+      "Ingestion comment labels the task 'multi-label' but the dataset manifest and profiling confirm a single-label multi-class task; wording inconsistency only, no functional impact.",
+      "compact_conv_token_transformer proposal description is truncated, leaving the exact transformer layer count implicit in the specification text (non-blocking; proposal is marked non-executable and pending review)."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8",
+    "stage": "preprocessing"
+  },
+  "payload_sha256": "307a236770042f444204cf4ab0813e808a733993d158a63b6008f92e6cb036da",
+  "producer": "reviewer",
+  "run_id": "seed_72",
+  "sequence": 16,
+  "version": 1
+}

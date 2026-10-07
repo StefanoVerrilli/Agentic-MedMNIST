@@ -1,0 +1,15 @@
+{"epoch": 1, "learning_rate": 0.0009890738, "train_loss": 0.611816, "val_accuracy": 0.845662, "val_loss": 0.647708, "val_macro_f1": 0.846602}
+{"epoch": 2, "learning_rate": 0.0009567727, "train_loss": 0.467396, "val_accuracy": 0.943922, "val_loss": 0.456493, "val_macro_f1": 0.941902}
+{"epoch": 3, "learning_rate": 0.0009045085, "train_loss": 0.425681, "val_accuracy": 0.958916, "val_loss": 0.419427, "val_macro_f1": 0.958843}
+{"epoch": 4, "learning_rate": 0.0008345653, "train_loss": 0.398291, "val_accuracy": 0.976809, "val_loss": 0.381325, "val_macro_f1": 0.976774}
+{"epoch": 5, "learning_rate": 0.00075, "train_loss": 0.381251, "val_accuracy": 0.97521, "val_loss": 0.37593, "val_macro_f1": 0.975439}
+{"epoch": 6, "learning_rate": 0.0006545085, "train_loss": 0.367372, "val_accuracy": 0.972011, "val_loss": 0.383901, "val_macro_f1": 0.971783}
+{"epoch": 7, "learning_rate": 0.0005522642, "train_loss": 0.356551, "val_accuracy": 0.978609, "val_loss": 0.360737, "val_macro_f1": 0.978711}
+{"epoch": 8, "learning_rate": 0.0004477358, "train_loss": 0.346969, "val_accuracy": 0.983107, "val_loss": 0.354716, "val_macro_f1": 0.983155}
+{"epoch": 9, "learning_rate": 0.0003454915, "train_loss": 0.339311, "val_accuracy": 0.985006, "val_loss": 0.346371, "val_macro_f1": 0.984767}
+{"epoch": 10, "learning_rate": 0.00025, "train_loss": 0.333938, "val_accuracy": 0.986106, "val_loss": 0.342404, "val_macro_f1": 0.986079}
+{"epoch": 11, "learning_rate": 0.0001654347, "train_loss": 0.32779, "val_accuracy": 0.985606, "val_loss": 0.341094, "val_macro_f1": 0.985473}
+{"epoch": 12, "learning_rate": 9.54915e-05, "train_loss": 0.323975, "val_accuracy": 0.988405, "val_loss": 0.332132, "val_macro_f1": 0.988474}
+{"epoch": 13, "learning_rate": 4.32273e-05, "train_loss": 0.320809, "val_accuracy": 0.989604, "val_loss": 0.330822, "val_macro_f1": 0.98961}
+{"epoch": 14, "learning_rate": 1.09262e-05, "train_loss": 0.318816, "val_accuracy": 0.989704, "val_loss": 0.33013, "val_macro_f1": 0.989673}
+{"epoch": 15, "learning_rate": 0.0, "train_loss": 0.317782, "val_accuracy": 0.990204, "val_loss": 0.328894, "val_macro_f1": 0.9902}

@@ -1,0 +1,36 @@
+{
+  "artefact": "representation_plan",
+  "artefact_type": "RepresentationPlan",
+  "created_at": "2026-10-02T15:33:56.949995+00:00",
+  "payload": {
+    "augmentation_factor": 7,
+    "augmentations": [
+      "hflip",
+      "vflip",
+      "rotate90",
+      "rotate180",
+      "brightness",
+      "contrast"
+    ],
+    "normalization": "standardize",
+    "rationale": "Standardization (z-score) is chosen over unit scaling because the three H&E channels exhibit meaningfully different means (0.74, 0.53, 0.71) and standard deviations (0.124, 0.177, 0.124). Centering each channel to zero mean and unit variance equalizes their contribution to the loss landscape, accelerates gradient-based convergence, and prevents the E channel (lower mean, higher variance) from dominating early training. For a 28x28x3 input feeding either a lightweight CNN backbone (3-5 conv blocks, per the MedMNIST design intent) or a compact convolutional-tokenized transformer (1-4M params, per the CCT hypothesis), standardized inputs reduce the risk of channel-wise scale mismatch that would otherwise require per-channel learnable gain/bias in the first layer. The moderate class imbalance (ratio 1.63, counts 7.8K-12.9K) further benefits from well-conditioned inputs, as the minority classes (e.g., 7,886 and 8,006 samples) rely on sharper gradient signals to learn discriminative features without being swamped by majority-class variance. All six approved augmentations are applied train-only: hflip, vflip, rotate90, and rotate180 provide geometric invariance (tissue morphology for type classification is orientation-agnostic, so no label is corrupted), effectively quadrupling the spatial training signal and reducing overfitting risk on the ~90K total samples. Brightness and contrast augmentations simulate the well-known inter-lab variability in H&E staining intensity and contrast, acting as a photometric regularizer that improves robustness without altering the semantic tissue-type label. Together, the six augmentations (4 geometric + 2 photometric) stay within the 8-item cap and cover the two primary sources of nuisance variation in pathology imaging—spatial orientation and staining protocol—while the standardization ensures the network sees a numerically well-scaled input regardless of the augmentation applied.",
+    "schema_version": "1.0",
+    "source": "qwen3.8",
+    "stats_source": "train",
+    "train_channel_mean_unit": [
+      0.740545,
+      0.53298219,
+      0.70582885
+    ],
+    "train_channel_std_unit": [
+      0.12368222,
+      0.17676253,
+      0.12443067
+    ]
+  },
+  "payload_sha256": "30a20570199015e579224cd110c55ec7cd557df12c6797045d5feeefd10f37c5",
+  "producer": "preprocessing",
+  "run_id": "seed_42",
+  "sequence": 14,
+  "version": 1
+}

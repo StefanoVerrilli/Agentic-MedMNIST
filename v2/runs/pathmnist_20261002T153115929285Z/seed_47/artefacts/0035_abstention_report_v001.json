@@ -1,0 +1,127 @@
+{
+  "artefact": "abstention_report",
+  "artefact_type": "AbstentionReport",
+  "created_at": "2026-10-02T16:09:41.638377+00:00",
+  "payload": {
+    "abstain_rate": 0.50585,
+    "accuracy_on_covered": 0.994081,
+    "base_test_accuracy": 0.925348,
+    "calibrated_on": "validation",
+    "corruption_seed": 1729,
+    "detector_status": "eligible",
+    "human_review_count": 3632,
+    "maximum_false_accept_rate": 0.2,
+    "method": "max_softmax",
+    "minimum_scenario_auroc": 0.65,
+    "ood_auroc": 0.794946,
+    "ood_corruption": "unit_scale_gaussian_noise_multi_severity",
+    "ood_evidence_path": "blobs/ood_probabilities_v001.npz",
+    "ood_evidence_sha256": "c62373f57498039360b001b1b15784d76fd324475628d050baa617564445c618",
+    "ood_pass": true,
+    "ood_scenarios": [
+      {
+        "corruption": "unit_scale_gaussian_noise_sigma_0.15",
+        "score": "max_softmax",
+        "test_auroc": 0.866988,
+        "test_false_accept_rate": 0.00403899721448468,
+        "validation_auroc": 0.974594,
+        "validation_false_accept_rate": 0.0016993202718912435
+      },
+      {
+        "corruption": "unit_scale_gaussian_noise_sigma_0.15",
+        "score": "predictive_entropy",
+        "test_auroc": 0.781917,
+        "test_false_accept_rate": 0.017688022284122563,
+        "validation_auroc": 0.953493,
+        "validation_false_accept_rate": 0.007197121151539384
+      },
+      {
+        "corruption": "unit_scale_gaussian_noise_sigma_0.25",
+        "score": "max_softmax",
+        "test_auroc": 0.793296,
+        "test_false_accept_rate": 0.042061281337047354,
+        "validation_auroc": 0.945891,
+        "validation_false_accept_rate": 0.029888044782087165
+      },
+      {
+        "corruption": "unit_scale_gaussian_noise_sigma_0.25",
+        "score": "predictive_entropy",
+        "test_auroc": 0.6555,
+        "test_false_accept_rate": 0.10348189415041782,
+        "validation_auroc": 0.892066,
+        "validation_false_accept_rate": 0.09266293482606958
+      },
+      {
+        "corruption": "unit_scale_gaussian_noise_sigma_0.4",
+        "score": "max_softmax",
+        "test_auroc": 0.724554,
+        "test_false_accept_rate": 0.11671309192200557,
+        "validation_auroc": 0.902919,
+        "validation_false_accept_rate": 0.11125549780087965
+      },
+      {
+        "corruption": "unit_scale_gaussian_noise_sigma_0.4",
+        "score": "predictive_entropy",
+        "test_auroc": 0.555282,
+        "test_false_accept_rate": 0.2545961002785515,
+        "validation_auroc": 0.813547,
+        "validation_false_accept_rate": 0.24500199920031987
+      }
+    ],
+    "ood_scope": "controlled_corruption_proxy",
+    "ood_validation_auroc": 0.941135,
+    "risk_coverage_curve": [
+      {
+        "target_validation_coverage": 0.5,
+        "test_coverage": 0.209192,
+        "test_risk": 0.002663,
+        "threshold": 0.95904493,
+        "validation_coverage": 0.5001,
+        "validation_risk": 0.0006
+      },
+      {
+        "target_validation_coverage": 0.6,
+        "test_coverage": 0.293175,
+        "test_risk": 0.00285,
+        "threshold": 0.95243561,
+        "validation_coverage": 0.60006,
+        "validation_risk": 0.000666
+      },
+      {
+        "target_validation_coverage": 0.7,
+        "test_coverage": 0.381337,
+        "test_risk": 0.004748,
+        "threshold": 0.94203269,
+        "validation_coverage": 0.70012,
+        "validation_risk": 0.000714
+      },
+      {
+        "target_validation_coverage": 0.8,
+        "test_coverage": 0.49415,
+        "test_risk": 0.005919,
+        "threshold": 0.92155516,
+        "validation_coverage": 0.80008,
+        "validation_risk": 0.000625
+      },
+      {
+        "target_validation_coverage": 0.9,
+        "test_coverage": 0.656825,
+        "test_risk": 0.01039,
+        "threshold": 0.85934997,
+        "validation_coverage": 0.90004,
+        "validation_risk": 0.001111
+      }
+    ],
+    "schema_version": "1.0",
+    "selective_risk": 0.005919,
+    "target_validation_coverage": 0.8,
+    "test_coverage": 0.49415,
+    "threshold": 0.9215551614761353,
+    "validation_coverage": 0.80008
+  },
+  "payload_sha256": "50442081e17f9a7e32f07cc5f35948f6a870b50e03712237d1663dcd31334070",
+  "producer": "abstention",
+  "run_id": "seed_47",
+  "sequence": 35,
+  "version": 1
+}

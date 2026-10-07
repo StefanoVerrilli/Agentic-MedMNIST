@@ -1,0 +1,33 @@
+{
+  "artefact": "representation_plan",
+  "artefact_type": "RepresentationPlan",
+  "created_at": "2026-10-02T15:48:03.759947+00:00",
+  "payload": {
+    "augmentation_factor": 4,
+    "augmentations": [
+      "hflip",
+      "brightness",
+      "contrast"
+    ],
+    "normalization": "standardize",
+    "rationale": "Refined tiny_cnn building on the best round-1 result (0.9762). Depth reduced to 3 (max valid for 28x28) to avoid over-downsampling while retaining 3 conv-pool stages. Hidden widened from 64 to 96 for ~50% more channel capacity without overfitting at 90K samples. Dropout relaxed to 0.15 since the wider channels provide implicit regularization. Added contrast augmentation alongside hflip+brightness for stronger photometric diversity. Patience increased to 3 (from 2) because the round-1 curve was still rising at epoch 3, indicating the model needs more epochs to converge. Cosine schedule with eta_min=0 ensures the LR decays smoothly over the 6-epoch budget. Class weighting retained for the 1.63x imbalance.",
+    "schema_version": "1.0",
+    "source": "agentic_search:selected:promotion:finalist",
+    "stats_source": "train",
+    "train_channel_mean_unit": [
+      0.740545,
+      0.53298219,
+      0.70582885
+    ],
+    "train_channel_std_unit": [
+      0.12368222,
+      0.17676253,
+      0.12443067
+    ]
+  },
+  "payload_sha256": "c0527274581ea2dc00f98b40a0ec9bbe4a4c50177c9b753df609f74e40ab170e",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 31,
+  "version": 2
+}
