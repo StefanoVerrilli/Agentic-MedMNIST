@@ -21,6 +21,15 @@ This run is agent_autonomous. YOU choose every active experimental parameter and
 all search actions. No allocated epoch ceiling, trial count or round count exists.
 Choose new_trial (complete experiment, explicit training options and initial epochs),
 continue_trial (existing candidate_id and positive additional_epochs), or finish_search.
+For new_trial, experiment is required; candidate_id and additional_epochs must be null.
+For continue_trial, experiment must be null. For finish_search, all three arguments
+must be null. Do not include fields belonging to another action.
+In experiment.training, explicitly supply every active optimizer and scheduler option:
+sgd requires momentum and nesterov; adam/adamw require adam_beta1, adam_beta2 and
+optimizer_eps. cosine requires cosine_eta_min; one_cycle requires one_cycle_pct_start;
+reduce_on_plateau requires plateau_factor and plateau_patience. scheduler='none'
+needs no scheduler-specific options. These choices are required even when you choose
+a value equal to a schema default. Select the values yourself; omit inactive options.
 Use validation only. Justify every choice and stop when further research is not useful.
 Experiments must support exact continuation. train(context) saves BOTH model.ckpt
 (best checkpoint) and resume.pt (latest state), both inside context['output']. context['epochs'] is the cumulative

@@ -8,7 +8,7 @@ import io
 import urllib.error
 from unittest.mock import patch
 
-from contracts import AmbiguityDecision, ExperimentDecision, LiteratureDecision
+from contracts import AmbiguityDecision, AutonomousTrainingOptions, ExperimentDecision, LiteratureDecision
 from llm import OllamaDecisionError, OllamaReasoner, _post_json
 
 SAFE_CONFIG = {
@@ -125,6 +125,8 @@ class OllamaReasonerTests(unittest.TestCase):
             if calls == 1:
                 return {"message": {"content": json.dumps({**SAFE_CONFIG, "hidden": 18})}}
             self.assertIn("validation errors", payload["messages"][-1]["content"])
+            self.assertEqual(payload["messages"][-2]["role"], "assistant")
+            self.assertEqual(json.loads(payload["messages"][-2]["content"])["hidden"], 18)
             return {"message": {"content": json.dumps(SAFE_CONFIG)}}
 
         reasoner = OllamaReasoner(
@@ -136,6 +138,64 @@ class OllamaReasonerTests(unittest.TestCase):
         )
         self.assertEqual(result.attempts, 2)
         self.assertFalse(result.used_fallback)
+
+    def test_truncated_response_has_stage_and_completion_diagnostics(self):
+        events = []
+        def transport(url, payload, timeout):
+            return {"message": {"content": '{"lr":', "thinking": "reasoning"},
+                    "done_reason": "length", "eval_count": 512}
+        reasoner = OllamaReasoner("http://localhost:11434", transport=transport,
+                                 retries=0, required=True, num_predict=512)
+        with self.assertRaisesRegex(OllamaDecisionError, "autonomous_search.action_1.*llm-num-predict"):
+            reasoner.decide(stage="autonomous_search.action_1", system="test", user="test",
+                response_model=ExperimentDecision, fallback=SAFE_CONFIG,
+                audit=lambda event, **kw: events.append(kw))
+        self.assertEqual(events[-1]["status"], "failed")
+        self.assertIsNone(events[-1]["decision"])
+        rejected = events[-1]["rejected_responses"][0]
+        self.assertEqual(rejected["done_reason"], "length")
+        self.assertEqual(rejected["completion_tokens"], 512)
+        self.assertTrue(rejected["has_thinking"])
+
+    def test_autonomous_training_repair_preserves_agent_selected_active_options(self):
+        valid = dict(lr=.002, weight_decay=.0001, class_weighting=False, optimizer="adamw",
+            scheduler="cosine", label_smoothing=0., early_stopping_patience=0,
+            early_stopping_monitor="val_accuracy", early_stopping_min_delta=0., gradient_clip_val=1.,
+            adam_beta1=.85, adam_beta2=.995, optimizer_eps=1e-7, cosine_eta_min=1e-6)
+        incomplete = {key: value for key, value in valid.items()
+                      if key not in {"adam_beta1", "adam_beta2", "optimizer_eps", "cosine_eta_min"}}
+        calls = 0
+        def transport(url, payload, timeout):
+            nonlocal calls
+            calls += 1
+            if calls == 1:
+                return {"message": {"content": json.dumps(incomplete)}}
+            self.assertEqual(json.loads(payload["messages"][-2]["content"]), incomplete)
+            self.assertIn("cosine_eta_min", payload["messages"][-1]["content"])
+            self.assertIn("adam_beta1", payload["messages"][-1]["content"])
+            return {"message": {"content": json.dumps(valid)}}
+        reasoner = OllamaReasoner("http://localhost:11434", retries=1, required=True, transport=transport)
+        result = reasoner.decide(stage="autonomous_search.action_1", system="test", user="test",
+            response_model=AutonomousTrainingOptions, fallback=valid)
+        self.assertFalse(result.used_fallback)
+        self.assertEqual(result.value.adam_beta1, .85)
+        self.assertEqual(result.value.cosine_eta_min, 1e-6)
+
+    def test_empty_thinking_response_cannot_be_used_as_a_decision(self):
+        reasoner = OllamaReasoner("http://localhost:11434", retries=0, required=True,
+            transport=lambda *args: {"message": {"content": "", "thinking": "unfinished"}})
+        with self.assertRaisesRegex(OllamaDecisionError, "no JSON message content"):
+            reasoner.decide(stage="test", system="test", user="test",
+                response_model=ExperimentDecision, fallback=SAFE_CONFIG)
+
+    def test_timeout_diagnostic_explains_configured_request_limit(self):
+        def transport(*args):
+            raise TimeoutError("timed out")
+        reasoner = OllamaReasoner("http://localhost:11434", retries=0, required=True,
+                                 timeout=90, transport=transport)
+        with self.assertRaisesRegex(OllamaDecisionError, "timeout=90s.*llm-timeout"):
+            reasoner.decide(stage="test", system="test", user="test",
+                response_model=ExperimentDecision, fallback=SAFE_CONFIG)
 
     def test_required_mode_raises_after_invalid_response(self) -> None:
         def transport(url, payload, timeout):

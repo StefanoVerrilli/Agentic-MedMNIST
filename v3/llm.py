@@ -166,9 +166,12 @@ class OllamaReasoner:
 
         errors: list[str] = []
         error_details: list[str] = []
+        rejected_responses: list[dict[str, Any]] = []
         format_negotiation: list[str] = []
         for attempt in range(1, self.retries + 2):
             started = time.monotonic()
+            response = None
+            content = None
             try:
                 with _GLOBAL_OLLAMA_LOCK:
                     try:
@@ -187,6 +190,8 @@ class OllamaReasoner:
                             f"{self.base_url}/api/chat", payload, self.timeout
                         )
                 content = response["message"]["content"]
+                if not isinstance(content, str) or not content.strip():
+                    raise ValueError("Ollama returned no JSON message content")
                 parsed = json.loads(content)
                 decision = response_model.model_validate(parsed)
                 _audit(
@@ -218,8 +223,27 @@ class OllamaReasoner:
                     )
                 else:
                     detail = _error_detail(exc)
+                if isinstance(exc, TimeoutError):
+                    detail += f" (request timeout={self.timeout}s; increase --llm-timeout for slow generation)"
+                if isinstance(response, dict):
+                    rejected_responses.append({
+                        "attempt": attempt,
+                        "done_reason": response.get("done_reason"),
+                        "completion_tokens": response.get("eval_count"),
+                        "content_preview": content[:4000] if isinstance(content, str) else None,
+                        "content_length": len(content) if isinstance(content, str) else None,
+                        "has_thinking": bool(response.get("message", {}).get("thinking"))
+                            if isinstance(response.get("message"), dict) else False,
+                    })
+                    if response.get("done_reason") == "length":
+                        detail += (f" (generation reached num_predict={self.num_predict}; "
+                                   "the response may be truncated; increase --llm-num-predict)")
+                    if response.get("error"):
+                        detail += f" (server error: {str(response['error'])[:4000]})"
                 error_details.append(detail)
                 if attempt <= self.retries and isinstance(exc, (KeyError, TypeError, ValueError)):
+                    if isinstance(content, str) and content.strip():
+                        messages.append({"role": "assistant", "content": content})
                     messages.append(
                         {
                             "role": "user",
@@ -243,6 +267,9 @@ class OllamaReasoner:
             request_id=request_id,
             error_types=error_summary,
             error_details=error_details,
+            rejected_responses=rejected_responses,
+            timeout_seconds=self.timeout,
+            num_predict=self.num_predict,
             output_format="json" if payload["format"] == "json" else "json_schema",
             format_negotiation=format_negotiation,
             decision=(
@@ -251,9 +278,10 @@ class OllamaReasoner:
         )
         if self.required:
             raise OllamaDecisionError(
-                f"Ollama returned no valid {response_model.__name__} after "
+                f"Ollama stage {stage} returned no valid {response_model.__name__} after "
                 f"{self.retries + 1} attempts ({error_summary}): "
-                f"{error_details[-1] if error_details else 'unknown validation error'}"
+                f"{error_details[-1] if error_details else 'unknown validation error'}. "
+                f"See llm_decision in decision_log.jsonl (request_id={request_id})."
             )
         return ReasonedDecision(
             validated_fallback,

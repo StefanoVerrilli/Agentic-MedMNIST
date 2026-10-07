@@ -151,6 +151,12 @@ def build_parser() -> argparse.ArgumentParser:
         default=int(os.environ.get("AGENTIC_LLM_RETRIES", "1")),
     )
     parser.add_argument(
+        "--llm-num-predict",
+        type=int,
+        default=int(os.environ.get("AGENTIC_LLM_NUM_PREDICT", "16384")),
+        help="maximum output tokens per Ollama decision (not a training epoch budget)",
+    )
+    parser.add_argument(
         "--keep-alive",
         default=os.environ.get("AGENTIC_LLM_KEEP_ALIVE", "5m"),
     )
@@ -349,6 +355,7 @@ def run_once(
         required=args.require_llm or args.execution_mode == "agent_autonomous",
         keep_alive=args.keep_alive,
         seed=seed,
+        num_predict=args.llm_num_predict,
     )
     reasoner = CachedReasoner(reasoner, bb.root,
                               replay_root=Path(args.replay_run) if args.replay_run else None)
@@ -703,6 +710,8 @@ def validate_args(args: argparse.Namespace) -> None:
         raise ValueError("--llm-retries cannot be negative")
     if args.llm_timeout <= 0:
         raise ValueError("--llm-timeout must be positive")
+    if args.llm_num_predict < 512:
+        raise ValueError("--llm-num-predict must be at least 512")
     if not 0.0 < args.target_coverage <= 1.0:
         raise ValueError("--target-coverage must be in (0, 1]")
     if not 0.5 <= args.ood_min_auroc <= 1.0:

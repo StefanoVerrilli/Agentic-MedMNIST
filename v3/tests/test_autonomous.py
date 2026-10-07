@@ -89,6 +89,17 @@ class AutonomousTests(unittest.TestCase):
             with self.subTest(flag=flag), self.assertRaises(ValueError):
                 validate_args(build_parser().parse_args([*base, flag]))
 
+    def test_llm_output_budget_is_configurable_independently_of_epochs(self):
+        from run import build_parser, validate_args
+        base = ["--execution-mode", "agent_autonomous", "--ollama-base", "http://localhost:11434"]
+        with patch.dict("os.environ", {"AGENTIC_LLM_NUM_PREDICT": "32768"}):
+            args = build_parser().parse_args(base)
+        validate_args(args)
+        self.assertEqual(args.llm_num_predict, 32768)
+        self.assertIsNone(args.max_epochs)
+        with self.assertRaisesRegex(ValueError, "llm-num-predict"):
+            validate_args(build_parser().parse_args([*base, "--llm-num-predict", "0"]))
+
     def test_code_only_pipeline_double_skips_baseline_freezes_and_replays(self):
         from agents import IngestionAgent
         from governance import read_artefact

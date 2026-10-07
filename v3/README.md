@@ -27,6 +27,14 @@ Non sono accettati `--max-epochs`, `--search-epochs`, `--search-trials`,
 Non esiste un tetto fisso di 1000 epoche. Ollama è obbligatorio: decisioni
 non valide interrompono la run dopo i tentativi previsti, senza fallback euristici.
 
+Se una decisione viene rifiutata, Ollama riceve sia la risposta precedente sia gli
+errori di validazione per correggerla. `decision_log.jsonl` registra la causa,
+l'identificativo della richiesta e un estratto della risposta rifiutata.
+Per generazioni lente si configura `--llm-timeout` (default 90 secondi). Se Ollama
+segnala `done_reason=length`, si aumenta `--llm-num-predict` (default 16384 token,
+anche tramite `AGENTIC_LLM_NUM_PREDICT`). Sono limiti delle chiamate LLM;
+le epoche di training restano scelte dagli agenti.
+
 Split ufficiali, metriche, seed e protocollo di valutazione restano gestiti dal
 framework. La ricerca vede solo training e validation; il test viene utilizzato
 dopo il congelamento del vincitore. La baseline è omessa nella modalità autonoma.
