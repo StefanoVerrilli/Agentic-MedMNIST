@@ -26,7 +26,10 @@ For continue_trial, experiment must be null. For finish_search, all three argume
 must be null. Do not include fields belonging to another action.
 In experiment.training, explicitly supply every active optimizer and scheduler option:
 sgd requires momentum and nesterov; adam/adamw require adam_beta1, adam_beta2 and
-optimizer_eps. cosine requires cosine_eta_min; one_cycle requires one_cycle_pct_start;
+optimizer_eps.
+optimizer_eps must be between 1e-12 and 0.01 inclusive (for example 1e-8);
+it is the numerical stability epsilon, not the learning rate or an Adam beta.
+cosine requires cosine_eta_min; one_cycle requires one_cycle_pct_start;
 reduce_on_plateau requires plateau_factor and plateau_patience. scheduler='none'
 needs no scheduler-specific options. These choices are required even when you choose
 a value equal to a schema default. Select the values yourself; omit inactive options.

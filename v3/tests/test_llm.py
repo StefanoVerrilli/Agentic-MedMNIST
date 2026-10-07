@@ -8,7 +8,8 @@ import io
 import urllib.error
 from unittest.mock import patch
 
-from contracts import AmbiguityDecision, AutonomousTrainingOptions, ExperimentDecision, LiteratureDecision
+from contracts import (AmbiguityDecision, AutonomousSearchDecision, AutonomousTrainingOptions,
+                       ExperimentDecision, LiteratureDecision)
 from llm import OllamaDecisionError, OllamaReasoner, _post_json
 
 SAFE_CONFIG = {
@@ -23,6 +24,74 @@ SAFE_CONFIG = {
 
 
 class OllamaReasonerTests(unittest.TestCase):
+    def test_timeout_does_not_consume_autonomous_validation_repair(self):
+        training = dict(lr=.002, weight_decay=.0001, class_weighting=False,
+            optimizer="adamw", scheduler="none", label_smoothing=0.,
+            early_stopping_patience=0, early_stopping_monitor="val_accuracy",
+            early_stopping_min_delta=0., gradient_clip_val=1.,
+            adam_beta1=.85, adam_beta2=.995, optimizer_eps=1e-7)
+        valid = dict(action="new_trial", rationale="Test a compact model",
+            experiment=dict(bundle_id="compact_experiment", hypothesis="Test a compact model",
+                files=[dict(path="experiment.py", code="def build_model(context):\n    pass\n")],
+                parameters={}, epochs=2, batch_size=64, training=training))
+        invalid = json.loads(json.dumps(valid))
+        invalid["experiment"]["training"]["optimizer_eps"] = .1
+        calls, events = [], []
+
+        def transport(url, payload, timeout):
+            calls.append(len(payload["messages"]))
+            if len(calls) == 1:
+                raise TimeoutError("timed out")
+            if len(calls) == 2:
+                return {"message": {"content": json.dumps(invalid)}}
+            self.assertEqual(json.loads(payload["messages"][-2]["content"]), invalid)
+            self.assertIn("experiment.training.optimizer_eps", payload["messages"][-1]["content"])
+            return {"message": {"content": json.dumps(valid)}}
+
+        reasoner = OllamaReasoner("http://localhost:11434", transport=transport,
+                                 retries=1, required=True)
+        result = reasoner.decide(stage="autonomous_search.action_1", system="test", user="test",
+            response_model=AutonomousSearchDecision,
+            fallback=dict(action="finish_search", rationale="No fallback permitted"),
+            audit=lambda event, **kw: events.append(kw))
+        self.assertFalse(result.used_fallback)
+        self.assertEqual(result.attempts, 3)
+        self.assertEqual(result.value.experiment.training.optimizer_eps, 1e-7)
+        self.assertEqual(result.value.experiment.training.adam_beta1, .85)
+        self.assertEqual(calls, [2, 2, 4])
+        self.assertEqual(events[-1]["attempts"], 3)
+
+    def test_mixed_failures_remain_bounded_and_report_actual_attempts(self):
+        for required in (True, False):
+            for failures in (("timeout", "invalid", "timeout"),
+                             ("invalid", "timeout", "invalid"),
+                             ("timeout", "timeout")):
+                with self.subTest(required=required, failures=failures):
+                    calls, events = [], []
+
+                    def transport(*args):
+                        failure = failures[len(calls)]
+                        calls.append(failure)
+                        if failure == "timeout":
+                            raise TimeoutError("timed out")
+                        return {"message": {"content": json.dumps({**SAFE_CONFIG, "lr": -1})}}
+
+                    reasoner = OllamaReasoner("http://localhost:11434", transport=transport,
+                                             retries=1, required=required)
+                    kwargs = dict(stage="test", system="test", user="test",
+                        response_model=ExperimentDecision, fallback=SAFE_CONFIG,
+                        audit=lambda event, **kw: events.append(kw))
+                    if required:
+                        with self.assertRaisesRegex(OllamaDecisionError, f"after {len(failures)} attempts"):
+                            reasoner.decide(**kwargs)
+                        self.assertIsNone(events[-1]["decision"])
+                    else:
+                        result = reasoner.decide(**kwargs)
+                        self.assertTrue(result.used_fallback)
+                        self.assertEqual(result.attempts, len(failures))
+                    self.assertEqual(calls, list(failures))
+                    self.assertEqual(events[-1]["attempts"], len(failures))
+
     def test_schema_http_400_retries_json_mode_with_full_literature_validation(self):
         valid = {"ideas": [{"idea_id": "compact_model", "target": "architecture",
                  "hypothesis": "Compare compact architectures under equal budgets.",

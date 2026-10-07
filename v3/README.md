@@ -30,6 +30,11 @@ non valide interrompono la run dopo i tentativi previsti, senza fallback euristi
 Se una decisione viene rifiutata, Ollama riceve sia la risposta precedente sia gli
 errori di validazione per correggerla. `decision_log.jsonl` registra la causa,
 l'identificativo della richiesta e un estratto della risposta rifiutata.
+`--llm-retries` assegna tentativi aggiuntivi separati agli errori di trasporto
+e alle risposte non valide: un timeout non consuma la possibilità di correggere
+il JSON. Con il default di 1 retry si effettuano al massimo 3 chiamate logiche
+per decisione. La validazione resta obbligatoria, incluso `optimizer_eps`
+nell'intervallo da `1e-12` a `0.01`.
 Per generazioni lente si configura `--llm-timeout` (default 90 secondi). Se Ollama
 segnala `done_reason=length`, si aumenta `--llm-num-predict` (default 16384 token,
 anche tramite `AGENTIC_LLM_NUM_PREDICT`). Sono limiti delle chiamate LLM;

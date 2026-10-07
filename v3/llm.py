@@ -168,7 +168,12 @@ class OllamaReasoner:
         error_details: list[str] = []
         rejected_responses: list[dict[str, Any]] = []
         format_negotiation: list[str] = []
-        for attempt in range(1, self.retries + 2):
+        # A transport failure produces no decision to repair. Keep its retry
+        # budget separate so a timeout cannot consume JSON correction attempts.
+        transport_failures = validation_failures = 0
+        attempt = 0
+        while True:
+            attempt += 1
             started = time.monotonic()
             response = None
             content = None
@@ -241,7 +246,13 @@ class OllamaReasoner:
                     if response.get("error"):
                         detail += f" (server error: {str(response['error'])[:4000]})"
                 error_details.append(detail)
-                if attempt <= self.retries and isinstance(exc, (KeyError, TypeError, ValueError)):
+                if isinstance(exc, OSError):
+                    transport_failures += 1
+                    retry = transport_failures <= self.retries
+                else:
+                    validation_failures += 1
+                    retry = validation_failures <= self.retries
+                if retry and not isinstance(exc, OSError):
                     if isinstance(content, str) and content.strip():
                         messages.append({"role": "assistant", "content": content})
                     messages.append(
@@ -254,6 +265,8 @@ class OllamaReasoner:
                             ),
                         }
                     )
+                if not retry:
+                    break
 
         error_summary = ",".join(errors)
         _audit(
@@ -263,7 +276,7 @@ class OllamaReasoner:
             schema=response_model.__name__,
             status="fallback" if not self.required else "failed",
             source="heuristic:fallback",
-            attempts=self.retries + 1,
+            attempts=attempt,
             request_id=request_id,
             error_types=error_summary,
             error_details=error_details,
@@ -279,7 +292,7 @@ class OllamaReasoner:
         if self.required:
             raise OllamaDecisionError(
                 f"Ollama stage {stage} returned no valid {response_model.__name__} after "
-                f"{self.retries + 1} attempts ({error_summary}): "
+                f"{attempt} attempts ({error_summary}): "
                 f"{error_details[-1] if error_details else 'unknown validation error'}. "
                 f"See llm_decision in decision_log.jsonl (request_id={request_id})."
             )
@@ -287,7 +300,7 @@ class OllamaReasoner:
             validated_fallback,
             f"heuristic:fallback:{errors[-1] if errors else 'unknown'}",
             True,
-            self.retries + 1,
+            attempt,
             request_id,
         )
 
