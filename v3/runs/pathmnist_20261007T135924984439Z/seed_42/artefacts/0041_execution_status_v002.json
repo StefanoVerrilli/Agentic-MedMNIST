@@ -1,0 +1,15 @@
+{
+  "artefact": "execution_status",
+  "artefact_type": "ExecutionState",
+  "created_at": "2026-10-07T17:18:24.157057+00:00",
+  "payload": {
+    "schema_version": "1.0",
+    "stage": "model_search",
+    "status": "failed:model_search"
+  },
+  "payload_sha256": "65b32604ecdf1672dfb2bcb4b260f5f5e11ccc33ae57f083558427c7423ac44a",
+  "producer": "orchestrator",
+  "run_id": "seed_42",
+  "sequence": 41,
+  "version": 2
+}

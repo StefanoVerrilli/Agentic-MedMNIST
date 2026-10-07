@@ -1,0 +1,313 @@
+{
+  "artefact": "trial_0006",
+  "artefact_type": "TrialResult",
+  "created_at": "2026-10-07T17:16:49.492158+00:00",
+  "payload": {
+    "best_epoch": 15,
+    "candidate_id": "autonomous_t0006",
+    "checkpoint_path": "blobs/search/autonomous_t0006_s0006.ckpt",
+    "checkpoint_sha256": "bf461f91f40b6f667e1659fe0f895dae762d70d28d249f0b1a6774fef6d2d0a0",
+    "config": {
+      "adam_beta1": 0.9,
+      "adam_beta2": 0.999,
+      "batch_size": 256,
+      "channel_cap": 256,
+      "class_weighting": true,
+      "cosine_eta_min": 0.0,
+      "depth": 2,
+      "device": "cuda",
+      "dropout": 0.0,
+      "early_stopping_min_delta": 0.001,
+      "early_stopping_monitor": "val_accuracy",
+      "early_stopping_patience": 10,
+      "epochs": 50,
+      "execution_mode": "agent_autonomous",
+      "generated_bundle": {
+        "bundle_id": "resnet18_tuned_pathmnist",
+        "parameters": {
+          "depth": 1,
+          "dropout": 0.3,
+          "hidden": 64
+        },
+        "path": "generated/resnet18_tuned_pathmnist/v001/manifest.json",
+        "sha256": "e1c69c5293fd5ce90b74fbc4f5267f7385941916fd4cd7815e73212ac6e34d06",
+        "version": 1
+      },
+      "gradient_clip_val": 1.0,
+      "hidden": 64,
+      "label_smoothing": 0.05,
+      "lr": 0.0003,
+      "mlp_ratio": 4,
+      "model_family": "run_generated",
+      "momentum": 0.9,
+      "nesterov": true,
+      "num_heads": 4,
+      "one_cycle_pct_start": 0.1,
+      "optimizer": "adamw",
+      "optimizer_eps": 1e-08,
+      "patch_size": 4,
+      "plateau_factor": 0.5,
+      "plateau_patience": 1,
+      "pooling": "cls",
+      "positional_encoding": "learned",
+      "rationale": "Reducing label smoothing (0.1→0.05) and weight decay (0.01→0.005) while lowering LR (5e-4→3e-4) will improve validation accuracy by ~0.1-0.3% over t0004's 99.62%. Rationale: (1) Label smoothing of 0.1 forces the model to assign ~1.1% probability to every class, which is excessive for 9 classes where most are visually distinct at 28x28; reducing to 0.05 allows sharper decision boundaries on the clearly separable classes (epithelium, lymphocytes, adipose) while class_weighting still protects the minority classes. (2) Weight decay of 0.01 with AdamW is relatively strong for a 90k-sample dataset; 0.005 reduces the regularization pressure, allowing the model to fit the subtle texture differences that distinguish confusable pairs (smooth muscle vs stroma, background vs debris). (3) The lower LR (3e-4) combined with cosine decay over 50 epochs provides a longer fine-tuning phase where the model can settle into a sharper minimum, as evidenced by t0004's continued improvement from epoch 15→29.",
+      "scales": [
+        2,
+        4,
+        7
+      ],
+      "scheduler": "cosine",
+      "schema_version": "1.0",
+      "seed": 42,
+      "segment_targets": [],
+      "source": "qwen3.8:latest",
+      "tokenizer_layers": 2,
+      "weight_decay": 0.005,
+      "worker": {
+        "max_bundles": 32,
+        "timeout_seconds": 3600
+      }
+    },
+    "config_hash": "9917e3d4975d5a0c3e41ebd5c963de5d8289e07a6f2ef014adfba0b2ec18510f",
+    "decision_source": "qwen3.8:latest",
+    "duration_seconds": 2004.9317600220002,
+    "epoch_budget": null,
+    "epochs_completed": 25,
+    "error": null,
+    "failed_operation": null,
+    "failure_kind": null,
+    "failure_signature": null,
+    "learning_curve": [
+      {
+        "epoch": 1,
+        "learning_rate": 0.0003,
+        "train_loss": 0.46356329677347813,
+        "val_accuracy": 0.958617,
+        "val_loss": 0.1636614203453064,
+        "val_macro_f1": 0.959593
+      },
+      {
+        "epoch": 2,
+        "learning_rate": 0.0002997040092642407,
+        "train_loss": 0.34167937346945115,
+        "val_accuracy": 0.982207,
+        "val_loss": 0.09364531189203262,
+        "val_macro_f1": 0.982302
+      },
+      {
+        "epoch": 3,
+        "learning_rate": 0.0002988172051971717,
+        "train_loss": 0.3183276700960492,
+        "val_accuracy": 0.983207,
+        "val_loss": 0.09717947244644165,
+        "val_macro_f1": 0.982992
+      },
+      {
+        "epoch": 4,
+        "learning_rate": 0.0002973430876093033,
+        "train_loss": 0.3079141672751097,
+        "val_accuracy": 0.976309,
+        "val_loss": 0.10940078645944595,
+        "val_macro_f1": 0.976733
+      },
+      {
+        "epoch": 5,
+        "learning_rate": 0.00029528747416929463,
+        "train_loss": 0.30163690851187847,
+        "val_accuracy": 0.988405,
+        "val_loss": 0.0805603563785553,
+        "val_macro_f1": 0.988587
+      },
+      {
+        "epoch": 6,
+        "learning_rate": 0.00029265847744427303,
+        "train_loss": 0.2972943191572055,
+        "val_accuracy": 0.988305,
+        "val_loss": 0.07855542749166489,
+        "val_macro_f1": 0.988268
+      },
+      {
+        "epoch": 7,
+        "learning_rate": 0.0002894664728832377,
+        "train_loss": 0.2945081455092191,
+        "val_accuracy": 0.987405,
+        "val_loss": 0.08132720738649368,
+        "val_macro_f1": 0.987501
+      },
+      {
+        "epoch": 8,
+        "learning_rate": 0.000285724057869903,
+        "train_loss": 0.2924154023424284,
+        "val_accuracy": 0.992503,
+        "val_loss": 0.06886836141347885,
+        "val_macro_f1": 0.992481
+      },
+      {
+        "epoch": 9,
+        "learning_rate": 0.00028144600200657956,
+        "train_loss": 0.2903058310379807,
+        "val_accuracy": 0.988605,
+        "val_loss": 0.07786344736814499,
+        "val_macro_f1": 0.988527
+      },
+      {
+        "epoch": 10,
+        "learning_rate": 0.0002766491888253023,
+        "train_loss": 0.2893079975534463,
+        "val_accuracy": 0.993603,
+        "val_loss": 0.06466244161128998,
+        "val_macro_f1": 0.993558
+      },
+      {
+        "epoch": 11,
+        "learning_rate": 0.00027135254915624217,
+        "train_loss": 0.2883351805252607,
+        "val_accuracy": 0.990004,
+        "val_loss": 0.07000405341386795,
+        "val_macro_f1": 0.989821
+      },
+      {
+        "epoch": 12,
+        "learning_rate": 0.0002655769864163684,
+        "train_loss": 0.28737425040748515,
+        "val_accuracy": 0.992703,
+        "val_loss": 0.06838035583496094,
+        "val_macro_f1": 0.99276
+      },
+      {
+        "epoch": 13,
+        "learning_rate": 0.0002593452941132117,
+        "train_loss": 0.286728680603298,
+        "val_accuracy": 0.993603,
+        "val_loss": 0.06621799618005753,
+        "val_macro_f1": 0.993615
+      },
+      {
+        "epoch": 14,
+        "learning_rate": 0.0002526820658893033,
+        "train_loss": 0.2860046274438288,
+        "val_accuracy": 0.993303,
+        "val_loss": 0.0667148306965828,
+        "val_macro_f1": 0.993169
+      },
+      {
+        "epoch": 15,
+        "learning_rate": 0.0002456135984623034,
+        "train_loss": 0.28554582281798835,
+        "val_accuracy": 0.995202,
+        "val_loss": 0.06225457042455673,
+        "val_macro_f1": 0.995093
+      },
+      {
+        "epoch": 16,
+        "learning_rate": 0.00023816778784387096,
+        "train_loss": 0.28515882084820826,
+        "val_accuracy": 0.991803,
+        "val_loss": 0.06947894394397736,
+        "val_macro_f1": 0.991744
+      },
+      {
+        "epoch": 17,
+        "learning_rate": 0.00023037401924684944,
+        "train_loss": 0.28488441914000007,
+        "val_accuracy": 0.994002,
+        "val_loss": 0.06467686593532562,
+        "val_macro_f1": 0.993923
+      },
+      {
+        "epoch": 18,
+        "learning_rate": 0.00022226305111525726,
+        "train_loss": 0.2843482736691013,
+        "val_accuracy": 0.994402,
+        "val_loss": 0.06384747475385666,
+        "val_macro_f1": 0.994198
+      },
+      {
+        "epoch": 19,
+        "learning_rate": 0.00021386689373476087,
+        "train_loss": 0.28399980857785817,
+        "val_accuracy": 0.994602,
+        "val_loss": 0.06463392078876495,
+        "val_macro_f1": 0.99451
+      },
+      {
+        "epoch": 20,
+        "learning_rate": 0.00020521868290270169,
+        "train_loss": 0.28390845312678487,
+        "val_accuracy": 0.994402,
+        "val_loss": 0.06283120810985565,
+        "val_macro_f1": 0.994281
+      },
+      {
+        "epoch": 21,
+        "learning_rate": 0.00019635254915624208,
+        "train_loss": 0.2833607030702202,
+        "val_accuracy": 0.995102,
+        "val_loss": 0.061145663261413574,
+        "val_macro_f1": 0.995104
+      },
+      {
+        "epoch": 22,
+        "learning_rate": 0.00018730348307472816,
+        "train_loss": 0.28338558959421106,
+        "val_accuracy": 0.994502,
+        "val_loss": 0.06594693660736084,
+        "val_macro_f1": 0.994499
+      },
+      {
+        "epoch": 23,
+        "learning_rate": 0.00017810719718785867,
+        "train_loss": 0.28311286679147907,
+        "val_accuracy": 0.995602,
+        "val_loss": 0.062264200299978256,
+        "val_macro_f1": 0.99548
+      },
+      {
+        "epoch": 24,
+        "learning_rate": 0.00016879998503464564,
+        "train_loss": 0.28284918278620175,
+        "val_accuracy": 0.995002,
+        "val_loss": 0.060147374868392944,
+        "val_macro_f1": 0.994905
+      },
+      {
+        "epoch": 25,
+        "learning_rate": 0.000159418577929397,
+        "train_loss": 0.2826615883140921,
+        "val_accuracy": 0.995802,
+        "val_loss": 0.06220916286110878,
+        "val_macro_f1": 0.995739
+      }
+    ],
+    "lightning_csv_path": null,
+    "parent_candidate_id": null,
+    "representation": {
+      "augmentations": [
+        "hflip",
+        "vflip",
+        "rotate90",
+        "rotate180",
+        "brightness",
+        "contrast"
+      ],
+      "normalization": "standardize",
+      "rationale": "Standardization (zero-mean, unit-variance) is selected over unit-range scaling because the downstream architecture is a compact transformer operating on 16 patch tokens (7x7 non-overlapping patches on 28x28 RGB). Transformers are notably more sensitive to input magnitude than CNNs; centering each channel to zero mean and scaling to unit variance stabilizes attention logits and gradient flow, especially given the small per-channel stds (0.124, 0.177, 0.124) which would otherwise produce near-constant inputs after unit scaling. The channel means (0.741, 0.533, 0.706) confirm the data is already in [0,1], so standardization adds the critical centering step without distorting relative channel relationships in H&E staining. All six approved augmentations are applied train-only: hflip, vflip, rotate90, and rotate180 are orientation-safe for tissue-type labels (tissue morphology is rotation/flip invariant at the classification level), while brightness and contrast simulate inter-lab staining variability without altering structural content. This augmentation set maximizes effective training diversity on ~90k samples with mild class imbalance (1.63:1) without introducing geometric distortions that could confuse nuclear/cytoplasmic texture cues critical for distinguishing the 9 tissue classes."
+    },
+    "requested_epochs": 50,
+    "resume_path": "blobs/search/autonomous_t0006_s0006.resume.pt",
+    "resume_sha256": "abfd0a27480ed2afc98b083464e9abece101e1cc71b269f40ef44c1bf4e4e71a",
+    "round_index": 6,
+    "schema_version": "1.0",
+    "status": "completed",
+    "stop_reason": "early_stopping",
+    "training_log_path": "blobs/search/autonomous_t0006_s0006.training.jsonl",
+    "validation_accuracy": 0.995202,
+    "validation_balanced_accuracy": 0.995169,
+    "validation_macro_f1": 0.995093
+  },
+  "payload_sha256": "fe0ff84a4855e0f410ac43a37c3ccfd3a504e8d371ac5cc82e720cb7fa6cc521",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 40,
+  "version": 1
+}

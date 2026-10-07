@@ -1,0 +1,39 @@
+{
+  "artefact": "generated_ms_transformer_pathmnist",
+  "artefact_type": "GeneratedBundle",
+  "created_at": "2026-10-07T14:33:09.595419+00:00",
+  "payload": {
+    "author": "experimental_development",
+    "files": {
+      "experiment.py": "200317d7611f4ccc4803a5de0329eafcc3b805cb17bb426c2be65e67b3169eeb"
+    },
+    "hypothesis": "Multi-scale joint attention (scales 2/4/7) captures both fine nuclear morphology and coarse tissue architecture simultaneously, better resolving confusable histopathology classes (background/debris/mucus, smooth muscle/stroma) than a single-scale CNN. The 196-token scale-2 branch provides sub-cellular detail while the 16-token scale-7 branch provides global tissue context, and joint attention allows cross-scale feature interaction that a hierarchical CNN cannot replicate.",
+    "parent_sha256": null,
+    "reference": {
+      "bundle_id": "ms_transformer_pathmnist",
+      "parameters": {
+        "depth": 2,
+        "dropout": 0.1,
+        "hidden": 128,
+        "mlp_ratio": 4,
+        "num_heads": 4,
+        "pooling": "mean",
+        "scales": [
+          2,
+          4,
+          7
+        ]
+      },
+      "path": "generated/ms_transformer_pathmnist/v001/manifest.json",
+      "sha256": "65aea8467c0421db175e244607b84a0213500804109039dceb10d24f199fc21d",
+      "version": 1
+    },
+    "schema_version": "1.0",
+    "source": "qwen3.8:latest"
+  },
+  "payload_sha256": "5e7fff37332471ee70f2f06bc2bb9bfd800203e20d1c893960a0237739c32953",
+  "producer": "experimental_development",
+  "run_id": "seed_42",
+  "sequence": 27,
+  "version": 1
+}

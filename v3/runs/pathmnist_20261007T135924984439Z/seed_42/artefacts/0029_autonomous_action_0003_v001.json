@@ -1,0 +1,68 @@
+{
+  "artefact": "autonomous_action_0003",
+  "artefact_type": "AutonomousSearchEvent",
+  "created_at": "2026-10-07T14:57:11.654440+00:00",
+  "payload": {
+    "decision": {
+      "action": "new_trial",
+      "additional_epochs": null,
+      "candidate_id": null,
+      "experiment": {
+        "batch_size": 256,
+        "bundle_id": "compact_tf_pathmnist",
+        "epochs": 25,
+        "files": [
+          {
+            "code": "\"\"\"Compact Transformer experiment for PathMNIST 28x28 RGB 9-class classification.\"\"\"\nimport torch\nfrom lightning_components import build_network\nfrom worker_runtime import fit_model, batched_logits\n\n\ndef build_model(context):\n    parameters = context[\"parameters\"]\n    return build_network(\n        \"compact_transformer\",\n        in_channels=3,\n        n_classes=9,\n        hidden=parameters.get(\"hidden\", 128),\n        depth=parameters.get(\"depth\", 4),\n        dropout=parameters.get(\"dropout\", 0.1),\n        patch_size=parameters.get(\"patch_size\", 4),\n        num_heads=parameters.get(\"num_heads\", 4),\n        mlp_ratio=parameters.get(\"mlp_ratio\", 4),\n        pooling=parameters.get(\"pooling\", \"cls\"),\n    )\n\n\ndef train(context):\n    return fit_model(context, build_model(context))\n\n\ndef predict(context):\n    model = build_model(context)\n    model.load_state_dict(torch.load(context[\"checkpoint\"], map_location=\"cpu\", weights_only=True))\n    return batched_logits(model, context[\"data\"][\"images\"], context[\"config\"])",
+            "path": "experiment.py"
+          }
+        ],
+        "hypothesis": "A compact transformer with a convolutional tokenizer (4x4 kernel, stride 4, 49 tokens) will outperform both the ResNet-18 and the multi-scale transformer on 28x28 histopathology classification because: (1) the conv tokenizer preserves spatial locality during tokenization, better capturing nuclear morphology and local texture patterns that distinguish confusable classes (background/debris/mucus, smooth muscle/stroma); (2) 49 tokens on a 7x7 grid provides sufficient spatial resolution for attention to model local tissue architecture without the overfitting risk of 196 tokens; (3) depth=4 with hidden=128 provides more sequential processing capacity than the multi-scale transformer's depth=2, enabling more complex feature interactions; (4) the single-scale design avoids the cross-scale attention overhead that may have diluted the multi-scale transformer's performance.",
+        "parameters": {
+          "depth": 4,
+          "dropout": 0.1,
+          "hidden": 128,
+          "mlp_ratio": 4,
+          "num_heads": 4,
+          "patch_size": 4,
+          "pooling": "cls"
+        },
+        "training": {
+          "adam_beta1": 0.9,
+          "adam_beta2": 0.999,
+          "channel_cap": 256,
+          "class_weighting": true,
+          "cosine_eta_min": 0.0,
+          "early_stopping_min_delta": 0.001,
+          "early_stopping_monitor": "val_accuracy",
+          "early_stopping_patience": 5,
+          "gradient_clip_val": 1.0,
+          "label_smoothing": 0.1,
+          "lr": 0.0002,
+          "momentum": 0.9,
+          "nesterov": true,
+          "one_cycle_pct_start": 0.1,
+          "optimizer": "adamw",
+          "optimizer_eps": 1e-08,
+          "plateau_factor": 0.5,
+          "plateau_patience": 1,
+          "scales": [
+            2,
+            4,
+            7
+          ],
+          "scheduler": "cosine",
+          "weight_decay": 0.01
+        }
+      },
+      "rationale": "The ResNet-18 (t0001) achieved 99.59% val accuracy, outperforming the multi-scale transformer (t0002) at 99.06%. Both are excellent, but I want to test one more architecture: the compact_transformer with its built-in convolutional tokenizer. Unlike the multi-scale transformer's linear patch embedding, the conv tokenizer preserves spatial locality in tokenization, which is critical for capturing nuclear-level texture in 28x28 histopathology patches. The 4x4 patch size yields 49 tokens on a 7x7 grid, balancing nuclear detail with tissue context. With hidden=128 and depth=4, it has more capacity than the multi-scale transformer (hidden=128, depth=2) while maintaining a shorter sequence. If this doesn't beat 99.59%, the ResNet-18 is confirmed as the best architecture and I will finish."
+    },
+    "schema_version": "1.0",
+    "source": "qwen3.8:latest"
+  },
+  "payload_sha256": "53c5bdd7ff332273ea60b11cf56b8a6b416683a218cebb46e7c791dde9d16549",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 29,
+  "version": 1
+}

@@ -1,0 +1,1 @@
+{"bundle_id": "resnet18_tuned_pathmnist", "entrypoint": "experiment.py", "files": {"experiment.py": "d05ce521495a3f8fe2e70df600d3efcc98899e702c2a8d9abb4304fd56043c71"}, "version": 1}

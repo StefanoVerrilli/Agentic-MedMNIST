@@ -1,0 +1,31 @@
+{
+  "artefact": "generated_resnet18_tuned_pathmnist",
+  "artefact_type": "GeneratedBundle",
+  "created_at": "2026-10-07T16:43:24.447286+00:00",
+  "payload": {
+    "author": "experimental_development",
+    "files": {
+      "experiment.py": "d05ce521495a3f8fe2e70df600d3efcc98899e702c2a8d9abb4304fd56043c71"
+    },
+    "hypothesis": "Reducing label smoothing (0.1→0.05) and weight decay (0.01→0.005) while lowering LR (5e-4→3e-4) will improve validation accuracy by ~0.1-0.3% over t0004's 99.62%. Rationale: (1) Label smoothing of 0.1 forces the model to assign ~1.1% probability to every class, which is excessive for 9 classes where most are visually distinct at 28x28; reducing to 0.05 allows sharper decision boundaries on the clearly separable classes (epithelium, lymphocytes, adipose) while class_weighting still protects the minority classes. (2) Weight decay of 0.01 with AdamW is relatively strong for a 90k-sample dataset; 0.005 reduces the regularization pressure, allowing the model to fit the subtle texture differences that distinguish confusable pairs (smooth muscle vs stroma, background vs debris). (3) The lower LR (3e-4) combined with cosine decay over 50 epochs provides a longer fine-tuning phase where the model can settle into a sharper minimum, as evidenced by t0004's continued improvement from epoch 15→29.",
+    "parent_sha256": null,
+    "reference": {
+      "bundle_id": "resnet18_tuned_pathmnist",
+      "parameters": {
+        "depth": 1,
+        "dropout": 0.3,
+        "hidden": 64
+      },
+      "path": "generated/resnet18_tuned_pathmnist/v001/manifest.json",
+      "sha256": "e1c69c5293fd5ce90b74fbc4f5267f7385941916fd4cd7815e73212ac6e34d06",
+      "version": 1
+    },
+    "schema_version": "1.0",
+    "source": "qwen3.8:latest"
+  },
+  "payload_sha256": "835cd45c7c71032c5326fe1839a76a3344cfef26548aa9cb5e3ed459e090f1fa",
+  "producer": "experimental_development",
+  "run_id": "seed_42",
+  "sequence": 39,
+  "version": 1
+}

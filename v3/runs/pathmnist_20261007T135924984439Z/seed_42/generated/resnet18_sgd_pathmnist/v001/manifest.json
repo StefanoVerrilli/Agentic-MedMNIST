@@ -1,0 +1,1 @@
+{"bundle_id": "resnet18_sgd_pathmnist", "entrypoint": "experiment.py", "files": {"experiment.py": "97e280b95a97994c04606684df8d6072299c6950e06dc3a1d83f65aabec49a8e"}, "version": 1}
