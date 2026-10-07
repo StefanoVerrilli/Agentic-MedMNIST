@@ -1,0 +1,137 @@
+{
+  "payload": {
+    "source_sha256": "64a1a73a2f4e04c6c0a6906651379f4e5584c2186f928615a17c55460c9be694",
+    "source_hash_algorithm": "canonical-text-v2",
+    "tests_run": 50,
+    "tests_passed": true,
+    "fault_cases": [
+      {
+        "fault": "_wrong_dataset",
+        "detected": true,
+        "findings": [
+          [
+            "critical",
+            "dataset is not PathMNIST"
+          ]
+        ]
+      },
+      {
+        "fault": "_wrong_channels",
+        "detected": true,
+        "findings": [
+          [
+            "critical",
+            "PathMNIST must have three channels"
+          ]
+        ]
+      },
+      {
+        "fault": "_empty_split",
+        "detected": true,
+        "findings": [
+          [
+            "critical",
+            "an official split is empty"
+          ]
+        ]
+      },
+      {
+        "fault": "_bad_profile_counts",
+        "detected": true,
+        "findings": [
+          [
+            "critical",
+            "train class counts do not sum"
+          ],
+          [
+            "critical",
+            "not every selection sample was profiled"
+          ]
+        ]
+      },
+      {
+        "fault": "_non_official_split",
+        "detected": true,
+        "findings": [
+          [
+            "critical",
+            "official splits were not preserved"
+          ]
+        ]
+      },
+      {
+        "fault": "_unsafe_augmentation",
+        "detected": true,
+        "findings": [
+          [
+            "critical",
+            "unsafe augmentations: ['color_shift']"
+          ]
+        ]
+      },
+      {
+        "fault": "_leaky_statistics",
+        "detected": true,
+        "findings": [
+          [
+            "critical",
+            "normalization stats are not train-only"
+          ]
+        ]
+      },
+      {
+        "fault": "_seed_mismatch",
+        "detected": true,
+        "findings": [
+          [
+            "critical",
+            "missing required artefact 'data_audit_report'"
+          ],
+          [
+            "critical",
+            "training seed differs from config"
+          ],
+          [
+            "critical",
+            "checkpoint is missing"
+          ]
+        ]
+      },
+      {
+        "fault": "_bad_confusion_matrix",
+        "detected": true,
+        "findings": [
+          [
+            "critical",
+            "confusion matrix count mismatch"
+          ],
+          [
+            "critical",
+            "missing required artefact 'prediction_artifact'"
+          ]
+        ]
+      },
+      {
+        "fault": "_bad_abstention_sum",
+        "detected": true,
+        "findings": [
+          [
+            "critical",
+            "missing required artefact 'human_review_queue'"
+          ],
+          [
+            "critical",
+            "coverage and abstention do not sum to one"
+          ],
+          [
+            "warning",
+            "OOD AUROC is undefined"
+          ]
+        ]
+      }
+    ],
+    "fault_detection_rate": 1.0,
+    "created_at": "2026-10-02T13:31:11.386890+00:00"
+  },
+  "sha256": "c2e552770cc1add39c3697fdb6b35819e0923c339740d94c41d44d959682c425"
+}

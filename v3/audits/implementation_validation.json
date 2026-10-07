@@ -1,0 +1,38 @@
+{
+  "created_at": "2026-10-07T09:41:09.614686+00:00",
+  "source_sha256": "1c799b679607d2a9eb91d123a3bba041ae8e903922329e494a29d0f3b4198e74",
+  "source_hash_algorithm": "canonical-text-v2",
+  "python_version": "3.14.6 (tags/v3.14.6:c63aec6, Jun 10 2026, 10:26:10) [MSC v.1944 64 bit (AMD64)]",
+  "tests_run": 100,
+  "tests_passed": true,
+  "failures": 0,
+  "errors": 0,
+  "skipped": [
+    {
+      "test": "test_real_adaptive_segments_match_continuous_training (test_worker_integration.WorkerIntegrationTests.test_real_adaptive_segments_match_continuous_training)",
+      "reason": "Linux SSH worker not configured; real isolation test not executed"
+    },
+    {
+      "test": "test_real_read_only_files_network_sealing_checkpoint_and_inference (test_worker_integration.WorkerIntegrationTests.test_real_read_only_files_network_sealing_checkpoint_and_inference)",
+      "reason": "Linux SSH worker not configured; real isolation test not executed"
+    }
+  ],
+  "real_linux_container_validation": "not_run_code_preparation_only",
+  "pathmnist_performance_benchmark": "not_run_no_local_archive",
+  "validation_scope": [
+    "real_multiscale_training_and_checkpoint_reload",
+    "original_pipeline_and_offline_replay",
+    "autonomous_pipeline_with_simulated_worker_and_frozen_seeds",
+    "source_integrity_and_code_repair",
+    "ssh_protocol_timeouts_and_output_validation",
+    "trusted_worker_training_helpers",
+    "fpt_numeric_operator_references_and_original_pyramid_branches",
+    "fpt_finite_gradients_training_export_checkpoint_reload",
+    "agent_selected_search_actions_without_external_epoch_clipping",
+    "exact_adaptive_training_state_and_scheduler_continuation_on_synthetic_data",
+    "autonomous_search_freeze_seed_replay_with_transport_double",
+    "baseline_omission_without_false_acceptance",
+    "resource_interruptions_and_resume_state_integrity"
+  ],
+  "pipeline_run": "not_started_user_requested_code_only"
+}
