@@ -162,20 +162,20 @@ class OllamaReasonerTests(unittest.TestCase):
                 self.assertIsNone(events[-1]["decision"])
                 self.assertEqual(events[-1]["field_repairs"][0]["rejected_value"], .1)
 
-    def test_multiple_errors_require_full_decision_repair(self):
+    def test_multiple_training_errors_require_training_subtree_repair(self):
         invalid = autonomous_decision(.1)
         invalid["experiment"]["training"]["lr"] = -1
         calls = []
 
         def transport(url, payload, timeout):
             calls.append(payload["format"]["title"])
-            return {"message": {"content": json.dumps(invalid if len(calls) == 1 else autonomous_decision())}}
+            return {"message": {"content": json.dumps(invalid if len(calls) == 1 else autonomous_decision()["experiment"]["training"])}}
 
         result = OllamaReasoner("http://localhost:11434", retries=1, required=True,
             transport=transport).decide(stage="test", system="test", user="test",
             response_model=AutonomousSearchDecision,
             fallback=dict(action="finish_search", rationale="No fallback permitted"))
-        self.assertEqual(calls, ["AutonomousSearchDecision"] * 2)
+        self.assertEqual(calls, ["AutonomousSearchDecision", "AutonomousTrainingOptions"])
         self.assertFalse(result.used_fallback)
 
     def test_mixed_failures_remain_bounded_and_report_actual_attempts(self):

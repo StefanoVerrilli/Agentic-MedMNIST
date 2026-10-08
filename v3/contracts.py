@@ -687,6 +687,34 @@ class AutonomousSearchDecision(StrictModel):
         return self
 
 
+class AutonomousRecoveryDecision(StrictModel):
+    action: Literal["finish_search", "continue_trial"]
+    candidate_id: str | None = Field(default=None, min_length=1)
+    additional_epochs: int | None = Field(default=None, ge=1, strict=True)
+    rationale: str = Field(min_length=3, max_length=6000)
+
+    @model_validator(mode="after")
+    def valid_arguments(self):
+        AutonomousSearchDecision.model_validate(self.model_dump())
+        return self
+
+
+class ResumeManifest(Artefact):
+    parent_run_path: str
+    parent_run_id: str
+    parent_execution_status: str
+    parent_stage: str
+    parent_code_sha256: str
+    resume_code_sha256: str
+    resumed_at: str
+    last_imported_artefact: str
+    last_imported_trial: str | None
+    first_new_decision: str | None
+    inherited_transcripts: list[str]
+    promoted_stages: list[str]
+    review_only: bool = False
+
+
 class AutonomousSearchEvent(Artefact):
     decision: AutonomousSearchDecision
     source: str
@@ -855,6 +883,7 @@ class ArchitectureResearch(Artefact):
     source: str
 
 class TrialResult(Artefact):
+    training_result: TrainResult | None = None
     failed_operation: str | None = None
     failure_kind: str | None = None
     failure_signature: str | None = None

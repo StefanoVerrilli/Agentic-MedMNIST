@@ -76,6 +76,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--allow-generated-code", action="store_true", help="run experiments in local subprocesses with run-scoped source code")
     parser.add_argument("--operation-timeout", "--worker-timeout", dest="worker_timeout", type=int, default=3600)
     parser.add_argument("--max-generated-bundles", type=int, default=32, action=ExternalBudgetAction)
+    parser.add_argument("--resume-run", default=None, help="continue a verified paused seed directory into a new child run")
     parser.add_argument("--replay-run", default=None, help="replay a seed directory with zero LLM/retrieval requests")
     parser.add_argument("--validation-evidence", default=None, help="checksummed fault-injection and test evidence")
     parser.add_argument("--acceptance-evidence", default=None, help="independent demonstration, risk mitigation and sign-off evidence")
@@ -179,6 +180,29 @@ def main(argv: list[str] | None = None) -> int:
     from extensions import clear_registry, restore_registry
     clear_registry()
     replay_frozen = None
+    if args.resume_run and args.replay_run:
+        parser.error("--resume-run and --replay-run are mutually exclusive")
+    if args.resume_run:
+        from resume import inspect_parent
+        try:
+            parent, _ = inspect_parent(Path(args.resume_run))
+        except (ValueError, OSError, KeyError) as exc:
+            parser.error(str(exc))
+        # Preserve experimental settings and seed. Only live-provider/runtime
+        # connection options may change on operational continuation.
+        runtime_keys = ("output_root", "resume_run", "ollama_base", "ollama_model",
+                        "llm_timeout", "llm_retries", "llm_num_predict", "keep_alive")
+        runtime = {k: getattr(args, k) for k in runtime_keys}
+        vars(args).update(parent.get("run_configuration").parameters)
+        vars(args).update(runtime)
+        args.resume_run = str(parent.root)
+        args.replay_run = None
+        args.seeds = str(parent.get("run_manifest").seed)
+        args.offline = False
+        args.research_online = False
+        restore_registry(parent.get("run_configuration").extension_registry)
+        if parent.get("run_configuration").frozen_best:
+            replay_frozen = BestConfiguration.model_validate(parent.get("run_configuration").frozen_best)
     if args.replay_run:
         from governance import read_artefact
         replay_root = Path(args.replay_run).resolve()
@@ -336,7 +360,12 @@ def run_once(
     *,
     frozen_best: BestConfiguration | None = None,
 ) -> dict[str, Any]:
-    bb = Blackboard(run_root, run_id=run_root.name)
+    if getattr(args, "resume_run", None):
+        from resume import create_child
+        bb = create_child(Path(args.resume_run), run_root,
+            code_sha256=code_tree_sha256(Path(__file__).resolve().parent))
+    else:
+        bb = Blackboard(run_root, run_id=run_root.name)
     if getattr(args, "allow_generated_code", False):
         from contracts import WorkerEvidence
         evidence_path = run_root.parent / "worker_preflight.json"
@@ -358,10 +387,11 @@ def run_once(
         num_predict=args.llm_num_predict,
     )
     reasoner = CachedReasoner(reasoner, bb.root,
-                              replay_root=Path(args.replay_run) if args.replay_run else None)
+                              replay_root=Path(args.replay_run) if args.replay_run else None,
+                              resume=bool(getattr(args, "resume_run", None)))
     from extensions import registry_entries
     frozen_payload = frozen_best.model_dump(mode="json") if frozen_best else None
-    if frozen_payload:
+    if frozen_payload and not getattr(args, "resume_run", None):
         from research import contained_path
         origin = run_root.parent / f"seed_{frozen_best.train_config.seed}"
         if args.replay_run:

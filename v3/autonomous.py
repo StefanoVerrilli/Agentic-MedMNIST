@@ -2,16 +2,18 @@
 from __future__ import annotations
 
 import json
+from dataclasses import dataclass, field
 from pathlib import Path
 import shutil
 import time
 
-from contracts import (AutonomousSearchDecision, AutonomousSearchEvent, BestConfiguration,
+from contracts import (AutonomousRecoveryDecision, AutonomousSearchDecision, AutonomousSearchEvent, BestConfiguration,
                        SearchPlan, SearchReport, TrainConfig, TrainResult, TrialResult, sha256_file)
 from generated_agents import CODE_INTERFACE, _representation, configuration_hash
 from ml import evaluate_probabilities, predict_probabilities
 from remote import RemoteModel, LocalWorker, archive_bundle, prepared_arrays
 from search import rank_trials
+from llm import OllamaDecisionError
 from failures import (SearchCircuitBreaker, TERMINAL_FAILURES,
                       failure_kind as classify_failure, failure_signature, is_timeout)
 
@@ -83,6 +85,88 @@ def experiment_config(experiment, reference, worker, seed, device, source):
         seed=seed, device=device, rationale=experiment.hypothesis, source=source)
 
 
+@dataclass
+class AutonomousSearchState:
+    sequence: int = 0
+    candidate_sequence: int = 0
+    trials: list[TrialResult] = field(default_factory=list)
+    trial_names: list[str] = field(default_factory=list)
+    latest: dict[str, TrialResult] = field(default_factory=dict)
+    results: dict[str, TrainResult] = field(default_factory=dict)
+    identities: set[str] = field(default_factory=set)
+    consecutive_failures: int = 0
+    same_failures: int = 0
+    last_signature: str | None = None
+
+    @classmethod
+    def empty(cls):
+        return cls()
+
+    @classmethod
+    def restore(cls, bb):
+        from resume import verify_store
+        verify_store(bb)
+        state = cls.empty()
+        names = sorted((n for n in bb.artefacts if n.startswith("trial_")),
+                       key=lambda n: int(n.removeprefix("trial_")))
+        for name in names:
+            trial = bb.get(name)
+            if trial.config.execution_mode != "agent_autonomous":
+                raise ValueError("cannot restore non-autonomous partial search")
+            if int(name.removeprefix("trial_")) != trial.round_index:
+                raise ValueError("trial sequence mismatch")
+            state.sequence = max(state.sequence, trial.round_index)
+            state.candidate_sequence = max(state.candidate_sequence, int(trial.candidate_id.removeprefix("autonomous_t")))
+            state.trials.append(trial)
+            state.trial_names.append(name)
+            state.identities.add(continuation_identity(trial.config))
+            if trial.status == "completed":
+                previous = state.latest.get(trial.candidate_id)
+                if previous and (continuation_identity(previous.config) != continuation_identity(trial.config)
+                                 or trial.epochs_completed <= previous.epochs_completed
+                                 or trial.learning_curve[:previous.epochs_completed] != previous.learning_curve):
+                    raise ValueError("persisted continuation identity/history mismatch")
+                state.latest[trial.candidate_id] = trial
+                state.results[trial.candidate_id] = restore_training_result(trial)
+                state.consecutive_failures = state.same_failures = 0
+                state.last_signature = None
+            else:
+                state.consecutive_failures += 1
+                state.same_failures = state.same_failures + 1 if trial.failure_signature == state.last_signature else 1
+                state.last_signature = trial.failure_signature
+        # An accepted action without a persisted trial is an unfinished operation.
+        # Reserve its identifiers; never overwrite its generated code or checkpoints.
+        for name in bb.artefacts:
+            if name.startswith("autonomous_action_"):
+                seq = int(name.removeprefix("autonomous_action_"))
+                if seq > state.sequence:
+                    action = bb.get(name).decision
+                    state.sequence = seq
+                    if action.action == "new_trial":
+                        state.candidate_sequence += 1
+        return state
+
+
+def restore_training_result(trial):
+    """Legacy migration derives metrics only from the recorded cumulative curve."""
+    if trial.training_result is not None:
+        return trial.training_result
+    if (not trial.learning_curve or len(trial.learning_curve) != trial.epochs_completed
+            or trial.best_epoch is None or not 1 <= trial.best_epoch <= trial.epochs_completed
+            or trial.resume_path is None or trial.resume_sha256 is None
+            or trial.stop_reason not in {"segment_complete", "early_stopping"}):
+        raise ValueError("legacy trial lacks lossless training evidence; cannot resume")
+    final = trial.learning_curve[-1]
+    best = trial.learning_curve[trial.best_epoch - 1]
+    return TrainResult(final_train_loss=final.train_loss, final_val_accuracy=final.val_accuracy,
+        best_val_accuracy=best.val_accuracy, best_epoch=trial.best_epoch,
+        epochs_completed=trial.epochs_completed, history=trial.learning_curve,
+        checkpoint_path=trial.checkpoint_path, checkpoint_sha256=trial.checkpoint_sha256,
+        resume_path=trial.resume_path, resume_sha256=trial.resume_sha256, stop_reason=trial.stop_reason,
+        training_log_path=trial.training_log_path, lightning_csv_path=trial.lightning_csv_path,
+        seed=trial.config.seed, device=trial.config.device, framework="local.python")
+
+
 class AutonomousSearchAgent:
     name = "model_search"
     # Decisions already have bounded retries. Restarting the entire stage would
@@ -106,10 +190,11 @@ class AutonomousSearchAgent:
         bb.put("search_plan", SearchPlan(policy="agent_autonomous", progressive_budget=False,
             framework="local.python", accuracy_tolerance=self.accuracy_tolerance), producer=self.name)
         prepared = bb.get_blob("prepared_data")
-        latest, results, trials, names, identities = {}, {}, [], [], set()
-        sequence, candidate_sequence = 0, 0
-        consecutive_failures = same_failures = 0
-        last_signature = None
+        state = AutonomousSearchState.restore(bb) if bb.get_optional("resume_manifest") else AutonomousSearchState.empty()
+        latest, results, trials, names, identities = state.latest, state.results, state.trials, state.trial_names, state.identities
+        sequence, candidate_sequence = state.sequence, state.candidate_sequence
+        consecutive_failures, same_failures = state.consecutive_failures, state.same_failures
+        last_signature = state.last_signature
         while True:
             sequence += 1
             resumable = sorted(candidate_id for candidate_id, trial in latest.items()
@@ -155,11 +240,26 @@ class AutonomousSearchAgent:
                     response_model=AutonomousSearchDecision,
                     fallback=AutonomousSearchDecision(action="finish_search", rationale="No fallback is permitted."),
                     audit=bb.record_event)
-            except Exception as exc:
+            except OllamaDecisionError as exc:
                 bb.record_event("autonomous_decision_failed", decision_sequence=sequence,
                     elapsed_seconds=time.monotonic() - decision_started, error=str(exc)[:8000],
                     failure_kind="llm_timeout" if is_timeout(exc) else "llm_error")
-                raise
+                if not latest:
+                    raise
+                decision = self.reasoner.decide(stage=f"autonomous_search.recovery_{sequence}",
+                    system="The proposed trial could not be validated. Valid completed trials exist. "
+                        "Choose finish_search or continue_trial of an eligible candidate. No new experiment is allowed.",
+                    user=json.dumps({"validation_evidence": evidence, "test_split": "locked",
+                                     "resumable_candidate_ids": resumable, "failed_decision": str(exc)}),
+                    response_model=AutonomousRecoveryDecision,
+                    fallback=AutonomousRecoveryDecision(action="finish_search", rationale="No fallback permitted"),
+                    audit=bb.record_event)
+                if decision.used_fallback:
+                    raise OllamaDecisionError("autonomous recovery requires a live validated decision")
+                from llm import ReasonedDecision
+                decision = ReasonedDecision(AutonomousSearchDecision.model_validate(decision.value.model_dump()),
+                    decision.source, False, decision.attempts, decision.request_id)
+                repair = None
             bb.record_event("autonomous_decision_finished", decision_sequence=sequence,
                 elapsed_seconds=time.monotonic() - decision_started, selected_action=decision.value.action)
             if decision.used_fallback:
@@ -282,7 +382,7 @@ class AutonomousSearchAgent:
             bb.record_event("autonomous_segment_failed", candidate_id=candidate_id, error=error,
                 interrupted=failure_kind in {"timeout", "oom"}, failure_kind=failure_kind,
                 operation=operation, failure_signature=signature)
-        trial = TrialResult(candidate_id=candidate_id, config_hash=configuration_hash(config),
+        trial = TrialResult(training_result=result, candidate_id=candidate_id, config_hash=configuration_hash(config),
             round_index=sequence, epoch_budget=None, requested_epochs=config.epochs,
             parent_candidate_id=parent.candidate_id if parent else None,
             status="completed" if result else "failed", config=config, representation=_representation(bb),

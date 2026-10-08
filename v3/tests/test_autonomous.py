@@ -321,7 +321,7 @@ class FailurePolicyTests(unittest.TestCase):
                 Orchestrator([agent], unittest.mock.Mock()).run(bb)
             self.assertEqual(transport.call_count, 2)
             worker.assert_not_called()
-            self.assertEqual(bb.get("execution_status").status, "failed:model_search")
+            self.assertEqual(bb.get("execution_status").status, "paused:model_search")
             events = [json.loads(row) for row in (bb.root / "decision_log.jsonl").read_text().splitlines()]
             failures = [row for row in events if row["event"] == "llm_decision_failed"]
             self.assertEqual(failures[-1]["failure_kind"], "llm_timeout")

@@ -10,6 +10,7 @@ fallback unless ``required=True``.
 from __future__ import annotations
 
 import json
+import hashlib
 import os
 import threading
 import time
@@ -42,6 +43,10 @@ class _OptimizerEpsilonRepair(BaseModel):
 
 class OllamaDecisionError(RuntimeError):
     """Raised when Ollama is required and no validated response is obtained."""
+
+
+class LLMOutputTruncated(ValueError):
+    """Incomplete generation, independently budgeted from semantic repair."""
 
 
 class OllamaHTTPError(OSError):
@@ -138,6 +143,8 @@ class OllamaReasoner:
         validated_fallback = response_model.model_validate(fallback)
         schema = response_model.model_json_schema()
         if not self.enabled:
+            if self.required:
+                raise OllamaDecisionError(f"Ollama stage {stage} requires a live provider")
             _audit(
                 audit,
                 "llm_decision",
@@ -182,12 +189,16 @@ class OllamaReasoner:
         error_details: list[str] = []
         rejected_responses: list[dict[str, Any]] = []
         format_negotiation: list[str] = []
-        epsilon_document = None
-        epsilon_path = None
+        working_document = None
+        repair_scope = None
+        repair_model = None
+        repair_number = 0
+        protected = {}
+        pending_errors = []
         field_repairs: list[dict[str, Any]] = []
         # A transport failure produces no decision to repair. Keep its retry
         # budget separate so a timeout cannot consume JSON correction attempts.
-        transport_failures = validation_failures = 0
+        transport_failures = validation_failures = generation_failures = 0
         attempt = 0
         decision_started = time.monotonic()
 
@@ -230,26 +241,68 @@ class OllamaReasoner:
                 if not isinstance(content, str) or not content.strip():
                     raise ValueError("Ollama returned no JSON message content")
                 if response.get("done_reason") == "length":
-                    raise ValueError("Ollama exhausted its output budget; a partial decision cannot be accepted")
+                    raise LLMOutputTruncated("Ollama exhausted its output budget; a partial decision cannot be accepted")
                 parsed = json.loads(content)
-                if epsilon_document is not None:
-                    correction = _OptimizerEpsilonRepair.model_validate(parsed)
-                    parsed = deepcopy(epsilon_document)
-                    target = parsed
-                    for key in epsilon_path[:-1]:
-                        target = target[key]
-                    target[epsilon_path[-1]] = float(correction.optimizer_eps)
-                    field_repairs[-1]["replacement_value"] = float(correction.optimizer_eps)
-                    # Nested errors can hide action-level errors. Once epsilon is
-                    # corrected, allow a subsequent retry to repair the full action.
-                    epsilon_document = None
-                    epsilon_path = None
+                if repair_scope is not None:
+                    before = deepcopy(working_document)
+                    # Validate epsilon grammar separately; other subtrees may still
+                    # be invalid and must remain available for progressive repair.
+                    replacement = (_OptimizerEpsilonRepair.model_validate(parsed).model_dump()
+                                   if repair_model is _OptimizerEpsilonRepair else parsed)
+                    if repair_model is _OptimizerEpsilonRepair:
+                        replacement = float(replacement["optimizer_eps"])
+                        field_repairs[-1]["replacement_value"] = replacement
+                    if not isinstance(replacement, dict) and repair_model is not _OptimizerEpsilonRepair:
+                        raise ValueError("repair must return an object")
+                    merged = deepcopy(working_document)
+                    if repair_scope:
+                        target = merged
+                        for key in repair_scope[:-1]:
+                            target = target[key]
+                        target[repair_scope[-1]] = deepcopy(replacement)
+                    else:
+                        merged = deepcopy(replacement)
+                    # Corrections from previous rounds are controller-owned. Even
+                    # a larger subsequent scope cannot regress those values.
+                    for path, value in protected.items():
+                        target = merged
+                        for key in path[:-1]:
+                            target = target[key]
+                        target[path[-1]] = deepcopy(value)
+                    changed = _changed_paths(before, merged)
+                    working_document = merged
+                    parsed = merged
+                    try:
+                        response_model.model_validate(merged)
+                        remaining_paths = []
+                    except ValidationError as remaining:
+                        remaining_paths = [tuple(row["loc"]) for row in remaining.errors()]
+                    for path in changed:
+                        value = merged
+                        try:
+                            for key in path:
+                                value = value[key]
+                        except (KeyError, TypeError):
+                            continue
+                        # Protect only corrected, individually invalid fields.
+                        if (path and (path in pending_errors or path == ("experiment", "training", "optimizer_eps"))
+                                and not any(p == path or p[:len(path)] == path for p in remaining_paths)
+                                and (path != ("experiment", "training", "optimizer_eps")
+                                     or isinstance(value, (int, float)) and 1e-12 <= value <= 1e-2)):
+                            protected[path] = deepcopy(value)
+                    _audit(audit, "llm_repair_finished", stage=stage, request_id=request_id,
+                           repair_number=repair_number, repair_scope=".".join(repair_scope) or "$",
+                           before_hash=_document_hash(before), after_hash=_document_hash(merged),
+                           changed_paths=[".".join(p) for p in changed])
+                    repair_scope = None
+                    repair_model = None
                     base_messages = full_messages
                     messages = list(base_messages)
                     payload["messages"] = messages
                     if payload["format"] != "json":
                         payload["format"] = schema
                     feedback_content = json.dumps(parsed, ensure_ascii=False)
+                working_document = deepcopy(parsed)
                 decision = response_model.model_validate(parsed)
                 _audit(
                     audit,
@@ -308,60 +361,71 @@ class OllamaReasoner:
                     if response.get("error"):
                         detail += f" (server error: {str(response['error'])[:4000]})"
                 error_details.append(detail)
+                if repair_scope is not None:
+                    _audit(audit, "llm_repair_failed", stage=stage, request_id=request_id,
+                           repair_number=repair_number, repair_scope=".".join(repair_scope) or "$",
+                           error=detail, before_hash=_document_hash(working_document))
                 if isinstance(exc, OSError):
                     transport_failures += 1
                     retry = transport_failures <= self.retries
+                elif isinstance(exc, LLMOutputTruncated):
+                    generation_failures += 1
+                    retry = generation_failures <= self.retries
+                    _audit(audit, "llm_output_truncated", stage=stage, request_id=request_id,
+                           attempt=attempt, generation_retry=generation_failures, retry=retry)
+                    if retry:
+                        payload["messages"] = [*messages, {"role": "user", "content":
+                            "The output was truncated. Preserve the same decision, return concise complete JSON; "
+                            "shorten rationale and remove unnecessary prose and code comments."}]
                 else:
                     validation_failures += 1
                     retry = validation_failures <= self.retries
-                if retry and not isinstance(exc, OSError):
-                    if (epsilon_document is None and isinstance(exc, ValidationError)
-                            and len(validation_errors) == 1
-                            and validation_errors[0]["loc"] == ("experiment", "training", "optimizer_eps")
-                            and validation_errors[0]["type"] in {"less_than_equal", "greater_than_equal"}
-                            and isinstance(parsed, dict)):
-                        epsilon_document = deepcopy(parsed)
-                        epsilon_path = validation_errors[0]["loc"]
-                        repair_schema = _OptimizerEpsilonRepair.model_json_schema()
-                        # Keep code and all other agent choices intact. Request only
-                        # epsilon, with bounds encoded in a string grammar instead
-                        # of relying on the backend to enforce numeric inequalities.
-                        messages = [
-                            {"role": "system", "content": (
-                                "Correct only the optimizer numerical stability epsilon. "
-                                "Choose the value yourself. Return only JSON conforming to: "
-                                + json.dumps(repair_schema))},
-                            {"role": "user", "content": json.dumps({
-                                "field": ".".join(epsilon_path),
-                                "validation_error": detail,
-                                "training": parsed["experiment"]["training"],
-                                "instruction": "Return only optimizer_eps as a scientific-notation string, "
-                                    "with a one-digit mantissa before the decimal point and a negative exponent.",
-                            })},
-                        ]
+                if retry and not isinstance(exc, (OSError, LLMOutputTruncated)):
+                    if isinstance(exc, ValidationError) and isinstance(working_document, dict) and repair_scope is None:
+                        from contracts import AutonomousSearchDecision, AutonomousTrainingOptions, AutonomousExperimentDecision
+                        paths = [tuple(row["loc"]) for row in validation_errors]
+                        pending_errors = paths
+                        scope, model = (), response_model
+                        if response_model is AutonomousSearchDecision:
+                            if all(path[:2] == ("experiment", "training") for path in paths):
+                                scope, model = ("experiment", "training"), AutonomousTrainingOptions
+                            elif all(path[:1] == ("experiment",) for path in paths):
+                                scope, model = ("experiment",), AutonomousExperimentDecision
+                        if (len(paths) == 1 and paths[0] == ("experiment", "training", "optimizer_eps")
+                                and validation_errors[0]["type"] in {"less_than_equal", "greater_than_equal"}):
+                            scope, model = paths[0], _OptimizerEpsilonRepair
+                            field_repairs.append({"after_attempt": attempt, "field": ".".join(scope),
+                                                 "rejected_value": validation_errors[0]["input"]})
+                        repair_scope, repair_model = scope, model
+                        repair_number += 1
+                        repair_schema = model.model_json_schema()
+                        subtree = working_document
+                        for key in scope:
+                            subtree = subtree[key]
+                        if scope:
+                            messages = [{"role": "system", "content":
+                                "Repair only " + ".".join(scope) + ". Preserve already valid choices. Return only JSON conforming to: "
+                                + json.dumps(repair_schema)},
+                                {"role": "user", "content": json.dumps({"current_document": subtree,
+                                    "validation_errors": detail, "protected_corrections": {
+                                        ".".join(k): v for k, v in protected.items()}})}]
+                        else:
+                            messages = [*full_messages, {"role": "assistant", "content": json.dumps(working_document)},
+                                {"role": "user", "content": "Correct these validation errors and return a complete replacement: " + detail}]
                         payload["messages"] = messages
-                        base_messages = list(messages)
                         if payload["format"] != "json":
                             payload["format"] = repair_schema
-                        field_repairs.append({"after_attempt": attempt,
-                            "field": ".".join(epsilon_path),
-                            "rejected_value": validation_errors[0]["input"]})
-                        continue
-                    # Retain only the latest rejection, not every generated source
-                    # file from earlier attempts (which can crowd out the prompt).
-                    messages[:] = base_messages
-                    if isinstance(feedback_content, str) and feedback_content.strip():
-                        messages.append({"role": "assistant", "content": feedback_content})
-                    messages.append(
-                        {
-                            "role": "user",
-                            "content": (
-                                "Your previous JSON was rejected. Correct these "
-                                "validation errors and return a complete replacement: "
-                                + detail
-                            ),
-                        }
-                    )
+                        _audit(audit, "llm_repair_started", stage=stage, request_id=request_id,
+                               repair_number=repair_number, repair_scope=".".join(scope) or "$",
+                               error_paths=[".".join(p) or "$" for p in paths],
+                               before_hash=_document_hash(working_document))
+                    elif repair_scope is None:
+                        messages = [*base_messages]
+                        if isinstance(feedback_content, str) and feedback_content.strip():
+                            messages.append({"role": "assistant", "content": feedback_content})
+                        messages.append({"role": "user", "content":
+                            "Correct these validation errors and return a complete replacement: " + detail})
+                        payload["messages"] = messages
                 if not retry:
                     break
 
@@ -473,3 +537,19 @@ def ollama_model_digest(
 def _audit(sink: AuditSink | None, event: str, **details: Any) -> None:
     if sink is not None:
         sink(event, **details)
+
+
+def _document_hash(document):
+    return hashlib.sha256(json.dumps(document, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+
+
+def _changed_paths(before, after, prefix=()):
+    if isinstance(before, dict) and isinstance(after, dict):
+        paths = []
+        for key in sorted(before.keys() | after.keys()):
+            if key not in before or key not in after:
+                paths.append((*prefix, key))
+            else:
+                paths.extend(_changed_paths(before[key], after[key], (*prefix, key)))
+        return paths
+    return [] if before == after else [prefix]

@@ -30,13 +30,16 @@ def stable_prompt(value: str, root: Path) -> str:
 
 
 class CachedReasoner:
-    def __init__(self, backend: Reasoner, root: Path, *, replay_root: Path | None = None):
+    def __init__(self, backend: Reasoner, root: Path, *, replay_root: Path | None = None, resume: bool = False):
         self.backend, self.root = backend, Path(root).resolve()
         self.replay_root = Path(replay_root).resolve() if replay_root else None
         self.model, self.seed = backend.model, backend.seed
         self.directory = self.root / "blobs" / "reasoning"
         self.directory.mkdir(parents=True, exist_ok=True)
-        self._sequence = 0
+        if resume and replay_root:
+            raise ValueError("operational resume cannot use replay transcripts")
+        inherited = max((int(p.stem) for p in self.directory.glob("*.json")), default=0) if resume else 0
+        self._sequence = inherited
         self._lock = threading.Lock()
 
     @property

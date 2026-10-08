@@ -200,3 +200,81 @@ devono conservare stato equivalente e gli identificativi della configurazione e 
 L'export corrente usa `run-experiment-v1`; i metadati SSH/Docker dei vecchi export
 vengono ignorati e gli esperimenti vengono eseguiti localmente. Un replay storico
 richiede comunque la versione originale dei sorgenti registrata nel manifest.
+
+## Operational pipeline resume and progressive LLM repair
+
+Three independent mechanisms exist:
+
+| Mechanism | Purpose | Decisions |
+| --- | --- | --- |
+| `resume.pt` | Continue a candidate from its latest optimizer, scheduler, RNG and epoch state | Search chooses `continue_trial` |
+| `--replay-run <seed-dir>` | Deterministically reproduce a historical execution with the recorded source revision | Checksummed historical transcripts; no live decisions |
+| `--resume-run <seed-dir>` | Continue an interrupted pipeline from its first unpromoted stage | Inherited history plus new live decisions |
+
+From `v3/`, for example:
+
+```bash
+python run.py \
+  --resume-run runs/pathmnist_20261007T135924984439Z/seed_42 \
+  --ollama-base http://localhost:11434 \
+  --ollama-model qwen3.8:latest
+```
+
+Resume creates a new timestamped experiment and seed directory. It physically copies
+and verifies the parent's immutable artifacts, generated bundles, transcripts,
+checkpoints and dataset blobs. It never writes into the parent or uses hard links.
+`resume_manifest` records the parent path/id/status/stage, both source hashes,
+resume timestamp, last imported artifact/trial, inherited transcript names,
+promoted stages and first new search decision. Different current source revisions
+are allowed for operational resume; historical replay still requires its recorded
+source hash. Experimental configuration and seed are inherited; live LLM connection
+settings can be supplied on the resume command. Replay and resume are mutually exclusive.
+
+A search with six persisted trials restores sequence and candidate counter to six
+and asks `autonomous_search.action_7`. Completed trials are never trained again;
+only an explicit live `continue_trial` requests an additional training segment.
+The complete `TrainResult` is now embedded in each trial. Older autonomous trial
+artifacts remain readable: their cumulative learning curve, best epoch and verified
+checkpoint/resume references reconstruct the training result without guessed metrics.
+An accepted action interrupted before trial persistence reserves its identifiers;
+the next live action uses fresh identifiers and leaves its unfinished output intact.
+Inherited transcripts retain their original request/provenance and new transcript
+numbers start after the highest inherited number. They are never consumed as replay.
+
+`paused:<stage>` identifies an exhausted live LLM decision/repair, timeout or manual
+interrupt with intact persisted evidence. `paused:review:<stage>` resumes the review
+without executing the stage again. Unknown controller errors, checksum mismatch,
+corruption and terminal circuit breakers remain `failed:<stage>`. Historical
+`failed:<stage>` records caused explicitly by `OllamaDecisionError` are accepted as
+a safe status migration after integrity validation. Other terminal failures are refused.
+
+Resume verifies all immutable artifact versions, evidence checksums, bundle manifests,
+checkpoint and latest-state hashes, configuration hashes, dataset/split provenance,
+seed and contiguous promoted stages. Missing files, incomplete training evidence,
+symlinks or inconsistent state abort continuation. Partial search restoration currently
+supports `agent_autonomous`; partial legacy/generated searches are rejected rather
+than repeated. A resumed pipeline skips promoted stages and proceeds normally after
+the resumed stage. The regression run committed in this repository omits dataset
+blobs/checkpoints; use the **complete original run directory** for actual continuation.
+
+LLM repair keeps a `working_document`. Training errors request only
+`AutonomousTrainingOptions`; experiment errors request `AutonomousExperimentDecision`;
+action/top-level errors request the search decision. The controller merges the
+assigned subtree, preserves corrected field values and validates the entire decision
+with Pydantic after every merge. The focused scientific-notation epsilon repair is
+retained. A later missing `cosine_eta_min` repair cannot regress the corrected epsilon
+or rewrite source files, epochs, batch size, bundle id, action or rationale.
+
+`done_reason=length` is classified as `llm_output_truncated`, even for parseable JSON.
+It requests a concise complete response preserving the same decision. Transport,
+generation/truncation and semantic repair have independent bounded counters; each
+uses `--llm-retries` as its retry limit for CLI compatibility. Repair audit events
+include request id, stage, scope, error paths, hashes and changed paths. The events
+`llm_repair_started`, `llm_repair_finished`, `llm_repair_failed` and `run_resume_*`
+are written to `decision_log.jsonl`.
+
+When a proposal cannot be validated and valid trials exist, a separate live
+`AutonomousRecoveryDecision` may finish search or continue an eligible candidate.
+It cannot generate a new experiment and cannot use a heuristic fallback. If this
+decision also fails, intact search evidence is paused for a later operational resume.
+The test split remains locked throughout search and recovery.
