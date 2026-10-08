@@ -1,9 +1,0 @@
-medmnist>=3.0.2,<4
-torch>=2.2,<3
-lightning>=2.4,<3
-jsonargparse[signatures]>=4.39,<5
-numpy>=1.26,<3
-pydantic>=2.7,<3
-scikit-learn>=1.4,<2
-# No LLM SDK is required: llm.py uses stdlib urllib against Ollama's native
-# /api/chat endpoint and supplies a strict JSON Schema for every decision.
