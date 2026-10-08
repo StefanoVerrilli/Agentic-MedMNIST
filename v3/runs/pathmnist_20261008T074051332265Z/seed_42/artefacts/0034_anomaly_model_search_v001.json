@@ -1,0 +1,28 @@
+{
+  "artefact": "anomaly_model_search",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-08T08:20:54.079895+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "No deterministic findings; the model-search stage completed 2 trials with 0 failures and produced a valid checkpoint. Several configuration ambiguities warrant verification before downstream stages, but none are blocking.\n\n1. Pooling inconsistency: the generated_bundle (pathmnist_mst_v2) specifies pooling=\"mean\" while the train_config field says pooling=\"cls\". Because model_family is \"run_generated\", the generated_bundle is presumably authoritative, but the mismatch should be reconciled in the persisted config to avoid misattribution in later stages.\n\n2. Hidden-width / depth ambiguity: the generated_bundle declares hidden=128, depth=3, whereas the train_config top-level fields show hidden=64, depth=2. The rationale text (\"Increasing multi_scale_transformer capacity (hidden 64→128, depth 2→3)\") suggests the train_config values are the pre-increment baseline and the generated_bundle is the actual model. Confirm which parameter set was used in the 10-epoch training run so that the checkpoint is correctly described.\n\n3. families_evaluated is an empty list despite 2 completed trials. The search_report should enumerate the evaluated family (multi_scale_transformer / run_generated) for auditability.\n\n4. Validation accuracy of 0.9892 (macro-F1 0.9890) on a 9-class histopathology task is very high. No deterministic leakage finding exists, but the split_manifest and data_audit_report (both in omitted_artefacts) should be spot-checked to confirm train/val disjointness and that the 1.63:1 imbalance is not masking a near-trivial split.\n\n5. Architecture-priority note: the research analysis ranks compact_transformer first, yet the agent selected multi_scale_transformer. This is a valid autonomous choice and not an error, but the justification for preferring the multi-scale joint-attention fusion over the single-scale compact transformer is only implicit in the rationale. Recording the explicit comparison (trial_0001 vs trial_0002 metrics) would strengthen the audit trail.\n\n6. All three arXiv citations are unverified_curated_excerpt. The patch-granularity, conv-tokenizer, and class-balancing design hypotheses drawn from them remain unconfirmed. This is already flagged in the risks section; no action needed beyond empirical validation in subsequent stages.\n\n7. Early-stopping logic is internally consistent: best_epoch=5 (val_acc 0.989204) because no later epoch improved by ≥ min_delta 0.003 (epoch 8 reached 0.990804, a delta of only 0.0016). The checkpoint correctly corresponds to epoch 5.\n\n8. Built-in augmentations (hflip, vflip, rotate90, rotate180, brightness, contrast) are all primitives and require no extension approval. The pending tissue_geometric_aug extension is correctly noted as unavailable and is not assumed in the training plan.\n\n9. Normalization is set to \"standardize\" (zero-mean, unit-variance), which is consistent with the architecture research's instruction to use dataset-specific channel statistics rather than ImageNet defaults, assuming the pipeline computes those stats from the training split.\n\nOverall the stage is functionally sound. Resolve the pooling and hidden/depth ambiguities in the persisted configuration, populate families_evaluated, and verify the data split before proceeding to fine-tuning or OOD evaluation.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Pooling mismatch: generated_bundle says 'mean', train_config says 'cls' — reconcile to a single authoritative value",
+      "Hidden/depth ambiguity: generated_bundle (128, 3) vs train_config (64, 2) — confirm which set was actually used in training",
+      "families_evaluated is empty despite 2 completed trials; should list the evaluated family for auditability",
+      "Validation accuracy 0.9892 on 9-class histopathology is very high; verify train/val disjointness via split_manifest and data_audit_report",
+      "Architecture research prioritizes compact_transformer first but agent selected multi_scale_transformer; record explicit trial comparison for justification",
+      "All three arXiv evidence sources are unverified_curated_excerpt; design hypotheses remain unconfirmed pending empirical validation"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8:latest",
+    "stage": "model_search"
+  },
+  "payload_sha256": "1f06bd1f9ce91ba986c448b91fbe67d8073d13fc3fa089c6226cd09688bd0b25",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 34,
+  "version": 1
+}

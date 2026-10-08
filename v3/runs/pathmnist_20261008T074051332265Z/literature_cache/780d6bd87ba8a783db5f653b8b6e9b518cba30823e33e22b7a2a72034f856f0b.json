@@ -1,0 +1,19 @@
+{
+  "key": "780d6bd87ba8a783db5f653b8b6e9b518cba30823e33e22b7a2a72034f856f0b",
+  "sources": [
+    {
+      "file": "source_f091c2ef191642d31d9b18f55f498d1af85352eed6f893d76ec3c7ff1577b8bd.json",
+      "sha256": "013ce03d1935d4683663dc5d1421835147dcaa717c9568e522ec2bbf0d6cfbd8"
+    },
+    {
+      "file": "source_f15e38bcdbb78006e71e2d613f376e2bccfc2942595ffcf1e5b30039be8fff11.json",
+      "sha256": "6fd30a0a461211c891c5bb60637c8c1a6a06f552f75f5a3c611098022896ef2a"
+    },
+    {
+      "file": "source_f61fe34c716cfc3eb25b6df6bc4e63b15eb5c5caa2d4ad1863c8fc66bcc3a82f.json",
+      "sha256": "c2ad6e95ea967d45cfd2fa01fb10c66fcb30db9479cc67a385bfcc36dfce4c86"
+    }
+  ],
+  "errors": [],
+  "sha256": "3503b931768fc8c832c3a66102831484a217825512d31fa236210c7392793792"
+}

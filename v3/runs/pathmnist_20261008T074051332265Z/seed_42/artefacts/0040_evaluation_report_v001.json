@@ -1,0 +1,217 @@
+{
+  "artefact": "evaluation_report",
+  "artefact_type": "EvalReport",
+  "created_at": "2026-10-08T08:21:50.277768+00:00",
+  "payload": {
+    "accuracy": 0.846518,
+    "accuracy_ci95_high": 0.85467,
+    "accuracy_ci95_low": 0.837996,
+    "balanced_accuracy": 0.810642,
+    "confusion_matrix": [
+      [
+        1224,
+        0,
+        2,
+        0,
+        5,
+        91,
+        7,
+        0,
+        9
+      ],
+      [
+        0,
+        847,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        9,
+        0,
+        266,
+        0,
+        0,
+        42,
+        0,
+        21,
+        1
+      ],
+      [
+        3,
+        0,
+        5,
+        626,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        56,
+        80,
+        0,
+        0,
+        766,
+        12,
+        67,
+        6,
+        48
+      ],
+      [
+        60,
+        2,
+        86,
+        0,
+        0,
+        344,
+        2,
+        98,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        9,
+        2,
+        0,
+        639,
+        2,
+        88
+      ],
+      [
+        6,
+        1,
+        92,
+        0,
+        1,
+        49,
+        13,
+        203,
+        56
+      ],
+      [
+        0,
+        0,
+        4,
+        37,
+        3,
+        1,
+        25,
+        0,
+        1163
+      ]
+    ],
+    "macro_f1": 0.803863,
+    "macro_precision": 0.80749,
+    "macro_recall": 0.810642,
+    "n_samples": 7180,
+    "per_class": [
+      {
+        "f1": 0.907675,
+        "label": 0,
+        "name": "adipose",
+        "precision": 0.900662,
+        "recall": 0.914798,
+        "recall_ci95_high": 0.928596,
+        "recall_ci95_low": 0.898626,
+        "support": 1338
+      },
+      {
+        "f1": 0.953292,
+        "label": 1,
+        "name": "background",
+        "precision": 0.910753,
+        "recall": 1.0,
+        "recall_ci95_high": 1.0,
+        "recall_ci95_low": 0.995485,
+        "support": 847
+      },
+      {
+        "f1": 0.670025,
+        "label": 2,
+        "name": "debris",
+        "precision": 0.584615,
+        "recall": 0.784661,
+        "recall_ci95_high": 0.825099,
+        "recall_ci95_low": 0.737843,
+        "support": 339
+      },
+      {
+        "f1": 0.958652,
+        "label": 3,
+        "name": "lymphocytes",
+        "precision": 0.931548,
+        "recall": 0.987382,
+        "recall_ci95_high": 0.993593,
+        "recall_ci95_low": 0.9753,
+        "support": 634
+      },
+      {
+        "f1": 0.845475,
+        "label": 4,
+        "name": "mucus",
+        "precision": 0.985843,
+        "recall": 0.740097,
+        "recall_ci95_high": 0.765894,
+        "recall_ci95_low": 0.712524,
+        "support": 1035
+      },
+      {
+        "f1": 0.608311,
+        "label": 5,
+        "name": "smooth muscle",
+        "precision": 0.638219,
+        "recall": 0.581081,
+        "recall_ci95_high": 0.620177,
+        "recall_ci95_low": 0.540939,
+        "support": 592
+      },
+      {
+        "f1": 0.855422,
+        "label": 6,
+        "name": "normal colon mucosa",
+        "precision": 0.848606,
+        "recall": 0.862348,
+        "recall_ci95_high": 0.885293,
+        "recall_ci95_low": 0.835666,
+        "support": 741
+      },
+      {
+        "f1": 0.540613,
+        "label": 7,
+        "name": "cancer-associated stroma",
+        "precision": 0.615152,
+        "recall": 0.482185,
+        "recall_ci95_high": 0.529861,
+        "recall_ci95_low": 0.434831,
+        "support": 421
+      },
+      {
+        "f1": 0.895304,
+        "label": 8,
+        "name": "colorectal adenocarcinoma epithelium",
+        "precision": 0.852015,
+        "recall": 0.943228,
+        "recall_ci95_high": 0.954821,
+        "recall_ci95_low": 0.928882,
+        "support": 1233
+      }
+    ],
+    "primary_metric": "accuracy",
+    "roc_auc_ovr_macro": 0.959244,
+    "schema_version": "1.0",
+    "split": "test"
+  },
+  "payload_sha256": "dd520c1588d6ed59cc252c55ac6121440677a9e14ac2053cc5eb15abf3f67277",
+  "producer": "evaluation",
+  "run_id": "seed_42",
+  "sequence": 40,
+  "version": 1
+}

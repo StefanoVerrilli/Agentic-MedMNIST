@@ -1,0 +1,29 @@
+{
+  "artefact": "anomaly_prior_art",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-08T07:42:39.336003+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "Prior-art stage is internally consistent and the evidence chain is traceable. Three curated-excerpt sources (ViT, Compact Transformers, MedMNIST v2) support four hypotheses and two proposals. Key observations:\n\n1. **Curated-excerpt provenance (deterministic warning)**: All three sources carry origin=curated_excerpt, meaning they are unverified external evidence. The short quotes are plausible for the cited papers, but they cannot be independently confirmed as verbatim. This is a warning, not a stop condition, and the hypotheses are appropriately tagged hypothesis_to_validate.\n\n2. **tissue_geometric_aug gate placement**: The proposal's operations are [hflip, vflip], both of which are built-in augmentations that per pipeline rules do not require extension approval. Its presence in the extension_gate_report as pending_review is a process inconsistency but does not invalidate the proposal or block downstream stages. The label-preservation rationale for histopathology is sound.\n\n3. **compact_conv_stem_transformer gate placement**: This is a custom architecture (conv stem + 2-layer transformer, 49 tokens, dim 64) and is NOT one of the seven built-in families (it is not 'compact_transformer'). It correctly requires extension approval and is appropriately pending_review. The spec is detailed and self-consistent.\n\n4. **Evidence-to-hypothesis support**: The ViT quote ('a pure transformer applied directly to sequences of image patches') is used to motivate a 28×28 / 16-token histopathology hypothesis. The quote establishes traceability to ViT but does not itself validate the transfer to 28×28 RGB histology at 90k samples. Similarly, the MedMNIST 28×28 quote supports the resolution context but not the specific class-weighted-loss hypothesis. These gaps are acceptable at the hypothesis stage but should be resolved during validation.\n\n5. **Data profile consistency**: Class counts sum to the stated split sizes (89996 train, 10004 val). Imbalance ratio 1.63 is mild. Train/val proportions are nearly identical, confirming no split-level distribution shift. 28×28×3 RGB, 9 classes — consistent with the standard MedMNIST distribution.\n\n6. **Compacted fields and omitted artefacts**: Five fields were preview-truncated and three artefacts (dataset_manifest, run_manifest, worker_evidence) are omitted. Per pipeline rules these are preview-level omissions, not incomplete persisted artefacts, and do not warrant regeneration.\n\nNo deterministic finding reaches critical severity. The stage is ready to proceed to the next stage with the noted warnings carried forward.",
+    "deterministic_issues": [
+      "warning:curated excerpts are not live retrieval evidence"
+    ],
+    "llm_issues": [
+      "All three literature sources are curated excerpts (unverified external evidence); quotes are plausible but not independently verified as verbatim from the cited papers.",
+      "tissue_geometric_aug uses only built-in augmentations (hflip, vflip) which do not require extension approval per pipeline rules, yet it is listed as pending_review in the extension gate — a process inconsistency that should be resolved before the gate is finalized.",
+      "Evidence-to-hypothesis support is partial: the ViT quote does not directly validate transfer to 28×28 histopathology at 90k samples, and the MedMNIST 28×28 quote does not directly support the class-weighted-loss hypothesis; both are acceptable at hypothesis stage but need empirical validation.",
+      "image_digest is null in worker_evidence (flagged at ingestion and profiling); should be populated before any remote or audited execution.",
+      "Worker isolation is local_subprocess with enforced=false; acceptable for local runs but should be noted in any reproducibility audit trail."
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8:latest",
+    "stage": "prior_art"
+  },
+  "payload_sha256": "bc939f22fd2472d77ae3ea0508d8de6fd39f5761a86859b409a5f0ffeddf4b45",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 13,
+  "version": 1
+}

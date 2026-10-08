@@ -1,0 +1,125 @@
+{
+  "artefact": "prior_art_brief",
+  "artefact_type": "PriorArtBrief",
+  "created_at": "2026-10-08T07:42:14.150522+00:00",
+  "payload": {
+    "ideas": [
+      {
+        "evidence_quote": "a pure transformer applied directly to sequences of image patches",
+        "hypothesis": "Applying a pure transformer directly to sequences of image patches on 28x28 RGB histopathology images, using 7x7 non-overlapping patches to yield 16 tokens, provides a compact global-context representation that may capture inter-region tissue relationships better than a standard CNN, while keeping the sequence short enough to avoid overfitting on ~90k samples.",
+        "idea_id": "patch_transformer_28x28",
+        "source_id": "arxiv_2010_11929",
+        "status": "hypothesis_to_validate",
+        "target": "representation"
+      },
+      {
+        "evidence_quote": "with the right size, convolutional tokenization, transformers can avoid overfitting",
+        "hypothesis": "Replacing the standard linear patch-embedding projection with a small convolutional stem (e.g., 3x3 conv with stride 7) for tokenization, combined with a reduced transformer width and depth, allows a transformer to avoid overfitting on the 28x28 PathMNIST dataset by learning spatially-aware local features before global attention, while keeping parameter count low.",
+        "idea_id": "conv_tokenization_compact",
+        "source_id": "arxiv_2104_05704",
+        "status": "hypothesis_to_validate",
+        "target": "architecture"
+      },
+      {
+        "evidence_quote": "All images are pre-processed into a small size of 28x28 (2D)",
+        "hypothesis": "Because all images are pre-processed to 28x28, the patch granularity must be chosen carefully: 4x4 patches yield 49 tokens (richer local detail but longer sequence), while 7x7 patches yield 16 tokens (coarser but shorter). For histopathology where nuclear morphology at sub-pixel scale matters, 4x4 patches with a convolutional stem may preserve more discriminative texture than 7x7 patches.",
+        "idea_id": "small_image_patch_granularity",
+        "source_id": "arxiv_2110_14795",
+        "status": "hypothesis_to_validate",
+        "target": "representation"
+      },
+      {
+        "evidence_quote": "All images are pre-processed into a small size of 28x28 (2D)",
+        "hypothesis": "Given the class counts range from 7886 to 12885 (ratio ~1.63:1), a mild class-weighted cross-entropy or focal loss during training may improve minority-class recall without destabilizing majority-class performance, especially when combined with the compact transformer's limited capacity.",
+        "idea_id": "class_balance_aware_training",
+        "source_id": "arxiv_2110_14795",
+        "status": "hypothesis_to_validate",
+        "target": "training"
+      }
+    ],
+    "proposals": [
+      {
+        "description": "Apply horizontal flip and vertical flip as training-time augmentations for 28x28 RGB histopathology patches. Tissue microstructures (nuclei, cytoplasm, stroma, glandular patterns) do not carry an inherent left-right or top-bottom orientation cue that would change the pathological class label. This doubles the effective training set per sample and encourages the model to learn orientation-invariant features, which is beneficial for a compact transformer with limited capacity.",
+        "implementation_requirements": [],
+        "kind": "augmentation",
+        "label_preservation_rationale": "Histopathology class labels (e.g., normal vs. adenocarcinoma, benign vs. malignant) are determined by cellular morphology, nuclear-to-cytoplasmic ratio, and tissue architecture, none of which are inherently directional. Flipping a tissue patch does not alter the presence or absence of pathological features, so the class label is preserved.",
+        "operations": [
+          "hflip",
+          "vflip"
+        ],
+        "proposal_id": "tissue_geometric_aug",
+        "source_ids": [
+          "arxiv_2110_14795",
+          "arxiv_2104_05704"
+        ]
+      },
+      {
+        "description": "A non-executable architecture specification for a compact transformer on 28x28x3 input: (1) Conv stem: 3x3 Conv, stride 4, padding 1, output 7x7x64, then reshape to 49 tokens of dim 64. (2) Add learned positional embeddings (49 x 64). (3) Two transformer encoder layers, each with 4-head self-attention (head_dim=16), FFN with hidden dim 128, pre-norm LayerNorm, residual connections. (4) Global average pooling over the 49 token positions. (5) Linear head to 9 classes. Total parameters roughly 0.5-0.8M, well within the capacity needed for ~90k samples at 28x28. The convolutional stem provides local spatial inductive bias before global attention, reducing the risk of overfitting noted in compact transformer literature.",
+        "implementation_requirements": [
+          "Input tensor shape: batch x 28 x 28 x 3",
+          "Conv stem: 3x3 kernel, stride 4, padding 1, 64 output channels, producing 7x7x64 feature map",
+          "Reshape 7x7x64 to sequence of 49 tokens, each of dimension 64",
+          "Learned positional embedding tensor of shape (49, 64) added to token sequence",
+          "Two transformer blocks: pre-norm, 4 attention heads, head_dim 16, FFN hidden 128, dropout 0.1",
+          "Global average pooling over 49 positions to produce a single 64-dim vector",
+          "Linear classifier head: 64 -> 9",
+          "Weight initialization: Xavier uniform for linear layers, truncated normal for conv stem",
+          "Training: AdamW, lr 3e-4, cosine schedule, weight decay 0.05, batch size 128, 50 epochs",
+          "No test-set access; validation split only for early stopping"
+        ],
+        "kind": "architecture",
+        "label_preservation_rationale": "",
+        "operations": [],
+        "proposal_id": "compact_conv_stem_transformer",
+        "source_ids": [
+          "arxiv_2010_11929",
+          "arxiv_2104_05704",
+          "arxiv_2110_14795"
+        ]
+      }
+    ],
+    "query": "all:PathMNIST OR (all:histology AND all:\"compact transformer\")",
+    "retrieval_errors": [],
+    "retrieval_mode": "bundled",
+    "schema_version": "1.0",
+    "source": "qwen3.8:latest",
+    "sources": [
+      {
+        "origin": "curated_excerpt",
+        "retrieved_at": "2026-10-08T07:41:38.987113+00:00",
+        "snapshot_path": "blobs/literature/source_f091c2ef191642d31d9b18f55f498d1af85352eed6f893d76ec3c7ff1577b8bd.json",
+        "snapshot_sha256": "013ce03d1935d4683663dc5d1421835147dcaa717c9568e522ec2bbf0d6cfbd8",
+        "source_id": "arxiv_2010_11929",
+        "text": "a pure transformer applied directly to sequences of image patches",
+        "title": "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale",
+        "url": "https://arxiv.org/abs/2010.11929"
+      },
+      {
+        "origin": "curated_excerpt",
+        "retrieved_at": "2026-10-08T07:41:38.987535+00:00",
+        "snapshot_path": "blobs/literature/source_f15e38bcdbb78006e71e2d613f376e2bccfc2942595ffcf1e5b30039be8fff11.json",
+        "snapshot_sha256": "6fd30a0a461211c891c5bb60637c8c1a6a06f552f75f5a3c611098022896ef2a",
+        "source_id": "arxiv_2104_05704",
+        "text": "with the right size, convolutional tokenization, transformers can avoid overfitting",
+        "title": "Escaping the Big Data Paradigm with Compact Transformers",
+        "url": "https://arxiv.org/abs/2104.05704"
+      },
+      {
+        "origin": "curated_excerpt",
+        "retrieved_at": "2026-10-08T07:41:38.987955+00:00",
+        "snapshot_path": "blobs/literature/source_f61fe34c716cfc3eb25b6df6bc4e63b15eb5c5caa2d4ad1863c8fc66bcc3a82f.json",
+        "snapshot_sha256": "c2ad6e95ea967d45cfd2fa01fb10c66fcb30db9479cc67a385bfcc36dfce4c86",
+        "source_id": "arxiv_2110_14795",
+        "text": "All images are pre-processed into a small size of 28x28 (2D)",
+        "title": "MedMNIST v2 -- A large-scale lightweight benchmark for 2D and 3D biomedical image classification",
+        "url": "https://arxiv.org/abs/2110.14795"
+      }
+    ],
+    "test_metrics_used": false
+  },
+  "payload_sha256": "029d4d7720fdf129f9e53478734302698a78fa30c16cefc23d739d1d0e1649c3",
+  "producer": "prior_art",
+  "run_id": "seed_42",
+  "sequence": 10,
+  "version": 1
+}

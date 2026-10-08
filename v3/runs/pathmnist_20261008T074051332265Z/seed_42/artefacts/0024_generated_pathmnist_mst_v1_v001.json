@@ -1,0 +1,39 @@
+{
+  "artefact": "generated_pathmnist_mst_v1",
+  "artefact_type": "GeneratedBundle",
+  "created_at": "2026-10-08T07:45:32.697221+00:00",
+  "payload": {
+    "author": "experimental_development",
+    "files": {
+      "experiment.py": "6c77e45d5d9791c097c3cfbddfc841f7640a91f08712793a01cebcba29d6344f"
+    },
+    "hypothesis": "Multi-scale joint attention over patch sizes 2, 4, 7 captures both sub-cellular nuclear morphology and broader tissue architecture in a single forward pass, outperforming single-scale approaches on 28x28 histopathology patches where visual ambiguity between classes (background/debris/mucus, smooth muscle/stroma) requires multi-granularity discrimination. Hidden width 128 with depth 2 provides sufficient capacity for ~90k samples while avoiding overfitting on the 196-token fine-scale branch.",
+    "parent_sha256": null,
+    "reference": {
+      "bundle_id": "pathmnist_mst_v1",
+      "parameters": {
+        "depth": 2,
+        "dropout": 0.1,
+        "hidden": 128,
+        "mlp_ratio": 4,
+        "num_heads": 4,
+        "pooling": "mean",
+        "scales": [
+          2,
+          4,
+          7
+        ]
+      },
+      "path": "generated/pathmnist_mst_v1/v001/manifest.json",
+      "sha256": "6401d2ffa54b728a65a31cf595ab2cb4250e973ec3e3f9f442b123bcb6271ff1",
+      "version": 1
+    },
+    "schema_version": "1.0",
+    "source": "qwen3.8:latest"
+  },
+  "payload_sha256": "46b46a0239e2198a8d569cd7e7c816a34221296ffcf4719e9431b30e557ebb25",
+  "producer": "experimental_development",
+  "run_id": "seed_42",
+  "sequence": 24,
+  "version": 1
+}

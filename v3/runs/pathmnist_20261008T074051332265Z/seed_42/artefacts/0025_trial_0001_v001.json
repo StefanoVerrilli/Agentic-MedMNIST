@@ -1,0 +1,318 @@
+{
+  "artefact": "trial_0001",
+  "artefact_type": "TrialResult",
+  "created_at": "2026-10-08T08:00:41.124981+00:00",
+  "payload": {
+    "best_epoch": 6,
+    "candidate_id": "autonomous_t0001",
+    "checkpoint_path": "blobs/search/autonomous_t0001_s0001.ckpt",
+    "checkpoint_sha256": "fc88d748b3f98dd931cdf3655fcd225c759287564fa777efa29186383342da7d",
+    "config": {
+      "adam_beta1": 0.9,
+      "adam_beta2": 0.999,
+      "batch_size": 256,
+      "channel_cap": 256,
+      "class_weighting": true,
+      "cosine_eta_min": 0.0,
+      "depth": 2,
+      "device": "cuda",
+      "dropout": 0.0,
+      "early_stopping_min_delta": 0.005,
+      "early_stopping_monitor": "val_accuracy",
+      "early_stopping_patience": 5,
+      "epochs": 30,
+      "execution_mode": "agent_autonomous",
+      "generated_bundle": {
+        "bundle_id": "pathmnist_mst_v1",
+        "parameters": {
+          "depth": 2,
+          "dropout": 0.1,
+          "hidden": 128,
+          "mlp_ratio": 4,
+          "num_heads": 4,
+          "pooling": "mean",
+          "scales": [
+            2,
+            4,
+            7
+          ]
+        },
+        "path": "generated/pathmnist_mst_v1/v001/manifest.json",
+        "sha256": "6401d2ffa54b728a65a31cf595ab2cb4250e973ec3e3f9f442b123bcb6271ff1",
+        "version": 1
+      },
+      "gradient_clip_val": 1.0,
+      "hidden": 64,
+      "label_smoothing": 0.1,
+      "lr": 0.0002,
+      "mlp_ratio": 4,
+      "model_family": "run_generated",
+      "momentum": 0.9,
+      "nesterov": true,
+      "num_heads": 4,
+      "one_cycle_pct_start": 0.1,
+      "optimizer": "adamw",
+      "optimizer_eps": 1e-08,
+      "patch_size": 4,
+      "plateau_factor": 0.5,
+      "plateau_patience": 1,
+      "pooling": "cls",
+      "positional_encoding": "learned",
+      "rationale": "Multi-scale joint attention over patch sizes 2, 4, 7 captures both sub-cellular nuclear morphology and broader tissue architecture in a single forward pass, outperforming single-scale approaches on 28x28 histopathology patches where visual ambiguity between classes (background/debris/mucus, smooth muscle/stroma) requires multi-granularity discrimination. Hidden width 128 with depth 2 provides sufficient capacity for ~90k samples while avoiding overfitting on the 196-token fine-scale branch.",
+      "scales": [
+        2,
+        4,
+        7
+      ],
+      "scheduler": "cosine",
+      "schema_version": "1.0",
+      "seed": 42,
+      "segment_targets": [],
+      "source": "qwen3.8:latest",
+      "tokenizer_layers": 2,
+      "weight_decay": 0.0001,
+      "worker": {
+        "max_bundles": 32,
+        "timeout_seconds": 3600
+      }
+    },
+    "config_hash": "1e0bd02ff6ffc17b435248f56e5128a10f79c074e0fd2bdf9dc4d25961cdfe46",
+    "decision_source": "qwen3.8:latest",
+    "duration_seconds": 908.3728881610004,
+    "epoch_budget": null,
+    "epochs_completed": 11,
+    "error": null,
+    "failed_operation": null,
+    "failure_kind": null,
+    "failure_signature": null,
+    "learning_curve": [
+      {
+        "epoch": 1,
+        "learning_rate": 0.0002,
+        "train_loss": 0.762817283476093,
+        "val_accuracy": 0.941523,
+        "val_loss": 0.2197573333978653,
+        "val_macro_f1": 0.940453
+      },
+      {
+        "epoch": 2,
+        "learning_rate": 0.00019945218953682734,
+        "train_loss": 0.6158705858245445,
+        "val_accuracy": 0.967113,
+        "val_loss": 0.15874071419239044,
+        "val_macro_f1": 0.966541
+      },
+      {
+        "epoch": 3,
+        "learning_rate": 0.00019781476007338058,
+        "train_loss": 0.5783788105630279,
+        "val_accuracy": 0.97501,
+        "val_loss": 0.13980402052402496,
+        "val_macro_f1": 0.974445
+      },
+      {
+        "epoch": 4,
+        "learning_rate": 0.00019510565162951537,
+        "train_loss": 0.5574966369059262,
+        "val_accuracy": 0.980308,
+        "val_loss": 0.12441317737102509,
+        "val_macro_f1": 0.979918
+      },
+      {
+        "epoch": 5,
+        "learning_rate": 0.00019135454576426006,
+        "train_loss": 0.5442202481430988,
+        "val_accuracy": 0.980808,
+        "val_loss": 0.12277936935424805,
+        "val_macro_f1": 0.980465
+      },
+      {
+        "epoch": 6,
+        "learning_rate": 0.00018660254037844388,
+        "train_loss": 0.5357111271199927,
+        "val_accuracy": 0.986206,
+        "val_loss": 0.11171162873506546,
+        "val_macro_f1": 0.986144
+      },
+      {
+        "epoch": 7,
+        "learning_rate": 0.00018090169943749476,
+        "train_loss": 0.5288350944603273,
+        "val_accuracy": 0.983007,
+        "val_loss": 0.11811158061027527,
+        "val_macro_f1": 0.982667
+      },
+      {
+        "epoch": 8,
+        "learning_rate": 0.00017431448254773944,
+        "train_loss": 0.5239908129337683,
+        "val_accuracy": 0.988405,
+        "val_loss": 0.10489360243082047,
+        "val_macro_f1": 0.988294
+      },
+      {
+        "epoch": 9,
+        "learning_rate": 0.00016691306063588583,
+        "train_loss": 0.5194818985337827,
+        "val_accuracy": 0.988005,
+        "val_loss": 0.10879218578338623,
+        "val_macro_f1": 0.987857
+      },
+      {
+        "epoch": 10,
+        "learning_rate": 0.00015877852522924732,
+        "train_loss": 0.516268451019778,
+        "val_accuracy": 0.990504,
+        "val_loss": 0.10380697250366211,
+        "val_macro_f1": 0.990236
+      },
+      {
+        "epoch": 11,
+        "learning_rate": 0.00015000000000000001,
+        "train_loss": 0.5135980611272316,
+        "val_accuracy": 0.989804,
+        "val_loss": 0.10534465312957764,
+        "val_macro_f1": 0.989629
+      }
+    ],
+    "lightning_csv_path": null,
+    "parent_candidate_id": null,
+    "representation": {
+      "augmentations": [
+        "hflip",
+        "vflip",
+        "rotate90",
+        "rotate180",
+        "brightness",
+        "contrast"
+      ],
+      "normalization": "standardize",
+      "rationale": "Standardization (zero-mean, unit-variance) is selected over unit-range scaling because the downstream architecture is a compact transformer operating on 16 patch tokens (7x7 non-overlapping patches on 28x28 RGB). Transformers are notably more sensitive to input magnitude than CNNs; centering each channel to zero mean and scaling to unit variance stabilizes attention logits and gradient flow, especially given the small per-channel stds (0.124, 0.177, 0.124) which would otherwise produce near-constant inputs after unit scaling. The channel means (0.741, 0.533, 0.706) confirm the data is already in [0,1], so standardization adds the critical centering step without distorting relative channel relationships in H&E staining. All six approved augmentations are applied train-only: hflip, vflip, rotate90, and rotate180 are orientation-safe for tissue-type labels (tissue morphology is rotation/flip invariant at the classification level), while brightness and contrast simulate inter-lab staining variability without altering structural content. This augmentation set maximizes effective training diversity on ~90k samples with mild class imbalance (1.63:1) without introducing geometric distortions that could confuse nuclear/cytoplasmic texture cues critical for distinguishing the 9 tissue classes."
+    },
+    "requested_epochs": 30,
+    "resume_path": "blobs/search/autonomous_t0001_s0001.resume.pt",
+    "resume_sha256": "83100c6ff08b60950a081b35179bb2e96daa938128a74e2a8ab5f1060e4eb926",
+    "round_index": 1,
+    "schema_version": "1.0",
+    "status": "completed",
+    "stop_reason": "early_stopping",
+    "training_log_path": "blobs/search/autonomous_t0001_s0001.training.jsonl",
+    "training_result": {
+      "best_epoch": 6,
+      "best_val_accuracy": 0.986206,
+      "checkpoint_path": "blobs/search/autonomous_t0001_s0001.ckpt",
+      "checkpoint_sha256": "fc88d748b3f98dd931cdf3655fcd225c759287564fa777efa29186383342da7d",
+      "device": "cuda",
+      "epochs_completed": 11,
+      "final_train_loss": 0.5135980611272316,
+      "final_val_accuracy": 0.989804,
+      "framework": "local.python",
+      "history": [
+        {
+          "epoch": 1,
+          "learning_rate": 0.0002,
+          "train_loss": 0.762817283476093,
+          "val_accuracy": 0.941523,
+          "val_loss": 0.2197573333978653,
+          "val_macro_f1": 0.940453
+        },
+        {
+          "epoch": 2,
+          "learning_rate": 0.00019945218953682734,
+          "train_loss": 0.6158705858245445,
+          "val_accuracy": 0.967113,
+          "val_loss": 0.15874071419239044,
+          "val_macro_f1": 0.966541
+        },
+        {
+          "epoch": 3,
+          "learning_rate": 0.00019781476007338058,
+          "train_loss": 0.5783788105630279,
+          "val_accuracy": 0.97501,
+          "val_loss": 0.13980402052402496,
+          "val_macro_f1": 0.974445
+        },
+        {
+          "epoch": 4,
+          "learning_rate": 0.00019510565162951537,
+          "train_loss": 0.5574966369059262,
+          "val_accuracy": 0.980308,
+          "val_loss": 0.12441317737102509,
+          "val_macro_f1": 0.979918
+        },
+        {
+          "epoch": 5,
+          "learning_rate": 0.00019135454576426006,
+          "train_loss": 0.5442202481430988,
+          "val_accuracy": 0.980808,
+          "val_loss": 0.12277936935424805,
+          "val_macro_f1": 0.980465
+        },
+        {
+          "epoch": 6,
+          "learning_rate": 0.00018660254037844388,
+          "train_loss": 0.5357111271199927,
+          "val_accuracy": 0.986206,
+          "val_loss": 0.11171162873506546,
+          "val_macro_f1": 0.986144
+        },
+        {
+          "epoch": 7,
+          "learning_rate": 0.00018090169943749476,
+          "train_loss": 0.5288350944603273,
+          "val_accuracy": 0.983007,
+          "val_loss": 0.11811158061027527,
+          "val_macro_f1": 0.982667
+        },
+        {
+          "epoch": 8,
+          "learning_rate": 0.00017431448254773944,
+          "train_loss": 0.5239908129337683,
+          "val_accuracy": 0.988405,
+          "val_loss": 0.10489360243082047,
+          "val_macro_f1": 0.988294
+        },
+        {
+          "epoch": 9,
+          "learning_rate": 0.00016691306063588583,
+          "train_loss": 0.5194818985337827,
+          "val_accuracy": 0.988005,
+          "val_loss": 0.10879218578338623,
+          "val_macro_f1": 0.987857
+        },
+        {
+          "epoch": 10,
+          "learning_rate": 0.00015877852522924732,
+          "train_loss": 0.516268451019778,
+          "val_accuracy": 0.990504,
+          "val_loss": 0.10380697250366211,
+          "val_macro_f1": 0.990236
+        },
+        {
+          "epoch": 11,
+          "learning_rate": 0.00015000000000000001,
+          "train_loss": 0.5135980611272316,
+          "val_accuracy": 0.989804,
+          "val_loss": 0.10534465312957764,
+          "val_macro_f1": 0.989629
+        }
+      ],
+      "lightning_config_path": null,
+      "lightning_csv_path": null,
+      "resume_path": "blobs/search/autonomous_t0001_s0001.resume.pt",
+      "resume_sha256": "83100c6ff08b60950a081b35179bb2e96daa938128a74e2a8ab5f1060e4eb926",
+      "schema_version": "1.0",
+      "seed": 42,
+      "stop_reason": "early_stopping",
+      "training_log_path": "blobs/search/autonomous_t0001_s0001.training.jsonl"
+    },
+    "validation_accuracy": 0.986206,
+    "validation_balanced_accuracy": 0.986421,
+    "validation_macro_f1": 0.986144
+  },
+  "payload_sha256": "2ed454d8ea63338a69f4900dba8f0ee5ca95f44b474c8dbaf27db97912009be2",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 25,
+  "version": 1
+}

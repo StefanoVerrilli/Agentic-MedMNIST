@@ -1,0 +1,28 @@
+{
+  "artefact": "anomaly_preprocessing",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-08T07:43:18.827484+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "Preprocessing stage is internally consistent and complete. Archive integrity (MD5 a8b06965… matches verified), split fidelity (89996/10004/7180 match official sizes, no subsampling), 28×28 RGB 9-class PathMNIST, and augmentation factor (7×89996=629972) all check out. No deterministic findings are present.\n\nWarnings noted (none blocking):\n\n1. **Extension-gate process inconsistency (tissue_geometric_aug)**: The proposal references only built-in augmentations (hflip, vflip), which per pipeline rules do not require extension approval. Its presence as pending_review in the gate is a process inconsistency flagged by the prior-art stage. This does not invalidate the built-in primitives—they remain available regardless of the gate entry. The gate entry should be cleaned up or auto-resolved, but it does not block progression.\n\n2. **compact_conv_stem_transformer pending review**: This appears to be a genuinely new architecture (conv-stem + transformer hybrid), distinct from the built-in compact_transformer family. Its pending_review status is appropriate and the gate correctly applies only to this specific proposal. No action needed beyond awaiting the hash-bound review.\n\n3. **Curated-excerpt provenance**: All three prior-art sources carry origin=curated_excerpt (unverified external evidence). Quotes are plausible but not independently verified as verbatim. Acceptable at hypothesis stage; empirical validation will follow.\n\n4. **image_digest is null** in worker_evidence (flagged at ingestion, prior-art, and profiling). Acceptable for local runs; should be populated before any remote or audited execution.\n\n5. **Worker isolation**: local_subprocess with enforced=false. Acceptable for local execution; note for reproducibility audit trail.\n\n6. **Representation-plan / architecture alignment**: The rationale references a 'compact transformer operating on 16 patch tokens (7×7 patches on 28×28)', which is consistent with the built-in compact_transformer family. The pending compact_conv_stem_transformer proposal is a separate, more specific variant. Ensure the final architecture selection is unambiguous before training.\n\n7. **Class ambiguity at 28×28**: Inherent to the resolution (background/debris/mucus, adipose, smooth-muscle/stroma overlap). Imbalance ratio is modest (1.63). No split-level distribution mismatch detected. These are expected limitations, not defects.\n\nNo deterministic findings justify stop. The prior-art 'revise' recommendation is addressed by the warnings above; none rise to a blocking condition. Proceed to the next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "tissue_geometric_aug is listed as pending_review in the extension gate despite using only built-in augmentations (hflip, vflip) that do not require extension approval—process inconsistency to resolve",
+      "All three prior-art literature sources are curated excerpts (unverified external evidence); quotes are plausible but not independently verified as verbatim from the cited papers",
+      "image_digest is null in worker_evidence; should be populated before any remote or audited execution",
+      "Worker isolation is local_subprocess with enforced=false; acceptable for local runs but should be noted in reproducibility audit trail",
+      "compact_conv_stem_transformer is a genuinely new architecture proposal (distinct from built-in compact_transformer) and correctly remains pending_review; ensure final architecture selection is unambiguous before training",
+      "Class ambiguity among histology classes (background/debris/mucus, adipose, smooth muscle/stroma) is inherent to 28×28 resolution and will likely limit per-class AUROC; set evaluation expectations accordingly"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8:latest",
+    "stage": "preprocessing"
+  },
+  "payload_sha256": "482bb8fbef56a391a791b36f78c89c33e9c98bad46a4370b53c3b04fa671c2f3",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 17,
+  "version": 1
+}

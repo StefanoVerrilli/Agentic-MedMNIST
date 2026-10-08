@@ -1,0 +1,25 @@
+{
+  "artefact": "anomaly_profiling",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-08T07:41:38.977302+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Profiling stage is internally consistent and complete. Verification summary:\n\n1. **Archive integrity**: archive_md5 (a8b06965200029087d5bd730944a56c1) matches verified_archive_md5. SHA-256 also recorded. No discrepancy.\n\n2. **Split fidelity**: train=89996, val=10004, test=7180 match official_split_sizes exactly; subsampled=false. Class counts sum correctly to these totals (89996 and 10004 respectively).\n\n3. **Distribution consistency**: Train and validation class proportions are nearly identical (max absolute deviation < 0.0001), indicating no split-level distribution shift. Imbalance ratio of 1.63 is modest and manageable with standard cross-entropy or mild class weighting.\n\n4. **Data quality**: blank_image_fraction=0.0, duplicate_train_samples=0, profiled_fraction=1.0. Channel statistics (mean ≈ [0.74, 0.53, 0.71], std ≈ [0.12, 0.18, 0.12]) are reasonable for 28×28 RGB histopathology patches.\n\n5. **Ambiguity risks**: Well-characterised for the 9-class CRC histology task at 28×28 resolution (background/debris/mucus overlap, adipose vs. background, smooth muscle vs. stroma, etc.). These are inherent to the task and resolution, not pipeline errors. The note correctly flags that split-level ambiguity cannot be assessed from aggregate statistics alone.\n\n6. **Test domain note**: CRC-VAL-HE-7K test images originate from a different clinical center — relevant context for OOD interpretation but a dataset property, not a defect.\n\n7. **Minor observations (non-blocking)**: (a) image_digest is null in worker_evidence; already flagged at ingestion as acceptable for local runs. (b) Worker isolation is local_subprocess (not enforced); acceptable for this execution context. Neither affects profiling validity.\n\n8. **Compacted fields**: Two preview truncations (ambiguity_note, anomaly_ingestion.comment) are noted in compacted_fields; per protocol these do not indicate incomplete persisted artefacts and do not warrant regeneration.\n\nNo deterministic findings. No critical or warning-level issues. The profile is ready to inform architecture selection and training configuration.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "image_digest is null in worker_evidence (flagged at ingestion; acceptable for local runs but should be populated before any remote or audited execution)",
+      "Worker isolation is local_subprocess with enforced=false; acceptable for local profiling but should be noted in any reproducibility audit trail",
+      "Ambiguity risks among histology classes (background/debris/mucus, adipose, smooth muscle/stroma) are inherent to 28×28 resolution and will likely limit per-class AUROC; consider this when setting evaluation expectations"
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8:latest",
+    "stage": "profiling"
+  },
+  "payload_sha256": "7feea368a232a4745ef209b88d0127f6db5c8dd98d0984e7fa15e8f4963cae9d",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 9,
+  "version": 1
+}

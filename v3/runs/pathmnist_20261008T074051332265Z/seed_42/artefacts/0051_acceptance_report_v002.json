@@ -1,0 +1,206 @@
+{
+  "artefact": "acceptance_report",
+  "artefact_type": "AcceptanceReport",
+  "created_at": "2026-10-08T08:24:43.528516+00:00",
+  "payload": {
+    "acceptance_ready": false,
+    "criteria": [
+      {
+        "detail": "Every persisted payload and referenced file is checksummed.",
+        "evidence": [
+          "artefacts/",
+          "blobs/"
+        ],
+        "requirement": "WP1_TYPED_VERSIONED_HANDOFFS",
+        "status": "passed"
+      },
+      {
+        "detail": "AST check of direct agent-class calls.",
+        "evidence": [
+          "agents.py"
+        ],
+        "requirement": "WP1_ZERO_DIRECT_AGENT_CALLS",
+        "status": "passed"
+      },
+      {
+        "detail": "Actual train/validation evidence audited before any training.",
+        "evidence": [
+          "data_audit_report",
+          "decision_log.jsonl"
+        ],
+        "requirement": "WP2_PRETRAINING_LEAKAGE_AUDIT",
+        "status": "passed"
+      },
+      {
+        "detail": "Exact supporting quotes resolve to checksummed snapshots; recommendations remain hypotheses.",
+        "evidence": [
+          "prior_art_brief",
+          "blobs/literature/"
+        ],
+        "requirement": "WP2_CITED_IDEAS",
+        "status": "passed"
+      },
+      {
+        "detail": "Curated excerpts alone do not demonstrate web retrieval.",
+        "evidence": [
+          "prior_art_brief"
+        ],
+        "requirement": "WP2_WEB_RETRIEVAL",
+        "status": "failed"
+      },
+      {
+        "detail": "Test metrics are excluded from search and configuration selection.",
+        "evidence": [
+          "best_configuration",
+          "search_report"
+        ],
+        "requirement": "WP3_VALIDATION_ONLY_SELECTION",
+        "status": "passed"
+      },
+      {
+        "detail": "Baseline/comparison intentionally not executed for this run; this criterion is not satisfied.",
+        "evidence": [
+          "comparison_report",
+          "baseline_report"
+        ],
+        "requirement": "WP4_BASELINE_COMPARISON",
+        "status": "failed"
+      },
+      {
+        "detail": "Three bounded representation scenarios.",
+        "evidence": [
+          "ablation_report"
+        ],
+        "requirement": "WP4_REPRESENTATION_ABLATIONS",
+        "status": "failed"
+      },
+      {
+        "detail": "At least three completed seeds, with a shared validation-selected configuration.",
+        "evidence": [
+          "../experiment_summary.json"
+        ],
+        "requirement": "WP4_FROZEN_CONFIGURATION_SEED_VARIANCE",
+        "status": "failed"
+      },
+      {
+        "detail": "Validation-calibrated abstention with a persistent benchmark review queue.",
+        "evidence": [
+          "abstention_report",
+          "human_review_queue"
+        ],
+        "requirement": "WP5_ABSTENTION_AND_HANDOFF",
+        "status": "passed"
+      },
+      {
+        "detail": "Every promoted stage has an independent reviewer report.",
+        "evidence": [
+          "anomaly_*",
+          "decision_log.jsonl"
+        ],
+        "requirement": "WP6_STAGE_REVIEWS",
+        "status": "passed"
+      },
+      {
+        "detail": "Decision source and stage are recorded; exact prompts/schema/results are retained.",
+        "evidence": [
+          "decision_log.jsonl",
+          "blobs/reasoning/"
+        ],
+        "requirement": "WP6_DECISION_PROVENANCE",
+        "status": "passed"
+      },
+      {
+        "detail": "Requires passing tests and measured fault injection for this exact source tree.",
+        "evidence": [],
+        "requirement": "WP6_FAULT_DETECTION_GE_90_PERCENT",
+        "status": "pending"
+      },
+      {
+        "detail": "A transcript alone is not proof that retraining reproduces predictions and metrics.",
+        "evidence": [],
+        "requirement": "WP5_FULL_RUN_REPLAY",
+        "status": "pending"
+      },
+      {
+        "detail": "completed_with_warning",
+        "evidence": [
+          "dossier.json"
+        ],
+        "requirement": "WP5_END_TO_END",
+        "status": "passed"
+      },
+      {
+        "detail": "Every unresolved reviewer issue requires an explicit approved mitigation.",
+        "evidence": [
+          "anomaly_*"
+        ],
+        "requirement": "WP6_APPROVED_RISK_MITIGATIONS",
+        "status": "failed"
+      },
+      {
+        "detail": "Requires named independent demonstrator/reviewer, bound predictions and checksummed environment evidence.",
+        "evidence": [],
+        "requirement": "TRL7_INDEPENDENT_DEMONSTRATION_AND_SIGNOFF",
+        "status": "pending"
+      }
+    ],
+    "independent_signoff": null,
+    "kpis": {
+      "cited_idea_fraction": 1.0,
+      "decision_provenance_fraction": 1.0,
+      "decisions_logged": 19,
+      "fault_detection_rate": null,
+      "live_source_fraction": 0.0,
+      "reasoning_snapshots": 19,
+      "unresolved_citation_issues": 0,
+      "unresolved_reviewer_issues": [
+        "All three arXiv evidence sources are unverified_curated_excerpt; design hypotheses remain unconfirmed pending empirical validation",
+        "All three arXiv evidence sources from prior stages are unverified_curated_excerpt; architecture design hypotheses remain unconfirmed pending empirical validation",
+        "All three literature sources are curated excerpts (unverified external evidence); quotes are plausible but not independently verified as verbatim from the cited papers.",
+        "All three prior-art literature sources are curated excerpts (unverified external evidence); quotes are plausible but not independently verified as verbatim from cited papers",
+        "All three prior-art literature sources are curated excerpts (unverified external evidence); quotes are plausible but not independently verified as verbatim from the cited papers",
+        "Architecture research prioritizes compact_transformer first but agent selected multi_scale_transformer; record explicit trial comparison for justification",
+        "Architecture research reportedly prioritized compact_transformer but agent selected multi_scale_transformer; ensure explicit trial comparison is documented in the (omitted) architecture_research artefact",
+        "Class ambiguity among histology classes (background/debris/mucus, adipose, smooth muscle/stroma) is inherent to 28×28 resolution and will likely limit per-class AUROC; set evaluation expectations accordingly",
+        "Configuration ambiguity (hidden/depth/pooling/dropout) between train_config and generated_bundle remains unresolved in this review; verify which set was instantiated in the checkpoint for reproducibility",
+        "Configuration ambiguity (hidden/depth/pooling/dropout) between train_config and generated_bundle remains unresolved; both artefacts omitted from this review",
+        "Configuration conflict: train_config (hidden=64, depth=2, pooling=cls, dropout=0.0) vs generated_bundle (hidden=128, depth=3, pooling=mean, dropout=0.1) — verify which set was instantiated in the checkpoint",
+        "Evidence-to-hypothesis support is partial: the ViT quote does not directly validate transfer to 28×28 histopathology at 90k samples, and the MedMNIST 28×28 quote does not directly support the class-weighted-loss hypothesis; both are acceptable at hypothesis stage but need empirical validation.",
+        "Hidden/depth ambiguity: generated_bundle (128, 3) vs train_config (64, 2) — confirm which set was actually used in training",
+        "Non-monotonic test risk at top of risk-coverage curve (0.07025 at 0.9 target < 0.07228 at 0.8 target); note as discrete-data artefact",
+        "Per-class covered-subset accuracy not reported; add breakdown to distinguish corruption sensitivity from base-class difficulty",
+        "Per-class recall for cancer-associated stroma (0.482) and smooth muscle (0.581) is low; ensure OOD evaluation reports per-class degradation separately to distinguish corruption sensitivity from base-class difficulty",
+        "Pooling mismatch: generated_bundle says 'mean', train_config says 'cls' — reconcile to a single authoritative value",
+        "Prior-art evidence sources are unverified_curated_excerpt; architecture hypotheses remain unconfirmed",
+        "Representation rationale describes compact_transformer with 16 tokens; actual model is multi_scale_transformer with patch_size=4 (49 base tokens) and multi-scale branches — correct the rationale for traceability",
+        "Val-test accuracy gap of ~14.3 pp (0.9892 vs 0.8465) is large; confirm val/test disjointness via split_manifest and document the gap in the final report",
+        "Val-test coverage gap: 80% validation target yields only 57.2% test coverage; document that the 80% figure is a calibration target, not a test guarantee",
+        "Val-test risk gap ~58x (0.00125 vs 0.0723); explain in final report",
+        "Validation accuracy 0.9892 on 9-class PathMNIST is very high; confirm train/val disjointness via split_manifest (currently in omitted_artefacts)",
+        "Validation accuracy 0.9892 on 9-class histopathology is very high; verify train/val disjointness via split_manifest and data_audit_report",
+        "Worker isolation is local_subprocess with enforced=false; acceptable for local runs but should be noted in any reproducibility audit trail.",
+        "Worker isolation is local_subprocess with enforced=false; acceptable for local runs but should be noted in reproducibility audit trail",
+        "compact_conv_stem_transformer is a genuinely new architecture proposal (distinct from built-in compact_transformer) and correctly remains pending_review; ensure final architecture selection is unambiguous before training",
+        "compact_conv_stem_transformer is a genuinely new architecture proposal correctly pending_review; ensure final architecture selection is unambiguous before training",
+        "families_evaluated empty in search_report despite 2 completed trials; populate for auditability",
+        "families_evaluated is empty despite 2 completed trials; should list the evaluated family for auditability",
+        "families_evaluated is empty in search_report despite 2 completed trials; populate with 'multi_scale_transformer' for auditability",
+        "families_evaluated is empty in search_report despite 2 completed trials; record the evaluated family for auditability",
+        "image_digest is null in worker_evidence (flagged at ingestion and profiling); should be populated before any remote or audited execution.",
+        "image_digest is null in worker_evidence; should be populated before any remote or audited execution",
+        "tissue_geometric_aug is listed as pending_review in the extension gate despite using only built-in augmentations (hflip, vflip) that do not require extension approval—process inconsistency to resolve",
+        "tissue_geometric_aug is pending_review in the extension gate despite using only built-in augmentations (hflip, vflip) that do not require extension approval per pipeline rules — process labeling inconsistency",
+        "tissue_geometric_aug uses only built-in augmentations (hflip, vflip) which do not require extension approval per pipeline rules, yet it is listed as pending_review in the extension gate — a process inconsistency that should be resolved before the gate is finalized.",
+        "warning:curated excerpts are not live retrieval evidence"
+      ]
+    },
+    "schema_version": "1.0",
+    "technical_complete": false,
+    "trl7_evidence_complete": false
+  },
+  "payload_sha256": "ded0172abe0f8607c83ec57a8e613c05dcc2b58911055f9a815531683bfa12dc",
+  "producer": "acceptance",
+  "run_id": "seed_42",
+  "sequence": 51,
+  "version": 2
+}

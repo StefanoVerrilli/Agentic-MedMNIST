@@ -1,0 +1,24 @@
+{
+  "artefact": "anomaly_architecture_research",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-08T07:45:05.627365+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "The architecture research is thorough, internally consistent, and correctly scoped to the 28×28 RGB MedMNIST distribution. Key strengths: (1) All seven built-in families are correctly identified as implemented and available without extension approval; the pending 'compact_conv_stem_transformer' is properly noted as functionally subsumed by compact_transformer's built-in convolutional tokenizer. (2) The representation plan uses only built-in augmentations (hflip, vflip, rotate90, rotate180, brightness, contrast) with augmentation_factor 7, correctly avoiding the unavailable 'tissue_geometric_aug' extension. (3) Dataset-specific channel statistics (mean [0.74, 0.53, 0.71], std [0.12, 0.18, 0.12]) are properly specified for standardization, replacing ImageNet defaults. (4) Evidence provenance is correctly handled: all three arXiv sources are flagged as unverified_curated_excerpt, and the analysis explicitly states no performance claims are confirmed. (5) Token-count arithmetic for multi_scale_transformer (196/49/16/4) and vision_transformer (49/16) is verified correct for 28×28 inputs. (6) The mild 1.63:1 imbalance is appropriately addressed with inverse-frequency class-weighted CE, with a reasonable caution against focal loss. (7) ResNet18 is correctly described with its fixed CIFAR-style topology; the analysis only suggests FC-head dropout tuning, not topology changes. Minor note: the parametrization priorities reference a '9-class head' for resnet18; this specific class count should be cross-checked against the data profile when it becomes available, as the task description's '1.63:1 imbalance' is consistent with both binary and multi-class formulations. No deterministic findings are present, no critical inconsistencies detected, and the prioritization (compact_transformer → resnet18 → multi_scale_transformer → remaining) is well-justified for the 28×28 histopathology setting. Proceed to the next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Parametrization priorities reference a '9-class head' for resnet18; verify this class count against the data profile (currently in omitted_artefacts) to confirm it matches the actual label space.",
+      "All three arXiv evidence sources remain unverified curated excerpts; the derived design hypotheses (patch granularity tradeoff, conv-tokenization benefit, class-balancing strategy) should be treated as starting points requiring empirical validation, as the analysis itself correctly states."
+    ],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8:latest",
+    "stage": "architecture_research"
+  },
+  "payload_sha256": "b57c8beffb8d077bcba98c785f6bceb3ae47545e7da79ed2cd76722f1defb9ee",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 21,
+  "version": 1
+}

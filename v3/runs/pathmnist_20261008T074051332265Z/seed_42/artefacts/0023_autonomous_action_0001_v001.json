@@ -1,0 +1,72 @@
+{
+  "artefact": "autonomous_action_0001",
+  "artefact_type": "AutonomousSearchEvent",
+  "created_at": "2026-10-08T07:45:32.690738+00:00",
+  "payload": {
+    "decision": {
+      "action": "new_trial",
+      "additional_epochs": null,
+      "candidate_id": null,
+      "experiment": {
+        "batch_size": 256,
+        "bundle_id": "pathmnist_mst_v1",
+        "epochs": 30,
+        "files": [
+          {
+            "code": "\"\"\"PathMNIST 28x28 RGB histopathology classification - multi_scale_transformer.\"\"\"\nimport torch\nfrom lightning_components import build_network\nfrom worker_runtime import fit_model, batched_logits\n\n\ndef build_model(context):\n    parameters = context[\"parameters\"]\n    return build_network(\n        \"multi_scale_transformer\",\n        in_channels=3,\n        n_classes=9,\n        hidden=parameters.get(\"hidden\", 128),\n        depth=parameters.get(\"depth\", 2),\n        dropout=parameters.get(\"dropout\", 0.1),\n        scales=tuple(parameters.get(\"scales\", [2, 4, 7])),\n        num_heads=parameters.get(\"num_heads\", 4),\n        mlp_ratio=parameters.get(\"mlp_ratio\", 4),\n        pooling=parameters.get(\"pooling\", \"mean\"),\n    )\n\n\ndef train(context):\n    return fit_model(context, build_model(context))\n\n\ndef predict(context):\n    model = build_model(context)\n    model.load_state_dict(torch.load(context[\"checkpoint\"], map_location=\"cpu\", weights_only=True))\n    return batched_logits(model, context[\"data\"][\"images\"], context[\"config\"])",
+            "path": "experiment.py"
+          }
+        ],
+        "hypothesis": "Multi-scale joint attention over patch sizes 2, 4, 7 captures both sub-cellular nuclear morphology and broader tissue architecture in a single forward pass, outperforming single-scale approaches on 28x28 histopathology patches where visual ambiguity between classes (background/debris/mucus, smooth muscle/stroma) requires multi-granularity discrimination. Hidden width 128 with depth 2 provides sufficient capacity for ~90k samples while avoiding overfitting on the 196-token fine-scale branch.",
+        "parameters": {
+          "depth": 2,
+          "dropout": 0.1,
+          "hidden": 128,
+          "mlp_ratio": 4,
+          "num_heads": 4,
+          "pooling": "mean",
+          "scales": [
+            2,
+            4,
+            7
+          ]
+        },
+        "training": {
+          "adam_beta1": 0.9,
+          "adam_beta2": 0.999,
+          "channel_cap": 256,
+          "class_weighting": true,
+          "cosine_eta_min": 0.0,
+          "early_stopping_min_delta": 0.005,
+          "early_stopping_monitor": "val_accuracy",
+          "early_stopping_patience": 5,
+          "gradient_clip_val": 1.0,
+          "label_smoothing": 0.1,
+          "lr": 0.0002,
+          "momentum": 0.9,
+          "nesterov": true,
+          "one_cycle_pct_start": 0.1,
+          "optimizer": "adamw",
+          "optimizer_eps": 1e-08,
+          "plateau_factor": 0.5,
+          "plateau_patience": 1,
+          "scales": [
+            2,
+            4,
+            7
+          ],
+          "scheduler": "cosine",
+          "weight_decay": 0.0001
+        }
+      },
+      "rationale": "Starting with multi_scale_transformer (scales 2,4,7) as the primary architecture. This is explicitly confirmed available in the system prompt and provides multi-granularity tokenization (196, 49, 16 tokens) well-suited for 28x28 histopathology where both nuclear morphology (fine scale) and tissue architecture (coarse scale) matter. Hidden=128 (divisible by 4) with depth=2 gives moderate capacity appropriate for ~90k samples without overfitting risk. AdamW with cosine decay at lr=2e-4 is standard for transformer training. Class weighting enabled for the mild 1.63:1 imbalance. Label smoothing 0.1 helps with the noted class ambiguity (background/debris/mucus, smooth muscle/stroma). 30 epochs is a reasonable initial budget; can continue if validation is still improving. Batch 256 balances throughput and gradient noise for this dataset size."
+    },
+    "schema_version": "1.0",
+    "source": "qwen3.8:latest"
+  },
+  "payload_sha256": "538afa69ff4f56e0ea289af8cc8417bcf9900bb8de181a68c12a01d9a7d83bb5",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 23,
+  "version": 1
+}

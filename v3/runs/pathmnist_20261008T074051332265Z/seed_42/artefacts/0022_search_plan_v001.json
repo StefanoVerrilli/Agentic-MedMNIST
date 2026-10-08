@@ -1,0 +1,24 @@
+{
+  "artefact": "search_plan",
+  "artefact_type": "SearchPlan",
+  "created_at": "2026-10-08T07:45:05.637029+00:00",
+  "payload": {
+    "accuracy_tolerance": 0.005,
+    "final_epochs": null,
+    "framework": "local.python",
+    "max_trials": null,
+    "objective": "validation_accuracy_then_macro_f1",
+    "policy": "agent_autonomous",
+    "progressive_budget": false,
+    "round_epoch_budgets": [],
+    "rounds": null,
+    "schema_version": "1.0",
+    "search_epochs": null,
+    "test_locked": true
+  },
+  "payload_sha256": "2e3604783dcaa1345935449bfa15e2fb39dbc4c532fc4c23e5fc3c31797e8633",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 22,
+  "version": 1
+}

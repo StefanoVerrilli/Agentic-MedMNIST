@@ -1,0 +1,72 @@
+{
+  "artefact": "autonomous_action_0002",
+  "artefact_type": "AutonomousSearchEvent",
+  "created_at": "2026-10-08T08:01:12.981513+00:00",
+  "payload": {
+    "decision": {
+      "action": "new_trial",
+      "additional_epochs": null,
+      "candidate_id": null,
+      "experiment": {
+        "batch_size": 256,
+        "bundle_id": "pathmnist_mst_v2",
+        "epochs": 25,
+        "files": [
+          {
+            "code": "\"\"\"Offline experiment: multi_scale_transformer with increased capacity for PathMNIST 9-class.\"\"\"\nimport torch\nfrom lightning_components import build_network\nfrom worker_runtime import fit_model, batched_logits\n\n\ndef build_model(context):\n    parameters = context[\"parameters\"]\n    return build_network(\n        \"multi_scale_transformer\",\n        in_channels=3,\n        n_classes=9,\n        hidden=parameters.get(\"hidden\", 128),\n        depth=parameters.get(\"depth\", 3),\n        dropout=parameters.get(\"dropout\", 0.1),\n        scales=tuple(parameters.get(\"scales\", [2, 4, 7])),\n        num_heads=parameters.get(\"num_heads\", 4),\n        mlp_ratio=parameters.get(\"mlp_ratio\", 4),\n        pooling=parameters.get(\"pooling\", \"mean\"),\n    )\n\n\ndef train(context):\n    return fit_model(context, build_model(context))\n\n\ndef predict(context):\n    model = build_model(context)\n    model.load_state_dict(torch.load(context[\"checkpoint\"], map_location=\"cpu\", weights_only=True))\n    return batched_logits(model, context[\"data\"][\"images\"], context[\"config\"])",
+            "path": "experiment.py"
+          }
+        ],
+        "hypothesis": "Increasing multi_scale_transformer capacity (hidden 64→128, depth 2→3) will improve discrimination of visually confusable histopathology classes (background/debris/mucus, smooth muscle/stroma, normal mucosa/adenocarcinoma) by providing more representational bandwidth in the joint-attention fusion of multi-granularity tokens, while the 196-token fine-scale branch remains regularized by cross-scale attention and dropout.",
+        "parameters": {
+          "depth": 3,
+          "dropout": 0.1,
+          "hidden": 128,
+          "mlp_ratio": 4,
+          "num_heads": 4,
+          "pooling": "mean",
+          "scales": [
+            2,
+            4,
+            7
+          ]
+        },
+        "training": {
+          "adam_beta1": 0.9,
+          "adam_beta2": 0.999,
+          "channel_cap": 256,
+          "class_weighting": true,
+          "cosine_eta_min": 0.0,
+          "early_stopping_min_delta": 0.003,
+          "early_stopping_monitor": "val_accuracy",
+          "early_stopping_patience": 5,
+          "gradient_clip_val": 1.0,
+          "label_smoothing": 0.1,
+          "lr": 0.0002,
+          "momentum": 0.9,
+          "nesterov": true,
+          "one_cycle_pct_start": 0.1,
+          "optimizer": "adamw",
+          "optimizer_eps": 1e-08,
+          "plateau_factor": 0.5,
+          "plateau_patience": 1,
+          "scales": [
+            2,
+            4,
+            7
+          ],
+          "scheduler": "cosine",
+          "weight_decay": 0.0001
+        }
+      },
+      "rationale": "The first trial (multi_scale_transformer, hidden=64, depth=2) achieved 99.05% val accuracy and early-stopped at epoch 11. The model is small relative to the ~90k training samples. Increasing hidden width to 128 and depth to 3 should provide more capacity to distinguish the confusable histopathology classes (background/debris/mucus, smooth muscle/stroma) without overfitting, since the 196-token fine-scale branch still has sufficient regularization from the joint attention mechanism. I keep the same scales [2,4,7], pooling='mean', and num_heads=4 to isolate the capacity effect. Training uses the same AdamW + cosine schedule that worked well, with slightly tighter early stopping (min_delta=0.003) to capture small improvements. 25 epochs gives ample room for the larger model to converge while staying well within the 1-hour timeout (~82s/epoch × 25 ≈ 34 min)."
+    },
+    "schema_version": "1.0",
+    "source": "qwen3.8:latest"
+  },
+  "payload_sha256": "b6bc07962ed0564e29753dbbbb6359c6aeb2926c1fe0d3988a9df9634c2a8c11",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 26,
+  "version": 1
+}

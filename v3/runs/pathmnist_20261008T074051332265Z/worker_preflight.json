@@ -1,0 +1,8 @@
+{
+  "backend": "local.subprocess",
+  "python_executable": "/media/neurone-pc11/Volume1/Giuseppe/Agentic-MedMNIST/.venv/bin/python",
+  "isolation": {
+    "enforced": false,
+    "execution": "local_subprocess"
+  }
+}

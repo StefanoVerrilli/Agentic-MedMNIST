@@ -1,0 +1,111 @@
+{
+  "artefact": "selected_training_result",
+  "artefact_type": "TrainResult",
+  "created_at": "2026-10-08T08:20:15.878357+00:00",
+  "payload": {
+    "best_epoch": 5,
+    "best_val_accuracy": 0.989204,
+    "checkpoint_path": "blobs/search/autonomous_t0002_s0002.ckpt",
+    "checkpoint_sha256": "0e3c4d1bad80aa24b354eca2ba7be2b088f358f0382ab06079f1455ae08ae592",
+    "device": "cuda",
+    "epochs_completed": 10,
+    "final_train_loss": 0.5066693996768954,
+    "final_val_accuracy": 0.990804,
+    "framework": "local.python",
+    "history": [
+      {
+        "epoch": 1,
+        "learning_rate": 0.0002,
+        "train_loss": 0.7380466952345743,
+        "val_accuracy": 0.947721,
+        "val_loss": 0.21287764608860016,
+        "val_macro_f1": 0.947194
+      },
+      {
+        "epoch": 2,
+        "learning_rate": 0.0001992114701314478,
+        "train_loss": 0.5900395231995147,
+        "val_accuracy": 0.97621,
+        "val_loss": 0.1428321897983551,
+        "val_macro_f1": 0.975847
+      },
+      {
+        "epoch": 3,
+        "learning_rate": 0.0001968583161128631,
+        "train_loss": 0.556619330936846,
+        "val_accuracy": 0.979508,
+        "val_loss": 0.13752755522727966,
+        "val_macro_f1": 0.979259
+      },
+      {
+        "epoch": 4,
+        "learning_rate": 0.00019297764858882514,
+        "train_loss": 0.5393209276906574,
+        "val_accuracy": 0.984906,
+        "val_loss": 0.11964421719312668,
+        "val_macro_f1": 0.98464
+      },
+      {
+        "epoch": 5,
+        "learning_rate": 0.00018763066800438636,
+        "train_loss": 0.5286386363669493,
+        "val_accuracy": 0.989204,
+        "val_loss": 0.10879675298929214,
+        "val_macro_f1": 0.98897
+      },
+      {
+        "epoch": 6,
+        "learning_rate": 0.00018090169943749476,
+        "train_loss": 0.5212029590865435,
+        "val_accuracy": 0.988505,
+        "val_loss": 0.11161895096302032,
+        "val_macro_f1": 0.988383
+      },
+      {
+        "epoch": 7,
+        "learning_rate": 0.00017289686274214118,
+        "train_loss": 0.5160530124092846,
+        "val_accuracy": 0.988505,
+        "val_loss": 0.10746146738529205,
+        "val_macro_f1": 0.988388
+      },
+      {
+        "epoch": 8,
+        "learning_rate": 0.000163742398974869,
+        "train_loss": 0.512450502430212,
+        "val_accuracy": 0.990804,
+        "val_loss": 0.10545138269662857,
+        "val_macro_f1": 0.990395
+      },
+      {
+        "epoch": 9,
+        "learning_rate": 0.00015358267949789966,
+        "train_loss": 0.5090142864660301,
+        "val_accuracy": 0.989804,
+        "val_loss": 0.10925367474555969,
+        "val_macro_f1": 0.989604
+      },
+      {
+        "epoch": 10,
+        "learning_rate": 0.00014257792915650726,
+        "train_loss": 0.5066693996768954,
+        "val_accuracy": 0.990804,
+        "val_loss": 0.10758060216903687,
+        "val_macro_f1": 0.990871
+      }
+    ],
+    "lightning_config_path": null,
+    "lightning_csv_path": null,
+    "resume_path": "blobs/search/autonomous_t0002_s0002.resume.pt",
+    "resume_sha256": "663d24eafa0676a4f0c40fc93cace064a0c4f4cd1101b9ff5d878d30e4da0d91",
+    "schema_version": "1.0",
+    "seed": 42,
+    "stop_reason": "early_stopping",
+    "training_log_path": "blobs/search/autonomous_t0002_s0002.training.jsonl"
+  },
+  "payload_sha256": "f975e6f230f2da8427bd604439b41fc3ee5d6f8e3200f36640e7dfae2e0e6a66",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 32,
+  "version": 1
+}

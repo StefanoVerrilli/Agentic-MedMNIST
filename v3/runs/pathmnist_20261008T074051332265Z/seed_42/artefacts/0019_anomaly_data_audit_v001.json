@@ -1,0 +1,28 @@
+{
+  "artefact": "anomaly_data_audit",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-08T07:43:44.935520+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "Data audit stage passes all integrity checks with no deterministic findings. Verification summary:\n\n1. **Archive integrity**: MD5 a8b06965… matches verified_archive_md5; SHA-256 recorded. No discrepancy.\n2. **Split fidelity**: train=89996, val=10004, test=7180 match official_split_sizes exactly; subsampled=false. Class counts sum correctly to these totals.\n3. **Train/val disjointness**: train_validation_overlap=0; all index, label, pixel, and shape checks pass.\n4. **Data quality**: 0 duplicates, 0 blank images, 28×28×3 RGB, 9-class multi-class PathMNIST. Imbalance ratio 1.63 is modest. Train and val class proportions are nearly identical (max Δ < 0.001), confirming no split-level distribution shift.\n5. **Augmentation**: 6 built-in augmentations (hflip, vflip, rotate90, rotate180, brightness, contrast) × 89996 = 629972 augmented samples. All are pipeline primitives requiring no extension approval.\n6. **Normalization**: Standardize (zero-mean, unit-variance) computed from train stats only. Consistent with the compact-transformer rationale.\n7. **Test domain**: CRC-VAL-HE-7K from a different clinical center — noted for OOD evaluation context.\n\nWarnings (non-blocking, carried from prior stages):\n- **Extension-gate process note**: tissue_geometric_aug is listed as pending_review despite composing only built-in augmentations. Per pipeline rules, built-in primitives do not require extension approval. This is a gate-labeling inconsistency, not a data-integrity issue. It does not block the data_audit stage.\n- **compact_conv_stem_transformer**: Correctly pending_review as a genuinely new architecture proposal distinct from the built-in compact_transformer family. Ensure final architecture selection is unambiguous before training.\n- **image_digest is null** in worker_evidence. Acceptable for local runs; should be populated before any remote or audited execution.\n- **Worker isolation**: local_subprocess, enforced=false. Acceptable for local execution; note in reproducibility audit trail.\n- **Prior-art provenance**: All three literature sources are curated excerpts (unverified external evidence). Quotes are plausible but not independently verified. This does not affect data integrity.\n- **Class ambiguity**: Inherent to 28×28 resolution (background/debris/mucus, adipose, smooth muscle/stroma overlap). Will limit per-class AUROC; set evaluation expectations accordingly.\n\nNo deterministic findings are present. The data_audit report is clean (passed=true, issues=[], all 11 checks true). The stage is ready to proceed to the next pipeline stage.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "tissue_geometric_aug is pending_review in the extension gate despite using only built-in augmentations (hflip, vflip) that do not require extension approval per pipeline rules — process labeling inconsistency",
+      "image_digest is null in worker_evidence; should be populated before any remote or audited execution",
+      "Worker isolation is local_subprocess with enforced=false; acceptable for local runs but should be noted in reproducibility audit trail",
+      "All three prior-art literature sources are curated excerpts (unverified external evidence); quotes are plausible but not independently verified as verbatim from cited papers",
+      "compact_conv_stem_transformer is a genuinely new architecture proposal correctly pending_review; ensure final architecture selection is unambiguous before training",
+      "Class ambiguity among histology classes (background/debris/mucus, adipose, smooth muscle/stroma) is inherent to 28×28 resolution and will likely limit per-class AUROC; set evaluation expectations accordingly"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8:latest",
+    "stage": "data_audit"
+  },
+  "payload_sha256": "dec0c262f221af4568de4eb62d2aec534ddc1d86e46e3cfdd8af8894fc3381d3",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 19,
+  "version": 1
+}

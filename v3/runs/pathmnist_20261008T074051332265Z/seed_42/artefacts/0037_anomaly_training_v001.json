@@ -1,0 +1,27 @@
+{
+  "artefact": "anomaly_training",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-08T08:21:37.520278+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "Training stage completed successfully: 10 epochs, early stopping triggered, valid checkpoint produced (sha256 verified). No deterministic findings. However, several configuration and documentation inconsistencies warrant verification before the evaluation/OOD stage:\n\n1. **Configuration ambiguity (train_config vs generated_bundle):** The top-level train_config specifies hidden=64, depth=2, pooling=\"cls\", dropout=0.0, while the generated_bundle (pathmnist_mst_v2) specifies hidden=128, depth=3, pooling=\"mean\", dropout=0.1. The rationale text explicitly states the intent was to increase capacity (64→128, 2→3), yet the train_config retains the lower values. It is unclear which parameter set was actually instantiated during training. This must be resolved to ensure the checkpoint corresponds to the intended architecture.\n\n2. **Representation rationale mismatch:** The representation plan rationale describes \"a compact transformer operating on 16 patch tokens (7x7 non-overlapping patches on 28x28 RGB).\" The actual model is a multi_scale_transformer (bundle pathmnist_mst_v2) with patch_size=4 and scales [2,4,7]. With patch_size=4 on 28×28, the base grid is 7×7=49 tokens, not 16. The rationale appears to describe a different architecture (compact_transformer) than the one actually selected. This should be corrected for audit traceability.\n\n3. **Validation accuracy plausibility:** 0.9892 val accuracy on 9-class PathMNIST is at the upper end of reported results. While not impossible, it warrants confirmation that the train/val split is disjoint (split_manifest and data_audit_report are in omitted_artefacts and cannot be inspected here). No deterministic leakage finding exists, so this remains a verification request rather than a blocking issue.\n\n4. **families_evaluated is empty:** The search_report lists 2 completed trials but families_evaluated=[]. For auditability, the evaluated family (multi_scale_transformer via run_generated) should be recorded.\n\n5. **Early stopping logic is internally consistent:** Under the min_delta=0.003 interpretation, no epoch after 5 improved by ≥0.003 over 0.989204, so patience=5 was correctly exhausted at epoch 10. The best_epoch=5 designation is consistent with this threshold-based update rule.\n\n6. **model_family=\"run_generated\":** This is a generic bundle-runner, not one of the seven built-in families. The underlying architecture is multi_scale_transformer (per bundle parameters). No extension approval is required for the built-in family itself; the runner is a valid execution mode.\n\n7. **Augmentations and normalization:** All six augmentations (hflip, vflip, rotate90, rotate180, brightness, contrast) are built-in primitives requiring no extension approval. Standardize normalization is appropriate.\n\nNo deterministic findings exist to justify a stop. The configuration ambiguity (item 1) is the most consequential: if the wrong parameter set was used, the checkpoint may not match the intended design. Recommend verifying the instantiated model dimensions from the checkpoint before proceeding to evaluation.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Configuration conflict: train_config (hidden=64, depth=2, pooling=cls, dropout=0.0) vs generated_bundle (hidden=128, depth=3, pooling=mean, dropout=0.1) — verify which set was instantiated in the checkpoint",
+      "Representation rationale describes compact_transformer with 16 tokens; actual model is multi_scale_transformer with patch_size=4 (49 base tokens) and multi-scale branches — correct the rationale for traceability",
+      "Validation accuracy 0.9892 on 9-class PathMNIST is very high; confirm train/val disjointness via split_manifest (currently in omitted_artefacts)",
+      "families_evaluated is empty in search_report despite 2 completed trials; record the evaluated family for auditability",
+      "Architecture research reportedly prioritized compact_transformer but agent selected multi_scale_transformer; ensure explicit trial comparison is documented in the (omitted) architecture_research artefact"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8:latest",
+    "stage": "training"
+  },
+  "payload_sha256": "54cece0b80a4561d4dc3882f403277a195061d7a05920ae862b9f8471220fc77",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 37,
+  "version": 1
+}

@@ -1,0 +1,29 @@
+{
+  "artefact": "anomaly_abstention",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-08T08:23:41.235391+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "Abstention stage is internally consistent and all safety constraints are satisfied. No deterministic findings.\n\n**Verified consistency checks (all pass):**\n- OOD aggregate AUROC: mean of predictive_entropy test AUROCs (0.913138 + 0.971582 + 0.992891)/3 = 0.959204, matching the reported ood_auroc exactly.\n- All six OOD scenario AUROCs exceed the 0.65 minimum; all false-accept rates are far below the 0.20 maximum.\n- abstain_rate (0.427716) = 1 − test_coverage (0.572284); human_review_count 3071 = 7180 × 0.427716 (exact).\n- selective_risk 0.07228 matches the test_risk at the 0.80 target-coverage row.\n- accuracy_on_covered (0.92772) > base_test_accuracy (0.846518), as expected when abstaining on uncertain predictions.\n- OOD evidence and prediction artifact SHA256 hashes are present; ood_scope is correctly labelled \"controlled_corruption_proxy.\"\n\n**Warnings (non-blocking, for documentation / downstream verification):**\n1. **Val–test coverage gap is large.** The threshold calibrated to 80 % validation coverage yields only 57.2 % test coverage. The corresponding risk gap (val 0.00125 vs test 0.0723) is ~58×. This is not a correctness error—the safety bound (FAR < 0.20) is met—but it should be explicitly documented in the final report so readers do not interpret the 80 % target as a test-set guarantee.\n2. **Non-monotonic test risk at the top of the curve.** At target 0.9 the test risk (0.07025) is marginally lower than at target 0.8 (0.07228). This is a small discrete-data artefact but should be noted so it is not misread as a calibration bug.\n3. **Configuration ambiguity carried from prior stages.** The training and evaluation anomaly reviews both flagged a hidden/depth/pooling/dropout mismatch between train_config and generated_bundle. Both artefacts are in omitted_artefacts, so this review cannot resolve which parameter set was instantiated. Verify against the checkpoint before any reproducibility claim.\n4. **Per-class abstention behaviour not reported.** The base model shows wide recall spread (0.482 for cancer-associated stroma to 1.0 for background). The abstention report gives only aggregate accuracy_on_covered. A per-class covered-subset breakdown would clarify whether the entropy threshold preferentially protects the weakest classes or merely the most ambiguous ones.\n5. **families_evaluated still empty in search_report** (flagged in both prior anomaly reviews; artefact omitted here). Populate for auditability.\n6. **Prior-art evidence remains unverified_curated_excerpt.** Architecture design hypotheses from the research stage are not empirically confirmed; this does not block the abstention stage but should be noted in the final summary.\n\nNone of the above are deterministic failures. The abstention mechanism is correctly specified, the OOD proxy evaluation passes all thresholds, and the selective-prediction safety bound is respected. Proceed to the next stage with the documentation items above tracked for the final report.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Val-test coverage gap: 80% validation target yields only 57.2% test coverage; document that the 80% figure is a calibration target, not a test guarantee",
+      "Val-test risk gap ~58x (0.00125 vs 0.0723); explain in final report",
+      "Non-monotonic test risk at top of risk-coverage curve (0.07025 at 0.9 target < 0.07228 at 0.8 target); note as discrete-data artefact",
+      "Configuration ambiguity (hidden/depth/pooling/dropout) between train_config and generated_bundle remains unresolved; both artefacts omitted from this review",
+      "Per-class covered-subset accuracy not reported; add breakdown to distinguish corruption sensitivity from base-class difficulty",
+      "families_evaluated empty in search_report despite 2 completed trials; populate for auditability",
+      "Prior-art evidence sources are unverified_curated_excerpt; architecture hypotheses remain unconfirmed"
+    ],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8:latest",
+    "stage": "abstention"
+  },
+  "payload_sha256": "3a35a327c605c71969094d760c60aca0c0e8fd5f4907c54488b5f1261a5c4196",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 44,
+  "version": 1
+}

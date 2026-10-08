@@ -1,0 +1,39 @@
+{
+  "artefact": "generated_pathmnist_mst_v2",
+  "artefact_type": "GeneratedBundle",
+  "created_at": "2026-10-08T08:01:12.987976+00:00",
+  "payload": {
+    "author": "experimental_development",
+    "files": {
+      "experiment.py": "83e004f62d423a6d1dea1cc6dabc1209faa30d04a02fe941da8783527432527c"
+    },
+    "hypothesis": "Increasing multi_scale_transformer capacity (hidden 64→128, depth 2→3) will improve discrimination of visually confusable histopathology classes (background/debris/mucus, smooth muscle/stroma, normal mucosa/adenocarcinoma) by providing more representational bandwidth in the joint-attention fusion of multi-granularity tokens, while the 196-token fine-scale branch remains regularized by cross-scale attention and dropout.",
+    "parent_sha256": null,
+    "reference": {
+      "bundle_id": "pathmnist_mst_v2",
+      "parameters": {
+        "depth": 3,
+        "dropout": 0.1,
+        "hidden": 128,
+        "mlp_ratio": 4,
+        "num_heads": 4,
+        "pooling": "mean",
+        "scales": [
+          2,
+          4,
+          7
+        ]
+      },
+      "path": "generated/pathmnist_mst_v2/v001/manifest.json",
+      "sha256": "8c83ab6b17aa6d6a0897a8de4e526b6be43a38b080f66bd21d3e6f643325de53",
+      "version": 1
+    },
+    "schema_version": "1.0",
+    "source": "qwen3.8:latest"
+  },
+  "payload_sha256": "d35fe520804d3187613eb93a8489eaaa52e0e78bf9bea43e448bb53bca8d4659",
+  "producer": "experimental_development",
+  "run_id": "seed_42",
+  "sequence": 27,
+  "version": 1
+}

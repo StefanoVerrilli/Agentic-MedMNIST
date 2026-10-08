@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/media/neurone-pc11/Volume1/Giuseppe/Agentic-MedMNIST/v3/runs/pathmnist_20261007T121856586020Z/seed_42/blobs/local_jobs/e1215dcc0f2b4705b7edfc43d0f6e3be/input/framework/worker_runtime.py", line 225, in <module>
+    main()
+  File "/media/neurone-pc11/Volume1/Giuseppe/Agentic-MedMNIST/v3/runs/pathmnist_20261007T121856586020Z/seed_42/blobs/local_jobs/e1215dcc0f2b4705b7edfc43d0f6e3be/input/framework/worker_runtime.py", line 207, in main
+    validate_resume(context, result)
+  File "/media/neurone-pc11/Volume1/Giuseppe/Agentic-MedMNIST/v3/runs/pathmnist_20261007T121856586020Z/seed_42/blobs/local_jobs/e1215dcc0f2b4705b7edfc43d0f6e3be/input/framework/adaptive_training.py", line 175, in validate_resume
+    raise ValueError("invalid model/optimizer/loader continuation state")
+ValueError: invalid model/optimizer/loader continuation state

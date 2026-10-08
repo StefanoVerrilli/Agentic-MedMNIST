@@ -1,0 +1,104 @@
+{
+  "artefact": "best_configuration",
+  "artefact_type": "BestConfiguration",
+  "created_at": "2026-10-08T08:20:15.872320+00:00",
+  "payload": {
+    "lightning_config_path": "best_config_v001.yaml",
+    "lightning_config_sha256": "88d6ec040da83d827cdb1b3397a89bd9003b9f91318e65b2ab94ddc17ca29b7a",
+    "representation": {
+      "augmentations": [
+        "hflip",
+        "vflip",
+        "rotate90",
+        "rotate180",
+        "brightness",
+        "contrast"
+      ],
+      "normalization": "standardize",
+      "rationale": "Standardization (zero-mean, unit-variance) is selected over unit-range scaling because the downstream architecture is a compact transformer operating on 16 patch tokens (7x7 non-overlapping patches on 28x28 RGB). Transformers are notably more sensitive to input magnitude than CNNs; centering each channel to zero mean and scaling to unit variance stabilizes attention logits and gradient flow, especially given the small per-channel stds (0.124, 0.177, 0.124) which would otherwise produce near-constant inputs after unit scaling. The channel means (0.741, 0.533, 0.706) confirm the data is already in [0,1], so standardization adds the critical centering step without distorting relative channel relationships in H&E staining. All six approved augmentations are applied train-only: hflip, vflip, rotate90, and rotate180 are orientation-safe for tissue-type labels (tissue morphology is rotation/flip invariant at the classification level), while brightness and contrast simulate inter-lab staining variability without altering structural content. This augmentation set maximizes effective training diversity on ~90k samples with mild class imbalance (1.63:1) without introducing geometric distortions that could confuse nuclear/cytoplasmic texture cues critical for distinguishing the 9 tissue classes."
+    },
+    "schema_version": "1.0",
+    "selected_candidate_id": "autonomous_t0002",
+    "selected_config_hash": "4e31744be9ddaf01bd60ea4fac840ce245842b5768b127baa441a289c54253b5",
+    "selection_rule": "agent-selected durations; validation accuracy tolerance then macro-F1; test locked",
+    "test_metrics_used": false,
+    "train_config": {
+      "adam_beta1": 0.9,
+      "adam_beta2": 0.999,
+      "batch_size": 256,
+      "channel_cap": 256,
+      "class_weighting": true,
+      "cosine_eta_min": 0.0,
+      "depth": 2,
+      "device": "cuda",
+      "dropout": 0.0,
+      "early_stopping_min_delta": 0.003,
+      "early_stopping_monitor": "val_accuracy",
+      "early_stopping_patience": 5,
+      "epochs": 25,
+      "execution_mode": "agent_autonomous",
+      "generated_bundle": {
+        "bundle_id": "pathmnist_mst_v2",
+        "parameters": {
+          "depth": 3,
+          "dropout": 0.1,
+          "hidden": 128,
+          "mlp_ratio": 4,
+          "num_heads": 4,
+          "pooling": "mean",
+          "scales": [
+            2,
+            4,
+            7
+          ]
+        },
+        "path": "generated/pathmnist_mst_v2/v001/manifest.json",
+        "sha256": "8c83ab6b17aa6d6a0897a8de4e526b6be43a38b080f66bd21d3e6f643325de53",
+        "version": 1
+      },
+      "gradient_clip_val": 1.0,
+      "hidden": 64,
+      "label_smoothing": 0.1,
+      "lr": 0.0002,
+      "mlp_ratio": 4,
+      "model_family": "run_generated",
+      "momentum": 0.9,
+      "nesterov": true,
+      "num_heads": 4,
+      "one_cycle_pct_start": 0.1,
+      "optimizer": "adamw",
+      "optimizer_eps": 1e-08,
+      "patch_size": 4,
+      "plateau_factor": 0.5,
+      "plateau_patience": 1,
+      "pooling": "cls",
+      "positional_encoding": "learned",
+      "rationale": "Increasing multi_scale_transformer capacity (hidden 64→128, depth 2→3) will improve discrimination of visually confusable histopathology classes (background/debris/mucus, smooth muscle/stroma, normal mucosa/adenocarcinoma) by providing more representational bandwidth in the joint-attention fusion of multi-granularity tokens, while the 196-token fine-scale branch remains regularized by cross-scale attention and dropout.",
+      "scales": [
+        2,
+        4,
+        7
+      ],
+      "scheduler": "cosine",
+      "schema_version": "1.0",
+      "seed": 42,
+      "segment_targets": [
+        25
+      ],
+      "source": "qwen3.8:latest",
+      "tokenizer_layers": 2,
+      "weight_decay": 0.0001,
+      "worker": {
+        "max_bundles": 32,
+        "timeout_seconds": 3600
+      }
+    },
+    "validation_accuracy": 0.989204,
+    "validation_macro_f1": 0.98897
+  },
+  "payload_sha256": "0c2596e5e67d2d6003f0e73b7f3cf3b19cd5776f9d3c2c76209a25b7d5667917",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 30,
+  "version": 1
+}
