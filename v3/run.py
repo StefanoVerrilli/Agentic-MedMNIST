@@ -63,6 +63,7 @@ def build_parser() -> argparse.ArgumentParser:
             "all Ollama requests execute sequentially."
         )
     )
+    parser.set_defaults(reviewer_revisions=True)
     parser.add_argument("--output-root", default="runs", help="experiment output root")
     parser.add_argument("--execution-mode", choices=("legacy", "agent_autonomous"), default="legacy",
                         help="agent_autonomous delegates search actions and adaptive training duration to agents")
@@ -194,6 +195,7 @@ def main(argv: list[str] | None = None) -> int:
                         "llm_timeout", "llm_retries", "llm_num_predict", "keep_alive")
         runtime = {k: getattr(args, k) for k in runtime_keys}
         vars(args).update(parent.get("run_configuration").parameters)
+        args.reviewer_revisions = parent.get("run_configuration").parameters.get("reviewer_revisions", False)
         vars(args).update(runtime)
         args.resume_run = str(parent.root)
         args.replay_run = None
@@ -215,6 +217,7 @@ def main(argv: list[str] | None = None) -> int:
         # Restore the actual run settings; a replay is not a new experiment.
         output_root = args.output_root
         vars(args).update(original["parameters"])
+        args.reviewer_revisions = original["parameters"].get("reviewer_revisions", False)
         args.output_root, args.replay_run = output_root, str(replay_root)
         args.seeds = str(manifest["seed"])
         args.research_online = False
@@ -525,11 +528,14 @@ def run_once(
                                minimum_scenario_auroc=args.ood_min_auroc,
                                maximum_false_accept_rate=args.ood_max_false_accept,
                                corruption_seed=args.ood_corruption_seed),
-            ReportingAgent(),
+            ReportingAgent(reasoner if args.execution_mode == "agent_autonomous"
+                           and getattr(args, "reviewer_revisions", True) else None),
         ]
     )
     orchestrator = Orchestrator(
-        pipeline, reviewer, max_stage_retries=0 if args.execution_mode == "agent_autonomous" else args.stage_retries
+        pipeline, reviewer, max_stage_retries=0 if args.execution_mode == "agent_autonomous" else args.stage_retries,
+        review_revision_stages=("model_search", "reporting") if args.execution_mode == "agent_autonomous"
+            and getattr(args, "reviewer_revisions", True) else (),
     )
     print(f"\n=== Agentic PathMNIST pipeline | seed={seed} ===")
     from resources import RunResources
@@ -551,8 +557,12 @@ def run_once(
     config = bb.get("train_config")
     evaluation = bb.get("evaluation_report")
     baseline, comparison = None, None
+    reporting_evidence_changed = False
     post_reviews = []
-    if not args.skip_baseline:
+    if not args.skip_baseline and bb.get_optional("baseline_report") is not None:
+        baseline, comparison = bb.get("baseline_report"), bb.get_optional("comparison_report")
+    elif not args.skip_baseline:
+        reporting_evidence_changed = True
         print("\n=== Conventional baseline on the same split ===")
         with resources.activate():
             baseline = run_baseline(
@@ -580,7 +590,8 @@ def run_once(
             )
 
 
-    if args.ablation_suite:
+    if args.ablation_suite and bb.get_optional("ablation_report") is None:
+        reporting_evidence_changed = True
         print("\n=== Three-scenario representation ablation ===")
         with resources.activate():
             ablation = run_representation_ablations(bundle, bb.root, template_config=config)
@@ -594,8 +605,18 @@ def run_once(
                 seed, status, run_root, evaluation, baseline.accuracy if baseline else None, None, bb
             )
 
-    ReportingAgent().run(bb)
-    reporting_review = reviewer.review(bb, "reporting")
+    if args.execution_mode == "agent_autonomous" and getattr(args, "reviewer_revisions", True):
+        # Review again only when baseline/ablation introduced new reporting evidence.
+        if reporting_evidence_changed:
+            with resources.activate():
+                reporting_orchestrator = Orchestrator([ReportingAgent(reasoner)], reviewer, max_stage_retries=0,
+                                                      review_revision_stages=("reporting",))
+                # The initial pipeline has already consumed any resume prefix.
+                reporting_orchestrator.run(bb, honor_resume=False)
+        reporting_review = bb.get("anomaly_reporting")
+    else:
+        ReportingAgent().run(bb)
+        reporting_review = reviewer.review(bb, "reporting")
     post_reviews.append(reporting_review)
     if reporting_review.action == "stop":
         final_status = "vetoed:reporting"

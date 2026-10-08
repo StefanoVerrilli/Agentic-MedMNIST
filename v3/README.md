@@ -278,3 +278,30 @@ When a proposal cannot be validated and valid trials exist, a separate live
 It cannot generate a new experiment and cannot use a heuristic fallback. If this
 decision also fails, intact search evidence is paused for a later operational resume.
 The test split remains locked throughout search and recovery.
+
+### Reviewer-driven autonomous revisions
+
+New `agent_autonomous` runs review the proposed search completion before moving
+to training and test evaluation. Corrective reviewer requests reopen the search
+without a revision limit, preserving all previous trials, checkpoints and action
+identifiers. The agent receives the previous review and must supply new evidence,
+a different correction, or an evidence-backed contestation. The reviewer decides
+whether requests are resolved or reclassified as informational observations.
+Observations can accompany completion with warnings; deterministic integrity
+failures still veto the run. Technical failure circuit breakers remain separate.
+
+Requests contain `request_id`, `problem`, `correction` and `required_evidence`.
+Responses and request dispositions are persisted in the Blackboard and decision
+log. `search_report` distinguishes checkpoint metrics from curve maxima and lists
+generated bundles and their parameters separately from inactive generic defaults.
+
+Reporting uses the same revision cycle, producing checksummed, versioned
+`report_summary_vNNN.md` files. It may explain test results or recompute documented
+summaries, but cannot change the frozen model, preprocessing, selection or
+abstention threshold. Reports are reviewed again after baseline or ablation only
+when these stages introduce new evidence. Open issues remain visible in acceptance.
+
+Interrupt a run normally to pause it and use `--resume-run` with the complete run
+directory to continue. There is no automatic stop after a fixed number of review
+iterations. Replay consumes the recorded decisions; historical run settings remain
+compatible. Existing runs are not modified or restarted by this change.

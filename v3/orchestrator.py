@@ -16,19 +16,21 @@ class Orchestrator:
         reviewer: ReviewerConsistencyAgent,
         *,
         max_stage_retries: int = 1,
+        review_revision_stages: tuple[str, ...] = (),
     ):
         if max_stage_retries < 0:
             raise ValueError("max_stage_retries cannot be negative")
         self.pipeline = pipeline
         self.reviewer = reviewer
         self.max_stage_retries = max_stage_retries
+        self.review_revision_stages = review_revision_stages
 
-    def run(self, bb: Blackboard) -> Blackboard:
+    def run(self, bb: Blackboard, *, honor_resume: bool = True) -> Blackboard:
         def status(value: str, stage: str | None = None) -> None:
             bb.put("execution_status", ExecutionState(status=value, stage=stage), producer="orchestrator")
 
         status("running")
-        resume = bb.get_optional("resume_manifest")
+        resume = bb.get_optional("resume_manifest") if honor_resume else None
         if resume:
             names = [agent.name for agent in self.pipeline]
             if resume.parent_stage not in names:
@@ -42,10 +44,14 @@ class Orchestrator:
             if resume:
                 bb.record_event("run_resume_stage_started", parent_run=resume.parent_run_path, stage=agent.name)
             promoted = False
-            for attempt in range(1, self.max_stage_retries + 2):
+            attempt = max((e.get("attempt", 0) for e in bb.log
+                           if e["event"] == "review_gate" and e.get("stage") == agent.name), default=0)
+            review_only = bool(resume and resume.review_only and agent.name == resume.parent_stage)
+            while True:
+                attempt += 1
                 bb.record_event("stage_started", stage=agent.name, attempt=attempt)
                 try:
-                    if not (resume and resume.review_only and agent.name == resume.parent_stage):
+                    if not review_only:
                         agent.run(bb)
                 except (Exception, KeyboardInterrupt) as exc:
                     bb.record_event(
@@ -73,6 +79,7 @@ class Orchestrator:
                     raise
 
                 try:
+                    previous_review = bb.get_optional(f"anomaly_{agent.name}")
                     report = self.reviewer.review(bb, agent.name, attempt=attempt)
                 except (Exception, KeyboardInterrupt) as exc:
                     failure = f"{exception_status(exc, bb)}:review:{agent.name}"
@@ -86,9 +93,11 @@ class Orchestrator:
                 mark = {"ok": "OK", "warning": "REVISE", "critical": "STOP"}[
                     report.severity
                 ]
+                if report.action == "continue" and report.severity == "warning":
+                    mark = "WARN"
                 print(
                     f"[{agent.name:<17}] reviewer={mark:<6} "
-                    f"source={report.source}  {report.comment}"
+                    f"attempt={attempt} source={report.source}  {report.comment}", flush=True,
                 )
                 bb.record_event(
                     "review_gate",
@@ -97,6 +106,15 @@ class Orchestrator:
                     severity=report.severity,
                     action=report.action,
                 )
+                if agent.name in self.review_revision_stages:
+                    retained = {request.request_id for request in report.requests}
+                    bb.record_event("review_request_disposition", stage=agent.name, attempt=attempt,
+                        open_requests=sorted(retained),
+                        closed_requests=[r.request_id for r in previous_review.requests
+                                         if r.request_id not in retained] if previous_review else [],
+                        reviewer_comment=report.comment,
+                        response_artefact=next((entry for entry in reversed(bb.registry)
+                            if entry["artefact"] == f"review_response_{agent.name}"), None))
                 if report.action == "stop":
                     failure = f"vetoed:{agent.name}"
                     status(failure, agent.name)
@@ -107,7 +125,8 @@ class Orchestrator:
                     )
                     bb.write_dossier(status=failure)
                     return bb
-                if report.action == "revise" and attempt <= self.max_stage_retries:
+                if report.action == "revise" and (agent.name in self.review_revision_stages
+                                                  or attempt <= self.max_stage_retries):
                     remediation = getattr(agent, "revise", None)
                     changed = (
                         bool(remediation(bb, report))
@@ -115,6 +134,7 @@ class Orchestrator:
                         else False
                     )
                     if changed:
+                        review_only = False
                         bb.record_event(
                             "stage_retry",
                             stage=agent.name,
@@ -129,8 +149,16 @@ class Orchestrator:
                         reason="agent_has_no_safe_remediation",
                         issues=report.deterministic_issues + report.llm_issues,
                     )
+                    if agent.name in self.review_revision_stages:
+                        failure = f"review_unresolved:{agent.name}"
+                        status(failure, agent.name)
+                        bb.write_dossier(status=failure)
+                        return bb
 
                 promoted = True
+                if agent.name == "model_search" and agent.name in self.review_revision_stages:
+                    bb.record_event("search_configuration_frozen", attempt=attempt,
+                                    selected_candidate_id=bb.get("best_configuration").selected_candidate_id)
                 bb.record_event(
                     "stage_promoted",
                     stage=agent.name,

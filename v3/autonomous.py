@@ -8,7 +8,7 @@ import shutil
 import time
 
 from contracts import (AutonomousRecoveryDecision, AutonomousSearchDecision, AutonomousSearchEvent, BestConfiguration,
-                       SearchPlan, SearchReport, TrainConfig, TrainResult, TrialResult, sha256_file)
+                       SearchPlan, SearchReport, TrainConfig, TrainResult, TrialResult, ReviewResponse, sha256_file)
 from generated_agents import CODE_INTERFACE, _representation, configuration_hash
 from ml import evaluate_probabilities, predict_probabilities
 from remote import RemoteModel, LocalWorker, archive_bundle, prepared_arrays
@@ -183,6 +183,8 @@ class AutonomousSearchAgent:
         self.max_same_signature_failures = max_same_signature_failures
 
     def run(self, bb):
+        if bb.get_optional("evaluation_report") is not None:
+            raise ValueError("cannot reopen model search after test evaluation")
         if not bb.get("data_audit_report").passed:
             raise ValueError("autonomous search requires a passed data audit")
         if not self.reasoner.enabled and not getattr(self.reasoner, "replay_root", None):
@@ -190,7 +192,8 @@ class AutonomousSearchAgent:
         bb.put("search_plan", SearchPlan(policy="agent_autonomous", progressive_budget=False,
             framework="local.python", accuracy_tolerance=self.accuracy_tolerance), producer=self.name)
         prepared = bb.get_blob("prepared_data")
-        state = AutonomousSearchState.restore(bb) if bb.get_optional("resume_manifest") else AutonomousSearchState.empty()
+        state = AutonomousSearchState.restore(bb) if (bb.get_optional("resume_manifest") or
+            any(n.startswith("trial_") for n in bb.artefacts)) else AutonomousSearchState.empty()
         latest, results, trials, names, identities = state.latest, state.results, state.trials, state.trial_names, state.identities
         sequence, candidate_sequence = state.sequence, state.candidate_sequence
         consecutive_failures, same_failures = state.consecutive_failures, state.same_failures
@@ -233,6 +236,13 @@ class AutonomousSearchAgent:
                     user=json.dumps({"profile": bb.get("data_profile").model_dump(mode="json"),
                         "research": bb.get("architecture_research").model_dump(mode="json"),
                         "validation_evidence": evidence, "test_split": "locked",
+                        "review_feedback": (bb.get("anomaly_model_search").model_dump(mode="json")
+                                            if bb.get_optional("anomaly_model_search") else None),
+                        "revision_instruction": "Address every corrective request with new evidence or a justified "
+                            "contestation. Compare checkpoint metrics, not curve maxima. Use archived program source "
+                            "and generated bundle parameters to identify active model settings; generic architecture "
+                            "defaults do not establish instantiated model shape. If previous evidence "
+                            "was insufficient, change the correction strategy. Only the reviewer can close a request.",
                         "available_actions": available, "repair": repair,
                         "resumable_candidate_ids": resumable,
                         "resources": {"operation_timeout_seconds": self.worker.timeout_seconds,
@@ -315,7 +325,24 @@ class AutonomousSearchAgent:
                     raise SearchCircuitBreaker(f"autonomous search stopped after {consecutive_failures} "
                                                f"consecutive failures ({trial.failure_kind})")
         selected = rank_trials(latest.values(), accuracy_tolerance=self.accuracy_tolerance, equal_epoch_budgets=False)
-        self._freeze(bb, selected, results[selected.candidate_id], trials, names)
+        self._freeze(bb, selected, results[selected.candidate_id], trials, names, rationale=action.rationale)
+        previous = bb.get_optional("anomaly_model_search")
+        if previous and previous.action == "revise":
+            bb.put("review_response_model_search", ReviewResponse(stage=self.name,
+                review_attempt=previous.attempt, response=action.rationale,
+                evidence=names + ["search_report", "best_configuration"],
+                evidence_versions=[{"artefact": entry["artefact"], "version": entry["version"],
+                    "artefact_path": entry["path"], "payload_sha256": entry["sha256"]}
+                    for entry in bb.registry if entry["artefact"] in names
+                    or (entry["artefact"] in {"search_report", "best_configuration"}
+                        and entry["version"] == bb._versions[entry["artefact"]])]), producer=self.name)
+
+    def revise(self, bb, report):
+        # run() restores the append-only trials and action sequence on the next iteration.
+        bb.record_event("search_revision_requested", attempt=report.attempt,
+                        requests=[r.model_dump(mode="json") for r in report.requests],
+                        issues=report.llm_issues)
+        return True
 
     def _segment(self, bb, prepared, config, candidate_id, sequence, parent):
         started = time.monotonic()
@@ -401,7 +428,7 @@ class AutonomousSearchAgent:
             duration_seconds=time.monotonic() - started, decision_source=config.source, error=error)
         return trial, result
 
-    def _freeze(self, bb, selected, result, trials, names):
+    def _freeze(self, bb, selected, result, trials, names, *, rationale=""):
         targets = [trial.config.epochs for trial in trials
                    if trial.candidate_id == selected.candidate_id and trial.status == "completed"]
         selected = selected.model_copy(update={"config": selected.config.model_copy(update={"segment_targets": targets})})
@@ -412,7 +439,8 @@ class AutonomousSearchAgent:
         if settings:
             payload["data"] = {key: settings.parameters.get(key) for key in
                 ("data_root", "train_limit", "val_limit", "test_limit", "quick", "no_download")}
-        path = bb.root / "best_config_v001.yaml"
+        version = bb._versions.get("best_configuration", 0) + 1
+        path = bb.root / f"best_config_v{version:03d}.yaml"
         path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         (bb.root / "best_config.yaml").write_bytes(path.read_bytes())
         bb.put("best_configuration", BestConfiguration(selected_candidate_id=selected.candidate_id,
@@ -423,7 +451,19 @@ class AutonomousSearchAgent:
             lightning_config_path=path.relative_to(bb.root).as_posix(), lightning_config_sha256=sha256_file(path)), producer=self.name)
         bb.put("train_config", selected.config, producer=self.name)
         bb.put("selected_training_result", result, producer=self.name)
+        from remote import validate_bundle
+        program = (validate_bundle(bb.root, selected.config.generated_bundle) / "experiment.py").read_text(encoding="utf-8")
         bb.put("search_report", SearchReport(trial_artefacts=names,
+            stopping_rationale=rationale, selected_program=program,
+            families_evaluated=sorted({t.config.model_family for t in trials if t.status == "completed"}),
+            evaluated_bundles=sorted({t.config.generated_bundle.bundle_id for t in trials
+                                     if t.status == "completed" and t.config.generated_bundle}),
+            validation_trials=[{"candidate_id": t.candidate_id, "round_index": t.round_index,
+                "checkpoint_accuracy": t.validation_accuracy, "checkpoint_macro_f1": t.validation_macro_f1,
+                "best_epoch": t.best_epoch, "curve_max_accuracy": max((r.val_accuracy for r in t.learning_curve), default=None),
+                "bundle": t.config.generated_bundle.model_dump(mode="json") if t.config.generated_bundle else None,
+                "generic_architecture_fields": "framework defaults; inspect archived build_model for actual parameter use",
+                "duration_seconds": t.duration_seconds} for t in trials if t.status == "completed"],
             selection_rule="agent_durations_accuracy_tolerance_then_macro_f1",
             completed_trials=sum(t.status == "completed" for t in trials),
             failed_trials=sum(t.status == "failed" for t in trials), selected_candidate_id=selected.candidate_id,

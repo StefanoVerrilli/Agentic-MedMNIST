@@ -65,6 +65,14 @@ def inspect_parent(root):
     if manifest.seed not in parse_seeds(config.parameters["seeds"]):
         raise ValueError("run configuration seed mismatch")
     promoted = list(dict.fromkeys(e["stage"] for e in bb.log if e["event"] == "stage_promoted"))
+    if stage == "reporting" and stage in promoted:
+        # A final report may be refreshed after baseline/ablation added evidence.
+        last_start = max((e["sequence"] for e in bb.log if e["event"] == "stage_started"
+                          and e.get("stage") == stage), default=0)
+        last_promotion = max(e["sequence"] for e in bb.log if e["event"] == "stage_promoted"
+                             and e.get("stage") == stage)
+        if last_start > last_promotion:
+            promoted.remove(stage)
     if stage in promoted:
         raise ValueError("failed stage was already promoted; inconsistent state")
     if (stage == "model_search" and not status.status.startswith(("paused:review:", "failed:review:"))

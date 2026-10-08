@@ -198,6 +198,8 @@ def assess(root: Path, *, validation_path: Path | None = None,
         "A transcript alone is not proof that retraining reproduces predictions and metrics.")
     add("WP5_END_TO_END", str(dossier["status"]).startswith("completed"), ["dossier.json"], dossier["status"])
     warnings = sorted({issue for review in reviews for issue in review.get("deterministic_issues", []) + review.get("llm_issues", [])
+                       + review.get("observations", [])
+                       + [f"request:{r['request_id']}:{r['problem']}" for r in review.get("requests", [])]
                        if review["severity"] != "ok"})
     # Semantic review and external demonstration are explicit independent inputs.
     signoff = None

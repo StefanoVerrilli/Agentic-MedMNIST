@@ -407,11 +407,48 @@ class ExecutionState(Artefact):
     stage: str | None = None
 
 
+class ReviewRequest(StrictModel):
+    request_id: str = Field(min_length=1)
+    problem: str = Field(min_length=1)
+    correction: str = Field(min_length=1)
+    required_evidence: str = Field(min_length=1)
+
+
+class ReviewResponse(Artefact):
+    stage: str
+    review_attempt: int
+    response: str
+    evidence: list[str] = Field(default_factory=list)
+    evidence_versions: list[dict[str, Any]] = Field(default_factory=list)
+
+
+class ReportSummary(Artefact):
+    narrative: str
+    evidence: dict[str, Any] = Field(default_factory=dict)
+    response_to_review: str = "Initial report."
+    path: str | None = None
+    sha256: str | None = None
+
+
+class ReportNarrative(StrictModel):
+    narrative: str = Field(min_length=2)
+    response_to_review: str = Field(min_length=2)
+
+
 class ReviewDecision(StrictModel):
     severity: Severity
     action: Action
     issues: list[str] = Field(default_factory=list, max_length=30)
     comment: str = Field(min_length=2, max_length=12000)
+    requests: list[ReviewRequest] = Field(default_factory=list)
+    observations: list[str] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def unique_request_ids(self):
+        ids = [request.request_id for request in self.requests]
+        if len(ids) != len(set(ids)):
+            raise ValueError("review request IDs must be unique")
+        return self
 
 
 # --- Artefacts exchanged between agents ------------------------------------
@@ -943,7 +980,11 @@ class SearchReport(Artefact):
         "highest_budget_accuracy_tolerance_then_macro_f1"
     )
     test_metrics_used: Literal[False] = False
-    families_evaluated: list[ModelFamily] = Field(default_factory=list)
+    families_evaluated: list[ModelFamily | Literal["run_generated"]] = Field(default_factory=list)
+    evaluated_bundles: list[str] = Field(default_factory=list)
+    validation_trials: list[dict[str, Any]] = Field(default_factory=list)
+    stopping_rationale: str = ""
+    selected_program: str = ""
     missing_families: list[ModelFamily] = Field(default_factory=list)
 
 
@@ -1111,6 +1152,8 @@ class AnomalyReport(Artefact):
     llm_issues: list[str] = Field(default_factory=list)
     comment: str
     source: str
+    requests: list[ReviewRequest] = Field(default_factory=list)
+    observations: list[str] = Field(default_factory=list)
 
 
 # --- Blackboard -------------------------------------------------------------
@@ -1284,7 +1327,7 @@ class Blackboard:
             ],
             "model_search": [
                 "search_report", "best_configuration", "search_plan",
-                "architecture_research",
+                "architecture_research", "review_response_model_search", "anomaly_model_search",
             ],
             "configuration_replay": [
                 "best_configuration",
@@ -1298,6 +1341,7 @@ class Blackboard:
             "comparison": ["comparison_report", "baseline_report", "evaluation_report"],
             "ablation": ["ablation_report", "best_configuration"],
             "reporting": [
+                "report_summary", "review_response_reporting", "anomaly_reporting",
                 "reporting_status",
                 "comparison_report",
                 "ablation_report",
@@ -1329,7 +1373,9 @@ class Blackboard:
             changes: list[dict[str, Any]] = []
             # Research prose is the subject of this gate, not a preview. The
             # primary artefact may exceed the soft context budget to stay intact.
-            selected[name] = (raw if stage == "architecture_research" and name == "architecture_research"
+            selected[name] = (raw if (stage == "architecture_research" and name == "architecture_research")
+                              or (stage == "reporting" and name == "report_summary")
+                              or (stage == "model_search" and name == "search_report")
                               else _compact_for_review(raw, path=name, changes=changes))
             candidate = {
                 "stage": stage,

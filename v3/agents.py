@@ -33,6 +33,9 @@ from contracts import (
     RepresentationPlan,
     RiskCoveragePoint,
     ReviewDecision,
+    ReviewResponse,
+    ReportSummary,
+    ReportNarrative,
     SearchDecision,
     SearchPlan,
     SearchReport,
@@ -1566,7 +1569,48 @@ class ReportingAgent:
 
     name = "reporting"
 
+    def __init__(self, reasoner=None):
+        self.reasoner = reasoner
+
+    def revise(self, bb, report):
+        return self.reasoner is not None
+
     def run(self, bb: Blackboard) -> None:
+        if self.reasoner is not None:
+            evidence = {name: bb.get(name).model_dump(mode="json") for name in
+                ("evaluation_report", "abstention_report", "search_report", "best_configuration",
+                 "data_audit_report", "split_manifest", "comparison_report", "ablation_report")
+                if bb.get_optional(name) is not None}
+            previous = bb.get_optional("anomaly_reporting")
+            decision = self.reasoner.decide(stage="reporting.summary",
+                system="Write an evidence-backed benchmark report. Include effective generated-bundle parameters "
+                    "separately from inactive generic defaults, checkpoint validation versus test metrics, "
+                    "per-class weaknesses, validation-calibrated versus achieved test coverage, and controlled "
+                    "corruption OOD scope. Explain limitations without asserting unverified causes or clinical "
+                    "safety. Address each corrective request or contest it using evidence. Do not change models, "
+                    "selection, preprocessing, thresholds, or predictions. Only the reviewer closes requests.",
+                user=json.dumps({"evidence": evidence, "previous_summary":
+                    bb.get("report_summary").model_dump(mode="json") if bb.get_optional("report_summary") else None,
+                    "review_feedback": previous.model_dump(mode="json") if previous else None}, sort_keys=True),
+                response_model=ReportNarrative,
+                fallback=ReportNarrative(narrative="Report generation requires a validated agent decision.",
+                                         response_to_review="No validated response."),
+                audit=bb.record_event)
+            if decision.used_fallback:
+                raise ValueError("autonomous reporting cannot use fallback")
+            summary = ReportSummary(**decision.value.model_dump(), evidence=evidence)
+            version = bb._versions.get("report_summary", 0) + 1
+            summary_path = bb.root / f"report_summary_v{version:03d}.md"
+            summary_path.write_text(summary.narrative + "\n", encoding="utf-8")
+            summary = summary.model_copy(update={"path": summary_path.name, "sha256": sha256_file(summary_path)})
+            bb.put("report_summary", summary, producer=self.name)
+            if previous and previous.action == "revise":
+                bb.put("review_response_reporting", ReviewResponse(stage=self.name,
+                    review_attempt=previous.attempt, response=summary.response_to_review,
+                    evidence=["report_summary"], evidence_versions=[{
+                        "artefact": "report_summary", "version": version,
+                        "artefact_path": bb.registry[-1]["path"],
+                        "payload_sha256": bb.registry[-1]["sha256"]}]), producer=self.name)
         if bb.get_optional("ablation_report") is not None:
             complete_through = "ablation"
         elif bb.get_optional("comparison_report") is not None:
@@ -1599,6 +1643,10 @@ class ReviewerConsistencyAgent:
         self.reasoner = reasoner
 
     def review(self, bb: Blackboard, stage: str, *, attempt: int = 1) -> AnomalyReport:
+        settings = bb.get_optional("run_configuration")
+        revision_mode = bool(settings and settings.parameters.get("execution_mode") == "agent_autonomous"
+                             and settings.parameters.get("reviewer_revisions", False)
+                             and stage in {"model_search", "reporting"})
         findings = self._deterministic_findings(bb, stage)
         deterministic_severity = max(
             (level for level, _ in findings),
@@ -1644,11 +1692,28 @@ class ReviewerConsistencyAgent:
                 "scientific inference: assess that support separately. The OOD "
                 "aggregate is the arithmetic mean of the selected score's AUROCs "
                 "across corruption severities, not a pooled-sample AUROC."
+                " For run_generated, generic architecture defaults do not identify the instantiated network. "
+                "Use generated_bundle.parameters and archived program source to establish which values are consumed."
+                + (" This stage supports unlimited corrective revisions. Use requests for actionable problems, "
+                   "each with a stable request_id, problem, correction and required_evidence. Use observations "
+                   "for documented limitations that need no corrective work. Compare with the previous review "
+                   "and response; retain request IDs until resolved or explicitly reclassified with evidence. "
+                   "A repeated proposal alone is not resolution. Do not require training changes after test "
+                   "evaluation. Requests mean revise; observations alone permit continue with warning. "
+                   "For search, assess whether the claimed stopping rationale is supported by checkpoint "
+                   "metrics and actual comparisons; do not infer an irreducible ceiling from two similar trials."
+                   if revision_mode else "")
             ),
             user=(
                 f"current_utc={utc_now()}; stage={stage}; "
                 f"deterministic_findings={deterministic_messages}; "
                 f"stage_focused_evidence={bb.review_context(stage)}"
+                + ("; revision_history=" + json.dumps({
+                    "previous_review": bb.get(f"anomaly_{stage}").model_dump(mode="json")
+                        if bb.get_optional(f"anomaly_{stage}") else None,
+                    "response": bb.get(f"review_response_{stage}").model_dump(mode="json")
+                        if bb.get_optional(f"review_response_{stage}") else None}, sort_keys=True)
+                   if revision_mode else "")
             ),
             response_model=ReviewDecision,
             fallback=fallback,
@@ -1675,6 +1740,12 @@ class ReviewerConsistencyAgent:
             if severity == "critical"
             else ("revise" if severity == "warning" else "continue")
         )
+        if revision_mode and deterministic_severity != "critical":
+            corrective = bool(decision.value.requests or deterministic_messages
+                              or decision.value.action in {"revise", "stop"})
+            action = "revise" if corrective else "continue"
+            if corrective or decision.value.observations:
+                severity = "warning"
         report = AnomalyReport(
             stage=stage,
             attempt=attempt,
@@ -1684,6 +1755,8 @@ class ReviewerConsistencyAgent:
             llm_issues=decision.value.issues,
             comment=decision.value.comment,
             source=decision.source,
+            requests=decision.value.requests,
+            observations=decision.value.observations,
         )
         bb.put(f"anomaly_{stage}", report, producer=self.name)
         return report
