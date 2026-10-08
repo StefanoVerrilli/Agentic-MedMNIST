@@ -1,0 +1,534 @@
+{
+  "artefact": "trial_0006",
+  "artefact_type": "TrialResult",
+  "created_at": "2026-10-08T11:27:38.079000+00:00",
+  "payload": {
+    "best_epoch": 15,
+    "candidate_id": "autonomous_t0006",
+    "checkpoint_path": "blobs/search/autonomous_t0006_s0006.ckpt",
+    "checkpoint_sha256": "fc197196daf399eab6ce6f37fdc2544e6f3549cb2425726531b46965f4a9c401",
+    "config": {
+      "adam_beta1": 0.9,
+      "adam_beta2": 0.999,
+      "batch_size": 256,
+      "channel_cap": 256,
+      "class_weighting": true,
+      "cosine_eta_min": 0.0,
+      "depth": 2,
+      "device": "cuda",
+      "dropout": 0.0,
+      "early_stopping_min_delta": 0.002,
+      "early_stopping_monitor": "val_accuracy",
+      "early_stopping_patience": 10,
+      "epochs": 40,
+      "execution_mode": "agent_autonomous",
+      "generated_bundle": {
+        "bundle_id": "pathmnist_resnet18_v1",
+        "parameters": {
+          "depth": 2,
+          "dropout": 0.3,
+          "hidden": 64
+        },
+        "path": "generated/pathmnist_resnet18_v1/v001/manifest.json",
+        "sha256": "fb89555bff5a4f24b975d07daeb363595164e19f7a94c6259fc804934bd71323",
+        "version": 1
+      },
+      "gradient_clip_val": 1.0,
+      "hidden": 64,
+      "label_smoothing": 0.1,
+      "lr": 0.0003,
+      "mlp_ratio": 4,
+      "model_family": "run_generated",
+      "momentum": 0.9,
+      "nesterov": true,
+      "num_heads": 4,
+      "one_cycle_pct_start": 0.1,
+      "optimizer": "adamw",
+      "optimizer_eps": 1e-08,
+      "patch_size": 4,
+      "plateau_factor": 0.5,
+      "plateau_patience": 1,
+      "pooling": "cls",
+      "positional_encoding": "learned",
+      "rationale": "A ResNet18 with CIFAR-style stem (3x3 stride-1, no max-pool) and hierarchical channel progression (64-128-256-512) will achieve competitive validation accuracy (~0.99+) on 28x28 PathMNIST by leveraging local convolutional receptive fields that capture texture and nuclear morphology at multiple scales. The inductive bias of progressive downsampling with residual connections may be particularly effective for distinguishing confusable tissue classes (smooth muscle vs stroma, background vs debris) through learned hierarchical feature maps, potentially matching or exceeding the compact_transformer's 0.9929 without the overhead of self-attention.",
+      "scales": [
+        2,
+        4,
+        7
+      ],
+      "scheduler": "cosine",
+      "schema_version": "1.0",
+      "seed": 42,
+      "segment_targets": [],
+      "source": "qwen3.8:latest",
+      "tokenizer_layers": 2,
+      "weight_decay": 0.01,
+      "worker": {
+        "max_bundles": 32,
+        "timeout_seconds": 3600
+      }
+    },
+    "config_hash": "698f5ed5bda3a2e9dd1dabb5366112e45b88e2ba4439643340e9d2e76467495f",
+    "decision_source": "qwen3.8:latest",
+    "duration_seconds": 1704.6414200419968,
+    "epoch_budget": null,
+    "epochs_completed": 25,
+    "error": null,
+    "failed_operation": null,
+    "failure_kind": null,
+    "failure_signature": null,
+    "learning_curve": [
+      {
+        "epoch": 1,
+        "learning_rate": 0.0003,
+        "train_loss": 0.6611539335093658,
+        "val_accuracy": 0.967313,
+        "val_loss": 0.18981532752513885,
+        "val_macro_f1": 0.967864
+      },
+      {
+        "epoch": 2,
+        "learning_rate": 0.00029953760005996916,
+        "train_loss": 0.5507565177979687,
+        "val_accuracy": 0.978709,
+        "val_loss": 0.15783348679542542,
+        "val_macro_f1": 0.978243
+      },
+      {
+        "epoch": 3,
+        "learning_rate": 0.00029815325108927063,
+        "train_loss": 0.5303689433023098,
+        "val_accuracy": 0.981507,
+        "val_loss": 0.15111568570137024,
+        "val_macro_f1": 0.981573
+      },
+      {
+        "epoch": 4,
+        "learning_rate": 0.0002958554880596515,
+        "train_loss": 0.5210551206691498,
+        "val_accuracy": 0.981208,
+        "val_loss": 0.14642439782619476,
+        "val_macro_f1": 0.981362
+      },
+      {
+        "epoch": 5,
+        "learning_rate": 0.00029265847744427303,
+        "train_loss": 0.5151395017271323,
+        "val_accuracy": 0.993203,
+        "val_loss": 0.11601179838180542,
+        "val_macro_f1": 0.993177
+      },
+      {
+        "epoch": 6,
+        "learning_rate": 0.000288581929876693,
+        "train_loss": 0.5115886589848975,
+        "val_accuracy": 0.990904,
+        "val_loss": 0.12174785882234573,
+        "val_macro_f1": 0.990875
+      },
+      {
+        "epoch": 7,
+        "learning_rate": 0.0002836509786282552,
+        "train_loss": 0.5086610191203375,
+        "val_accuracy": 0.988804,
+        "val_loss": 0.12692303955554962,
+        "val_macro_f1": 0.988644
+      },
+      {
+        "epoch": 8,
+        "learning_rate": 0.00027789602465311383,
+        "train_loss": 0.5064133322396058,
+        "val_accuracy": 0.990804,
+        "val_loss": 0.1205243393778801,
+        "val_macro_f1": 0.990711
+      },
+      {
+        "epoch": 9,
+        "learning_rate": 0.0002713525491562421,
+        "train_loss": 0.504633028964502,
+        "val_accuracy": 0.994002,
+        "val_loss": 0.11131507903337479,
+        "val_macro_f1": 0.994062
+      },
+      {
+        "epoch": 10,
+        "learning_rate": 0.00026406089484000466,
+        "train_loss": 0.5034729749331226,
+        "val_accuracy": 0.994002,
+        "val_loss": 0.11527165025472641,
+        "val_macro_f1": 0.993811
+      },
+      {
+        "epoch": 11,
+        "learning_rate": 0.0002560660171779821,
+        "train_loss": 0.5025376545805603,
+        "val_accuracy": 0.992503,
+        "val_loss": 0.11467193067073822,
+        "val_macro_f1": 0.992443
+      },
+      {
+        "epoch": 12,
+        "learning_rate": 0.0002474172072495276,
+        "train_loss": 0.5014317934420581,
+        "val_accuracy": 0.994202,
+        "val_loss": 0.11421365290880203,
+        "val_macro_f1": 0.99419
+      },
+      {
+        "epoch": 13,
+        "learning_rate": 0.000238167787843871,
+        "train_loss": 0.5008703807660371,
+        "val_accuracy": 0.993503,
+        "val_loss": 0.1116069108247757,
+        "val_macro_f1": 0.993447
+      },
+      {
+        "epoch": 14,
+        "learning_rate": 0.00022837478470739232,
+        "train_loss": 0.5005018510650627,
+        "val_accuracy": 0.994002,
+        "val_loss": 0.11620806902647018,
+        "val_macro_f1": 0.994054
+      },
+      {
+        "epoch": 15,
+        "learning_rate": 0.000218098574960932,
+        "train_loss": 0.5001183559329856,
+        "val_accuracy": 0.995402,
+        "val_loss": 0.1078893169760704,
+        "val_macro_f1": 0.995418
+      },
+      {
+        "epoch": 16,
+        "learning_rate": 0.00020740251485476348,
+        "train_loss": 0.4993071104260451,
+        "val_accuracy": 0.992903,
+        "val_loss": 0.11966440081596375,
+        "val_macro_f1": 0.992791
+      },
+      {
+        "epoch": 17,
+        "learning_rate": 0.00019635254915624213,
+        "train_loss": 0.49904085394537495,
+        "val_accuracy": 0.995102,
+        "val_loss": 0.11074300855398178,
+        "val_macro_f1": 0.995159
+      },
+      {
+        "epoch": 18,
+        "learning_rate": 0.00018501680457838585,
+        "train_loss": 0.4985529378044321,
+        "val_accuracy": 0.995502,
+        "val_loss": 0.10986464470624924,
+        "val_macro_f1": 0.995427
+      },
+      {
+        "epoch": 19,
+        "learning_rate": 0.00017346516975603465,
+        "train_loss": 0.49837372828752935,
+        "val_accuracy": 0.995002,
+        "val_loss": 0.11205989122390747,
+        "val_macro_f1": 0.994996
+      },
+      {
+        "epoch": 20,
+        "learning_rate": 0.00016176886435917675,
+        "train_loss": 0.4979424202085585,
+        "val_accuracy": 0.995902,
+        "val_loss": 0.1079108789563179,
+        "val_macro_f1": 0.995882
+      },
+      {
+        "epoch": 21,
+        "learning_rate": 0.00015,
+        "train_loss": 0.4977002551236926,
+        "val_accuracy": 0.995902,
+        "val_loss": 0.11003603041172028,
+        "val_macro_f1": 0.995888
+      },
+      {
+        "epoch": 22,
+        "learning_rate": 0.00013823113564082325,
+        "train_loss": 0.4975002015319658,
+        "val_accuracy": 0.994302,
+        "val_loss": 0.11502781510353088,
+        "val_macro_f1": 0.994177
+      },
+      {
+        "epoch": 23,
+        "learning_rate": 0.00012653483024396538,
+        "train_loss": 0.497386456797671,
+        "val_accuracy": 0.995302,
+        "val_loss": 0.11250144988298416,
+        "val_macro_f1": 0.995192
+      },
+      {
+        "epoch": 24,
+        "learning_rate": 0.00011498319542161417,
+        "train_loss": 0.497102894667204,
+        "val_accuracy": 0.996801,
+        "val_loss": 0.10758257657289505,
+        "val_macro_f1": 0.996791
+      },
+      {
+        "epoch": 25,
+        "learning_rate": 0.00010364745084375787,
+        "train_loss": 0.4970566434064345,
+        "val_accuracy": 0.995702,
+        "val_loss": 0.10993147641420364,
+        "val_macro_f1": 0.99562
+      }
+    ],
+    "lightning_csv_path": null,
+    "parent_candidate_id": null,
+    "representation": {
+      "augmentations": [
+        "hflip",
+        "vflip",
+        "rotate90",
+        "rotate180",
+        "brightness",
+        "contrast"
+      ],
+      "normalization": "standardize",
+      "rationale": "Standardization (zero-mean, unit-variance) is selected over unit-range scaling because the downstream architecture is a compact transformer operating on 16 patch tokens (7x7 non-overlapping patches on 28x28 RGB). Transformers are notably more sensitive to input magnitude than CNNs; centering each channel to zero mean and scaling to unit variance stabilizes attention logits and gradient flow, especially given the small per-channel stds (0.124, 0.177, 0.124) which would otherwise produce near-constant inputs after unit scaling. The channel means (0.741, 0.533, 0.706) confirm the data is already in [0,1], so standardization adds the critical centering step without distorting relative channel relationships in H&E staining. All six approved augmentations are applied train-only: hflip, vflip, rotate90, and rotate180 are orientation-safe for tissue-type labels (tissue morphology is rotation/flip invariant at the classification level), while brightness and contrast simulate inter-lab staining variability without altering structural content. This augmentation set maximizes effective training diversity on ~90k samples with mild class imbalance (1.63:1) without introducing geometric distortions that could confuse nuclear/cytoplasmic texture cues critical for distinguishing the 9 tissue classes."
+    },
+    "requested_epochs": 40,
+    "resume_path": "blobs/search/autonomous_t0006_s0006.resume.pt",
+    "resume_sha256": "97774afab810950ca4b4880f72b888be7755a358a3bbb365e1d3c054c50a743e",
+    "round_index": 6,
+    "schema_version": "1.0",
+    "status": "completed",
+    "stop_reason": "early_stopping",
+    "training_log_path": "blobs/search/autonomous_t0006_s0006.training.jsonl",
+    "training_result": {
+      "best_epoch": 15,
+      "best_val_accuracy": 0.995402,
+      "checkpoint_path": "blobs/search/autonomous_t0006_s0006.ckpt",
+      "checkpoint_sha256": "fc197196daf399eab6ce6f37fdc2544e6f3549cb2425726531b46965f4a9c401",
+      "device": "cuda",
+      "epochs_completed": 25,
+      "final_train_loss": 0.4970566434064345,
+      "final_val_accuracy": 0.995702,
+      "framework": "local.python",
+      "history": [
+        {
+          "epoch": 1,
+          "learning_rate": 0.0003,
+          "train_loss": 0.6611539335093658,
+          "val_accuracy": 0.967313,
+          "val_loss": 0.18981532752513885,
+          "val_macro_f1": 0.967864
+        },
+        {
+          "epoch": 2,
+          "learning_rate": 0.00029953760005996916,
+          "train_loss": 0.5507565177979687,
+          "val_accuracy": 0.978709,
+          "val_loss": 0.15783348679542542,
+          "val_macro_f1": 0.978243
+        },
+        {
+          "epoch": 3,
+          "learning_rate": 0.00029815325108927063,
+          "train_loss": 0.5303689433023098,
+          "val_accuracy": 0.981507,
+          "val_loss": 0.15111568570137024,
+          "val_macro_f1": 0.981573
+        },
+        {
+          "epoch": 4,
+          "learning_rate": 0.0002958554880596515,
+          "train_loss": 0.5210551206691498,
+          "val_accuracy": 0.981208,
+          "val_loss": 0.14642439782619476,
+          "val_macro_f1": 0.981362
+        },
+        {
+          "epoch": 5,
+          "learning_rate": 0.00029265847744427303,
+          "train_loss": 0.5151395017271323,
+          "val_accuracy": 0.993203,
+          "val_loss": 0.11601179838180542,
+          "val_macro_f1": 0.993177
+        },
+        {
+          "epoch": 6,
+          "learning_rate": 0.000288581929876693,
+          "train_loss": 0.5115886589848975,
+          "val_accuracy": 0.990904,
+          "val_loss": 0.12174785882234573,
+          "val_macro_f1": 0.990875
+        },
+        {
+          "epoch": 7,
+          "learning_rate": 0.0002836509786282552,
+          "train_loss": 0.5086610191203375,
+          "val_accuracy": 0.988804,
+          "val_loss": 0.12692303955554962,
+          "val_macro_f1": 0.988644
+        },
+        {
+          "epoch": 8,
+          "learning_rate": 0.00027789602465311383,
+          "train_loss": 0.5064133322396058,
+          "val_accuracy": 0.990804,
+          "val_loss": 0.1205243393778801,
+          "val_macro_f1": 0.990711
+        },
+        {
+          "epoch": 9,
+          "learning_rate": 0.0002713525491562421,
+          "train_loss": 0.504633028964502,
+          "val_accuracy": 0.994002,
+          "val_loss": 0.11131507903337479,
+          "val_macro_f1": 0.994062
+        },
+        {
+          "epoch": 10,
+          "learning_rate": 0.00026406089484000466,
+          "train_loss": 0.5034729749331226,
+          "val_accuracy": 0.994002,
+          "val_loss": 0.11527165025472641,
+          "val_macro_f1": 0.993811
+        },
+        {
+          "epoch": 11,
+          "learning_rate": 0.0002560660171779821,
+          "train_loss": 0.5025376545805603,
+          "val_accuracy": 0.992503,
+          "val_loss": 0.11467193067073822,
+          "val_macro_f1": 0.992443
+        },
+        {
+          "epoch": 12,
+          "learning_rate": 0.0002474172072495276,
+          "train_loss": 0.5014317934420581,
+          "val_accuracy": 0.994202,
+          "val_loss": 0.11421365290880203,
+          "val_macro_f1": 0.99419
+        },
+        {
+          "epoch": 13,
+          "learning_rate": 0.000238167787843871,
+          "train_loss": 0.5008703807660371,
+          "val_accuracy": 0.993503,
+          "val_loss": 0.1116069108247757,
+          "val_macro_f1": 0.993447
+        },
+        {
+          "epoch": 14,
+          "learning_rate": 0.00022837478470739232,
+          "train_loss": 0.5005018510650627,
+          "val_accuracy": 0.994002,
+          "val_loss": 0.11620806902647018,
+          "val_macro_f1": 0.994054
+        },
+        {
+          "epoch": 15,
+          "learning_rate": 0.000218098574960932,
+          "train_loss": 0.5001183559329856,
+          "val_accuracy": 0.995402,
+          "val_loss": 0.1078893169760704,
+          "val_macro_f1": 0.995418
+        },
+        {
+          "epoch": 16,
+          "learning_rate": 0.00020740251485476348,
+          "train_loss": 0.4993071104260451,
+          "val_accuracy": 0.992903,
+          "val_loss": 0.11966440081596375,
+          "val_macro_f1": 0.992791
+        },
+        {
+          "epoch": 17,
+          "learning_rate": 0.00019635254915624213,
+          "train_loss": 0.49904085394537495,
+          "val_accuracy": 0.995102,
+          "val_loss": 0.11074300855398178,
+          "val_macro_f1": 0.995159
+        },
+        {
+          "epoch": 18,
+          "learning_rate": 0.00018501680457838585,
+          "train_loss": 0.4985529378044321,
+          "val_accuracy": 0.995502,
+          "val_loss": 0.10986464470624924,
+          "val_macro_f1": 0.995427
+        },
+        {
+          "epoch": 19,
+          "learning_rate": 0.00017346516975603465,
+          "train_loss": 0.49837372828752935,
+          "val_accuracy": 0.995002,
+          "val_loss": 0.11205989122390747,
+          "val_macro_f1": 0.994996
+        },
+        {
+          "epoch": 20,
+          "learning_rate": 0.00016176886435917675,
+          "train_loss": 0.4979424202085585,
+          "val_accuracy": 0.995902,
+          "val_loss": 0.1079108789563179,
+          "val_macro_f1": 0.995882
+        },
+        {
+          "epoch": 21,
+          "learning_rate": 0.00015,
+          "train_loss": 0.4977002551236926,
+          "val_accuracy": 0.995902,
+          "val_loss": 0.11003603041172028,
+          "val_macro_f1": 0.995888
+        },
+        {
+          "epoch": 22,
+          "learning_rate": 0.00013823113564082325,
+          "train_loss": 0.4975002015319658,
+          "val_accuracy": 0.994302,
+          "val_loss": 0.11502781510353088,
+          "val_macro_f1": 0.994177
+        },
+        {
+          "epoch": 23,
+          "learning_rate": 0.00012653483024396538,
+          "train_loss": 0.497386456797671,
+          "val_accuracy": 0.995302,
+          "val_loss": 0.11250144988298416,
+          "val_macro_f1": 0.995192
+        },
+        {
+          "epoch": 24,
+          "learning_rate": 0.00011498319542161417,
+          "train_loss": 0.497102894667204,
+          "val_accuracy": 0.996801,
+          "val_loss": 0.10758257657289505,
+          "val_macro_f1": 0.996791
+        },
+        {
+          "epoch": 25,
+          "learning_rate": 0.00010364745084375787,
+          "train_loss": 0.4970566434064345,
+          "val_accuracy": 0.995702,
+          "val_loss": 0.10993147641420364,
+          "val_macro_f1": 0.99562
+        }
+      ],
+      "lightning_config_path": null,
+      "lightning_csv_path": null,
+      "resume_path": "blobs/search/autonomous_t0006_s0006.resume.pt",
+      "resume_sha256": "97774afab810950ca4b4880f72b888be7755a358a3bbb365e1d3c054c50a743e",
+      "schema_version": "1.0",
+      "seed": 42,
+      "stop_reason": "early_stopping",
+      "training_log_path": "blobs/search/autonomous_t0006_s0006.training.jsonl"
+    },
+    "validation_accuracy": 0.995402,
+    "validation_balanced_accuracy": 0.995421,
+    "validation_macro_f1": 0.995418
+  },
+  "payload_sha256": "def96dc4d634812b8854a98b45dab4164ae8dc816d6a5371808aa7d304124c9f",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 40,
+  "version": 1
+}

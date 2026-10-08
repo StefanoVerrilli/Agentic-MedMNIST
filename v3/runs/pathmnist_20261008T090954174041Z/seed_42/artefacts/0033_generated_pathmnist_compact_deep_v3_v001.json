@@ -1,0 +1,35 @@
+{
+  "artefact": "generated_pathmnist_compact_deep_v3",
+  "artefact_type": "GeneratedBundle",
+  "created_at": "2026-10-08T09:54:17.086487+00:00",
+  "payload": {
+    "author": "experimental_development",
+    "files": {
+      "experiment.py": "884bae0c8b9dc2599ac18f7645bedce5c1e75cf82dae29f1622e7387e8859eca"
+    },
+    "hypothesis": "Increasing compact_transformer depth from 4 to 6 (with hidden=256, patch_size=4, 49 tokens) will improve validation accuracy beyond 0.9905 by providing additional hierarchical feature extraction layers. In histopathology, distinguishing confusable classes (smooth muscle vs stroma, normal mucosa vs adenocarcinoma, background vs debris) requires multi-level abstraction: low-level texture → mid-level cell morphology → high-level tissue architecture. Six transformer blocks provide more sequential refinement of these features than four, while the 49-token sequence remains short enough to avoid overfitting on ~90k samples. Slightly higher dropout (0.15) and lower LR (1e-4) compensate for the increased model capacity.",
+    "parent_sha256": null,
+    "reference": {
+      "bundle_id": "pathmnist_compact_deep_v3",
+      "parameters": {
+        "depth": 6,
+        "dropout": 0.15,
+        "hidden": 256,
+        "mlp_ratio": 4,
+        "num_heads": 4,
+        "patch_size": 4,
+        "pooling": "cls"
+      },
+      "path": "generated/pathmnist_compact_deep_v3/v001/manifest.json",
+      "sha256": "1cacf9a6efbb5102fc7a356e842cde71c432e05da99ebbaa3dce9d52931074e7",
+      "version": 1
+    },
+    "schema_version": "1.0",
+    "source": "qwen3.8:latest"
+  },
+  "payload_sha256": "32800d617864717f91641324a4d799c8157be0b354034fe672ed93dfa085a1a3",
+  "producer": "experimental_development",
+  "run_id": "seed_42",
+  "sequence": 33,
+  "version": 1
+}

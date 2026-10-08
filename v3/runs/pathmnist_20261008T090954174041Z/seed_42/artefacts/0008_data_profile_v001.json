@@ -1,0 +1,99 @@
+{
+  "artefact": "data_profile",
+  "artefact_type": "DataProfile",
+  "created_at": "2026-10-08T09:10:32.364294+00:00",
+  "payload": {
+    "ambiguity_note": "Using only the provided train and validation metadata, the main ambiguity risks are patch-level label ambiguity and visual overlap among histology classes at 28x28 RGB resolution. The class counts and proportions are nearly identical between train and validation, and the imbalance ratio is modest, so there is no strong evidence of split-level distribution mismatch from these statistics alone. However, several labels are likely to be visually confusable in small tissue patches: background, debris, and mucus can appear as low-structure or amorphous regions; adipose may resemble background or empty space depending on staining and cropping; smooth muscle and cancer-associated stroma can share fibrous or spindle-cell texture; normal colon mucosa and colorectal adenocarcinoma epithelium may overlap when a patch contains mixed glandular architecture; and lymphocytes may be confused with small debris or nuclear fragments. Because the images are intentionally small, boundary effects, mixed-tissue patches, and annotation uncertainty are plausible ambiguity sources. The held-out test split is locked and unavailable, so these risks cannot be validated against test performance.",
+    "ambiguity_risks": [
+      "background, debris, and mucus may be visually similar in low-resolution 28x28 patches",
+      "adipose tissue may be confused with background or empty tissue regions",
+      "smooth muscle and cancer-associated stroma may share fibrous or spindle-cell appearance",
+      "normal colon mucosa and colorectal adenocarcinoma epithelium may overlap in mixed glandular patches",
+      "lymphocytes may be confused with small debris or nuclear fragments",
+      "patch-level labels may contain multiple tissue types, increasing label ambiguity",
+      "small image size may reduce discriminative texture and boundary detail",
+      "train and validation distributions are similar, so split-level ambiguity cannot be assessed from these statistics alone"
+    ],
+    "blank_image_fraction": 0.0,
+    "class_counts": {
+      "train": [
+        9366,
+        9509,
+        10360,
+        10401,
+        8006,
+        12182,
+        7886,
+        9401,
+        12885
+      ],
+      "val": [
+        1041,
+        1057,
+        1152,
+        1156,
+        890,
+        1354,
+        877,
+        1045,
+        1432
+      ]
+    },
+    "class_proportions": {
+      "train": [
+        0.10407129,
+        0.10566025,
+        0.11511623,
+        0.1155718,
+        0.08895951,
+        0.13536157,
+        0.08762612,
+        0.1044602,
+        0.14317303
+      ],
+      "val": [
+        0.10405838,
+        0.10565774,
+        0.11515394,
+        0.11555378,
+        0.08896441,
+        0.13534586,
+        0.08766493,
+        0.10445822,
+        0.14314274
+      ]
+    },
+    "dataset": "pathmnist",
+    "decision_source": "qwen3.8:latest",
+    "duplicate_train_samples": 0,
+    "image_shape_hwc": [
+      28,
+      28,
+      3
+    ],
+    "imbalance_ratio": 1.633908,
+    "n_channels": 3,
+    "n_classes": 9,
+    "official_data_fraction": 1.0,
+    "profiled_fraction": 1.0,
+    "samples_profiled": 100000,
+    "schema_version": "1.0",
+    "test_imbalance_ratio": 1.0,
+    "test_to_train_prevalence_ratio": [],
+    "train_channel_mean_unit": [
+      0.740545,
+      0.53298219,
+      0.70582885
+    ],
+    "train_channel_std_unit": [
+      0.12368222,
+      0.17676253,
+      0.12443067
+    ]
+  },
+  "payload_sha256": "16ca5a23aeb8ce9d7ed41eb5dbde2a2a2ff0cd2ce070cfbdbead28a36ffe82d6",
+  "producer": "profiling",
+  "run_id": "seed_42",
+  "sequence": 8,
+  "version": 1
+}

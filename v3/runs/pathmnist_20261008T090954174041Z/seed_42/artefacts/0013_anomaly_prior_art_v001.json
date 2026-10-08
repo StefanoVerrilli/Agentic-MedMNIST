@@ -1,0 +1,37 @@
+{
+  "artefact": "anomaly_prior_art",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-08T09:11:53.442145+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "The prior_art stage is functionally sound. The data profile for PathMNIST (9-class, 28×28 RGB, imbalance ratio 1.63, no duplicates, no blank images) is internally consistent and matches the standard MedMNIST distribution. The four derived ideas are clearly labelled hypothesis_to_validate and are reasonable design considerations, though the evidentiary link between some curated-excerpt quotes and the specific inferences is thin (e.g., the class-balance idea cites the 28×28 pre-processing quote, which does not directly support a class-weighted-loss hypothesis; the class-count range comes from the local data profile, not the source). This is acceptable given the hypothesis status, but the traceability gap should be noted for downstream validation.\n\nThe deterministic finding that curated excerpts are not live retrieval evidence is valid and appropriately scoped as a warning. All three sources carry origin=curated_excerpt, so the quotes establish traceability to the cited papers but do not independently verify the performance or design claims extrapolated from them. No retrieved abstracts are present to close that gap.\n\nTwo proposals are in the extension gate as pending_review. The compact_conv_stem_transformer is a genuinely new architecture specification (conv stem 3×3 stride 4 → 7×7×64 → 49 tokens, 2 transformer blocks, 4 heads × head_dim 16, FFN 128, GAP, linear 64→9) that is not one of the seven built-in families, so its pending_review status is correct. The architecture math is internally consistent (output spatial size floor((28−3+2)/4)+1 = 7; model_dim = 4×16 = 64 matches the conv output channels).\n\nThe tissue_geometric_aug proposal requests hflip and vflip, which are built-in augmentations that do not require extension approval per pipeline policy. Its presence in the gate as pending_review is a minor process redundancy rather than a correctness defect; the primitives are available regardless of gate status. No action is needed to unblock downstream stages on this point.\n\nCompacted fields (4 entries) and omitted artefacts (anomaly_ingestion, dataset_manifest, run_manifest) are preview-level truncations, not incomplete persisted artefacts, and do not warrant regeneration requests. Worker isolation is not enforced (local_subprocess) and image_digest is null; these are operational notes only and do not affect the prior-art review.\n\nNo critical issues identified. The stage can proceed.",
+    "deterministic_issues": [
+      "warning:curated excerpts are not live retrieval evidence"
+    ],
+    "llm_issues": [
+      "tissue_geometric_aug proposal (hflip, vflip) is listed in the extension gate as pending_review, but these are built-in augmentations that do not require extension approval per pipeline policy; the gate entry is redundant and could cause unnecessary blocking if a reviewer is not assigned.",
+      "The class_balance_aware_training idea cites the MedMNIST 28×28 pre-processing quote as evidence, but the quote does not support the class-weighted-loss hypothesis; the class-count range (7886–12885) is drawn from the local data profile, not the source. The evidentiary link is weak and the idea should be treated as a local design heuristic rather than a literature-supported hypothesis.",
+      "All three literature sources are curated excerpts, not live retrievals or retrieved abstracts. The evidence quotes establish traceability to the cited papers but do not independently verify the specific design inferences (e.g., 7×7 patch granularity, conv-stem overfitting avoidance) drawn from them."
+    ],
+    "observations": [
+      "Data profile is clean: 100 000 samples profiled, 0 duplicates, 0 blank images, imbalance ratio 1.63, train/val class proportions nearly identical (max Δ < 0.0001).",
+      "Archive integrity verified via MD5 a8b06965200029087d5bd730944a56c1; split sizes (89996/10004/7180) match official PathMNIST sizes; subsampled=false.",
+      "The compact_conv_stem_transformer architecture spec is internally consistent: conv 3×3 stride 4 pad 1 on 28×28 yields 7×7×64 (49 tokens × dim 64); 4 heads × head_dim 16 = model_dim 64; FFN hidden 128; GAP → 64-dim; linear 64→9.",
+      "Test-domain note from profiling: CRC-VAL-HE-7K test images originate from a different clinical center, relevant for OOD AUROC interpretation in later stages.",
+      "Ambiguity risks for visually similar histology classes at 28×28 resolution are well-documented and consistent with the literature.",
+      "Worker isolation not enforced (local_subprocess); image_digest null; LLM model qwen3.8:latest (ollama) digest recorded. Operational notes only.",
+      "Compacted fields (4) and omitted artefacts (3) are preview truncations, not incomplete persisted artefacts."
+    ],
+    "requests": [],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8:latest",
+    "stage": "prior_art"
+  },
+  "payload_sha256": "90e49e8ecd5d40780add2d2004a388fc95fcc423d7e6c2ccb853f57c492950f5",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 13,
+  "version": 1
+}

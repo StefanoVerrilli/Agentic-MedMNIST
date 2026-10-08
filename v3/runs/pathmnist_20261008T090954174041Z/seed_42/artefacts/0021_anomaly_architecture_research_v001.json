@@ -1,0 +1,34 @@
+{
+  "artefact": "anomaly_architecture_research",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-08T09:14:30.108052+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "The architecture research stage is well-structured and internally consistent for a 28x28 RGB histopathology classification task with ~90k training samples and mild 1.63:1 class imbalance.\n\n**Strengths:**\n- All seven built-in families are correctly treated as available without extension approval. The priority ordering (compact_transformer → resnet18 → multi_scale_transformer → vision_transformer → residual_cnn → feature_pyramid_transformer → tiny_cnn) is well-justified by the 28x28 spatial constraint and the need for local feature extraction.\n- Both pending extensions (tissue_geometric_aug, compact_conv_stem_transformer) are correctly identified as unavailable and explicitly excluded from planning. The observation that compact_conv_stem_transformer is functionally subsumed by compact_transformer's built-in convolutional tokenizer is sound and avoids unnecessary dependency on an unapproved proposal.\n- Evidence provenance is properly handled: all three arxiv sources are flagged as unverified_curated_excerpt, and the analysis explicitly states that derived hypotheses require empirical validation and no performance claims are confirmed.\n- Token-count arithmetic is correct throughout: 28/4=7→49 tokens, 28/7=4→16 tokens, multi_scale 28/2=14→196, 28/4=7→49, 28/7=4→16, 28/14=2→4.\n- Normalization correctly uses dataset-specific channel statistics (mean [0.74, 0.53, 0.71], std [0.12, 0.18, 0.12]) rather than ImageNet defaults, and the rationale for standardization over unit-range scaling is appropriate for transformer attention stability.\n- ResNet18 is correctly described with its fixed CIFAR-style topology (3x3 stride-1 stem, no max-pool, 64-128-256-512 channel progression). No incorrect assumptions about configurable depth or width.\n- feature_pyramid_transformer's constraints (fixed depth=1, inactive pooling/position/heads/scales) are accurately described, and it is appropriately positioned as a low-capacity ablation rather than a primary candidate.\n- Class-imbalance handling (inverse-frequency CE, max weight ~1.63x, avoiding focal loss) is proportionate to the mild imbalance.\n- Built-in augmentations (hflip, vflip, rotate90, rotate180, brightness, contrast) are correctly used without requiring extension approval.\n\n**Minor observations (non-blocking):**\n- The representation_plan rationale (truncated at 397/1304 chars) references \"16 patch tokens (7x7 non-overlapping patches)\" as the downstream architecture description, while the primary recommendation in the analysis is 4x4 patches yielding 49 tokens. The full rationale likely discusses the ablation case, but the visible fragment could be misread as the primary configuration. This is a preview-truncation artifact, not a persisted error.\n- augmentation_factor is 7 with 6 augmentations listed; this is consistent with the convention of 1 original + 6 augmented = 7 total, but the convention is not explicitly stated.\n- The 196-token scale-2 branch in multi_scale_transformer is correctly flagged as the highest overfitting risk at 90k samples, with a concrete monitoring recommendation (per-branch gradient norms).\n\nNo deterministic findings are present. No unsupported external-memory claims are made. No clinical claims are present. The stage is ready to proceed to the next phase.",
+    "deterministic_issues": [],
+    "llm_issues": [],
+    "observations": [
+      "All seven built-in architecture families are correctly treated as implemented and available; no extension approval is requested for any of them.",
+      "Both pending extensions (tissue_geometric_aug, compact_conv_stem_transformer) are correctly gated and excluded from planning; compact_conv_stem_transformer is noted as functionally redundant with compact_transformer's built-in conv tokenizer.",
+      "All three arxiv evidence sources are correctly classified as unverified_curated_excerpt; no performance claims are derived from them.",
+      "Token-count arithmetic is verified correct for all patch/scale configurations across compact_transformer, vision_transformer, and multi_scale_transformer.",
+      "Dataset-specific normalization statistics are used consistently; ImageNet defaults are explicitly rejected.",
+      "ResNet18 fixed topology is correctly described; no configurable depth or width is assumed.",
+      "feature_pyramid_transformer's highly constrained configuration (depth=1, inactive pooling/position/heads/scales) is accurately characterized and appropriately scoped as an ablation.",
+      "Built-in augmentations (hflip, vflip, rotate90, rotate180, brightness, contrast) are used without extension approval, consistent with pipeline rules.",
+      "The truncated representation_plan rationale (397/1304 chars) references 16 tokens as the architecture description, while the primary recommendation is 49 tokens; this is a preview-truncation artifact, not a persisted inconsistency.",
+      "augmentation_factor=7 with 6 listed augmentations is consistent with the 1+6 convention but the convention is not explicitly stated in the visible text."
+    ],
+    "requests": [],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8:latest",
+    "stage": "architecture_research"
+  },
+  "payload_sha256": "7e7e74a5f1c8a0f8469bf48ab11844b24a32f03fc713f0ef9d680125597ec40e",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 21,
+  "version": 1
+}

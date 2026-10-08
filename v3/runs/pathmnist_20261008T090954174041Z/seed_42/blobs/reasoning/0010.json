@@ -1,0 +1,135 @@
+{
+  "payload": {
+    "decision": {
+      "action": "continue",
+      "comment": "The architecture research stage is well-structured and internally consistent for a 28x28 RGB histopathology classification task with ~90k training samples and mild 1.63:1 class imbalance.\n\n**Strengths:**\n- All seven built-in families are correctly treated as available without extension approval. The priority ordering (compact_transformer \u2192 resnet18 \u2192 multi_scale_transformer \u2192 vision_transformer \u2192 residual_cnn \u2192 feature_pyramid_transformer \u2192 tiny_cnn) is well-justified by the 28x28 spatial constraint and the need for local feature extraction.\n- Both pending extensions (tissue_geometric_aug, compact_conv_stem_transformer) are correctly identified as unavailable and explicitly excluded from planning. The observation that compact_conv_stem_transformer is functionally subsumed by compact_transformer's built-in convolutional tokenizer is sound and avoids unnecessary dependency on an unapproved proposal.\n- Evidence provenance is properly handled: all three arxiv sources are flagged as unverified_curated_excerpt, and the analysis explicitly states that derived hypotheses require empirical validation and no performance claims are confirmed.\n- Token-count arithmetic is correct throughout: 28/4=7\u219249 tokens, 28/7=4\u219216 tokens, multi_scale 28/2=14\u2192196, 28/4=7\u219249, 28/7=4\u219216, 28/14=2\u21924.\n- Normalization correctly uses dataset-specific channel statistics (mean [0.74, 0.53, 0.71], std [0.12, 0.18, 0.12]) rather than ImageNet defaults, and the rationale for standardization over unit-range scaling is appropriate for transformer attention stability.\n- ResNet18 is correctly described with its fixed CIFAR-style topology (3x3 stride-1 stem, no max-pool, 64-128-256-512 channel progression). No incorrect assumptions about configurable depth or width.\n- feature_pyramid_transformer's constraints (fixed depth=1, inactive pooling/position/heads/scales) are accurately described, and it is appropriately positioned as a low-capacity ablation rather than a primary candidate.\n- Class-imbalance handling (inverse-frequency CE, max weight ~1.63x, avoiding focal loss) is proportionate to the mild imbalance.\n- Built-in augmentations (hflip, vflip, rotate90, rotate180, brightness, contrast) are correctly used without requiring extension approval.\n\n**Minor observations (non-blocking):**\n- The representation_plan rationale (truncated at 397/1304 chars) references \"16 patch tokens (7x7 non-overlapping patches)\" as the downstream architecture description, while the primary recommendation in the analysis is 4x4 patches yielding 49 tokens. The full rationale likely discusses the ablation case, but the visible fragment could be misread as the primary configuration. This is a preview-truncation artifact, not a persisted error.\n- augmentation_factor is 7 with 6 augmentations listed; this is consistent with the convention of 1 original + 6 augmented = 7 total, but the convention is not explicitly stated.\n- The 196-token scale-2 branch in multi_scale_transformer is correctly flagged as the highest overfitting risk at 90k samples, with a concrete monitoring recommendation (per-branch gradient norms).\n\nNo deterministic findings are present. No unsupported external-memory claims are made. No clinical claims are present. The stage is ready to proceed to the next phase.",
+      "issues": [],
+      "observations": [
+        "All seven built-in architecture families are correctly treated as implemented and available; no extension approval is requested for any of them.",
+        "Both pending extensions (tissue_geometric_aug, compact_conv_stem_transformer) are correctly gated and excluded from planning; compact_conv_stem_transformer is noted as functionally redundant with compact_transformer's built-in conv tokenizer.",
+        "All three arxiv evidence sources are correctly classified as unverified_curated_excerpt; no performance claims are derived from them.",
+        "Token-count arithmetic is verified correct for all patch/scale configurations across compact_transformer, vision_transformer, and multi_scale_transformer.",
+        "Dataset-specific normalization statistics are used consistently; ImageNet defaults are explicitly rejected.",
+        "ResNet18 fixed topology is correctly described; no configurable depth or width is assumed.",
+        "feature_pyramid_transformer's highly constrained configuration (depth=1, inactive pooling/position/heads/scales) is accurately characterized and appropriately scoped as an ablation.",
+        "Built-in augmentations (hflip, vflip, rotate90, rotate180, brightness, contrast) are used without extension approval, consistent with pipeline rules.",
+        "The truncated representation_plan rationale (397/1304 chars) references 16 tokens as the architecture description, while the primary recommendation is 49 tokens; this is a preview-truncation artifact, not a persisted inconsistency.",
+        "augmentation_factor=7 with 6 listed augmentations is consistent with the 1+6 convention but the convention is not explicitly stated in the visible text."
+      ],
+      "requests": [],
+      "severity": "ok"
+    },
+    "request": {
+      "fallback": {
+        "action": "continue",
+        "comment": "Deterministic reviewer invariants passed.",
+        "issues": [],
+        "observations": [],
+        "requests": [],
+        "severity": "ok"
+      },
+      "model": "qwen3.8:latest",
+      "schema": {
+        "$defs": {
+          "ReviewRequest": {
+            "additionalProperties": false,
+            "properties": {
+              "correction": {
+                "minLength": 1,
+                "title": "Correction",
+                "type": "string"
+              },
+              "problem": {
+                "minLength": 1,
+                "title": "Problem",
+                "type": "string"
+              },
+              "request_id": {
+                "minLength": 1,
+                "title": "Request Id",
+                "type": "string"
+              },
+              "required_evidence": {
+                "minLength": 1,
+                "title": "Required Evidence",
+                "type": "string"
+              }
+            },
+            "required": [
+              "request_id",
+              "problem",
+              "correction",
+              "required_evidence"
+            ],
+            "title": "ReviewRequest",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "enum": [
+              "continue",
+              "revise",
+              "stop"
+            ],
+            "title": "Action",
+            "type": "string"
+          },
+          "comment": {
+            "maxLength": 12000,
+            "minLength": 2,
+            "title": "Comment",
+            "type": "string"
+          },
+          "issues": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 30,
+            "title": "Issues",
+            "type": "array"
+          },
+          "observations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Observations",
+            "type": "array"
+          },
+          "requests": {
+            "items": {
+              "$ref": "#/$defs/ReviewRequest"
+            },
+            "title": "Requests",
+            "type": "array"
+          },
+          "severity": {
+            "enum": [
+              "ok",
+              "warning",
+              "critical"
+            ],
+            "title": "Severity",
+            "type": "string"
+          }
+        },
+        "required": [
+          "severity",
+          "action",
+          "comment"
+        ],
+        "title": "ReviewDecision",
+        "type": "object"
+      },
+      "seed": 42,
+      "stage": "review.architecture_research",
+      "system": "You are an independent software and ML consistency reviewer. Inspect only the supplied evidence. You may raise severity but must never dismiss deterministic findings. No clinical claims. The supplied current UTC timestamp is authoritative. This pipeline uses the standard 28x28 RGB MedMNIST distribution; do not substitute the source-dataset or MedMNIST+ resolution. Only deterministic findings may justify action=stop; unsupported external-memory claims must be warnings requesting verification. ResNet18 has fixed topology; hidden controls base width and depth is ignored. Generic transformer fields are inactive for CNN families and do not make them transformer hybrids. Built-in augmentations (hflip, vflip, rotate90, rotate180, brightness, contrast) do not require extension approval; pending new proposals do not invalidate these primitives. All seven built-in families (tiny_cnn, residual_cnn, resnet18, vision_transformer, compact_transformer, multi_scale_transformer, feature_pyramid_transformer) are implemented and need no extension approval. Gate status applies only to the specific new proposals. Respect evidence_provenance: curated excerpts and bare URLs are unverified external evidence, while retrieved abstracts alone do not verify performance claims. Entries in compacted_fields identify preview truncation performed for this review, not incomplete persisted artefacts. Do not request regeneration solely because of these previews or omitted_artefacts. A cited quote establishes traceability, not support for every scientific inference: assess that support separately. The OOD aggregate is the arithmetic mean of the selected score's AUROCs across corruption severities, not a pooled-sample AUROC. For run_generated, generic architecture defaults do not identify the instantiated network. Use generated_bundle.parameters and archived program source to establish which values are consumed.",
+      "user": "current_utc=2026-10-08T09:13:54.634751+00:00; stage=architecture_research; deterministic_findings=[]; stage_focused_evidence={\"artefacts\": {\"approved_extensions\": {\"entries\": [], \"schema_version\": \"1.0\"}, \"architecture_research\": {\"analysis\": \"Task: 28x28 RGB histopathology classification, ~90k train / ~10k val, mild imbalance (1.63:1). Channel stats (mean [0.74, 0.53, 0.71], std [0.12, 0.18, 0.12]) are dataset-specific and must replace any ImageNet defaults for input normalization.\\n\\nArchitecture fit for 28x28 inputs:\\n1. compact_transformer is the top immediately-actionable transformer. It already ships a configurable convolutional tokenizer, directly implementing the spatially-aware local-feature hypothesis without requiring the pending 'compact_conv_stem_transformer' extension. This makes it the primary transformer candidate.\\n2. resnet18 uses a CIFAR-style 3x3 stride-1 stem with no max-pooling, preserving 28x28 spatial resolution through the stem. This is the strongest CNN baseline and is well-matched to the input size.\\n3. multi_scale_transformer fuses patch scales 2, 4, 7, 14 with joint attention. For 28x28 this yields 196, 49, 16, and 4 tokens respectively, giving a natural multi-granularity view from nuclear morphology (fine) to tissue architecture (coarse).\\n4. vision_transformer with 7x7 patches gives 16 tokens; 4x4 gives 49. Viable but lacks the built-in conv tokenization that compact_transformer provides.\\n5. feature_pyramid_transformer: fixed depth=1, shared hidden width divisible by 4, ST dot-product MoS(2), GT negative Euclidean MoS(4), convolutional RT. Pooling, position, heads, and scales are inactive. Highly constrained; utility for histopathology is unverified.\\n6. residual_cnn and tiny_cnn serve as lightweight baselines for ablation.\\n\\nPending extensions: 'compact_conv_stem_transformer' (pending_review) is functionally subsumed by compact_transformer's built-in conv tokenizer; do not plan around it. 'tissue_geometric_aug' (pending_review) is unavailable; do not include geometric augmentations in training plans until approved.\\n\\nEvidence caveat: all three arxiv sources are unverified curated excerpts. The derived hypotheses (patch granularity, conv tokenization, class balancing) are reasonable starting points but require empirical validation. No performance claims from these sources are confirmed.\\n\\nParameter budget: with ~90k samples and 28x28 inputs, keep transformer width at 128-256, depth 4-6, heads 4-8. The convolutional tokenizer should use kernels matching the patch size (4x4 or 7x7) with equal stride to produce spatially-aware tokens before global attention. Class imbalance at 1.63:1 is mild; inverse-frequency class-weighted CE is sufficient. Focal loss is likely overkill and may destabilize training.\", \"architecture_priorities\": [\"compact_transformer\", \"resnet18\", \"multi_scale_transformer\", \"vision_transformer\", \"residual_cnn\", \"feature_pyramid_transformer\", \"tiny_cnn\"], \"evidence_provenance\": {\"https://arxiv.org/abs/2010.11929\": \"unverified_curated_excerpt\", \"https://arxiv.org/abs/2104.05704\": \"unverified_curated_excerpt\", \"https://arxiv.org/abs/2110.14795\": \"unverified_curated_excerpt\"}, \"evidence_sources\": [\"https://arxiv.org/abs/2010.11929\", \"https://arxiv.org/abs/2104.05704\", \"https://arxiv.org/abs/2110.14795\"], \"parametrization_priorities\": [\"compact_transformer: hidden width 128 or 256, depth 4-6, heads 4-8, MLP ratio 4x, dropout 0.1-0.2 on attention and MLP outputs\", \"Convolutional tokenizer kernel size and stride must match the chosen patch size (4x4/s4 or 7x7/s7); ablate both on the validation set\", \"Learning rate 1e-4 to 3e-4 with cosine decay and 5-10 epoch warmup; batch size 128-256\", \"Class-weighted cross-entropy with inverse-frequency weights (max weight ~1.63x); avoid focal loss given the mild imbalance\", \"multi_scale_transformer: shared hidden width must be divisible by 4; verify that the 196-token scale-2 branch does not dominate or overfit\", \"feature_pyramid_transformer: shared hidden width divisible by 4; depth is fixed at 1 so width is the primary capacity knob\", \"resnet18: standard CIFAR-style channel progression (64-128-256-512); tune the final FC head and dropout (0.3-0.5) for the 9-class head\", \"Weight decay 1e-4 to 1e-3; gradient clipping at 1.0 to stabilize transformer training\"], \"representation_priorities\": [\"Use compact_transformer's built-in convolutional tokenizer with 4x4 kernel / stride 4 (49 tokens) as the primary tokenization; ablate against 7x7 / stride 7 (16 tokens) to measure the nuclear-detail vs tissue-context tradeoff\", \"Apply dataset-specific input normalization using the provided channel mean [0.74, 0.53, 0.71] and std [0.12, 0.18, 0.12] rather than ImageNet defaults\", \"For multi_scale_transformer, exploit the joint-attention fusion of scales 2/4/7/14 to capture both sub-cellular nuclear morphology and broader tissue architecture in a single forward pass\", \"Prefer 2D positional encoding (7x7 grid for 49 tokens, 4x4 grid for 16 tokens) over 1D to preserve spatial locality in attention\", \"For resnet18, leverage the CIFAR-style 3x3 stride-1 stem (no max-pool) to retain full 28x28 spatial resolution before the first downsampling layer\", \"For feature_pyramid_transformer, rely on the convolutional RT for local feature extraction and the ST/GT MoS mechanisms for cross-scale interaction; note that pooling, position, heads, and scales are inactive so the representation is highly constrained\", \"Keep token sequences short (16-49 tokens) to limit attention cost and reduce overfitting risk on ~90k samples\", \"Pending extension approval: tissue_geometric_aug would add rotation/flip/elastic-deformation augmentations to enrich the representation, but is unavailable until the hash-bound review clears\"], \"risks\": [\"All three cited arxiv sources are unverified curated excerpts; the patch-granularity, conv-tokenization, and class-balancing hypotheses are unconfirmed and must be validated empirically before being treated as design principles\", \"The 196-token scale-2 branch in multi_scale_transformer may overfit on ~90k samples; monitor per-branch gradient norms and validation loss divergence\", \"feature_pyramid_transformer's fixed depth=1 and inactive pooling/position/heads/scales severely limit capacity; it may underfit histopathology's multi-scale texture requirements\", \"Pending extensions (tissue_geometric_aug, compact_conv_stem_transformer) are unavailable; training plans must not assume geometric augmentations or a separate conv-stem transformer\", \"Mild class imbalance (1.63:1) may not benefit from aggressive reweighting; focal loss or oversampling could destabilize majority-class performance\", \"28x28 inputs provide limited spatial information; overly deep or wide transformers risk memorizing training patterns rather than learning generalizable tissue features\", \"Channel statistics differ substantially from ImageNet; using wrong normalization will degrade all architectures equally and mask true architectural differences\", \"The compact_transformer vs resnet18 comparison is the critical decision point; if the transformer does not clearly win on validation, the added complexity and training cost are not justified\"], \"schema_version\": \"1.0\", \"source\": \"qwen3.8:latest\", \"test_metrics_used\": false, \"transformer_guidance\": \"compact_transformer (top priority, immediately available):\\n- Tokenization: use the built-in convolutional tokenizer. Primary config: 4x4 kernel, stride 4, producing 7x7 = 49 tokens. Ablate: 7x7 kernel, stride 7, producing 4x4 = 16 tokens. The 49-token variant preserves nuclear-level texture; the 16-token variant emphasizes tissue-level context. Select via validation accuracy and per-class F1.\\n- Architecture: hidden width 128 or 256, depth 4-6, heads 4-8, MLP expansion 4x. Learnable 2D positional encoding on a 7x7 or 4x4 grid. Dropout 0.1-0.2.\\n- Training: LR 2e-4, cosine schedule, 10-epoch warmup, batch 256, weight decay 1e-4, grad clip 1.0. Class-weighted CE (inverse-frequency, max ~1.63x).\\n- The pending 'compact_conv_stem_transformer' extension is functionally redundant with this built-in tokenizer; do not wait for it.\\n\\nmulti_scale_transformer:\\n- Fuses scales 2, 4, 7, 14 with joint attention. Token counts: 196, 49, 16, 4. The 196-token branch (2x2 patches) is the highest-risk component for overfitting at 90k samples; monitor its gradient norm and consider reducing its contribution if validation loss diverges.\\n- Shared hidden width must be divisible by 4. Start at 128.\\n- Joint attention provides cross-scale context without explicit pooling, which suits the 28x28 constraint.\\n\\nvision_transformer:\\n- Patch size 4 (49 tokens) or 7 (16 tokens). Linear patch embedding lacks the spatial locality of compact_transformer's conv tokenizer, which may be a meaningful disadvantage at 28x28 where local nuclear morphology is critical.\\n- Use as a control to isolate the benefit of convolutional tokenization.\\n\\nfeature_pyramid_transformer:\\n- Fixed depth=1, shared hidden width divisible by 4. ST dot-product MoS(2) and GT negative Euclidean MoS(4) are the primary inductive-bias mechanisms. Convolutional RT handles local feature extraction. Pooling, position, heads, and scales are inactive, so the architecture is highly constrained.\\n- Best used as a low-capacity ablation to test whether the MoS mechanisms alone provide sufficient histopathology inductive bias.\\n\\nresnet18 (strongest CNN baseline):\\n- CIFAR-style 3x3 stride-1 stem, no max-pool. Preserves 28x28 resolution. Channel progression 64-128-256-512. Final FC head with dropout 0.3-0.5.\\n- Use as the primary non-transformer baseline. If compact_transformer does not clearly exceed resnet18 on validation, the transformer inductive bias is not justified for this task.\\n\\nPending extension approval:\\n- 'tissue_geometric_aug' (pending_review): geometric augmentations (rotation, horizontal/vertical flip, elastic deformation) would enrich training data for histopathology but are NOT available. Do not include in any training plan until the hash-bound review clears.\\n- 'compact_conv_stem_transformer' (pending_review): subsumed by compact_transformer's built-in conv tokenizer. No action needed.\"}, \"extension_gate_report\": {\"approvals_sha256\": null, \"entries\": [{\"proposal_id\": \"tissue_geometric_aug\", \"reason\": \"A hash-bound independent review is required.\", \"registry_name\": null, \"reviewer\": null, \"spec_sha256\": \"0934be5b4728667375abf618a115ae0481a6513fe9a0333ac02e6df7b77b04c1\", \"status\": \"pending_review\"}, {\"proposal_id\": \"compact_conv_stem_transformer\", \"reason\": \"A hash-bound independent review is required.\", \"registry_name\": null, \"reviewer\": null, \"spec_sha256\": \"fffb2acfa4a8adc98bc437b352d6e2fdc7ac31701182799f188f6c458ad03290\", \"status\": \"pending_review\"}], \"schema_version\": \"1.0\"}, \"representation_plan\": {\"augmentation_factor\": 7, \"augmentations\": [\"hflip\", \"vflip\", \"rotate90\", \"rotate180\", \"brightness\", \"contrast\"], \"normalization\": \"standardize\", \"rationale\": \"Standardization (zero-mean, unit-variance) is selected over unit-range scaling because the downstream architecture is a compact transformer operating on 16 patch tokens (7x7 non-overlapping patches on 28x28 RGB). Transformers are notably more sensitive to input magnitude than CNNs; centering each channel to zero mean and scaling to unit variance stabilizes attention logits and gradient flow, es...\", \"schema_version\": \"1.0\", \"source\": \"qwen3.8:latest\", \"stats_source\": \"train\", \"train_channel_mean_unit\": [0.740545, 0.53298219, 0.70582885], \"train_channel_std_unit\": [0.12368222, 0.17676253, 0.12443067]}}, \"compacted_fields\": [{\"original_chars\": 1304, \"path\": \"representation_plan.rationale\", \"shown_chars\": 397}], \"omitted_artefacts\": [\"data_profile\", \"anomaly_data_audit\", \"data_audit_report\", \"anomaly_preprocessing\", \"split_manifest\", \"anomaly_prior_art\", \"prior_art_brief\", \"anomaly_profiling\", \"anomaly_ingestion\", \"dataset_manifest\", \"run_manifest\", \"worker_evidence\"], \"stage\": \"architecture_research\"}"
+    },
+    "request_sha256": "fb39ab690c99464bb01ac74c7d047e06df6bb214da74f10b727489ebd0afb0a5",
+    "source": "qwen3.8:latest",
+    "used_fallback": false
+  },
+  "sha256": "4ed04f4cc82f527a9f36e0f0a4609631b7b1af39afa3f4b4081bf63b80079bfc"
+}

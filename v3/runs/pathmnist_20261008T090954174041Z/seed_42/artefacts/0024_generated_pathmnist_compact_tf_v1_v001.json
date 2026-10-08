@@ -1,0 +1,34 @@
+{
+  "artefact": "generated_pathmnist_compact_tf_v1",
+  "artefact_type": "GeneratedBundle",
+  "created_at": "2026-10-08T09:14:57.523190+00:00",
+  "payload": {
+    "author": "experimental_development",
+    "files": {
+      "experiment.py": "3b51002f92dc94de8ffb4c85048f329c3a5c7ca579fa29477308d6a5eed5ff2c"
+    },
+    "hypothesis": "A compact transformer with convolutional tokenization (4x4 patches, 49 tokens) will outperform linear-embedding ViTs on 28x28 histopathology because the conv stem captures local nuclear morphology and texture patterns that are critical for distinguishing visually confusable tissue classes (background/debris/mucus, smooth muscle/stroma, normal mucosa/adenocarcinoma). The 49-token sequence length provides sufficient spatial resolution for attention to model inter-cellular relationships while remaining short enough to avoid overfitting on ~90k samples. Hidden width 128 with depth 4 balances capacity against the limited spatial information in 28x28 inputs.",
+    "parent_sha256": null,
+    "reference": {
+      "bundle_id": "pathmnist_compact_tf_v1",
+      "parameters": {
+        "depth": 4,
+        "dropout": 0.1,
+        "hidden": 128,
+        "mlp_ratio": 4,
+        "num_heads": 4,
+        "patch_size": 4
+      },
+      "path": "generated/pathmnist_compact_tf_v1/v001/manifest.json",
+      "sha256": "c7630a27be09a22b52b8307466f601bc75abbd6f4eaea2fff06eb0f84a80b8e3",
+      "version": 1
+    },
+    "schema_version": "1.0",
+    "source": "qwen3.8:latest"
+  },
+  "payload_sha256": "5f23af500ef05c35fe17da0913f5077fc44502c50c837546546bef9973b64255",
+  "producer": "experimental_development",
+  "run_id": "seed_42",
+  "sequence": 24,
+  "version": 1
+}

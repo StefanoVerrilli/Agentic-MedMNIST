@@ -1,0 +1,64 @@
+{
+  "artefact": "autonomous_action_0008",
+  "artefact_type": "AutonomousSearchEvent",
+  "created_at": "2026-10-08T12:02:43.681665+00:00",
+  "payload": {
+    "decision": {
+      "action": "new_trial",
+      "additional_epochs": null,
+      "candidate_id": null,
+      "experiment": {
+        "batch_size": 256,
+        "bundle_id": "pathmnist_resnet18_v3",
+        "epochs": 60,
+        "files": [
+          {
+            "code": "import torch\nfrom lightning_components import build_network\nfrom worker_runtime import fit_model, batched_logits\n\n\ndef build_model(context):\n    p = context[\"parameters\"]\n    return build_network(\"resnet18\", in_channels=3, n_classes=9,\n        hidden=p.get(\"hidden\", 64), depth=p.get(\"depth\", 2),\n        dropout=p.get(\"dropout\", 0.25))\n\n\ndef train(context):\n    return fit_model(context, build_model(context))\n\n\ndef predict(context):\n    model = build_model(context)\n    model.load_state_dict(torch.load(context[\"checkpoint\"], map_location=\"cpu\", weights_only=True))\n    return batched_logits(model, context[\"data\"][\"images\"], context[\"config\"])",
+            "path": "experiment.py"
+          }
+        ],
+        "hypothesis": "ResNet18 with reduced regularization (dropout 0.25, wd 0.005, ls 0.03) and lower LR (1.5e-4) will exceed 0.996 val accuracy by allowing sharper decision boundaries and more complete convergence on the 28x28 histopathology task where local texture features dominate.",
+        "parameters": {
+          "depth": 2,
+          "dropout": 0.25,
+          "hidden": 64
+        },
+        "training": {
+          "adam_beta1": 0.9,
+          "adam_beta2": 0.999,
+          "channel_cap": 256,
+          "class_weighting": true,
+          "cosine_eta_min": 0.0,
+          "early_stopping_min_delta": 0.001,
+          "early_stopping_monitor": "val_accuracy",
+          "early_stopping_patience": 15,
+          "gradient_clip_val": 1.0,
+          "label_smoothing": 0.03,
+          "lr": 0.00015,
+          "momentum": 0.9,
+          "nesterov": true,
+          "one_cycle_pct_start": 0.1,
+          "optimizer": "adamw",
+          "optimizer_eps": 1e-08,
+          "plateau_factor": 0.5,
+          "plateau_patience": 1,
+          "scales": [
+            2,
+            4,
+            7
+          ],
+          "scheduler": "cosine",
+          "weight_decay": 0.005
+        }
+      },
+      "rationale": "ResNet18 dominates all transformer variants (0.9959 vs 0.9917 best). t0007 was still improving at epoch 29 (0.9961). Refining: lower LR (1.5e-4) for finer convergence, reduced label smoothing (0.03) for sharper boundaries, lower weight decay (0.005) and dropout (0.25) to reduce over-regularization, extended to 60 epochs with patience 15 for full convergence."
+    },
+    "schema_version": "1.0",
+    "source": "qwen3.8:latest"
+  },
+  "payload_sha256": "3fba199460b86affa82df70025351079d583bb30bca3ba9e9020dd82291432d7",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 44,
+  "version": 1
+}

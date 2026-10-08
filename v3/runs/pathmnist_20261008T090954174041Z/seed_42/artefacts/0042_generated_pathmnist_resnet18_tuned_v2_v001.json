@@ -1,0 +1,31 @@
+{
+  "artefact": "generated_pathmnist_resnet18_tuned_v2",
+  "artefact_type": "GeneratedBundle",
+  "created_at": "2026-10-08T11:28:37.533596+00:00",
+  "payload": {
+    "author": "experimental_development",
+    "files": {
+      "experiment.py": "2f93e3ba16681106662f699b66662936442bb831fe56c23f73015a50c4c9ce11"
+    },
+    "hypothesis": "ResNet18 with reduced label smoothing (0.05) and extended cosine-scheduled training (50 epochs, patience 12) will exceed 0.9968 validation accuracy by allowing sharper decision boundaries and more complete convergence. The CNN's local receptive fields and hierarchical channel progression are better suited to 28x28 histopathology texture discrimination than self-attention, as confirmed by t0006's 0.4% margin over the best transformer. Reducing label smoothing from 0.1 to 0.05 removes the artificial uncertainty that limits peak accuracy on already-well-separated classes, while the longer schedule with lower peak LR (2e-4) enables finer weight adjustments in the final epochs.",
+    "parent_sha256": null,
+    "reference": {
+      "bundle_id": "pathmnist_resnet18_tuned_v2",
+      "parameters": {
+        "depth": 2,
+        "dropout": 0.3,
+        "hidden": 64
+      },
+      "path": "generated/pathmnist_resnet18_tuned_v2/v001/manifest.json",
+      "sha256": "36e5a4307d7dd4f200ba64d665a6379fc8efea024e54ab2df926e742feccd738",
+      "version": 1
+    },
+    "schema_version": "1.0",
+    "source": "qwen3.8:latest"
+  },
+  "payload_sha256": "a3f59181c3f4343dcdc9e7157ebea6797cd819218cd3a37ed006cdafb53f5bda",
+  "producer": "experimental_development",
+  "run_id": "seed_42",
+  "sequence": 42,
+  "version": 1
+}

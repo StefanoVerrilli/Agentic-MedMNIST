@@ -1,0 +1,31 @@
+{
+  "artefact": "anomaly_reporting",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-08T12:40:53.571155+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 2,
+    "comment": "Both issues from the previous review are properly resolved in the revised narrative. (1) The architecture misidentification in `best_configuration.representation.rationale` is now explicitly flagged in §1 with a clear explanation that the selected model is ResNet18 per the bundle manifest and program source, while the persisted rationale text contains a transformer-specific justification that is architecture-mismatched. (2) The lymphocyte false-positive count is corrected to 28 with the per-source breakdown (5+2+21), consistent with the confusion matrix column sum (662 total predictions, 634 TP, 28 FP; precision 634/662=0.957704 ✓).\n\nAll core metrics re-verified: accuracy 6590/7180=0.917827 ✓; OOD aggregate (0.934119+0.937481+0.958463)/3=0.943354 ✓; selective-prediction coverage/risk internally consistent (abstain_rate 0.307242, human_review_count 2206, accuracy_on_covered 0.975875) ✓; data audit all-pass with zero overlap ✓; search stopping rationale is a process constraint (no resumable candidates), not a performance-ceiling claim ✓. The narrative correctly identifies inactive transformer fields for the CNN family and documents the separate-center test provenance without asserting unsupported causal mechanisms. No clinical claims are made. The report is substantively accurate and complete.",
+    "deterministic_issues": [],
+    "llm_issues": [],
+    "observations": [
+      "Minor descriptive inaccuracy in §1 table: depth=2 is labeled 'Residual block depth multiplier,' but per the fixed ResNet18 topology, depth is ignored (only hidden controls base width). The parameter is correctly identified as being passed to build_network and the overall architecture identification is accurate; this is a table-cell wording issue with no effect on computed results.",
+      "The 7.8-point validation-to-test gap (99.59%→91.78%) is documented with the separate-center provenance (official_test_separate_center: true) without asserting a specific causal mechanism. This is the most ecologically valid distribution-shift signal in the report.",
+      "OOD evaluation is scoped as a controlled corruption proxy (additive Gaussian noise, σ∈{0.15,0.25,0.40}). It validates pixel-level noise detection but does not capture staining variability, scanner differences, or tissue-preparation artifacts.",
+      "Selective-prediction coverage gap: validation achieves 80.0% coverage at target, test achieves 69.3% (abstain rate 30.7%, 2,206 samples to human review). This is a calibration-transfer effect between validation and test entropy distributions.",
+      "All results use a single seed (42); cross-seed variance is not characterized.",
+      "The two weakest test classes (cancer-associated stroma F1=0.667, smooth muscle F1=0.768) are histologically similar spindle-cell/fibrous tissues and are also among the smallest classes (421 and 592 samples).",
+      "Search evaluated 8 trials (5 transformer, 3 ResNet18) via run_generated. Stopping is a process constraint (no resumable candidates), not a performance-ceiling inference from two similar trials."
+    ],
+    "requests": [],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8:latest",
+    "stage": "reporting"
+  },
+  "payload_sha256": "4eecd0d104b8956220bb6efecdaf1eedbd38f96c723e8ec91c8d1523e260645f",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 69,
+  "version": 2
+}

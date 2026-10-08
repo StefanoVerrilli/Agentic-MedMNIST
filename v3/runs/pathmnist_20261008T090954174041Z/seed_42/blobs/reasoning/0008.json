@@ -1,0 +1,142 @@
+{
+  "payload": {
+    "decision": {
+      "action": "revise",
+      "comment": "Data audit passes all deterministic checks: archive hashes verified, split sizes match official PathMNIST (89996/10004/7180), no subsampling, train/val disjoint (overlap=0), 9-class 3-channel RGB 28\u00d728 confirmed, class imbalance modest (ratio 1.63), 0 duplicates, 0 blank images. Normalization uses train-only statistics (no leakage). All six augmentations are built-in primitives. Augmentation factor 7 is arithmetically consistent (89996\u00d77=629,972).\n\nThree warning-level issues require revision before downstream stages consume these artefacts:\n\n1. **Arithmetic error in representation_plan.rationale**: States '16 patch tokens (7\u00d77 non-overlapping patches on 28\u00d728 RGB)'. Correct value is 49 tokens (7\u00d77=49), as confirmed by the prior_art architecture spec (conv 3\u00d73 stride 4 pad 1 on 28\u00d728 \u2192 7\u00d77\u00d764, 49 tokens \u00d7 dim 64). This is a factual documentation error that could mislead downstream design decisions or reviewer interpretation.\n\n2. **Redundant extension-gate entry for tissue_geometric_aug**: The gate lists hflip and vflip as pending_review, but per pipeline policy these are built-in augmentations requiring no extension approval. The entry is redundant and could cause unnecessary blocking if a reviewer is not assigned. The compact_conv_stem_transformer entry is legitimate (not among the seven built-in families) and correctly pending.\n\n3. **Prior-art evidence quality**: All three literature sources are curated excerpts (unverified external evidence per evidence_provenance policy). The specific design inferences drawn (conv-stem overfitting avoidance, 7\u00d77 patch granularity choice) are not independently verified by the cited quotes. The class_balance_aware_training idea cites a pre-processing quote that does not support the class-weighted-loss hypothesis. These ideas should be explicitly labelled as local design heuristics rather than literature-supported hypotheses.\n\nNone of these issues are deterministic failures; the data pipeline is functionally sound. Revision is requested to correct the documentation error, remove the redundant gate entry, and properly label evidence provenance.",
+      "issues": [
+        "representation_plan.rationale contains arithmetic error: states '16 patch tokens' for 7\u00d77 non-overlapping patches on 28\u00d728, but 7\u00d77=49 tokens (confirmed by prior_art architecture spec: conv 3\u00d73 stride 4 pad 1 \u2192 7\u00d77\u00d764, 49 tokens \u00d7 dim 64).",
+        "Extension gate contains redundant pending_review entry for tissue_geometric_aug (hflip, vflip), which are built-in augmentations that do not require extension approval per pipeline policy; could cause unnecessary blocking.",
+        "All three prior-art literature sources are curated excerpts (unverified external evidence); specific design inferences (conv-stem overfitting avoidance, patch granularity) are not independently verified by the cited quotes.",
+        "class_balance_aware_training idea cites a MedMNIST pre-processing quote as evidence for class-weighted-loss, but the quote does not support that hypothesis; the class-count range is from local data profile, not the source.",
+        "Prior-art evidence quotes establish traceability but do not independently verify the specific scientific inferences drawn from them."
+      ],
+      "observations": [
+        "Data integrity fully verified: archive MD5 a8b06965200029087d5bd730944a56c1 and SHA256 match verified hashes; split sizes identical to official PathMNIST; subsampled=false.",
+        "Class distribution well-balanced: imbalance ratio 1.63, train/val class proportions nearly identical (max \u0394 < 0.0001), 0 duplicates, 0 blank images.",
+        "All six augmentations (hflip, vflip, rotate90, rotate180, brightness, contrast) are built-in primitives requiring no extension approval.",
+        "Augmentation factor 7 (1 original + 6 augmentations) is consistent with augmented_train_size 629,972 = 89996 \u00d7 7.",
+        "compact_conv_stem_transformer is a legitimate new proposal (not among the seven built-in families) and is correctly pending independent review in the extension gate.",
+        "Test-domain note: CRC-VAL-HE-7K test images originate from a different clinical center\u2014relevant for OOD AUROC interpretation in later stages.",
+        "Normalization uses standardize with train-only statistics (mean [0.7405, 0.5330, 0.7058], std [0.1237, 0.1768, 0.1244]); stats_source=train prevents test leakage.",
+        "deterministic_torch=true, seed=42, code SHA256 anchored via canonical-text-v2; LLM model qwen3.8:latest (ollama) digest recorded for traceability.",
+        "Compacted fields (4) and omitted artefacts (prior_art_brief, anomaly_profiling, anomaly_ingestion, run_manifest) are preview truncations for this review, not incomplete persisted artefacts.",
+        "data_audit_report: all 11 checks passed, train_validation_overlap=0, test_inspected=false (appropriate for audit stage).",
+        "Worker isolation not enforced (local_subprocess); image_digest null. Operational notes only, not blocking."
+      ],
+      "requests": [],
+      "severity": "warning"
+    },
+    "request": {
+      "fallback": {
+        "action": "continue",
+        "comment": "Deterministic reviewer invariants passed.",
+        "issues": [],
+        "observations": [],
+        "requests": [],
+        "severity": "ok"
+      },
+      "model": "qwen3.8:latest",
+      "schema": {
+        "$defs": {
+          "ReviewRequest": {
+            "additionalProperties": false,
+            "properties": {
+              "correction": {
+                "minLength": 1,
+                "title": "Correction",
+                "type": "string"
+              },
+              "problem": {
+                "minLength": 1,
+                "title": "Problem",
+                "type": "string"
+              },
+              "request_id": {
+                "minLength": 1,
+                "title": "Request Id",
+                "type": "string"
+              },
+              "required_evidence": {
+                "minLength": 1,
+                "title": "Required Evidence",
+                "type": "string"
+              }
+            },
+            "required": [
+              "request_id",
+              "problem",
+              "correction",
+              "required_evidence"
+            ],
+            "title": "ReviewRequest",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "enum": [
+              "continue",
+              "revise",
+              "stop"
+            ],
+            "title": "Action",
+            "type": "string"
+          },
+          "comment": {
+            "maxLength": 12000,
+            "minLength": 2,
+            "title": "Comment",
+            "type": "string"
+          },
+          "issues": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 30,
+            "title": "Issues",
+            "type": "array"
+          },
+          "observations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Observations",
+            "type": "array"
+          },
+          "requests": {
+            "items": {
+              "$ref": "#/$defs/ReviewRequest"
+            },
+            "title": "Requests",
+            "type": "array"
+          },
+          "severity": {
+            "enum": [
+              "ok",
+              "warning",
+              "critical"
+            ],
+            "title": "Severity",
+            "type": "string"
+          }
+        },
+        "required": [
+          "severity",
+          "action",
+          "comment"
+        ],
+        "title": "ReviewDecision",
+        "type": "object"
+      },
+      "seed": 42,
+      "stage": "review.data_audit",
+      "system": "You are an independent software and ML consistency reviewer. Inspect only the supplied evidence. You may raise severity but must never dismiss deterministic findings. No clinical claims. The supplied current UTC timestamp is authoritative. This pipeline uses the standard 28x28 RGB MedMNIST distribution; do not substitute the source-dataset or MedMNIST+ resolution. Only deterministic findings may justify action=stop; unsupported external-memory claims must be warnings requesting verification. ResNet18 has fixed topology; hidden controls base width and depth is ignored. Generic transformer fields are inactive for CNN families and do not make them transformer hybrids. Built-in augmentations (hflip, vflip, rotate90, rotate180, brightness, contrast) do not require extension approval; pending new proposals do not invalidate these primitives. All seven built-in families (tiny_cnn, residual_cnn, resnet18, vision_transformer, compact_transformer, multi_scale_transformer, feature_pyramid_transformer) are implemented and need no extension approval. Gate status applies only to the specific new proposals. Respect evidence_provenance: curated excerpts and bare URLs are unverified external evidence, while retrieved abstracts alone do not verify performance claims. Entries in compacted_fields identify preview truncation performed for this review, not incomplete persisted artefacts. Do not request regeneration solely because of these previews or omitted_artefacts. A cited quote establishes traceability, not support for every scientific inference: assess that support separately. The OOD aggregate is the arithmetic mean of the selected score's AUROCs across corruption severities, not a pooled-sample AUROC. For run_generated, generic architecture defaults do not identify the instantiated network. Use generated_bundle.parameters and archived program source to establish which values are consumed.",
+      "user": "current_utc=2026-10-08T09:12:42.682773+00:00; stage=data_audit; deterministic_findings=[]; stage_focused_evidence={\"artefacts\": {\"anomaly_preprocessing\": {\"action\": \"revise\", \"attempt\": 1, \"comment\": \"Preprocessing stage is functionally sound. Data integrity is fully verified: archive MD5/SHA256 match, split sizes (89996/10004/7180) identical to official PathMNIST sizes, no subsampling, 9-class 3-channel RGB 28\u00d728 under the standard MedMNIST distribution. Class imbalance is modest (ratio 1.63) with near-identical train/val proportions. The representation plan correctly uses standardization w...\", \"deterministic_issues\": [], \"llm_issues\": [\"Extension gate contains a redundant pending_review entry for tissue_geometric_aug (hflip, vflip), which are built-in augmentations that do not require extension approval per pipeline policy.\", \"Prior-art evidence is based on curated excerpts (unverified external evidence) rather than live retrievals or retrieved abstracts; specific design inferences (conv-stem overfitting avoidance, patch granularity) are not independently verified by the cited quotes.\", \"representation_plan.rationale contains a factual arithmetic error: states '16 patch tokens' for 7\u00d77 non-overlapping patches on 28\u00d728, but 7\u00d77 = 49 tokens (confirmed by prior-art architecture spec).\"], \"observations\": [\"Data integrity fully verified: archive MD5 a8b06965200029087d5bd730944a56c1 and SHA256 match verified hashes; split sizes identical to official; subsampled=false.\", \"Class distribution well-balanced: imbalance ratio 1.63, train/val class proportions nearly identical (max \u0394 < 0.0001), 0 duplicates, 0 blank images.\", \"All six augmentations in the representation plan (hflip, vflip, rotate90, rotate180, brightness, contrast) are built-in primitives requiring no extension approval.\", \"Augmentation factor 7 (1 original + 6 augmentations) is consistent with augmented_train_size 629,972 = 89996 \u00d7 7.\", \"compact_conv_stem_transformer is a legitimate new proposal (not among the seven built-in families) and is correctly pending independent review in the extension gate.\", \"Test-domain note: CRC-VAL-HE-7K test images originate from a different clinical center\u2014relevant for OOD AUROC interpretation in later stages.\", \"Normalization uses standardize with train-only statistics (mean [0.7405, 0.5330, 0.7058], std [0.1237, 0.1768, 0.1244]); stats_source=train prevents test leakage.\", \"deterministic_torch=true, seed=42, code SHA256 anchored via canonical-text-v2; LLM model qwen3.8:latest (ollama) digest recorded for traceability.\", \"Compacted fields (5) and omitted artefacts (prior_art_brief, run_manifest, worker_evidence) are preview truncations for this review, not incomplete persisted artefacts.\"], \"requests\": [], \"schema_version\": \"1.0\", \"severity\": \"warning\", \"source\": \"qwen3.8:latest\", \"stage\": \"preprocessing\"}, \"anomaly_prior_art\": {\"action\": \"revise\", \"attempt\": 1, \"comment\": \"The prior_art stage is functionally sound. The data profile for PathMNIST (9-class, 28\u00d728 RGB, imbalance ratio 1.63, no duplicates, no blank images) is internally consistent and matches the standard MedMNIST distribution. The four derived ideas are clearly labelled hypothesis_to_validate and are reasonable design considerations, though the evidentiary link between some curated-excerpt quotes an...\", \"deterministic_issues\": [\"warning:curated excerpts are not live retrieval evidence\"], \"llm_issues\": [\"tissue_geometric_aug proposal (hflip, vflip) is listed in the extension gate as pending_review, but these are built-in augmentations that do not require extension approval per pipeline policy; the gate entry is redundant and could cause unnecessary blocking if a reviewer is not assigned.\", \"The class_balance_aware_training idea cites the MedMNIST 28\u00d728 pre-processing quote as evidence, but the quote does not support the class-weighted-loss hypothesis; the class-count range (7886\u201312885) is drawn from the local data profile, not the source. The evidentiary link is weak and the idea should be treated as a local design heuristic rather than a literature-supported hypothesis.\", \"All three literature sources are curated excerpts, not live retrievals or retrieved abstracts. The evidence quotes establish traceability to the cited papers but do not independently verify the specific design inferences (e.g., 7\u00d77 patch granularity, conv-stem overfitting avoidance) drawn from them.\"], \"observations\": [\"Data profile is clean: 100 000 samples profiled, 0 duplicates, 0 blank images, imbalance ratio 1.63, train/val class proportions nearly identical (max \u0394 < 0.0001).\", \"Archive integrity verified via MD5 a8b06965200029087d5bd730944a56c1; split sizes (89996/10004/7180) match official PathMNIST sizes; subsampled=false.\", \"The compact_conv_stem_transformer architecture spec is internally consistent: conv 3\u00d73 stride 4 pad 1 on 28\u00d728 yields 7\u00d77\u00d764 (49 tokens \u00d7 dim 64); 4 heads \u00d7 head_dim 16 = model_dim 64; FFN hidden 128; GAP \u2192 64-dim; linear 64\u21929.\", \"Test-domain note from profiling: CRC-VAL-HE-7K test images originate from a different clinical center, relevant for OOD AUROC interpretation in later stages.\", \"Ambiguity risks for visually similar histology classes at 28\u00d728 resolution are well-documented and consistent with the literature.\", \"Worker isolation not enforced (local_subprocess); image_digest null; LLM model qwen3.8:latest (ollama) digest recorded. Operational notes only.\", \"Compacted fields (4) and omitted artefacts (3) are preview truncations, not incomplete persisted artefacts.\"], \"requests\": [], \"schema_version\": \"1.0\", \"severity\": \"warning\", \"source\": \"qwen3.8:latest\", \"stage\": \"prior_art\"}, \"approved_extensions\": {\"entries\": [], \"schema_version\": \"1.0\"}, \"data_audit_report\": {\"checks\": {\"official_split\": true, \"train_indices\": true, \"train_labels\": true, \"train_only_statistics\": true, \"train_pixels\": true, \"train_shape\": true, \"train_validation_disjoint_images\": true, \"val_indices\": true, \"val_labels\": true, \"val_pixels\": true, \"val_shape\": true}, \"issues\": [], \"passed\": true, \"schema_version\": \"1.0\", \"test_inspected\": false, \"train_validation_overlap\": 0}, \"data_profile\": {\"ambiguity_note\": \"Using only the provided train and validation metadata, the main ambiguity risks are patch-level label ambiguity and visual overlap among histology classes at 28x28 RGB resolution. The class counts and proportions are nearly identical between train and validation, and the imbalance ratio is modest, so there is no strong evidence of split-level distribution mismatch from these statistics alone. H...\", \"ambiguity_risks\": [\"background, debris, and mucus may be visually similar in low-resolution 28x28 patches\", \"adipose tissue may be confused with background or empty tissue regions\", \"smooth muscle and cancer-associated stroma may share fibrous or spindle-cell appearance\", \"normal colon mucosa and colorectal adenocarcinoma epithelium may overlap in mixed glandular patches\", \"lymphocytes may be confused with small debris or nuclear fragments\", \"patch-level labels may contain multiple tissue types, increasing label ambiguity\", \"small image size may reduce discriminative texture and boundary detail\", \"train and validation distributions are similar, so split-level ambiguity cannot be assessed from these statistics alone\"], \"blank_image_fraction\": 0.0, \"class_counts\": {\"train\": [9366, 9509, 10360, 10401, 8006, 12182, 7886, 9401, 12885], \"val\": [1041, 1057, 1152, 1156, 890, 1354, 877, 1045, 1432]}, \"class_proportions\": {\"train\": [0.10407129, 0.10566025, 0.11511623, 0.1155718, 0.08895951, 0.13536157, 0.08762612, 0.1044602, 0.14317303], \"val\": [0.10405838, 0.10565774, 0.11515394, 0.11555378, 0.08896441, 0.13534586, 0.08766493, 0.10445822, 0.14314274]}, \"dataset\": \"pathmnist\", \"decision_source\": \"qwen3.8:latest\", \"duplicate_train_samples\": 0, \"image_shape_hwc\": [28, 28, 3], \"imbalance_ratio\": 1.633908, \"n_channels\": 3, \"n_classes\": 9, \"official_data_fraction\": 1.0, \"profiled_fraction\": 1.0, \"samples_profiled\": 100000, \"schema_version\": \"1.0\", \"test_imbalance_ratio\": 1.0, \"test_to_train_prevalence_ratio\": [], \"train_channel_mean_unit\": [0.740545, 0.53298219, 0.70582885], \"train_channel_std_unit\": [0.12368222, 0.17676253, 0.12443067]}, \"dataset_manifest\": {\"archive_md5\": \"a8b06965200029087d5bd730944a56c1\", \"archive_sha256\": \"81823f52dc622e69db2db4c72f8e8e617938dd6864d3c1f23d4e49724a28ea72\", \"data_reference\": \"https://zenodo.org/records/10519652/files/pathmnist.npz?download=1\", \"dataset\": \"pathmnist\", \"labels\": [\"adipose\", \"background\", \"debris\", \"lymphocytes\", \"mucus\", \"smooth muscle\", \"normal colon mucosa\", \"cancer-associated stroma\", \"colorectal adenocarcinoma epithelium\"], \"license\": \"CC BY 4.0\", \"loaded_split_sizes\": {\"test\": 7180, \"train\": 89996, \"val\": 10004}, \"n_channels\": 3, \"n_classes\": 9, \"official_split_sizes\": {\"test\": 7180, \"train\": 89996, \"val\": 10004}, \"schema_version\": \"1.0\", \"selected_index_sha256\": {\"test\": \"27ab586ecd9b4ac7278c6a91cf0b336a2ba742afe742d13eff51f702635791e8\", \"train\": \"1478a96c1d8ad06d0a600d6c9b8d5c8dddd83fbda22307ab449764f013683b51\", \"val\": \"a13f875ade8e54f5aee16ff205c36aa628396dddec09a33a175fcf9cbbb9d402\"}, \"subsampled\": false, \"task\": \"multi-class\", \"test_domain_note\": \"CRC-VAL-HE-7K test images originate from a different clinical center.\", \"verified_archive_md5\": \"a8b06965200029087d5bd730944a56c1\"}, \"extension_gate_report\": {\"approvals_sha256\": null, \"entries\": [{\"proposal_id\": \"tissue_geometric_aug\", \"reason\": \"A hash-bound independent review is required.\", \"registry_name\": null, \"reviewer\": null, \"spec_sha256\": \"0934be5b4728667375abf618a115ae0481a6513fe9a0333ac02e6df7b77b04c1\", \"status\": \"pending_review\"}, {\"proposal_id\": \"compact_conv_stem_transformer\", \"reason\": \"A hash-bound independent review is required.\", \"registry_name\": null, \"reviewer\": null, \"spec_sha256\": \"fffb2acfa4a8adc98bc437b352d6e2fdc7ac31701182799f188f6c458ad03290\", \"status\": \"pending_review\"}], \"schema_version\": \"1.0\"}, \"representation_plan\": {\"augmentation_factor\": 7, \"augmentations\": [\"hflip\", \"vflip\", \"rotate90\", \"rotate180\", \"brightness\", \"contrast\"], \"normalization\": \"standardize\", \"rationale\": \"Standardization (zero-mean, unit-variance) is selected over unit-range scaling because the downstream architecture is a compact transformer operating on 16 patch tokens (7x7 non-overlapping patches on 28x28 RGB). Transformers are notably more sensitive to input magnitude than CNNs; centering each channel to zero mean and scaling to unit variance stabilizes attention logits and gradient flow, es...\", \"schema_version\": \"1.0\", \"source\": \"qwen3.8:latest\", \"stats_source\": \"train\", \"train_channel_mean_unit\": [0.740545, 0.53298219, 0.70582885], \"train_channel_std_unit\": [0.12368222, 0.17676253, 0.12443067]}, \"split_manifest\": {\"augmented_train_size\": 629972, \"dataset\": \"pathmnist\", \"official_test_separate_center\": true, \"schema_version\": \"1.0\", \"seed\": 42, \"selected_index_sha256\": {\"test\": \"27ab586ecd9b4ac7278c6a91cf0b336a2ba742afe742d13eff51f702635791e8\", \"train\": \"1478a96c1d8ad06d0a600d6c9b8d5c8dddd83fbda22307ab449764f013683b51\", \"val\": \"a13f875ade8e54f5aee16ff205c36aa628396dddec09a33a175fcf9cbbb9d402\"}, \"strategy\": \"official\", \"test_size\": 7180, \"train_size\": 89996, \"train_stats_only\": true, \"val_size\": 10004}, \"worker_evidence\": {\"configuration\": {\"max_bundles\": 32, \"timeout_seconds\": 3600}, \"image_digest\": null, \"isolation\": {\"enforced\": false, \"execution\": \"local_subprocess\"}, \"python_executable\": \"/media/neurone-pc11/Volume1/Giuseppe/Agentic-MedMNIST/.venv/bin/python\", \"schema_version\": \"1.0\"}}, \"compacted_fields\": [{\"original_chars\": 1183, \"path\": \"data_profile.ambiguity_note\", \"shown_chars\": 397}, {\"original_chars\": 2705, \"path\": \"anomaly_preprocessing.comment\", \"shown_chars\": 397}, {\"original_chars\": 1304, \"path\": \"representation_plan.rationale\", \"shown_chars\": 397}, {\"original_chars\": 2428, \"path\": \"anomaly_prior_art.comment\", \"shown_chars\": 397}], \"omitted_artefacts\": [\"prior_art_brief\", \"anomaly_profiling\", \"anomaly_ingestion\", \"run_manifest\"], \"stage\": \"data_audit\"}"
+    },
+    "request_sha256": "23d2f7358017075e3ec6b68f765428f295645c79593213a0a0a7eabdc6b5e39c",
+    "source": "qwen3.8:latest",
+    "used_fallback": false
+  },
+  "sha256": "60f78c5ee29b83d6edb4b8b38bc78d93f2f6412baa48315eb15168702fea243f"
+}

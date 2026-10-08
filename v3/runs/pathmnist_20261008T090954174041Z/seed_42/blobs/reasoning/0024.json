@@ -1,0 +1,131 @@
+{
+  "payload": {
+    "decision": {
+      "action": "continue",
+      "comment": "The abstention stage is internally consistent and correctly computed. All arithmetic checks pass: (1) OOD AUROC 0.943354 = mean(0.934119, 0.937481, 0.958463) for predictive_entropy across three severity levels; (2) ood_validation_auroc 0.993805 \u2248 mean(0.991291, 0.993977, 0.996145); (3) abstain_rate 0.307242 = 1 \u2212 test_coverage 0.692758; (4) human_review_count 2206 = round(0.307242 \u00d7 7180); (5) accuracy_on_covered 0.975875 = 1 \u2212 selective_risk 0.024125; (6) risk_coverage_curve at target 0.8 reproduces the headline threshold, coverage, and risk values exactly. Calibration is properly performed on validation (validation_coverage 0.80008 \u2248 target 0.8), and the test coverage gap (0.693 vs 0.800) is the expected distribution-shift effect, consistently visible across all five curve points. All six OOD scenarios exceed the minimum_scenario_auroc of 0.65 (minimum observed: 0.926673) and the maximum_false_accept_rate of 0.2 (maximum observed: 0.00195). The OOD scope is correctly labelled 'controlled_corruption_proxy' with a fixed corruption_seed (1729) and SHA-256-verified evidence blob. The two upstream 'revise' flags (training rationale text mismatch; final_val_accuracy 0.996102 vs best_val_accuracy 0.995902) are documentation-level inconsistencies that do not propagate into the abstention computation, which consumes only the test predictions and validation-calibrated threshold. No deterministic findings are present. The compacted_fields entries are review-preview truncations, not incomplete persisted artefacts. The abstention mechanism is sound and ready for downstream consumption.",
+      "issues": [],
+      "observations": [
+        "OOD AUROC arithmetic verified: (0.934119+0.937481+0.958463)/3 = 0.943354, matching the reported ood_auroc exactly.",
+        "Test coverage (0.6928) is ~10.7 pp below the validation target (0.8001), a consistent gap visible at every point on the risk-coverage curve; this is the expected calibration-to-test shift and does not indicate a computational error.",
+        "Selective risk on test (0.0241) is ~27\u00d7 the validation risk (0.00088) at the same coverage target, again consistent with distribution shift; both are far below the 0.2 maximum_false_accept_rate ceiling.",
+        "Class 7 (cancer-associated stroma, recall 0.520) is the dominant source of misclassification and will likely contribute disproportionately to the abstained set, which is the intended behaviour of the predictive-entropy gate.",
+        "The OOD evidence is a controlled Gaussian-noise proxy (\u03c3 \u2208 {0.15, 0.25, 0.4}), not a true distributional shift; the report correctly scopes it as 'controlled_corruption_proxy'.",
+        "Upstream training-stage documentation issues (rationale text referencing a compact transformer while the selected model is ResNet18; final_val_accuracy 0.996102 marginally exceeding best_val_accuracy 0.995902) are cosmetic and do not affect the checkpoint or the abstention threshold."
+      ],
+      "requests": [],
+      "severity": "ok"
+    },
+    "request": {
+      "fallback": {
+        "action": "continue",
+        "comment": "Deterministic reviewer invariants passed.",
+        "issues": [],
+        "observations": [],
+        "requests": [],
+        "severity": "ok"
+      },
+      "model": "qwen3.8:latest",
+      "schema": {
+        "$defs": {
+          "ReviewRequest": {
+            "additionalProperties": false,
+            "properties": {
+              "correction": {
+                "minLength": 1,
+                "title": "Correction",
+                "type": "string"
+              },
+              "problem": {
+                "minLength": 1,
+                "title": "Problem",
+                "type": "string"
+              },
+              "request_id": {
+                "minLength": 1,
+                "title": "Request Id",
+                "type": "string"
+              },
+              "required_evidence": {
+                "minLength": 1,
+                "title": "Required Evidence",
+                "type": "string"
+              }
+            },
+            "required": [
+              "request_id",
+              "problem",
+              "correction",
+              "required_evidence"
+            ],
+            "title": "ReviewRequest",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "enum": [
+              "continue",
+              "revise",
+              "stop"
+            ],
+            "title": "Action",
+            "type": "string"
+          },
+          "comment": {
+            "maxLength": 12000,
+            "minLength": 2,
+            "title": "Comment",
+            "type": "string"
+          },
+          "issues": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 30,
+            "title": "Issues",
+            "type": "array"
+          },
+          "observations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Observations",
+            "type": "array"
+          },
+          "requests": {
+            "items": {
+              "$ref": "#/$defs/ReviewRequest"
+            },
+            "title": "Requests",
+            "type": "array"
+          },
+          "severity": {
+            "enum": [
+              "ok",
+              "warning",
+              "critical"
+            ],
+            "title": "Severity",
+            "type": "string"
+          }
+        },
+        "required": [
+          "severity",
+          "action",
+          "comment"
+        ],
+        "title": "ReviewDecision",
+        "type": "object"
+      },
+      "seed": 42,
+      "stage": "review.abstention",
+      "system": "You are an independent software and ML consistency reviewer. Inspect only the supplied evidence. You may raise severity but must never dismiss deterministic findings. No clinical claims. The supplied current UTC timestamp is authoritative. This pipeline uses the standard 28x28 RGB MedMNIST distribution; do not substitute the source-dataset or MedMNIST+ resolution. Only deterministic findings may justify action=stop; unsupported external-memory claims must be warnings requesting verification. ResNet18 has fixed topology; hidden controls base width and depth is ignored. Generic transformer fields are inactive for CNN families and do not make them transformer hybrids. Built-in augmentations (hflip, vflip, rotate90, rotate180, brightness, contrast) do not require extension approval; pending new proposals do not invalidate these primitives. All seven built-in families (tiny_cnn, residual_cnn, resnet18, vision_transformer, compact_transformer, multi_scale_transformer, feature_pyramid_transformer) are implemented and need no extension approval. Gate status applies only to the specific new proposals. Respect evidence_provenance: curated excerpts and bare URLs are unverified external evidence, while retrieved abstracts alone do not verify performance claims. Entries in compacted_fields identify preview truncation performed for this review, not incomplete persisted artefacts. Do not request regeneration solely because of these previews or omitted_artefacts. A cited quote establishes traceability, not support for every scientific inference: assess that support separately. The OOD aggregate is the arithmetic mean of the selected score's AUROCs across corruption severities, not a pooled-sample AUROC. For run_generated, generic architecture defaults do not identify the instantiated network. Use generated_bundle.parameters and archived program source to establish which values are consumed.",
+      "user": "current_utc=2026-10-08T12:37:03.820114+00:00; stage=abstention; deterministic_findings=[]; stage_focused_evidence={\"artefacts\": {\"abstention_report\": {\"abstain_rate\": 0.307242, \"accuracy_on_covered\": 0.975875, \"base_test_accuracy\": 0.917827, \"calibrated_on\": \"validation\", \"corruption_seed\": 1729, \"detector_status\": \"eligible\", \"human_review_count\": 2206, \"maximum_false_accept_rate\": 0.2, \"method\": \"predictive_entropy\", \"minimum_scenario_auroc\": 0.65, \"ood_auroc\": 0.943354, \"ood_corruption\": \"unit_scale_gaussian_noise_multi_severity\", \"ood_evidence_path\": \"blobs/ood_probabilities_v001.npz\", \"ood_evidence_sha256\": \"5328667157896905570c14ceb36440a0907f2a4e5165ae25431a535fdb4c338b\", \"ood_pass\": true, \"ood_scenarios\": [{\"corruption\": \"unit_scale_gaussian_noise_sigma_0.15\", \"score\": \"max_softmax\", \"test_auroc\": 0.926673, \"test_false_accept_rate\": 0.001532033426183844, \"validation_auroc\": 0.990887, \"validation_false_accept_rate\": 0.0013994402239104358}, {\"corruption\": \"unit_scale_gaussian_noise_sigma_0.15\", \"score\": \"predictive_entropy\", \"test_auroc\": 0.934119, \"test_false_accept_rate\": 0.0019498607242339832, \"validation_auroc\": 0.991291, \"validation_false_accept_rate\": 0.0026989204318272693}, {\"corruption\": \"unit_scale_gaussian_noise_sigma_0.25\", \"score\": \"max_softmax\", \"test_auroc\": 0.935509, \"test_false_accept_rate\": 0.0, \"validation_auroc\": 0.993676, \"validation_false_accept_rate\": 0.0}, {\"corruption\": \"unit_scale_gaussian_noise_sigma_0.25\", \"score\": \"predictive_entropy\", \"test_auroc\": 0.937481, \"test_false_accept_rate\": 0.0, \"validation_auroc\": 0.993977, \"validation_false_accept_rate\": 0.0}, {\"corruption\": \"unit_scale_gaussian_noise_sigma_0.4\", \"score\": \"max_softmax\", \"test_auroc\": 0.959836, \"test_false_accept_rate\": 0.0, \"validation_auroc\": 0.996173, \"validation_false_accept_rate\": 0.0}, {\"corruption\": \"unit_scale_gaussian_noise_sigma_0.4\", \"score\": \"predictive_entropy\", \"test_auroc\": 0.958463, \"test_false_accept_rate\": 0.0, \"validation_auroc\": 0.996145, \"validation_false_accept_rate\": 0.0}], \"ood_scope\": \"controlled_corruption_proxy\", \"ood_validation_auroc\": 0.993805, \"risk_coverage_curve\": [{\"target_validation_coverage\": 0.5, \"test_coverage\": 0.458496, \"test_risk\": 0.014277, \"threshold\": 0.87480944, \"validation_coverage\": 0.5001, \"validation_risk\": 0.0008}, {\"target_validation_coverage\": 0.6, \"test_coverage\": 0.532591, \"test_risk\": 0.01386, \"threshold\": 0.87100193, \"validation_coverage\": 0.60006, \"validation_risk\": 0.000666}, {\"target_validation_coverage\": 0.7, \"test_coverage\": 0.601811, \"test_risk\": 0.014811, \"threshold\": 0.86584471, \"validation_coverage\": 0.70012, \"validation_risk\": 0.000571}, {\"target_validation_coverage\": 0.8, \"test_coverage\": 0.692758, \"test_risk\": 0.024125, \"threshold\": 0.84827752, \"validation_coverage\": 0.80008, \"validation_risk\": 0.000875}, {\"target_validation_coverage\": 0.9, \"test_coverage\": 0.762256, \"test_risk\": 0.026494, \"threshold\": 0.84265456, \"validation_coverage\": 0.90004, \"validation_risk\": 0.000777}], \"schema_version\": \"1.0\", \"selective_risk\": 0.024125, \"target_validation_coverage\": 0.8, \"test_coverage\": 0.692758, \"threshold\": 0.8482775178452377, \"validation_coverage\": 0.80008}, \"anomaly_evaluation\": {\"action\": \"revise\", \"attempt\": 1, \"comment\": \"Evaluation stage is internally consistent and properly conducted. All reported metrics (accuracy 0.917827, balanced_accuracy 0.893666, macro_f1 0.890046, macro_precision 0.902529, macro_recall 0.893666, roc_auc_ovr_macro 0.980611) are arithmetically verified against the 9\u00d79 confusion matrix and per-class breakdowns. The test split (n=7180) is correctly designated, and the prediction artifact in...\", \"deterministic_issues\": [], \"llm_issues\": [], \"observations\": [\"All aggregate metrics are arithmetically consistent with the confusion matrix: accuracy 6590/7180=0.917827, balanced_accuracy (mean recall) 8.042994/9=0.893666, macro_f1 8.010416/9=0.890046, macro_precision 8.122758/9=0.902529.\", \"Val-to-test accuracy gap of ~7.8 pp (0.995902 \u2192 0.917827) is the most notable performance signal; it may reflect split-level distribution differences or mild overfitting to validation patterns in a 9-class histopathology task.\", \"Class 7 (cancer-associated stroma) is the weakest class: recall 0.520, F1 0.667, with substantial confusion into smooth muscle (70), debris (55), and adenocarcinoma (59). This is a domain-relevant performance gap.\", \"Classes 1 (background) and 3 (lymphocytes) achieve perfect recall (1.0), while classes 0, 4, 6, and 8 all exceed 0.92 recall, indicating the model is broadly competent with specific difficulty on morphologically similar stromal/muscular tissue.\", \"The training-stage 'revise' flag (final_val_accuracy 0.996102 vs best_val_accuracy 0.995902, \u0394=0.0002; rationale text mismatch) are minor documentation inconsistencies that do not affect checkpoint validity or evaluation correctness.\", \"Prediction artifact is complete: 7180 test samples, 10004 validation samples, includes logits/probabilities/targets, SHA-256 provided for integrity verification.\", \"The compacted_fields entries (history 29\u219220 items, comment truncations) are review-preview truncations, not incomplete persisted artefacts.\", \"Early-stopping arithmetic is correct: best_epoch 17 + patience 12 = epoch 29 = epochs_completed.\"], \"requests\": [], \"schema_version\": \"1.0\", \"severity\": \"warning\", \"source\": \"qwen3.8:latest\", \"stage\": \"evaluation\"}, \"anomaly_training\": {\"action\": \"revise\", \"attempt\": 1, \"comment\": \"Training stage completed successfully for autonomous_t0007 (ResNet18 tuned, bundle pathmnist_resnet18_tuned_v2). Best validation accuracy 0.995902 at epoch 17, early stopping triggered at epoch 29 (patience 12, 17+12=29 \u2713). The model selection is well-grounded: ResNet18 outperformed transformer variants by 0.3\u20130.9 pp, dropout=0.3 was validated over 0.25, and the cosine schedule with label_smoot...\", \"deterministic_issues\": [], \"llm_issues\": [\"final_val_accuracy (0.996102) exceeds best_val_accuracy (0.995902) at best_epoch 17, yet early_stopping is the stop reason and best_epoch remains 17; if epoch 29 truly scored higher, the best-checkpoint tracking appears inconsistent\", \"best_configuration.representation.rationale describes the downstream architecture as a 'compact transformer operating on 16 patch tokens' but the selected model is ResNet18 (bundle pathmnist_resnet18_tuned_v2); the rationale text is mismatched to the actual architecture\"], \"observations\": [\"Early stopping arithmetic is internally consistent: best_epoch 17 + patience 12 = epoch 29 = epochs_completed, confirming the patience counter was applied correctly\", \"The training curve (epochs 1\u201320 visible) shows healthy convergence: val_accuracy rises from 0.966 to 0.996 by epoch 17, with minor oscillation (\u00b10.002) in subsequent epochs, typical of a well-tuned cosine schedule\", \"Bundle parameters (depth=2, dropout=0.3, hidden=64) are the authoritative architecture values per the run_generated protocol; the top-level dropout=0.0 is a generic default that does not override the bundle\", \"All six augmentations (hflip, vflip, rotate90, rotate180, brightness, contrast) are built-in primitives and require no extension gate approval\", \"The model_search stage review (anomaly_model_search) correctly identified the stopping rationale as a system constraint (empty resumable_candidate_ids, no new experiments permitted) rather than a performance ceiling\", \"Selection used validation metrics only (test_metrics_used: false), respecting the test-lock protocol\", \"The compacted_fields entries (history 29\u219220 items, rationale truncation) are preview truncations for this review and do not indicate incomplete persisted artefacts\"], \"requests\": [], \"schema_version\": \"1.0\", \"severity\": \"warning\", \"source\": \"qwen3.8:latest\", \"stage\": \"training\"}, \"autonomous_action_0009\": {\"decision\": {\"action\": \"finish_search\", \"additional_epochs\": null, \"candidate_id\": null, \"experiment\": null, \"rationale\": \"The proposed trial could not be validated and no new experiment is permitted. The resumable_candidate_ids list is empty, meaning no eligible candidate exists for a continue_trial action. All 8 trials (autonomous_t0001 through autonomous_t0008) have completed successfully. The best-performing model is autonomous_t0007 (ResNet18 tuned, lr=2e-4, label_smoothing=0.05, weight_decay=0.01, dropout=0.3...\"}, \"schema_version\": \"1.0\", \"source\": \"qwen3.8:latest\"}, \"evaluation_report\": {\"accuracy\": 0.917827, \"accuracy_ci95_high\": 0.923958, \"accuracy_ci95_low\": 0.911249, \"balanced_accuracy\": 0.893666, \"confusion_matrix\": [[1233, 0, 1, 0, 3, 99, 0, 1, 1], [0, 847, 0, 0, 0, 0, 0, 0, 0], [0, 9, 314, 0, 0, 16, 0, 0, 0], [0, 0, 0, 634, 0, 0, 0, 0, 0], [38, 22, 1, 0, 955, 2, 10, 4, 3], [0, 61, 30, 0, 1, 486, 0, 11, 3], [0, 0, 0, 5, 0, 0, 722, 1, 13], [0, 6, 55, 2, 1, 70, 9, 219, 59], [0, 0, 1, 21, 1, 0, 30, 0, 1180]], \"macro_f1\": 0.890046, \"macro_precision\": 0.902529, \"macro_recall\": 0.893666, \"n_samples\": 7180, \"per_class\": [{\"f1\": 0.94519, \"label\": 0, \"name\": \"adipose\", \"precision\": 0.970102, \"recall\": 0.921525, \"recall_ci95_high\": 0.934757, \"recall_ci95_low\": 0.905879, \"support\": 1338}, {\"f1\": 0.945312, \"label\": 1, \"name\": \"background\", \"precision\": 0.896296, \"recall\": 1.0, \"recall_ci95_high\": 1.0, \"recall_ci95_low\": 0.995485, \"support\": 847}, {\"f1\": 0.847503, \"label\": 2, \"name\": \"debris\", \"precision\": 0.781095, \"recall\": 0.926254, \"recall_ci95_high\": 0.949552, \"recall_ci95_low\": 0.893403, \"support\": 339}, {\"f1\": 0.978395, \"label\": 3, \"name\": \"lymphocytes\", \"precision\": 0.957704, \"recall\": 1.0, \"recall_ci95_high\": 1.0, \"recall_ci95_low\": 0.993977, \"support\": 634}, {\"f1\": 0.956914, \"label\": 4, \"name\": \"mucus\", \"precision\": 0.993757, \"recall\": 0.922705, \"recall_ci95_high\": 0.937457, \"recall_ci95_low\": 0.904827, \"support\": 1035}, {\"f1\": 0.768379, \"label\": 5, \"name\": \"smooth muscle\", \"precision\": 0.72214, \"recall\": 0.820946, \"recall_ci95_high\": 0.849731, \"recall_ci95_low\": 0.788023, \"support\": 592}, {\"f1\": 0.955026, \"label\": 6, \"name\": \"normal colon mucosa\", \"precision\": 0.936446, \"recall\": 0.974359, \"recall_ci95_high\": 0.983524, \"recall_ci95_low\": 0.960301, \"support\": 741}, {\"f1\": 0.666667, \"label\": 7, \"name\": \"cancer-associated stroma\", \"precision\": 0.927966, \"recall\": 0.52019, \"recall_ci95_high\": 0.567514, \"recall_ci95_low\": 0.472501, \"support\": 421}, {\"f1\": 0.94703, \"label\": 8, \"name\": \"colorectal adenocarcinoma epithelium\", \"precision\": 0.937252, \"recall\": 0.957015, \"recall_ci95_high\": 0.966988, \"recall_ci95_low\": 0.944204, \"support\": 1233}], \"primary_metric\": \"accuracy\", \"roc_auc_ovr_macro\": 0.980611, \"schema_version\": \"1.0\", \"split\": \"test\"}, \"human_review_queue\": {\"count\": 2206, \"path\": \"blobs/human_review_queue_v001.json\", \"purpose\": \"benchmark_review\", \"schema_version\": \"1.0\", \"sha256\": \"6965cd75c3a864b8ab24edc4ffa2f7007281303edca6fe62bd71ffa8ee5ff6ed\", \"split\": \"test\"}, \"prediction_artifact\": {\"includes_logits\": true, \"includes_probabilities\": true, \"includes_targets\": true, \"path\": \"blobs/predictions_v001.npz\", \"schema_version\": \"1.0\", \"sha256\": \"e2fd8b554fa7a33bae9bfc2a910cf162914dd4ba323c018d6d08c992cc6222aa\", \"test_samples\": 7180, \"validation_samples\": 10004}}, \"compacted_fields\": [{\"original_chars\": 1892, \"path\": \"anomaly_evaluation.comment\", \"shown_chars\": 397}, {\"original_chars\": 1724, \"path\": \"anomaly_training.comment\", \"shown_chars\": 397}, {\"original_chars\": 815, \"path\": \"autonomous_action_0009.decision.rationale\", \"shown_chars\": 397}], \"omitted_artefacts\": [\"train_result\", \"anomaly_model_search\", \"search_report\", \"selected_training_result\", \"train_config\", \"best_configuration\", \"trial_0008\", \"generated_pathmnist_resnet18_v3\", \"autonomous_action_0008\", \"trial_0007\", \"generated_pathmnist_resnet18_tuned_v2\", \"autonomous_action_0007\", \"trial_0006\", \"generated_pathmnist_resnet18_v1\", \"autonomous_action_0006\", \"trial_0005\", \"generated_pathmnist_compact_d8_v4\", \"autonomous_action_0005\", \"trial_0004\", \"generated_pathmnist_compact_deep_v3\", \"autonomous_action_0004\", \"trial_0003\", \"generated_pathmnist_compact_wide_v2\", \"autonomous_action_0003\", \"trial_0002\", \"generated_pathmnist_multiscale_v1\", \"autonomous_action_0002\", \"trial_0001\", \"generated_pathmnist_compact_tf_v1\", \"autonomous_action_0001\", \"search_plan\", \"anomaly_architecture_research\", \"architecture_research\", \"anomaly_data_audit\", \"data_audit_report\", \"anomaly_preprocessing\", \"split_manifest\", \"representation_plan\", \"anomaly_prior_art\", \"approved_extensions\", \"extension_gate_report\", \"prior_art_brief\", \"anomaly_profiling\", \"data_profile\", \"anomaly_ingestion\", \"dataset_manifest\", \"run_manifest\", \"worker_evidence\"], \"stage\": \"abstention\"}"
+    },
+    "request_sha256": "51c3188f0078c82618cbdebb8b170d60b301c15ce3b26b1b0d6b8e9f50a8a7a0",
+    "source": "qwen3.8:latest",
+    "used_fallback": false
+  },
+  "sha256": "ae8c63e1bfe1da1f1df4de8cbefebe8ccaf9ef3647d64c941b03b77ab58d3d72"
+}

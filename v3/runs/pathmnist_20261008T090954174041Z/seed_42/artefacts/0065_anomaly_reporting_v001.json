@@ -1,0 +1,33 @@
+{
+  "artefact": "anomaly_reporting",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-08T12:39:16.868075+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "The benchmark report is well-structured and the core metrics are internally consistent. The confusion matrix sums, accuracy, per-class precision/recall, OOD aggregate (arithmetic mean of predictive_entropy test AUROCs: (0.934119+0.937481+0.958463)/3 = 0.943354 ✓), selective-prediction coverage/risk curves, and data-integrity checks all verify correctly. The architecture identification in narrative §1 is accurate: ResNet18 with hidden=64 (base width), depth ignored, dropout=0.3, and all transformer-specific fields correctly flagged as inactive. The search stopping rationale is a process constraint (no resumable candidates), not a performance-ceiling claim, and is supported by the trial record.\n\nTwo documentation errors require correction: (1) the best_configuration.representation.rationale describes the downstream architecture as a 'compact transformer operating on 16 patch tokens (7×7 non-overlapping patches on 28×28 RGB)' when the selected model is unambiguously ResNet18 per the generated_bundle, program source, and narrative §1; (2) the narrative states 27 false positives for lymphocytes, but the confusion matrix column yields 28 (5+2+21). Neither affects computed results, but both are factual inaccuracies in persisted artefacts that could mislead downstream readers.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "best_configuration.representation.rationale incorrectly identifies the selected architecture as a 'compact transformer operating on 16 patch tokens (7x7 non-overlapping patches on 28x28 RGB)' when the selected model is ResNet18 (bundle pathmnist_resnet18_tuned_v2, program source calls build_network('resnet18',...)).",
+      "Narrative §3 states 27 false positives for lymphocytes (class 3), but the confusion matrix column 3 yields 28 (5 from class 6 + 2 from class 7 + 21 from class 8 = 28; precision 634/662 = 0.957704 confirms 28 FP)."
+    ],
+    "observations": [
+      "The 7.8-point validation-to-test accuracy gap (99.59% → 91.78%) is consistent with the separate-center test provenance (official_test_separate_center: true). The report correctly documents the gap without asserting a specific causal mechanism.",
+      "The OOD evaluation is scoped as a controlled corruption proxy (additive Gaussian noise, σ ∈ {0.15, 0.25, 0.40}). It does not capture staining variability, scanner differences, or tissue-preparation artifacts. The separate-center test set is the more ecologically valid distribution-shift evaluation.",
+      "Selective-prediction coverage gap: validation achieves 80.0% coverage at the target threshold, but test achieves only 69.3% coverage (abstain rate 30.7%, 2,206 samples routed to human review). This is a calibration-transfer effect, not a threshold error.",
+      "All results use a single seed (42); variance across seeds is not characterized.",
+      "The two weakest test classes (cancer-associated stroma F1=0.667, smooth muscle F1=0.768) are histologically similar spindle-cell/fibrous tissues and are also the two smallest classes (421 and 592 samples), compounding the difficulty.",
+      "The search evaluated 8 trials across both transformer (t0001–t0005) and ResNet18 (t0006–t0008) architectures via the run_generated mechanism. The stopping rationale is a process constraint (no resumable candidates), not a performance-ceiling inference."
+    ],
+    "requests": [],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8:latest",
+    "stage": "reporting"
+  },
+  "payload_sha256": "3c291fa5beb91fd27f5791f7d457429cf395162b41b46a799990972f148a263c",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 65,
+  "version": 1
+}

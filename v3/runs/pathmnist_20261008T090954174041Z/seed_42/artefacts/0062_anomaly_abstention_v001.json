@@ -1,0 +1,30 @@
+{
+  "artefact": "anomaly_abstention",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-08T12:37:37.705589+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "The abstention stage is internally consistent and correctly computed. All arithmetic checks pass: (1) OOD AUROC 0.943354 = mean(0.934119, 0.937481, 0.958463) for predictive_entropy across three severity levels; (2) ood_validation_auroc 0.993805 ≈ mean(0.991291, 0.993977, 0.996145); (3) abstain_rate 0.307242 = 1 − test_coverage 0.692758; (4) human_review_count 2206 = round(0.307242 × 7180); (5) accuracy_on_covered 0.975875 = 1 − selective_risk 0.024125; (6) risk_coverage_curve at target 0.8 reproduces the headline threshold, coverage, and risk values exactly. Calibration is properly performed on validation (validation_coverage 0.80008 ≈ target 0.8), and the test coverage gap (0.693 vs 0.800) is the expected distribution-shift effect, consistently visible across all five curve points. All six OOD scenarios exceed the minimum_scenario_auroc of 0.65 (minimum observed: 0.926673) and the maximum_false_accept_rate of 0.2 (maximum observed: 0.00195). The OOD scope is correctly labelled 'controlled_corruption_proxy' with a fixed corruption_seed (1729) and SHA-256-verified evidence blob. The two upstream 'revise' flags (training rationale text mismatch; final_val_accuracy 0.996102 vs best_val_accuracy 0.995902) are documentation-level inconsistencies that do not propagate into the abstention computation, which consumes only the test predictions and validation-calibrated threshold. No deterministic findings are present. The compacted_fields entries are review-preview truncations, not incomplete persisted artefacts. The abstention mechanism is sound and ready for downstream consumption.",
+    "deterministic_issues": [],
+    "llm_issues": [],
+    "observations": [
+      "OOD AUROC arithmetic verified: (0.934119+0.937481+0.958463)/3 = 0.943354, matching the reported ood_auroc exactly.",
+      "Test coverage (0.6928) is ~10.7 pp below the validation target (0.8001), a consistent gap visible at every point on the risk-coverage curve; this is the expected calibration-to-test shift and does not indicate a computational error.",
+      "Selective risk on test (0.0241) is ~27× the validation risk (0.00088) at the same coverage target, again consistent with distribution shift; both are far below the 0.2 maximum_false_accept_rate ceiling.",
+      "Class 7 (cancer-associated stroma, recall 0.520) is the dominant source of misclassification and will likely contribute disproportionately to the abstained set, which is the intended behaviour of the predictive-entropy gate.",
+      "The OOD evidence is a controlled Gaussian-noise proxy (σ ∈ {0.15, 0.25, 0.4}), not a true distributional shift; the report correctly scopes it as 'controlled_corruption_proxy'.",
+      "Upstream training-stage documentation issues (rationale text referencing a compact transformer while the selected model is ResNet18; final_val_accuracy 0.996102 marginally exceeding best_val_accuracy 0.995902) are cosmetic and do not affect the checkpoint or the abstention threshold."
+    ],
+    "requests": [],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8:latest",
+    "stage": "abstention"
+  },
+  "payload_sha256": "c008744461c8848664e64b268086426746c525f9950c66b28a1eb67f8e929303",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 62,
+  "version": 1
+}

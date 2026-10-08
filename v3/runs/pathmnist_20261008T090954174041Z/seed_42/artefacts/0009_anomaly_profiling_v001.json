@@ -1,0 +1,33 @@
+{
+  "artefact": "anomaly_profiling",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-08T09:10:44.208131+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Profiling stage is clean and internally consistent. PathMNIST (9-class, 3-channel RGB, 28×28) is correctly configured under the standard MedMNIST distribution. Archive integrity verified (MD5 match), split sizes identical to official sizes, no subsampling. Class distribution is well-balanced (imbalance ratio ≈ 1.63) with near-identical train/val proportions, indicating no split-level distribution shift. No blank images, no duplicate train samples. Ambiguity risks among visually similar histology classes at 28×28 resolution are appropriately documented. The test-domain note (CRC-VAL-HE-7K from a different clinical center) is correctly flagged for later OOD interpretation. Worker isolation is not enforced (local_subprocess) and image_digest is null—these are operational notes, not data-integrity defects. Two fields (data_profile.ambiguity_note, anomaly_ingestion.comment) are preview-truncated per compacted_fields; this is expected and does not indicate incomplete artefacts. No deterministic findings. No omitted artefacts. All evidence supports proceeding to the next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [],
+    "observations": [
+      "Archive integrity verified: MD5 a8b06965200029087d5bd730944a56c1 matches verified hash; SHA256 also recorded.",
+      "Loaded split sizes (train=89996, val=10004, test=7180) exactly match official sizes; subsampled=false.",
+      "Class imbalance ratio 1.63 is modest; train and val class proportions are nearly identical (max Δ < 0.0001).",
+      "Ambiguity risks for visually similar classes (background/debris/mucus, adipose/background, smooth muscle/stroma, normal mucosa/adenocarcinoma, lymphocytes/debris) are well-documented for 28×28 patches.",
+      "Test-domain note: CRC-VAL-HE-7K test images originate from a different clinical center—relevant for OOD AUROC interpretation in later stages.",
+      "deterministic_torch=true, seed=42, code SHA256 anchored via canonical-text-v2; LLM model qwen3.8:latest (ollama) digest recorded.",
+      "Worker isolation not enforced (local_subprocess); image_digest null—operational notes only.",
+      "Compacted fields (ambiguity_note, anomaly_ingestion.comment) are preview truncations, not incomplete artefacts.",
+      "No deterministic findings; no omitted artefacts; no LLM issues raised."
+    ],
+    "requests": [],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8:latest",
+    "stage": "profiling"
+  },
+  "payload_sha256": "8f91230eb50095d93345087035d1e39246849c7eb766f7b4a99143f4e8639fbb",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 9,
+  "version": 1
+}

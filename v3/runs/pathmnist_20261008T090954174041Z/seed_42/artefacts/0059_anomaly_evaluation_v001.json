@@ -1,0 +1,32 @@
+{
+  "artefact": "anomaly_evaluation",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-08T12:36:24.961392+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "Evaluation stage is internally consistent and properly conducted. All reported metrics (accuracy 0.917827, balanced_accuracy 0.893666, macro_f1 0.890046, macro_precision 0.902529, macro_recall 0.893666, roc_auc_ovr_macro 0.980611) are arithmetically verified against the 9×9 confusion matrix and per-class breakdowns. The test split (n=7180) is correctly designated, and the prediction artifact includes logits, probabilities, and targets with a verifiable SHA-256. Model selection respected the test-lock protocol (validation-only selection, test_metrics_used: false).\n\nTwo performance observations warrant attention but do not constitute pipeline errors: (1) The validation-to-test accuracy gap is approximately 7.8 pp (0.995902 → 0.917827), which is substantial and may reflect distribution shift between splits or mild overfitting to validation patterns; (2) Class 7 (cancer-associated stroma, support 421) shows markedly degraded performance (recall 0.520, F1 0.667), with 70 samples misclassified as smooth muscle, 55 as debris, and 59 as adenocarcinoma epithelium. These are legitimate performance characteristics of the selected ResNet18 model on this 28×28 histopathology task, not pipeline defects.\n\nThe training-stage review flagged two minor documentation issues (final_val_accuracy 0.996102 marginally exceeding best_val_accuracy 0.995902 by 0.0002; rationale text referencing a 'compact transformer' instead of ResNet18). Neither affects the validity of the checkpoint, the training trajectory, or the evaluation results. The early-stopping arithmetic (best_epoch 17 + patience 12 = epoch 29) is correct. The compacted_fields entries (history 29→20, comment truncations) are preview truncations for this review and do not indicate incomplete persisted artefacts.\n\nNo deterministic findings are present. The evaluation is complete, reproducible, and correctly scoped. Proceeding.",
+    "deterministic_issues": [],
+    "llm_issues": [],
+    "observations": [
+      "All aggregate metrics are arithmetically consistent with the confusion matrix: accuracy 6590/7180=0.917827, balanced_accuracy (mean recall) 8.042994/9=0.893666, macro_f1 8.010416/9=0.890046, macro_precision 8.122758/9=0.902529.",
+      "Val-to-test accuracy gap of ~7.8 pp (0.995902 → 0.917827) is the most notable performance signal; it may reflect split-level distribution differences or mild overfitting to validation patterns in a 9-class histopathology task.",
+      "Class 7 (cancer-associated stroma) is the weakest class: recall 0.520, F1 0.667, with substantial confusion into smooth muscle (70), debris (55), and adenocarcinoma (59). This is a domain-relevant performance gap.",
+      "Classes 1 (background) and 3 (lymphocytes) achieve perfect recall (1.0), while classes 0, 4, 6, and 8 all exceed 0.92 recall, indicating the model is broadly competent with specific difficulty on morphologically similar stromal/muscular tissue.",
+      "The training-stage 'revise' flag (final_val_accuracy 0.996102 vs best_val_accuracy 0.995902, Δ=0.0002; rationale text mismatch) are minor documentation inconsistencies that do not affect checkpoint validity or evaluation correctness.",
+      "Prediction artifact is complete: 7180 test samples, 10004 validation samples, includes logits/probabilities/targets, SHA-256 provided for integrity verification.",
+      "The compacted_fields entries (history 29→20 items, comment truncations) are review-preview truncations, not incomplete persisted artefacts.",
+      "Early-stopping arithmetic is correct: best_epoch 17 + patience 12 = epoch 29 = epochs_completed."
+    ],
+    "requests": [],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8:latest",
+    "stage": "evaluation"
+  },
+  "payload_sha256": "c016b181ee7e978f1502574a1e7a6de0bb4ab360ddb2a9099a92eb51d49913b4",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 59,
+  "version": 1
+}

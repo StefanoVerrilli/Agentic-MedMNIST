@@ -1,0 +1,39 @@
+{
+  "artefact": "generated_pathmnist_multiscale_v1",
+  "artefact_type": "GeneratedBundle",
+  "created_at": "2026-10-08T09:23:05.831926+00:00",
+  "payload": {
+    "author": "experimental_development",
+    "files": {
+      "experiment.py": "65f941ef576621c5ea16fadc956d9e9c5a79b72754d894f740cc9c1c0cd3f63c"
+    },
+    "hypothesis": "The multi_scale_transformer's joint attention over three spatial granularities (scales 2, 4, 7) will outperform the single-scale compact transformer on PathMNIST 28x28 histopathology by simultaneously capturing nuclear-level detail (scale 2, 196 tokens), cell-level structure (scale 4, 49 tokens), and tissue architecture (scale 7, 16 tokens). This multi-granularity view should better resolve the visually confusable class pairs (background/debris/mucus, smooth muscle/stroma, normal mucosa/adenocarcinoma) that account for the remaining ~1% errors, because these distinctions manifest at different spatial scales. Mean pooling over all scales provides a holistic tissue context that cls-token pooling may miss.",
+    "parent_sha256": null,
+    "reference": {
+      "bundle_id": "pathmnist_multiscale_v1",
+      "parameters": {
+        "depth": 2,
+        "dropout": 0.1,
+        "hidden": 128,
+        "mlp_ratio": 4,
+        "num_heads": 4,
+        "pooling": "mean",
+        "scales": [
+          2,
+          4,
+          7
+        ]
+      },
+      "path": "generated/pathmnist_multiscale_v1/v001/manifest.json",
+      "sha256": "3b3a4d7006c4cbb7e48b021c296323e5cdaf80ae52e24d03641e55dda348be3a",
+      "version": 1
+    },
+    "schema_version": "1.0",
+    "source": "qwen3.8:latest"
+  },
+  "payload_sha256": "3bf81c13e7a14f4e961ed8d62d5e80722fc9a56e7e04e5e37f69962530c413ab",
+  "producer": "experimental_development",
+  "run_id": "seed_42",
+  "sequence": 27,
+  "version": 1
+}

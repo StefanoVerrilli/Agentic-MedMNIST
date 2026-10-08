@@ -1,0 +1,31 @@
+{
+  "artefact": "generated_pathmnist_resnet18_v3",
+  "artefact_type": "GeneratedBundle",
+  "created_at": "2026-10-08T12:02:43.689361+00:00",
+  "payload": {
+    "author": "experimental_development",
+    "files": {
+      "experiment.py": "4146961eb3def1d26370100d73a86ff6c4b20786d4a841e5422dd9cb3f5b7a72"
+    },
+    "hypothesis": "ResNet18 with reduced regularization (dropout 0.25, wd 0.005, ls 0.03) and lower LR (1.5e-4) will exceed 0.996 val accuracy by allowing sharper decision boundaries and more complete convergence on the 28x28 histopathology task where local texture features dominate.",
+    "parent_sha256": null,
+    "reference": {
+      "bundle_id": "pathmnist_resnet18_v3",
+      "parameters": {
+        "depth": 2,
+        "dropout": 0.25,
+        "hidden": 64
+      },
+      "path": "generated/pathmnist_resnet18_v3/v001/manifest.json",
+      "sha256": "f6100ae3cb4bf5caa571976323ef57b3ce85409190a15a1f1ba697801956ff3c",
+      "version": 1
+    },
+    "schema_version": "1.0",
+    "source": "qwen3.8:latest"
+  },
+  "payload_sha256": "a9d4564d460bd6af82fc10d3ef91c72e6eb6d1de6beee959c2d211d81dcf677b",
+  "producer": "experimental_development",
+  "run_id": "seed_42",
+  "sequence": 45,
+  "version": 1
+}

@@ -1,0 +1,31 @@
+{
+  "artefact": "generated_pathmnist_resnet18_v1",
+  "artefact_type": "GeneratedBundle",
+  "created_at": "2026-10-08T10:59:13.368078+00:00",
+  "payload": {
+    "author": "experimental_development",
+    "files": {
+      "experiment.py": "22e3b0a91152f4955138a3dca46e5a22f06ad7267ed43d121a2307b3decb26c9"
+    },
+    "hypothesis": "A ResNet18 with CIFAR-style stem (3x3 stride-1, no max-pool) and hierarchical channel progression (64-128-256-512) will achieve competitive validation accuracy (~0.99+) on 28x28 PathMNIST by leveraging local convolutional receptive fields that capture texture and nuclear morphology at multiple scales. The inductive bias of progressive downsampling with residual connections may be particularly effective for distinguishing confusable tissue classes (smooth muscle vs stroma, background vs debris) through learned hierarchical feature maps, potentially matching or exceeding the compact_transformer's 0.9929 without the overhead of self-attention.",
+    "parent_sha256": null,
+    "reference": {
+      "bundle_id": "pathmnist_resnet18_v1",
+      "parameters": {
+        "depth": 2,
+        "dropout": 0.3,
+        "hidden": 64
+      },
+      "path": "generated/pathmnist_resnet18_v1/v001/manifest.json",
+      "sha256": "fb89555bff5a4f24b975d07daeb363595164e19f7a94c6259fc804934bd71323",
+      "version": 1
+    },
+    "schema_version": "1.0",
+    "source": "qwen3.8:latest"
+  },
+  "payload_sha256": "a6d9dfc81b88511f4e737d71688e430c3a4280e76bab30271cfb6d41e6172346",
+  "producer": "experimental_development",
+  "run_id": "seed_42",
+  "sequence": 39,
+  "version": 1
+}

@@ -1,0 +1,29 @@
+{
+  "artefact": "anomaly_model_search",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-08T12:34:35.953892+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "First review of the model_search stage. All 8 trials completed with 0 failures. The stopping rationale is operationally grounded: the system reports an empty resumable_candidate_ids list and no permission for new experiments, which is a valid hard constraint rather than an inferred performance ceiling. The selected candidate (autonomous_t0007, ResNet18 tuned, val_acc=0.995902, macro_F1=0.995778) is the best-performing trial and is selected under the stated rule (validation accuracy tolerance then macro-F1, test locked, test_metrics_used=false). The ResNet18 configuration is consistent with its fixed topology: hidden=64 controls base width, depth=2 is passed but ignored per the fixed-topology rule, and dropout=0.3 is consumed. Generic transformer fields (num_heads, patch_size, mlp_ratio, positional_encoding, pooling, scales, tokenizer_layers) are present in the config but inactive for this CNN family, as expected. All augmentations used are built-in primitives requiring no extension approval. The search explored compact_transformer (4 trials), multi_scale_transformer (1 trial), and resnet18 (3 trials); the remaining built-in families (tiny_cnn, residual_cnn, vision_transformer, feature_pyramid_transformer) were not explored, which is within the agent_autonomous policy. No deterministic findings are present. No previous review exists for comparison. The stopping rationale is supported by the operational state and does not constitute an unsupported ceiling inference from a small number of similar trials.",
+    "deterministic_issues": [],
+    "llm_issues": [],
+    "observations": [
+      "The search explored 3 of 7 built-in architecture families (compact_transformer, multi_scale_transformer, resnet18). The agent_autonomous policy permits selective exploration, and the stopping was driven by a system constraint (no eligible candidates, no new experiments permitted) rather than family exhaustion.",
+      "ResNet18 trials (t0006–t0008) consistently outperformed transformer-based trials (t0001–t0005) by 0.3–0.9 percentage points in validation accuracy, supporting the selection of the ResNet18 family for this 28×28 histopathology task.",
+      "t0008 (resnet18_v3, dropout=0.25) underperformed both t0006 and t0007 (both dropout=0.3), indicating the dropout=0.3 setting was well-chosen and the search correctly identified the superior configuration.",
+      "The curve_max_accuracy for t0006 (0.996801) exceeds the selected t0007 checkpoint (0.995902), but selection is based on the monitored best-epoch checkpoint metric, not the curve maximum, which is the correct protocol.",
+      "families_evaluated is reported as [\"run_generated\"] reflecting the model_family classification; the underlying architectures span multiple built-in families as evidenced by the bundle IDs and parameters."
+    ],
+    "requests": [],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8:latest",
+    "stage": "model_search"
+  },
+  "payload_sha256": "bc6ca4570d324c470640485798d8a4f282d569868f92ea417a1a1df05bc50a3a",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 52,
+  "version": 1
+}

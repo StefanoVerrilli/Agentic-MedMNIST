@@ -1,0 +1,21 @@
+{
+  "artefact": "autonomous_action_0009",
+  "artefact_type": "AutonomousSearchEvent",
+  "created_at": "2026-10-08T12:34:04.470553+00:00",
+  "payload": {
+    "decision": {
+      "action": "finish_search",
+      "additional_epochs": null,
+      "candidate_id": null,
+      "experiment": null,
+      "rationale": "The proposed trial could not be validated and no new experiment is permitted. The resumable_candidate_ids list is empty, meaning no eligible candidate exists for a continue_trial action. All 8 trials (autonomous_t0001 through autonomous_t0008) have completed successfully. The best-performing model is autonomous_t0007 (ResNet18 tuned, lr=2e-4, label_smoothing=0.05, weight_decay=0.01, dropout=0.3) with validation accuracy 0.995902 and macro F1 0.995778, achieved in 29 epochs. The second-best is autonomous_t0006 (ResNet18 base) at 0.995402/0.995418. The transformer-based models peaked at 0.992903 (t0004, depth=6). Given that no candidates are available for continuation and no new experiments are allowed, the search must conclude with the best validated result: autonomous_t0007 at 99.59% validation accuracy."
+    },
+    "schema_version": "1.0",
+    "source": "qwen3.8:latest"
+  },
+  "payload_sha256": "5a3748e94cb8932935a5d153eb7892b95de7682c1ba393423543e0e9fbe31b2c",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 47,
+  "version": 1
+}

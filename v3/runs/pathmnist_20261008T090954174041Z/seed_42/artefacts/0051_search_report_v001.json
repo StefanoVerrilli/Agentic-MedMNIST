@@ -1,0 +1,239 @@
+{
+  "artefact": "search_report",
+  "artefact_type": "SearchReport",
+  "created_at": "2026-10-08T12:34:04.488399+00:00",
+  "payload": {
+    "completed_trials": 8,
+    "evaluated_bundles": [
+      "pathmnist_compact_d8_v4",
+      "pathmnist_compact_deep_v3",
+      "pathmnist_compact_tf_v1",
+      "pathmnist_compact_wide_v2",
+      "pathmnist_multiscale_v1",
+      "pathmnist_resnet18_tuned_v2",
+      "pathmnist_resnet18_v1",
+      "pathmnist_resnet18_v3"
+    ],
+    "failed_trials": 0,
+    "families_evaluated": [
+      "run_generated"
+    ],
+    "missing_families": [],
+    "schema_version": "1.0",
+    "selected_candidate_id": "autonomous_t0007",
+    "selected_config_hash": "fd2b367361516106eb8ad8f4466f0389895b00c2db1470318edb4f07e0b946e4",
+    "selected_program": "\"\"\"ResNet18 tuned for PathMNIST 28x28 histopathology classification.\"\"\"\nimport torch\nfrom lightning_components import build_network\nfrom worker_runtime import fit_model, batched_logits\n\n\ndef build_model(context):\n    parameters = context[\"parameters\"]\n    return build_network(\n        \"resnet18\",\n        in_channels=3,\n        n_classes=9,\n        hidden=parameters.get(\"hidden\", 64),\n        depth=parameters.get(\"depth\", 2),\n        dropout=parameters.get(\"dropout\", 0.3),\n    )\n\n\ndef train(context):\n    return fit_model(context, build_model(context))\n\n\ndef predict(context):\n    model = build_model(context)\n    model.load_state_dict(torch.load(context[\"checkpoint\"], map_location=\"cpu\", weights_only=True))\n    return batched_logits(model, context[\"data\"][\"images\"], context[\"config\"])",
+    "selected_validation_accuracy": 0.995902,
+    "selected_validation_macro_f1": 0.995778,
+    "selection_rule": "agent_durations_accuracy_tolerance_then_macro_f1",
+    "stopping_rationale": "The proposed trial could not be validated and no new experiment is permitted. The resumable_candidate_ids list is empty, meaning no eligible candidate exists for a continue_trial action. All 8 trials (autonomous_t0001 through autonomous_t0008) have completed successfully. The best-performing model is autonomous_t0007 (ResNet18 tuned, lr=2e-4, label_smoothing=0.05, weight_decay=0.01, dropout=0.3) with validation accuracy 0.995902 and macro F1 0.995778, achieved in 29 epochs. The second-best is autonomous_t0006 (ResNet18 base) at 0.995402/0.995418. The transformer-based models peaked at 0.992903 (t0004, depth=6). Given that no candidates are available for continuation and no new experiments are allowed, the search must conclude with the best validated result: autonomous_t0007 at 99.59% validation accuracy.",
+    "test_metrics_used": false,
+    "trial_artefacts": [
+      "trial_0001",
+      "trial_0002",
+      "trial_0003",
+      "trial_0004",
+      "trial_0005",
+      "trial_0006",
+      "trial_0007",
+      "trial_0008"
+    ],
+    "validation_trials": [
+      {
+        "best_epoch": 11,
+        "bundle": {
+          "bundle_id": "pathmnist_compact_tf_v1",
+          "parameters": {
+            "depth": 4,
+            "dropout": 0.1,
+            "hidden": 128,
+            "mlp_ratio": 4,
+            "num_heads": 4,
+            "patch_size": 4
+          },
+          "path": "generated/pathmnist_compact_tf_v1/v001/manifest.json",
+          "sha256": "c7630a27be09a22b52b8307466f601bc75abbd6f4eaea2fff06eb0f84a80b8e3",
+          "version": 1
+        },
+        "candidate_id": "autonomous_t0001",
+        "checkpoint_accuracy": 0.988605,
+        "checkpoint_macro_f1": 0.988523,
+        "curve_max_accuracy": 0.989204,
+        "duration_seconds": 445.34208356399904,
+        "generic_architecture_fields": "framework defaults; inspect archived build_model for actual parameter use",
+        "round_index": 1
+      },
+      {
+        "best_epoch": 6,
+        "bundle": {
+          "bundle_id": "pathmnist_multiscale_v1",
+          "parameters": {
+            "depth": 2,
+            "dropout": 0.1,
+            "hidden": 128,
+            "mlp_ratio": 4,
+            "num_heads": 4,
+            "pooling": "mean",
+            "scales": [
+              2,
+              4,
+              7
+            ]
+          },
+          "path": "generated/pathmnist_multiscale_v1/v001/manifest.json",
+          "sha256": "3b3a4d7006c4cbb7e48b021c296323e5cdaf80ae52e24d03641e55dda348be3a",
+          "version": 1
+        },
+        "candidate_id": "autonomous_t0002",
+        "checkpoint_accuracy": 0.987105,
+        "checkpoint_macro_f1": 0.9869,
+        "curve_max_accuracy": 0.988904,
+        "duration_seconds": 951.5795067580038,
+        "generic_architecture_fields": "framework defaults; inspect archived build_model for actual parameter use",
+        "round_index": 2
+      },
+      {
+        "best_epoch": 11,
+        "bundle": {
+          "bundle_id": "pathmnist_compact_wide_v2",
+          "parameters": {
+            "depth": 4,
+            "dropout": 0.1,
+            "hidden": 256,
+            "mlp_ratio": 4,
+            "num_heads": 4,
+            "patch_size": 4
+          },
+          "path": "generated/pathmnist_compact_wide_v2/v001/manifest.json",
+          "sha256": "4306e4750b4f1960cb302b359535b5d4c88d3b78fa22ed471053d7f8ccaf64e7",
+          "version": 1
+        },
+        "candidate_id": "autonomous_t0003",
+        "checkpoint_accuracy": 0.990504,
+        "checkpoint_macro_f1": 0.990509,
+        "curve_max_accuracy": 0.990604,
+        "duration_seconds": 816.0172702169948,
+        "generic_architecture_fields": "framework defaults; inspect archived build_model for actual parameter use",
+        "round_index": 3
+      },
+      {
+        "best_epoch": 22,
+        "bundle": {
+          "bundle_id": "pathmnist_compact_deep_v3",
+          "parameters": {
+            "depth": 6,
+            "dropout": 0.15,
+            "hidden": 256,
+            "mlp_ratio": 4,
+            "num_heads": 4,
+            "patch_size": 4,
+            "pooling": "cls"
+          },
+          "path": "generated/pathmnist_compact_deep_v3/v001/manifest.json",
+          "sha256": "1cacf9a6efbb5102fc7a356e842cde71c432e05da99ebbaa3dce9d52931074e7",
+          "version": 1
+        },
+        "candidate_id": "autonomous_t0004",
+        "checkpoint_accuracy": 0.991703,
+        "checkpoint_macro_f1": 0.991803,
+        "curve_max_accuracy": 0.992903,
+        "duration_seconds": 2078.2644872999954,
+        "generic_architecture_fields": "framework defaults; inspect archived build_model for actual parameter use",
+        "round_index": 4
+      },
+      {
+        "best_epoch": 11,
+        "bundle": {
+          "bundle_id": "pathmnist_compact_d8_v4",
+          "parameters": {
+            "depth": 8,
+            "dropout": 0.2,
+            "hidden": 256,
+            "mlp_ratio": 4,
+            "num_heads": 4,
+            "patch_size": 4,
+            "pooling": "cls"
+          },
+          "path": "generated/pathmnist_compact_d8_v4/v001/manifest.json",
+          "sha256": "d43fef611147e6168051c849c53ef140ef9983bca31267c2bf75c2c4cd0d26ab",
+          "version": 1
+        },
+        "candidate_id": "autonomous_t0005",
+        "checkpoint_accuracy": 0.989304,
+        "checkpoint_macro_f1": 0.989393,
+        "curve_max_accuracy": 0.990804,
+        "duration_seconds": 1719.4724606050004,
+        "generic_architecture_fields": "framework defaults; inspect archived build_model for actual parameter use",
+        "round_index": 5
+      },
+      {
+        "best_epoch": 15,
+        "bundle": {
+          "bundle_id": "pathmnist_resnet18_v1",
+          "parameters": {
+            "depth": 2,
+            "dropout": 0.3,
+            "hidden": 64
+          },
+          "path": "generated/pathmnist_resnet18_v1/v001/manifest.json",
+          "sha256": "fb89555bff5a4f24b975d07daeb363595164e19f7a94c6259fc804934bd71323",
+          "version": 1
+        },
+        "candidate_id": "autonomous_t0006",
+        "checkpoint_accuracy": 0.995402,
+        "checkpoint_macro_f1": 0.995418,
+        "curve_max_accuracy": 0.996801,
+        "duration_seconds": 1704.6414200419968,
+        "generic_architecture_fields": "framework defaults; inspect archived build_model for actual parameter use",
+        "round_index": 6
+      },
+      {
+        "best_epoch": 17,
+        "bundle": {
+          "bundle_id": "pathmnist_resnet18_tuned_v2",
+          "parameters": {
+            "depth": 2,
+            "dropout": 0.3,
+            "hidden": 64
+          },
+          "path": "generated/pathmnist_resnet18_tuned_v2/v001/manifest.json",
+          "sha256": "36e5a4307d7dd4f200ba64d665a6379fc8efea024e54ab2df926e742feccd738",
+          "version": 1
+        },
+        "candidate_id": "autonomous_t0007",
+        "checkpoint_accuracy": 0.995902,
+        "checkpoint_macro_f1": 0.995778,
+        "curve_max_accuracy": 0.996102,
+        "duration_seconds": 1965.93626798701,
+        "generic_architecture_fields": "framework defaults; inspect archived build_model for actual parameter use",
+        "round_index": 7
+      },
+      {
+        "best_epoch": 12,
+        "bundle": {
+          "bundle_id": "pathmnist_resnet18_v3",
+          "parameters": {
+            "depth": 2,
+            "dropout": 0.25,
+            "hidden": 64
+          },
+          "path": "generated/pathmnist_resnet18_v3/v001/manifest.json",
+          "sha256": "f6100ae3cb4bf5caa571976323ef57b3ce85409190a15a1f1ba697801956ff3c",
+          "version": 1
+        },
+        "candidate_id": "autonomous_t0008",
+        "checkpoint_accuracy": 0.993902,
+        "checkpoint_macro_f1": 0.993888,
+        "curve_max_accuracy": 0.994902,
+        "duration_seconds": 1816.2008359320025,
+        "generic_architecture_fields": "framework defaults; inspect archived build_model for actual parameter use",
+        "round_index": 8
+      }
+    ]
+  },
+  "payload_sha256": "69b442bdd5995d26dabbb1ba2ce52f1960dfb1f561e0737a5434624825d4149d",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 51,
+  "version": 1
+}

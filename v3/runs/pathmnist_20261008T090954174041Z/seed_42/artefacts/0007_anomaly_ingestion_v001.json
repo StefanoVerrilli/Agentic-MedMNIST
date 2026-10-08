@@ -1,0 +1,32 @@
+{
+  "artefact": "anomaly_ingestion",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-08T09:10:21.087691+00:00",
+  "payload": {
+    "action": "continue",
+    "attempt": 1,
+    "comment": "Ingestion stage is clean. All integrity checks pass: archive MD5 (a8b06965200029087d5bd730944a56c1) matches the verified hash; loaded split sizes (train=89996, val=10004, test=7180) are identical to official split sizes; subsampled=false confirms the full dataset is in use. PathMNIST is correctly configured as 9-class, 3-channel (RGB) under the standard 28×28 MedMNIST distribution. No deterministic findings were raised. The run manifest records deterministic_torch=true, seed=42, and a canonical-text-v2 code SHA256, providing reproducibility anchors. Package versions (torch 2.14.0+cu126, lightning 2.6.5, medmnist 3.0.2) are internally consistent. Two observations are noted for downstream stages: (1) the test-domain note flags that CRC-VAL-HE-7K test images originate from a different clinical center, which is a legitimate OOD consideration for later evaluation but does not invalidate ingestion; (2) worker isolation is not enforced (local_subprocess) and image_digest is null—these are operational notes, not data-integrity failures. No requests are needed; proceed to the next stage.",
+    "deterministic_issues": [],
+    "llm_issues": [],
+    "observations": [
+      "Archive integrity verified: archive_md5 == verified_archive_md5 (a8b06965200029087d5bd730944a56c1).",
+      "Loaded split sizes exactly match official split sizes; no subsampling applied.",
+      "PathMNIST: 9 classes, 3 channels (RGB), consistent with the standard 28×28 MedMNIST distribution.",
+      "Test-domain note: CRC-VAL-HE-7K test images originate from a different clinical center—relevant for OOD interpretation in later stages.",
+      "deterministic_torch=true and seed=42 recorded; code integrity anchored via canonical-text-v2 SHA256.",
+      "Worker isolation not enforced (local_subprocess); image_digest is null—operational notes, not data-integrity issues.",
+      "LLM code-generation model: qwen3.8:latest (ollama), digest 22130167c4c2… recorded for traceability.",
+      "No deterministic findings; no compacted fields; no omitted artefacts."
+    ],
+    "requests": [],
+    "schema_version": "1.0",
+    "severity": "ok",
+    "source": "qwen3.8:latest",
+    "stage": "ingestion"
+  },
+  "payload_sha256": "b4538222701f3ec2e41ca35fe4204b84112863343800c967f444e887c3ae1a35",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 7,
+  "version": 1
+}

@@ -1,0 +1,1 @@
+/media/neurone-pc11/Volume1/Giuseppe/Agentic-MedMNIST/v3/runs/pathmnist_20261008T090954174041Z/seed_42/blobs/local_jobs/7f9e00d1749b460bb24bdd98ab32c401/input/framework/lightning_components.py:103: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True

@@ -1,0 +1,130 @@
+{
+  "payload": {
+    "decision": {
+      "action": "continue",
+      "comment": "First review of the model_search stage. All 8 trials completed with 0 failures. The stopping rationale is operationally grounded: the system reports an empty resumable_candidate_ids list and no permission for new experiments, which is a valid hard constraint rather than an inferred performance ceiling. The selected candidate (autonomous_t0007, ResNet18 tuned, val_acc=0.995902, macro_F1=0.995778) is the best-performing trial and is selected under the stated rule (validation accuracy tolerance then macro-F1, test locked, test_metrics_used=false). The ResNet18 configuration is consistent with its fixed topology: hidden=64 controls base width, depth=2 is passed but ignored per the fixed-topology rule, and dropout=0.3 is consumed. Generic transformer fields (num_heads, patch_size, mlp_ratio, positional_encoding, pooling, scales, tokenizer_layers) are present in the config but inactive for this CNN family, as expected. All augmentations used are built-in primitives requiring no extension approval. The search explored compact_transformer (4 trials), multi_scale_transformer (1 trial), and resnet18 (3 trials); the remaining built-in families (tiny_cnn, residual_cnn, vision_transformer, feature_pyramid_transformer) were not explored, which is within the agent_autonomous policy. No deterministic findings are present. No previous review exists for comparison. The stopping rationale is supported by the operational state and does not constitute an unsupported ceiling inference from a small number of similar trials.",
+      "issues": [],
+      "observations": [
+        "The search explored 3 of 7 built-in architecture families (compact_transformer, multi_scale_transformer, resnet18). The agent_autonomous policy permits selective exploration, and the stopping was driven by a system constraint (no eligible candidates, no new experiments permitted) rather than family exhaustion.",
+        "ResNet18 trials (t0006\u2013t0008) consistently outperformed transformer-based trials (t0001\u2013t0005) by 0.3\u20130.9 percentage points in validation accuracy, supporting the selection of the ResNet18 family for this 28\u00d728 histopathology task.",
+        "t0008 (resnet18_v3, dropout=0.25) underperformed both t0006 and t0007 (both dropout=0.3), indicating the dropout=0.3 setting was well-chosen and the search correctly identified the superior configuration.",
+        "The curve_max_accuracy for t0006 (0.996801) exceeds the selected t0007 checkpoint (0.995902), but selection is based on the monitored best-epoch checkpoint metric, not the curve maximum, which is the correct protocol.",
+        "families_evaluated is reported as [\"run_generated\"] reflecting the model_family classification; the underlying architectures span multiple built-in families as evidenced by the bundle IDs and parameters."
+      ],
+      "requests": [],
+      "severity": "ok"
+    },
+    "request": {
+      "fallback": {
+        "action": "continue",
+        "comment": "Deterministic reviewer invariants passed.",
+        "issues": [],
+        "observations": [],
+        "requests": [],
+        "severity": "ok"
+      },
+      "model": "qwen3.8:latest",
+      "schema": {
+        "$defs": {
+          "ReviewRequest": {
+            "additionalProperties": false,
+            "properties": {
+              "correction": {
+                "minLength": 1,
+                "title": "Correction",
+                "type": "string"
+              },
+              "problem": {
+                "minLength": 1,
+                "title": "Problem",
+                "type": "string"
+              },
+              "request_id": {
+                "minLength": 1,
+                "title": "Request Id",
+                "type": "string"
+              },
+              "required_evidence": {
+                "minLength": 1,
+                "title": "Required Evidence",
+                "type": "string"
+              }
+            },
+            "required": [
+              "request_id",
+              "problem",
+              "correction",
+              "required_evidence"
+            ],
+            "title": "ReviewRequest",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "enum": [
+              "continue",
+              "revise",
+              "stop"
+            ],
+            "title": "Action",
+            "type": "string"
+          },
+          "comment": {
+            "maxLength": 12000,
+            "minLength": 2,
+            "title": "Comment",
+            "type": "string"
+          },
+          "issues": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 30,
+            "title": "Issues",
+            "type": "array"
+          },
+          "observations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Observations",
+            "type": "array"
+          },
+          "requests": {
+            "items": {
+              "$ref": "#/$defs/ReviewRequest"
+            },
+            "title": "Requests",
+            "type": "array"
+          },
+          "severity": {
+            "enum": [
+              "ok",
+              "warning",
+              "critical"
+            ],
+            "title": "Severity",
+            "type": "string"
+          }
+        },
+        "required": [
+          "severity",
+          "action",
+          "comment"
+        ],
+        "title": "ReviewDecision",
+        "type": "object"
+      },
+      "seed": 42,
+      "stage": "review.model_search",
+      "system": "You are an independent software and ML consistency reviewer. Inspect only the supplied evidence. You may raise severity but must never dismiss deterministic findings. No clinical claims. The supplied current UTC timestamp is authoritative. This pipeline uses the standard 28x28 RGB MedMNIST distribution; do not substitute the source-dataset or MedMNIST+ resolution. Only deterministic findings may justify action=stop; unsupported external-memory claims must be warnings requesting verification. ResNet18 has fixed topology; hidden controls base width and depth is ignored. Generic transformer fields are inactive for CNN families and do not make them transformer hybrids. Built-in augmentations (hflip, vflip, rotate90, rotate180, brightness, contrast) do not require extension approval; pending new proposals do not invalidate these primitives. All seven built-in families (tiny_cnn, residual_cnn, resnet18, vision_transformer, compact_transformer, multi_scale_transformer, feature_pyramid_transformer) are implemented and need no extension approval. Gate status applies only to the specific new proposals. Respect evidence_provenance: curated excerpts and bare URLs are unverified external evidence, while retrieved abstracts alone do not verify performance claims. Entries in compacted_fields identify preview truncation performed for this review, not incomplete persisted artefacts. Do not request regeneration solely because of these previews or omitted_artefacts. A cited quote establishes traceability, not support for every scientific inference: assess that support separately. The OOD aggregate is the arithmetic mean of the selected score's AUROCs across corruption severities, not a pooled-sample AUROC. For run_generated, generic architecture defaults do not identify the instantiated network. Use generated_bundle.parameters and archived program source to establish which values are consumed. This stage supports unlimited corrective revisions. Use requests for actionable problems, each with a stable request_id, problem, correction and required_evidence. Use observations for documented limitations that need no corrective work. Compare with the previous review and response; retain request IDs until resolved or explicitly reclassified with evidence. A repeated proposal alone is not resolution. Do not require training changes after test evaluation. Requests mean revise; observations alone permit continue with warning. For search, assess whether the claimed stopping rationale is supported by checkpoint metrics and actual comparisons; do not infer an irreducible ceiling from two similar trials.",
+      "user": "current_utc=2026-10-08T12:34:04.557427+00:00; stage=model_search; deterministic_findings=[]; stage_focused_evidence={\"artefacts\": {\"autonomous_action_0009\": {\"decision\": {\"action\": \"finish_search\", \"additional_epochs\": null, \"candidate_id\": null, \"experiment\": null, \"rationale\": \"The proposed trial could not be validated and no new experiment is permitted. The resumable_candidate_ids list is empty, meaning no eligible candidate exists for a continue_trial action. All 8 trials (autonomous_t0001 through autonomous_t0008) have completed successfully. The best-performing model is autonomous_t0007 (ResNet18 tuned, lr=2e-4, label_smoothing=0.05, weight_decay=0.01, dropout=0.3...\"}, \"schema_version\": \"1.0\", \"source\": \"qwen3.8:latest\"}, \"best_configuration\": {\"lightning_config_path\": \"best_config_v001.yaml\", \"lightning_config_sha256\": \"2c9158c76e8f354525924f7bc74ef3e0c0b9594d1fd1d7ba0cbfa116fe45c011\", \"representation\": {\"augmentations\": [\"hflip\", \"vflip\", \"rotate90\", \"rotate180\", \"brightness\", \"contrast\"], \"normalization\": \"standardize\", \"rationale\": \"Standardization (zero-mean, unit-variance) is selected over unit-range scaling because the downstream architecture is a compact transformer operating on 16 patch tokens (7x7 non-overlapping patches on 28x28 RGB). Transformers are notably more sensitive to input magnitude than CNNs; centering each channel to zero mean and scaling to unit variance stabilizes attention logits and gradient flow, es...\"}, \"schema_version\": \"1.0\", \"selected_candidate_id\": \"autonomous_t0007\", \"selected_config_hash\": \"fd2b367361516106eb8ad8f4466f0389895b00c2db1470318edb4f07e0b946e4\", \"selection_rule\": \"agent-selected durations; validation accuracy tolerance then macro-F1; test locked\", \"test_metrics_used\": false, \"train_config\": {\"adam_beta1\": 0.9, \"adam_beta2\": 0.999, \"batch_size\": 256, \"channel_cap\": 256, \"class_weighting\": true, \"cosine_eta_min\": 0.0, \"depth\": 2, \"device\": \"cuda\", \"dropout\": 0.0, \"early_stopping_min_delta\": 0.001, \"early_stopping_monitor\": \"val_accuracy\", \"early_stopping_patience\": 12, \"epochs\": 50, \"execution_mode\": \"agent_autonomous\", \"generated_bundle\": {\"bundle_id\": \"pathmnist_resnet18_tuned_v2\", \"parameters\": {\"depth\": 2, \"dropout\": 0.3, \"hidden\": 64}, \"path\": \"generated/pathmnist_resnet18_tuned_v2/v001/manifest.json\", \"sha256\": \"36e5a4307d7dd4f200ba64d665a6379fc8efea024e54ab2df926e742feccd738\", \"version\": 1}, \"gradient_clip_val\": 1.0, \"hidden\": 64, \"label_smoothing\": 0.05, \"lr\": 0.0002, \"mlp_ratio\": 4, \"model_family\": \"run_generated\", \"momentum\": 0.9, \"nesterov\": true, \"num_heads\": 4, \"one_cycle_pct_start\": 0.1, \"optimizer\": \"adamw\", \"optimizer_eps\": 1e-08, \"patch_size\": 4, \"plateau_factor\": 0.5, \"plateau_patience\": 1, \"pooling\": \"cls\", \"positional_encoding\": \"learned\", \"rationale\": \"ResNet18 with reduced label smoothing (0.05) and extended cosine-scheduled training (50 epochs, patience 12) will exceed 0.9968 validation accuracy by allowing sharper decision boundaries and more complete convergence. The CNN's local receptive fields and hierarchical channel progression are better suited to 28x28 histopathology texture discrimination than self-attention, as confirmed by t0006'...\", \"scales\": [2, 4, 7], \"scheduler\": \"cosine\", \"schema_version\": \"1.0\", \"seed\": 42, \"segment_targets\": [50], \"source\": \"qwen3.8:latest\", \"tokenizer_layers\": 2, \"weight_decay\": 0.01, \"worker\": {\"max_bundles\": 32, \"timeout_seconds\": 3600}}, \"validation_accuracy\": 0.995902, \"validation_macro_f1\": 0.995778}, \"search_plan\": {\"accuracy_tolerance\": 0.005, \"final_epochs\": null, \"framework\": \"local.python\", \"max_trials\": null, \"objective\": \"validation_accuracy_then_macro_f1\", \"policy\": \"agent_autonomous\", \"progressive_budget\": false, \"round_epoch_budgets\": [], \"rounds\": null, \"schema_version\": \"1.0\", \"search_epochs\": null, \"test_locked\": true}, \"search_report\": {\"completed_trials\": 8, \"evaluated_bundles\": [\"pathmnist_compact_d8_v4\", \"pathmnist_compact_deep_v3\", \"pathmnist_compact_tf_v1\", \"pathmnist_compact_wide_v2\", \"pathmnist_multiscale_v1\", \"pathmnist_resnet18_tuned_v2\", \"pathmnist_resnet18_v1\", \"pathmnist_resnet18_v3\"], \"failed_trials\": 0, \"families_evaluated\": [\"run_generated\"], \"missing_families\": [], \"schema_version\": \"1.0\", \"selected_candidate_id\": \"autonomous_t0007\", \"selected_config_hash\": \"fd2b367361516106eb8ad8f4466f0389895b00c2db1470318edb4f07e0b946e4\", \"selected_program\": \"\\\"\\\"\\\"ResNet18 tuned for PathMNIST 28x28 histopathology classification.\\\"\\\"\\\"\\nimport torch\\nfrom lightning_components import build_network\\nfrom worker_runtime import fit_model, batched_logits\\n\\n\\ndef build_model(context):\\n    parameters = context[\\\"parameters\\\"]\\n    return build_network(\\n        \\\"resnet18\\\",\\n        in_channels=3,\\n        n_classes=9,\\n        hidden=parameters.get(\\\"hidden\\\", 64),\\n        depth=parameters.get(\\\"depth\\\", 2),\\n        dropout=parameters.get(\\\"dropout\\\", 0.3),\\n    )\\n\\n\\ndef train(context):\\n    return fit_model(context, build_model(context))\\n\\n\\ndef predict(context):\\n    model = build_model(context)\\n    model.load_state_dict(torch.load(context[\\\"checkpoint\\\"], map_location=\\\"cpu\\\", weights_only=True))\\n    return batched_logits(model, context[\\\"data\\\"][\\\"images\\\"], context[\\\"config\\\"])\", \"selected_validation_accuracy\": 0.995902, \"selected_validation_macro_f1\": 0.995778, \"selection_rule\": \"agent_durations_accuracy_tolerance_then_macro_f1\", \"stopping_rationale\": \"The proposed trial could not be validated and no new experiment is permitted. The resumable_candidate_ids list is empty, meaning no eligible candidate exists for a continue_trial action. All 8 trials (autonomous_t0001 through autonomous_t0008) have completed successfully. The best-performing model is autonomous_t0007 (ResNet18 tuned, lr=2e-4, label_smoothing=0.05, weight_decay=0.01, dropout=0.3) with validation accuracy 0.995902 and macro F1 0.995778, achieved in 29 epochs. The second-best is autonomous_t0006 (ResNet18 base) at 0.995402/0.995418. The transformer-based models peaked at 0.992903 (t0004, depth=6). Given that no candidates are available for continuation and no new experiments are allowed, the search must conclude with the best validated result: autonomous_t0007 at 99.59% validation accuracy.\", \"test_metrics_used\": false, \"trial_artefacts\": [\"trial_0001\", \"trial_0002\", \"trial_0003\", \"trial_0004\", \"trial_0005\", \"trial_0006\", \"trial_0007\", \"trial_0008\"], \"validation_trials\": [{\"best_epoch\": 11, \"bundle\": {\"bundle_id\": \"pathmnist_compact_tf_v1\", \"parameters\": {\"depth\": 4, \"dropout\": 0.1, \"hidden\": 128, \"mlp_ratio\": 4, \"num_heads\": 4, \"patch_size\": 4}, \"path\": \"generated/pathmnist_compact_tf_v1/v001/manifest.json\", \"sha256\": \"c7630a27be09a22b52b8307466f601bc75abbd6f4eaea2fff06eb0f84a80b8e3\", \"version\": 1}, \"candidate_id\": \"autonomous_t0001\", \"checkpoint_accuracy\": 0.988605, \"checkpoint_macro_f1\": 0.988523, \"curve_max_accuracy\": 0.989204, \"duration_seconds\": 445.34208356399904, \"generic_architecture_fields\": \"framework defaults; inspect archived build_model for actual parameter use\", \"round_index\": 1}, {\"best_epoch\": 6, \"bundle\": {\"bundle_id\": \"pathmnist_multiscale_v1\", \"parameters\": {\"depth\": 2, \"dropout\": 0.1, \"hidden\": 128, \"mlp_ratio\": 4, \"num_heads\": 4, \"pooling\": \"mean\", \"scales\": [2, 4, 7]}, \"path\": \"generated/pathmnist_multiscale_v1/v001/manifest.json\", \"sha256\": \"3b3a4d7006c4cbb7e48b021c296323e5cdaf80ae52e24d03641e55dda348be3a\", \"version\": 1}, \"candidate_id\": \"autonomous_t0002\", \"checkpoint_accuracy\": 0.987105, \"checkpoint_macro_f1\": 0.9869, \"curve_max_accuracy\": 0.988904, \"duration_seconds\": 951.5795067580038, \"generic_architecture_fields\": \"framework defaults; inspect archived build_model for actual parameter use\", \"round_index\": 2}, {\"best_epoch\": 11, \"bundle\": {\"bundle_id\": \"pathmnist_compact_wide_v2\", \"parameters\": {\"depth\": 4, \"dropout\": 0.1, \"hidden\": 256, \"mlp_ratio\": 4, \"num_heads\": 4, \"patch_size\": 4}, \"path\": \"generated/pathmnist_compact_wide_v2/v001/manifest.json\", \"sha256\": \"4306e4750b4f1960cb302b359535b5d4c88d3b78fa22ed471053d7f8ccaf64e7\", \"version\": 1}, \"candidate_id\": \"autonomous_t0003\", \"checkpoint_accuracy\": 0.990504, \"checkpoint_macro_f1\": 0.990509, \"curve_max_accuracy\": 0.990604, \"duration_seconds\": 816.0172702169948, \"generic_architecture_fields\": \"framework defaults; inspect archived build_model for actual parameter use\", \"round_index\": 3}, {\"best_epoch\": 22, \"bundle\": {\"bundle_id\": \"pathmnist_compact_deep_v3\", \"parameters\": {\"depth\": 6, \"dropout\": 0.15, \"hidden\": 256, \"mlp_ratio\": 4, \"num_heads\": 4, \"patch_size\": 4, \"pooling\": \"cls\"}, \"path\": \"generated/pathmnist_compact_deep_v3/v001/manifest.json\", \"sha256\": \"1cacf9a6efbb5102fc7a356e842cde71c432e05da99ebbaa3dce9d52931074e7\", \"version\": 1}, \"candidate_id\": \"autonomous_t0004\", \"checkpoint_accuracy\": 0.991703, \"checkpoint_macro_f1\": 0.991803, \"curve_max_accuracy\": 0.992903, \"duration_seconds\": 2078.2644872999954, \"generic_architecture_fields\": \"framework defaults; inspect archived build_model for actual parameter use\", \"round_index\": 4}, {\"best_epoch\": 11, \"bundle\": {\"bundle_id\": \"pathmnist_compact_d8_v4\", \"parameters\": {\"depth\": 8, \"dropout\": 0.2, \"hidden\": 256, \"mlp_ratio\": 4, \"num_heads\": 4, \"patch_size\": 4, \"pooling\": \"cls\"}, \"path\": \"generated/pathmnist_compact_d8_v4/v001/manifest.json\", \"sha256\": \"d43fef611147e6168051c849c53ef140ef9983bca31267c2bf75c2c4cd0d26ab\", \"version\": 1}, \"candidate_id\": \"autonomous_t0005\", \"checkpoint_accuracy\": 0.989304, \"checkpoint_macro_f1\": 0.989393, \"curve_max_accuracy\": 0.990804, \"duration_seconds\": 1719.4724606050004, \"generic_architecture_fields\": \"framework defaults; inspect archived build_model for actual parameter use\", \"round_index\": 5}, {\"best_epoch\": 15, \"bundle\": {\"bundle_id\": \"pathmnist_resnet18_v1\", \"parameters\": {\"depth\": 2, \"dropout\": 0.3, \"hidden\": 64}, \"path\": \"generated/pathmnist_resnet18_v1/v001/manifest.json\", \"sha256\": \"fb89555bff5a4f24b975d07daeb363595164e19f7a94c6259fc804934bd71323\", \"version\": 1}, \"candidate_id\": \"autonomous_t0006\", \"checkpoint_accuracy\": 0.995402, \"checkpoint_macro_f1\": 0.995418, \"curve_max_accuracy\": 0.996801, \"duration_seconds\": 1704.6414200419968, \"generic_architecture_fields\": \"framework defaults; inspect archived build_model for actual parameter use\", \"round_index\": 6}, {\"best_epoch\": 17, \"bundle\": {\"bundle_id\": \"pathmnist_resnet18_tuned_v2\", \"parameters\": {\"depth\": 2, \"dropout\": 0.3, \"hidden\": 64}, \"path\": \"generated/pathmnist_resnet18_tuned_v2/v001/manifest.json\", \"sha256\": \"36e5a4307d7dd4f200ba64d665a6379fc8efea024e54ab2df926e742feccd738\", \"version\": 1}, \"candidate_id\": \"autonomous_t0007\", \"checkpoint_accuracy\": 0.995902, \"checkpoint_macro_f1\": 0.995778, \"curve_max_accuracy\": 0.996102, \"duration_seconds\": 1965.93626798701, \"generic_architecture_fields\": \"framework defaults; inspect archived build_model for actual parameter use\", \"round_index\": 7}, {\"best_epoch\": 12, \"bundle\": {\"bundle_id\": \"pathmnist_resnet18_v3\", \"parameters\": {\"depth\": 2, \"dropout\": 0.25, \"hidden\": 64}, \"path\": \"generated/pathmnist_resnet18_v3/v001/manifest.json\", \"sha256\": \"f6100ae3cb4bf5caa571976323ef57b3ce85409190a15a1f1ba697801956ff3c\", \"version\": 1}, \"candidate_id\": \"autonomous_t0008\", \"checkpoint_accuracy\": 0.993902, \"checkpoint_macro_f1\": 0.993888, \"curve_max_accuracy\": 0.994902, \"duration_seconds\": 1816.2008359320025, \"generic_architecture_fields\": \"framework defaults; inspect archived build_model for actual parameter use\", \"round_index\": 8}]}}, \"compacted_fields\": [{\"original_chars\": 681, \"path\": \"best_configuration.train_config.rationale\", \"shown_chars\": 397}, {\"original_chars\": 1304, \"path\": \"best_configuration.representation.rationale\", \"shown_chars\": 397}, {\"original_chars\": 815, \"path\": \"autonomous_action_0009.decision.rationale\", \"shown_chars\": 397}], \"omitted_artefacts\": [\"architecture_research\", \"selected_training_result\", \"train_config\", \"trial_0008\", \"generated_pathmnist_resnet18_v3\", \"autonomous_action_0008\", \"trial_0007\", \"generated_pathmnist_resnet18_tuned_v2\", \"autonomous_action_0007\", \"trial_0006\", \"generated_pathmnist_resnet18_v1\", \"autonomous_action_0006\", \"trial_0005\", \"generated_pathmnist_compact_d8_v4\", \"autonomous_action_0005\", \"trial_0004\", \"generated_pathmnist_compact_deep_v3\", \"autonomous_action_0004\", \"trial_0003\", \"generated_pathmnist_compact_wide_v2\", \"autonomous_action_0003\", \"trial_0002\", \"generated_pathmnist_multiscale_v1\", \"autonomous_action_0002\", \"trial_0001\", \"generated_pathmnist_compact_tf_v1\", \"autonomous_action_0001\", \"anomaly_architecture_research\", \"anomaly_data_audit\", \"data_audit_report\", \"anomaly_preprocessing\", \"split_manifest\", \"representation_plan\", \"anomaly_prior_art\", \"approved_extensions\", \"extension_gate_report\", \"prior_art_brief\", \"anomaly_profiling\", \"data_profile\", \"anomaly_ingestion\", \"dataset_manifest\", \"run_manifest\", \"worker_evidence\"], \"stage\": \"model_search\"}; revision_history={\"previous_review\": null, \"response\": null}"
+    },
+    "request_sha256": "22b05463f1743e523dd9a7dc6b1199b185a3523777ded8b2a400f2ce2f44de0a",
+    "source": "qwen3.8:latest",
+    "used_fallback": false
+  },
+  "sha256": "b581e0cbd657a06a23b42ad59fd0fd5abed859d0b2ae337ac5fb3eb7021d0012"
+}

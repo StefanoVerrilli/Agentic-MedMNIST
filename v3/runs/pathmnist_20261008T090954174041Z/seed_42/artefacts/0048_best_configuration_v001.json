@@ -1,0 +1,96 @@
+{
+  "artefact": "best_configuration",
+  "artefact_type": "BestConfiguration",
+  "created_at": "2026-10-08T12:34:04.474401+00:00",
+  "payload": {
+    "lightning_config_path": "best_config_v001.yaml",
+    "lightning_config_sha256": "2c9158c76e8f354525924f7bc74ef3e0c0b9594d1fd1d7ba0cbfa116fe45c011",
+    "representation": {
+      "augmentations": [
+        "hflip",
+        "vflip",
+        "rotate90",
+        "rotate180",
+        "brightness",
+        "contrast"
+      ],
+      "normalization": "standardize",
+      "rationale": "Standardization (zero-mean, unit-variance) is selected over unit-range scaling because the downstream architecture is a compact transformer operating on 16 patch tokens (7x7 non-overlapping patches on 28x28 RGB). Transformers are notably more sensitive to input magnitude than CNNs; centering each channel to zero mean and scaling to unit variance stabilizes attention logits and gradient flow, especially given the small per-channel stds (0.124, 0.177, 0.124) which would otherwise produce near-constant inputs after unit scaling. The channel means (0.741, 0.533, 0.706) confirm the data is already in [0,1], so standardization adds the critical centering step without distorting relative channel relationships in H&E staining. All six approved augmentations are applied train-only: hflip, vflip, rotate90, and rotate180 are orientation-safe for tissue-type labels (tissue morphology is rotation/flip invariant at the classification level), while brightness and contrast simulate inter-lab staining variability without altering structural content. This augmentation set maximizes effective training diversity on ~90k samples with mild class imbalance (1.63:1) without introducing geometric distortions that could confuse nuclear/cytoplasmic texture cues critical for distinguishing the 9 tissue classes."
+    },
+    "schema_version": "1.0",
+    "selected_candidate_id": "autonomous_t0007",
+    "selected_config_hash": "fd2b367361516106eb8ad8f4466f0389895b00c2db1470318edb4f07e0b946e4",
+    "selection_rule": "agent-selected durations; validation accuracy tolerance then macro-F1; test locked",
+    "test_metrics_used": false,
+    "train_config": {
+      "adam_beta1": 0.9,
+      "adam_beta2": 0.999,
+      "batch_size": 256,
+      "channel_cap": 256,
+      "class_weighting": true,
+      "cosine_eta_min": 0.0,
+      "depth": 2,
+      "device": "cuda",
+      "dropout": 0.0,
+      "early_stopping_min_delta": 0.001,
+      "early_stopping_monitor": "val_accuracy",
+      "early_stopping_patience": 12,
+      "epochs": 50,
+      "execution_mode": "agent_autonomous",
+      "generated_bundle": {
+        "bundle_id": "pathmnist_resnet18_tuned_v2",
+        "parameters": {
+          "depth": 2,
+          "dropout": 0.3,
+          "hidden": 64
+        },
+        "path": "generated/pathmnist_resnet18_tuned_v2/v001/manifest.json",
+        "sha256": "36e5a4307d7dd4f200ba64d665a6379fc8efea024e54ab2df926e742feccd738",
+        "version": 1
+      },
+      "gradient_clip_val": 1.0,
+      "hidden": 64,
+      "label_smoothing": 0.05,
+      "lr": 0.0002,
+      "mlp_ratio": 4,
+      "model_family": "run_generated",
+      "momentum": 0.9,
+      "nesterov": true,
+      "num_heads": 4,
+      "one_cycle_pct_start": 0.1,
+      "optimizer": "adamw",
+      "optimizer_eps": 1e-08,
+      "patch_size": 4,
+      "plateau_factor": 0.5,
+      "plateau_patience": 1,
+      "pooling": "cls",
+      "positional_encoding": "learned",
+      "rationale": "ResNet18 with reduced label smoothing (0.05) and extended cosine-scheduled training (50 epochs, patience 12) will exceed 0.9968 validation accuracy by allowing sharper decision boundaries and more complete convergence. The CNN's local receptive fields and hierarchical channel progression are better suited to 28x28 histopathology texture discrimination than self-attention, as confirmed by t0006's 0.4% margin over the best transformer. Reducing label smoothing from 0.1 to 0.05 removes the artificial uncertainty that limits peak accuracy on already-well-separated classes, while the longer schedule with lower peak LR (2e-4) enables finer weight adjustments in the final epochs.",
+      "scales": [
+        2,
+        4,
+        7
+      ],
+      "scheduler": "cosine",
+      "schema_version": "1.0",
+      "seed": 42,
+      "segment_targets": [
+        50
+      ],
+      "source": "qwen3.8:latest",
+      "tokenizer_layers": 2,
+      "weight_decay": 0.01,
+      "worker": {
+        "max_bundles": 32,
+        "timeout_seconds": 3600
+      }
+    },
+    "validation_accuracy": 0.995902,
+    "validation_macro_f1": 0.995778
+  },
+  "payload_sha256": "ebb4842070a829ea1e3d1aeb04065fb45bbaeb7e30fbb607489306bba793998b",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 48,
+  "version": 1
+}

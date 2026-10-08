@@ -1,0 +1,68 @@
+{
+  "artefact": "autonomous_action_0005",
+  "artefact_type": "AutonomousSearchEvent",
+  "created_at": "2026-10-08T10:29:39.905248+00:00",
+  "payload": {
+    "decision": {
+      "action": "new_trial",
+      "additional_epochs": null,
+      "candidate_id": null,
+      "experiment": {
+        "batch_size": 256,
+        "bundle_id": "pathmnist_compact_d8_v4",
+        "epochs": 40,
+        "files": [
+          {
+            "code": "\"\"\"Compact transformer depth-8 experiment for PathMNIST 28x28 histopathology.\"\"\"\nimport torch\nfrom lightning_components import build_network\nfrom worker_runtime import fit_model, batched_logits\n\n\ndef build_model(context):\n    parameters = context[\"parameters\"]\n    return build_network(\n        \"compact_transformer\",\n        in_channels=3,\n        n_classes=9,\n        hidden=parameters.get(\"hidden\", 256),\n        depth=parameters.get(\"depth\", 8),\n        dropout=parameters.get(\"dropout\", 0.2),\n        patch_size=parameters.get(\"patch_size\", 4),\n        num_heads=parameters.get(\"num_heads\", 4),\n        mlp_ratio=parameters.get(\"mlp_ratio\", 4),\n        pooling=parameters.get(\"pooling\", \"cls\"),\n    )\n\n\ndef train(context):\n    return fit_model(context, build_model(context))\n\n\ndef predict(context):\n    model = build_model(context)\n    model.load_state_dict(torch.load(context[\"checkpoint\"], map_location=\"cpu\", weights_only=True))\n    return batched_logits(model, context[\"data\"][\"images\"], context[\"config\"])",
+            "path": "experiment.py"
+          }
+        ],
+        "hypothesis": "Increasing compact_transformer depth from 6 to 8 (with hidden=256, patch_size=4, 49 tokens) will improve validation accuracy beyond 0.9917 by providing additional hierarchical abstraction layers. In histopathology, distinguishing confusable classes (smooth muscle vs stroma, normal mucosa vs adenocarcinoma, background vs debris) requires progressive feature refinement: low-level texture → mid-level nuclear/cellular morphology → high-level tissue architecture. Eight transformer blocks provide more sequential refinement than six, while the 49-token sequence (7x7 grid) remains short enough to avoid overfitting on ~90k samples. Slightly higher dropout (0.2 vs 0.15) compensates for the increased model capacity. The model was still improving at epoch 30 in t0004, so 40 epochs with patience 8 gives adequate convergence time.",
+        "parameters": {
+          "depth": 8,
+          "dropout": 0.2,
+          "hidden": 256,
+          "mlp_ratio": 4,
+          "num_heads": 4,
+          "patch_size": 4,
+          "pooling": "cls"
+        },
+        "training": {
+          "adam_beta1": 0.9,
+          "adam_beta2": 0.999,
+          "channel_cap": 256,
+          "class_weighting": true,
+          "cosine_eta_min": 0.0,
+          "early_stopping_min_delta": 0.002,
+          "early_stopping_monitor": "val_accuracy",
+          "early_stopping_patience": 8,
+          "gradient_clip_val": 1.0,
+          "label_smoothing": 0.05,
+          "lr": 0.0001,
+          "momentum": 0.9,
+          "nesterov": true,
+          "one_cycle_pct_start": 0.1,
+          "optimizer": "adamw",
+          "optimizer_eps": 1e-08,
+          "plateau_factor": 0.5,
+          "plateau_patience": 1,
+          "scales": [
+            2,
+            4,
+            7
+          ],
+          "scheduler": "cosine",
+          "weight_decay": 0.0001
+        }
+      },
+      "rationale": "The clear progression across trials shows that increasing compact_transformer capacity consistently improves validation accuracy: hidden=128/depth=4 → 0.9886, hidden=256/depth=4 → 0.9905, hidden=256/depth=6 → 0.9917. Critically, t0004 (depth=6) was still improving at epoch 30 (val_acc 0.9925 at epoch 27, train_loss still decreasing at 0.2806), indicating it had not fully converged. The next natural step is depth=8 with hidden=256, which adds two more hierarchical refinement layers for the multi-scale tissue features (nuclear morphology → cell structure → tissue architecture) that distinguish confusable histopathology classes. I increase dropout from 0.15 to 0.2 to regularize the additional depth, and extend the epoch budget to 40 to allow the deeper model to converge. All other hyperparameters (lr=1e-4, cosine scheduler, label_smoothing=0.05, class_weighting, batch=256, weight_decay=1e-4) are held constant from t0004 to isolate the depth effect. The multi_scale_transformer (t0002, 0.9871) underperformed, confirming that the compact conv-tokenizer architecture is the right inductive bias for 28x28 histopathology."
+    },
+    "schema_version": "1.0",
+    "source": "qwen3.8:latest"
+  },
+  "payload_sha256": "d24a436cf56eeaa8f3b518815d08429929797157fa07f101d787a8781a53a01e",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 35,
+  "version": 1
+}

@@ -1,0 +1,64 @@
+{
+  "artefact": "autonomous_action_0007",
+  "artefact_type": "AutonomousSearchEvent",
+  "created_at": "2026-10-08T11:28:37.524416+00:00",
+  "payload": {
+    "decision": {
+      "action": "new_trial",
+      "additional_epochs": null,
+      "candidate_id": null,
+      "experiment": {
+        "batch_size": 256,
+        "bundle_id": "pathmnist_resnet18_tuned_v2",
+        "epochs": 50,
+        "files": [
+          {
+            "code": "\"\"\"ResNet18 tuned for PathMNIST 28x28 histopathology classification.\"\"\"\nimport torch\nfrom lightning_components import build_network\nfrom worker_runtime import fit_model, batched_logits\n\n\ndef build_model(context):\n    parameters = context[\"parameters\"]\n    return build_network(\n        \"resnet18\",\n        in_channels=3,\n        n_classes=9,\n        hidden=parameters.get(\"hidden\", 64),\n        depth=parameters.get(\"depth\", 2),\n        dropout=parameters.get(\"dropout\", 0.3),\n    )\n\n\ndef train(context):\n    return fit_model(context, build_model(context))\n\n\ndef predict(context):\n    model = build_model(context)\n    model.load_state_dict(torch.load(context[\"checkpoint\"], map_location=\"cpu\", weights_only=True))\n    return batched_logits(model, context[\"data\"][\"images\"], context[\"config\"])",
+            "path": "experiment.py"
+          }
+        ],
+        "hypothesis": "ResNet18 with reduced label smoothing (0.05) and extended cosine-scheduled training (50 epochs, patience 12) will exceed 0.9968 validation accuracy by allowing sharper decision boundaries and more complete convergence. The CNN's local receptive fields and hierarchical channel progression are better suited to 28x28 histopathology texture discrimination than self-attention, as confirmed by t0006's 0.4% margin over the best transformer. Reducing label smoothing from 0.1 to 0.05 removes the artificial uncertainty that limits peak accuracy on already-well-separated classes, while the longer schedule with lower peak LR (2e-4) enables finer weight adjustments in the final epochs.",
+        "parameters": {
+          "depth": 2,
+          "dropout": 0.3,
+          "hidden": 64
+        },
+        "training": {
+          "adam_beta1": 0.9,
+          "adam_beta2": 0.999,
+          "channel_cap": 256,
+          "class_weighting": true,
+          "cosine_eta_min": 0.0,
+          "early_stopping_min_delta": 0.001,
+          "early_stopping_monitor": "val_accuracy",
+          "early_stopping_patience": 12,
+          "gradient_clip_val": 1.0,
+          "label_smoothing": 0.05,
+          "lr": 0.0002,
+          "momentum": 0.9,
+          "nesterov": true,
+          "one_cycle_pct_start": 0.1,
+          "optimizer": "adamw",
+          "optimizer_eps": 1e-08,
+          "plateau_factor": 0.5,
+          "plateau_patience": 1,
+          "scales": [
+            2,
+            4,
+            7
+          ],
+          "scheduler": "cosine",
+          "weight_decay": 0.01
+        }
+      },
+      "rationale": "ResNet18 (t0006) is the clear winner at 0.9968 val accuracy (epoch 24), significantly outperforming all transformer variants (best: 0.9917 for compact_transformer depth=6). The model was still improving at epoch 25 when early stopping triggered. Two key adjustments should push accuracy higher: (1) reducing label smoothing from 0.1 to 0.05 to allow sharper decision boundaries for the ~1% remaining errors in confusable classes (smooth muscle/stroma, background/debris/mucus), and (2) extending the training horizon to 50 epochs with patience 12 and tighter min_delta (0.001) to give the cosine schedule more room for fine-grained convergence. Lowering LR from 3e-4 to 2e-4 provides a more gradual decay over the longer schedule, reducing the risk of overshooting the optimum in the final epochs. The ResNet18's CIFAR-style stem preserves 28x28 spatial resolution, and its hierarchical 64-128-256-512 channel progression captures both nuclear morphology and tissue architecture through local receptive fields, which is the right inductive bias for this task."
+    },
+    "schema_version": "1.0",
+    "source": "qwen3.8:latest"
+  },
+  "payload_sha256": "eb47adc9cdbf4bd3bc52b438252f2073bd4498711acbd1dba4f7833c2683b1d4",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 41,
+  "version": 1
+}

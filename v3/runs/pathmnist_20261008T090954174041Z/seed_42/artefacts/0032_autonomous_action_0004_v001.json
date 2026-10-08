@@ -1,0 +1,68 @@
+{
+  "artefact": "autonomous_action_0004",
+  "artefact_type": "AutonomousSearchEvent",
+  "created_at": "2026-10-08T09:54:17.079987+00:00",
+  "payload": {
+    "decision": {
+      "action": "new_trial",
+      "additional_epochs": null,
+      "candidate_id": null,
+      "experiment": {
+        "batch_size": 256,
+        "bundle_id": "pathmnist_compact_deep_v3",
+        "epochs": 30,
+        "files": [
+          {
+            "code": "\"\"\"PathMNIST 28x28 RGB histopathology - compact transformer depth 6, hidden 256.\"\"\"\nimport torch\nfrom lightning_components import build_network\nfrom worker_runtime import fit_model, batched_logits\n\n\ndef build_model(context):\n    parameters = context[\"parameters\"]\n    return build_network(\n        \"compact_transformer\",\n        in_channels=3,\n        n_classes=9,\n        hidden=parameters.get(\"hidden\", 256),\n        depth=parameters.get(\"depth\", 6),\n        dropout=parameters.get(\"dropout\", 0.15),\n        patch_size=parameters.get(\"patch_size\", 4),\n        num_heads=parameters.get(\"num_heads\", 4),\n        mlp_ratio=parameters.get(\"mlp_ratio\", 4),\n        pooling=parameters.get(\"pooling\", \"cls\"),\n    )\n\n\ndef train(context):\n    return fit_model(context, build_model(context))\n\n\ndef predict(context):\n    model = build_model(context)\n    model.load_state_dict(torch.load(context[\"checkpoint\"], map_location=\"cpu\", weights_only=True))\n    return batched_logits(model, context[\"data\"][\"images\"], context[\"config\"])",
+            "path": "experiment.py"
+          }
+        ],
+        "hypothesis": "Increasing compact_transformer depth from 4 to 6 (with hidden=256, patch_size=4, 49 tokens) will improve validation accuracy beyond 0.9905 by providing additional hierarchical feature extraction layers. In histopathology, distinguishing confusable classes (smooth muscle vs stroma, normal mucosa vs adenocarcinoma, background vs debris) requires multi-level abstraction: low-level texture → mid-level cell morphology → high-level tissue architecture. Six transformer blocks provide more sequential refinement of these features than four, while the 49-token sequence remains short enough to avoid overfitting on ~90k samples. Slightly higher dropout (0.15) and lower LR (1e-4) compensate for the increased model capacity.",
+        "parameters": {
+          "depth": 6,
+          "dropout": 0.15,
+          "hidden": 256,
+          "mlp_ratio": 4,
+          "num_heads": 4,
+          "patch_size": 4,
+          "pooling": "cls"
+        },
+        "training": {
+          "adam_beta1": 0.9,
+          "adam_beta2": 0.999,
+          "channel_cap": 256,
+          "class_weighting": true,
+          "cosine_eta_min": 0.0,
+          "early_stopping_min_delta": 0.002,
+          "early_stopping_monitor": "val_accuracy",
+          "early_stopping_patience": 8,
+          "gradient_clip_val": 1.0,
+          "label_smoothing": 0.05,
+          "lr": 0.0001,
+          "momentum": 0.9,
+          "nesterov": true,
+          "one_cycle_pct_start": 0.1,
+          "optimizer": "adamw",
+          "optimizer_eps": 1e-08,
+          "plateau_factor": 0.5,
+          "plateau_patience": 1,
+          "scales": [
+            2,
+            4,
+            7
+          ],
+          "scheduler": "cosine",
+          "weight_decay": 0.0001
+        }
+      },
+      "rationale": "The best result so far is autonomous_t0003 (compact_transformer, hidden=256, depth=4) at 0.990504 val accuracy. The multi_scale_transformer (t0002) underperformed at 0.987105 and was 2x slower. The width increase from 128→256 gave a clear +0.002 gain, confirming capacity matters. The next natural step is increasing depth from 4→6 to add more hierarchical processing layers for the multi-scale tissue features (nuclear morphology → cell structure → tissue architecture) that distinguish confusable histopathology classes. I'm also slightly increasing dropout (0.1→0.15) to regularize the deeper network, lowering LR (1.5e-4→1e-4) for stability with more layers, and increasing early-stopping patience (5→8) to give the deeper model more time to converge. The 49-token patch_size=4 tokenization is retained as it proved effective. This is a focused single-variable change (depth) on our best architecture, minimizing confounds."
+    },
+    "schema_version": "1.0",
+    "source": "qwen3.8:latest"
+  },
+  "payload_sha256": "481dc9bc3e40f368100f7188939b974a65eb2da5e0856e5e8b00a473e26fb01c",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 32,
+  "version": 1
+}

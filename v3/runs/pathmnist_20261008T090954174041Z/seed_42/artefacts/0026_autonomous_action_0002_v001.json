@@ -1,0 +1,72 @@
+{
+  "artefact": "autonomous_action_0002",
+  "artefact_type": "AutonomousSearchEvent",
+  "created_at": "2026-10-08T09:23:05.825857+00:00",
+  "payload": {
+    "decision": {
+      "action": "new_trial",
+      "additional_epochs": null,
+      "candidate_id": null,
+      "experiment": {
+        "batch_size": 256,
+        "bundle_id": "pathmnist_multiscale_v1",
+        "epochs": 30,
+        "files": [
+          {
+            "code": "\"\"\"Multi-scale transformer experiment for PathMNIST 28x28 histopathology classification.\"\"\"\nimport torch\nfrom lightning_components import build_network\nfrom worker_runtime import fit_model, batched_logits\n\n\ndef build_model(context):\n    parameters = context[\"parameters\"]\n    return build_network(\n        \"multi_scale_transformer\",\n        in_channels=3,\n        n_classes=9,\n        hidden=parameters.get(\"hidden\", 128),\n        depth=parameters.get(\"depth\", 2),\n        dropout=parameters.get(\"dropout\", 0.1),\n        scales=tuple(parameters.get(\"scales\", [2, 4, 7])),\n        num_heads=parameters.get(\"num_heads\", 4),\n        mlp_ratio=parameters.get(\"mlp_ratio\", 4),\n        pooling=parameters.get(\"pooling\", \"mean\"),\n    )\n\n\ndef train(context):\n    return fit_model(context, build_model(context))\n\n\ndef predict(context):\n    model = build_model(context)\n    model.load_state_dict(torch.load(context[\"checkpoint\"], map_location=\"cpu\", weights_only=True))\n    return batched_logits(model, context[\"data\"][\"images\"], context[\"config\"])",
+            "path": "experiment.py"
+          }
+        ],
+        "hypothesis": "The multi_scale_transformer's joint attention over three spatial granularities (scales 2, 4, 7) will outperform the single-scale compact transformer on PathMNIST 28x28 histopathology by simultaneously capturing nuclear-level detail (scale 2, 196 tokens), cell-level structure (scale 4, 49 tokens), and tissue architecture (scale 7, 16 tokens). This multi-granularity view should better resolve the visually confusable class pairs (background/debris/mucus, smooth muscle/stroma, normal mucosa/adenocarcinoma) that account for the remaining ~1% errors, because these distinctions manifest at different spatial scales. Mean pooling over all scales provides a holistic tissue context that cls-token pooling may miss.",
+        "parameters": {
+          "depth": 2,
+          "dropout": 0.1,
+          "hidden": 128,
+          "mlp_ratio": 4,
+          "num_heads": 4,
+          "pooling": "mean",
+          "scales": [
+            2,
+            4,
+            7
+          ]
+        },
+        "training": {
+          "adam_beta1": 0.9,
+          "adam_beta2": 0.999,
+          "channel_cap": 256,
+          "class_weighting": true,
+          "cosine_eta_min": 0.0,
+          "early_stopping_min_delta": 0.003,
+          "early_stopping_monitor": "val_accuracy",
+          "early_stopping_patience": 6,
+          "gradient_clip_val": 1.0,
+          "label_smoothing": 0.05,
+          "lr": 0.0002,
+          "momentum": 0.9,
+          "nesterov": true,
+          "one_cycle_pct_start": 0.1,
+          "optimizer": "adamw",
+          "optimizer_eps": 1e-08,
+          "plateau_factor": 0.5,
+          "plateau_patience": 1,
+          "scales": [
+            2,
+            4,
+            7
+          ],
+          "scheduler": "cosine",
+          "weight_decay": 0.0001
+        }
+      },
+      "rationale": "The compact transformer (autonomous_t0001) achieved 98.92% val accuracy with early stopping at epoch 16. The remaining ~1% errors are concentrated in visually confusable classes (background/debris/mucus, smooth muscle/stroma, normal mucosa/adenocarcinoma). The multi_scale_transformer directly addresses this by fusing three spatial granularities (2x2, 4x4, 7x7 patches → 196, 49, 16 tokens) with joint attention, providing both fine nuclear morphology and coarse tissue architecture in a single forward pass. This multi-granularity inductive bias is fundamentally different from the single-scale compact transformer and may better resolve the ambiguous class boundaries. Using hidden=128 (divisible by 4), depth=2, num_heads=4, mean pooling for global context. Reducing label smoothing from 0.1 to 0.05 to be less aggressive on the 9-class problem where some classes are genuinely ambiguous. Slightly lower early-stopping min_delta (0.003 vs 0.005) to capture small but real improvements. 30 epochs with cosine decay gives sufficient training time while the patience of 6 prevents overfitting."
+    },
+    "schema_version": "1.0",
+    "source": "qwen3.8:latest"
+  },
+  "payload_sha256": "f30a63c008f7e4580b43f40e08ff6a133a278b4eeee5b00b94a77a32108b57e4",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 26,
+  "version": 1
+}

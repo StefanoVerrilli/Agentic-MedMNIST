@@ -1,0 +1,34 @@
+{
+  "artefact": "anomaly_training",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-08T12:35:16.629079+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "Training stage completed successfully for autonomous_t0007 (ResNet18 tuned, bundle pathmnist_resnet18_tuned_v2). Best validation accuracy 0.995902 at epoch 17, early stopping triggered at epoch 29 (patience 12, 17+12=29 ✓). The model selection is well-grounded: ResNet18 outperformed transformer variants by 0.3–0.9 pp, dropout=0.3 was validated over 0.25, and the cosine schedule with label_smoothing=0.05 produced a stable convergence curve. Augmentations are all built-in primitives requiring no extension approval. Generic transformer fields (num_heads, patch_size, positional_encoding, pooling, mlp_ratio, scales, tokenizer_layers) are inactive for this CNN family per protocol. The top-level dropout=0.0 is a generic default overridden by the authoritative bundle parameter dropout=0.3, consistent with the model_search observation that t0007 used dropout=0.3.\n\nOne inconsistency warrants attention: final_val_accuracy (0.996102) exceeds best_val_accuracy (0.995902) at epoch 17, yet best_epoch is recorded as 17 and the stop reason is early_stopping. If epoch 29 truly achieved 0.996102, it should have superseded epoch 17 as the best checkpoint. This may reflect a reporting nuance (e.g., final_val_accuracy computed on a slightly different evaluation pass) or a minor best-tracking edge case. It does not invalidate the saved checkpoint or the training outcome, but it should be verified in the next stage.\n\nThe representation rationale text references a 'compact transformer operating on 16 patch tokens' while the selected architecture is ResNet18. This is a documentation mismatch in the rationale string; the normalization choice (standardize) remains valid for the CNN and does not affect training correctness.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "final_val_accuracy (0.996102) exceeds best_val_accuracy (0.995902) at best_epoch 17, yet early_stopping is the stop reason and best_epoch remains 17; if epoch 29 truly scored higher, the best-checkpoint tracking appears inconsistent",
+      "best_configuration.representation.rationale describes the downstream architecture as a 'compact transformer operating on 16 patch tokens' but the selected model is ResNet18 (bundle pathmnist_resnet18_tuned_v2); the rationale text is mismatched to the actual architecture"
+    ],
+    "observations": [
+      "Early stopping arithmetic is internally consistent: best_epoch 17 + patience 12 = epoch 29 = epochs_completed, confirming the patience counter was applied correctly",
+      "The training curve (epochs 1–20 visible) shows healthy convergence: val_accuracy rises from 0.966 to 0.996 by epoch 17, with minor oscillation (±0.002) in subsequent epochs, typical of a well-tuned cosine schedule",
+      "Bundle parameters (depth=2, dropout=0.3, hidden=64) are the authoritative architecture values per the run_generated protocol; the top-level dropout=0.0 is a generic default that does not override the bundle",
+      "All six augmentations (hflip, vflip, rotate90, rotate180, brightness, contrast) are built-in primitives and require no extension gate approval",
+      "The model_search stage review (anomaly_model_search) correctly identified the stopping rationale as a system constraint (empty resumable_candidate_ids, no new experiments permitted) rather than a performance ceiling",
+      "Selection used validation metrics only (test_metrics_used: false), respecting the test-lock protocol",
+      "The compacted_fields entries (history 29→20 items, rationale truncation) are preview truncations for this review and do not indicate incomplete persisted artefacts"
+    ],
+    "requests": [],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8:latest",
+    "stage": "training"
+  },
+  "payload_sha256": "516524e43f69133929f5dedfdfba79093436edd6c43f21f7dc750dea58ed2655",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 55,
+  "version": 1
+}

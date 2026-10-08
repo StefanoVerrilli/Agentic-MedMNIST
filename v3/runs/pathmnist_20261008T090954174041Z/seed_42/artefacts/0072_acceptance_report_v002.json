@@ -1,0 +1,230 @@
+{
+  "artefact": "acceptance_report",
+  "artefact_type": "AcceptanceReport",
+  "created_at": "2026-10-08T12:40:57.704214+00:00",
+  "payload": {
+    "acceptance_ready": false,
+    "criteria": [
+      {
+        "detail": "Every persisted payload and referenced file is checksummed.",
+        "evidence": [
+          "artefacts/",
+          "blobs/"
+        ],
+        "requirement": "WP1_TYPED_VERSIONED_HANDOFFS",
+        "status": "passed"
+      },
+      {
+        "detail": "AST check of direct agent-class calls.",
+        "evidence": [
+          "agents.py"
+        ],
+        "requirement": "WP1_ZERO_DIRECT_AGENT_CALLS",
+        "status": "passed"
+      },
+      {
+        "detail": "Actual train/validation evidence audited before any training.",
+        "evidence": [
+          "data_audit_report",
+          "decision_log.jsonl"
+        ],
+        "requirement": "WP2_PRETRAINING_LEAKAGE_AUDIT",
+        "status": "passed"
+      },
+      {
+        "detail": "Exact supporting quotes resolve to checksummed snapshots; recommendations remain hypotheses.",
+        "evidence": [
+          "prior_art_brief",
+          "blobs/literature/"
+        ],
+        "requirement": "WP2_CITED_IDEAS",
+        "status": "passed"
+      },
+      {
+        "detail": "Curated excerpts alone do not demonstrate web retrieval.",
+        "evidence": [
+          "prior_art_brief"
+        ],
+        "requirement": "WP2_WEB_RETRIEVAL",
+        "status": "failed"
+      },
+      {
+        "detail": "Test metrics are excluded from search and configuration selection.",
+        "evidence": [
+          "best_configuration",
+          "search_report"
+        ],
+        "requirement": "WP3_VALIDATION_ONLY_SELECTION",
+        "status": "passed"
+      },
+      {
+        "detail": "Baseline/comparison intentionally not executed for this run; this criterion is not satisfied.",
+        "evidence": [
+          "comparison_report",
+          "baseline_report"
+        ],
+        "requirement": "WP4_BASELINE_COMPARISON",
+        "status": "failed"
+      },
+      {
+        "detail": "Three bounded representation scenarios.",
+        "evidence": [
+          "ablation_report"
+        ],
+        "requirement": "WP4_REPRESENTATION_ABLATIONS",
+        "status": "failed"
+      },
+      {
+        "detail": "At least three completed seeds, with a shared validation-selected configuration.",
+        "evidence": [
+          "../experiment_summary.json"
+        ],
+        "requirement": "WP4_FROZEN_CONFIGURATION_SEED_VARIANCE",
+        "status": "failed"
+      },
+      {
+        "detail": "Validation-calibrated abstention with a persistent benchmark review queue.",
+        "evidence": [
+          "abstention_report",
+          "human_review_queue"
+        ],
+        "requirement": "WP5_ABSTENTION_AND_HANDOFF",
+        "status": "passed"
+      },
+      {
+        "detail": "Every promoted stage has an independent reviewer report.",
+        "evidence": [
+          "anomaly_*",
+          "decision_log.jsonl"
+        ],
+        "requirement": "WP6_STAGE_REVIEWS",
+        "status": "passed"
+      },
+      {
+        "detail": "Decision source and stage are recorded; exact prompts/schema/results are retained.",
+        "evidence": [
+          "decision_log.jsonl",
+          "blobs/reasoning/"
+        ],
+        "requirement": "WP6_DECISION_PROVENANCE",
+        "status": "passed"
+      },
+      {
+        "detail": "Requires passing tests and measured fault injection for this exact source tree.",
+        "evidence": [],
+        "requirement": "WP6_FAULT_DETECTION_GE_90_PERCENT",
+        "status": "pending"
+      },
+      {
+        "detail": "A transcript alone is not proof that retraining reproduces predictions and metrics.",
+        "evidence": [],
+        "requirement": "WP5_FULL_RUN_REPLAY",
+        "status": "pending"
+      },
+      {
+        "detail": "completed_with_warning",
+        "evidence": [
+          "dossier.json"
+        ],
+        "requirement": "WP5_END_TO_END",
+        "status": "passed"
+      },
+      {
+        "detail": "Every unresolved reviewer issue requires an explicit approved mitigation.",
+        "evidence": [
+          "anomaly_*"
+        ],
+        "requirement": "WP6_APPROVED_RISK_MITIGATIONS",
+        "status": "failed"
+      },
+      {
+        "detail": "Requires named independent demonstrator/reviewer, bound predictions and checksummed environment evidence.",
+        "evidence": [],
+        "requirement": "TRL7_INDEPENDENT_DEMONSTRATION_AND_SIGNOFF",
+        "status": "pending"
+      }
+    ],
+    "independent_signoff": null,
+    "kpis": {
+      "cited_idea_fraction": 1.0,
+      "decision_provenance_fraction": 1.0,
+      "decisions_logged": 28,
+      "fault_detection_rate": null,
+      "live_source_fraction": 0.0,
+      "reasoning_snapshots": 27,
+      "unresolved_citation_issues": 0,
+      "unresolved_reviewer_issues": [
+        "All aggregate metrics are arithmetically consistent with the confusion matrix: accuracy 6590/7180=0.917827, balanced_accuracy (mean recall) 8.042994/9=0.893666, macro_f1 8.010416/9=0.890046, macro_precision 8.122758/9=0.902529.",
+        "All results use a single seed (42); cross-seed variance is not characterized.",
+        "All six augmentations (hflip, vflip, rotate90, rotate180, brightness, contrast) are built-in primitives and require no extension gate approval",
+        "All six augmentations (hflip, vflip, rotate90, rotate180, brightness, contrast) are built-in primitives requiring no extension approval.",
+        "All six augmentations in the representation plan (hflip, vflip, rotate90, rotate180, brightness, contrast) are built-in primitives requiring no extension approval.",
+        "All three literature sources are curated excerpts, not live retrievals or retrieved abstracts. The evidence quotes establish traceability to the cited papers but do not independently verify the specific design inferences (e.g., 7×7 patch granularity, conv-stem overfitting avoidance) drawn from them.",
+        "All three prior-art literature sources are curated excerpts (unverified external evidence); specific design inferences (conv-stem overfitting avoidance, patch granularity) are not independently verified by the cited quotes.",
+        "Ambiguity risks for visually similar histology classes at 28×28 resolution are well-documented and consistent with the literature.",
+        "Archive integrity verified via MD5 a8b06965200029087d5bd730944a56c1; split sizes (89996/10004/7180) match official PathMNIST sizes; subsampled=false.",
+        "Augmentation factor 7 (1 original + 6 augmentations) is consistent with augmented_train_size 629,972 = 89996 × 7.",
+        "Bundle parameters (depth=2, dropout=0.3, hidden=64) are the authoritative architecture values per the run_generated protocol; the top-level dropout=0.0 is a generic default that does not override the bundle",
+        "Class 7 (cancer-associated stroma) is the weakest class: recall 0.520, F1 0.667, with substantial confusion into smooth muscle (70), debris (55), and adenocarcinoma (59). This is a domain-relevant performance gap.",
+        "Class distribution well-balanced: imbalance ratio 1.63, train/val class proportions nearly identical (max Δ < 0.0001), 0 duplicates, 0 blank images.",
+        "Classes 1 (background) and 3 (lymphocytes) achieve perfect recall (1.0), while classes 0, 4, 6, and 8 all exceed 0.92 recall, indicating the model is broadly competent with specific difficulty on morphologically similar stromal/muscular tissue.",
+        "Compacted fields (4) and omitted artefacts (3) are preview truncations, not incomplete persisted artefacts.",
+        "Compacted fields (4) and omitted artefacts (prior_art_brief, anomaly_profiling, anomaly_ingestion, run_manifest) are preview truncations for this review, not incomplete persisted artefacts.",
+        "Compacted fields (5) and omitted artefacts (prior_art_brief, run_manifest, worker_evidence) are preview truncations for this review, not incomplete persisted artefacts.",
+        "Data integrity fully verified: archive MD5 a8b06965200029087d5bd730944a56c1 and SHA256 match verified hashes; split sizes identical to official PathMNIST; subsampled=false.",
+        "Data integrity fully verified: archive MD5 a8b06965200029087d5bd730944a56c1 and SHA256 match verified hashes; split sizes identical to official; subsampled=false.",
+        "Data profile is clean: 100 000 samples profiled, 0 duplicates, 0 blank images, imbalance ratio 1.63, train/val class proportions nearly identical (max Δ < 0.0001).",
+        "Early stopping arithmetic is internally consistent: best_epoch 17 + patience 12 = epoch 29 = epochs_completed, confirming the patience counter was applied correctly",
+        "Early-stopping arithmetic is correct: best_epoch 17 + patience 12 = epoch 29 = epochs_completed.",
+        "Extension gate contains a redundant pending_review entry for tissue_geometric_aug (hflip, vflip), which are built-in augmentations that do not require extension approval per pipeline policy.",
+        "Extension gate contains redundant pending_review entry for tissue_geometric_aug (hflip, vflip), which are built-in augmentations that do not require extension approval per pipeline policy; could cause unnecessary blocking.",
+        "Minor descriptive inaccuracy in §1 table: depth=2 is labeled 'Residual block depth multiplier,' but per the fixed ResNet18 topology, depth is ignored (only hidden controls base width). The parameter is correctly identified as being passed to build_network and the overall architecture identification is accurate; this is a table-cell wording issue with no effect on computed results.",
+        "Normalization uses standardize with train-only statistics (mean [0.7405, 0.5330, 0.7058], std [0.1237, 0.1768, 0.1244]); stats_source=train prevents test leakage.",
+        "OOD evaluation is scoped as a controlled corruption proxy (additive Gaussian noise, σ∈{0.15,0.25,0.40}). It validates pixel-level noise detection but does not capture staining variability, scanner differences, or tissue-preparation artifacts.",
+        "Prediction artifact is complete: 7180 test samples, 10004 validation samples, includes logits/probabilities/targets, SHA-256 provided for integrity verification.",
+        "Prior-art evidence is based on curated excerpts (unverified external evidence) rather than live retrievals or retrieved abstracts; specific design inferences (conv-stem overfitting avoidance, patch granularity) are not independently verified by the cited quotes.",
+        "Prior-art evidence quotes establish traceability but do not independently verify the specific scientific inferences drawn from them.",
+        "ResNet18 trials (t0006–t0008) consistently outperformed transformer-based trials (t0001–t0005) by 0.3–0.9 percentage points in validation accuracy, supporting the selection of the ResNet18 family for this 28×28 histopathology task.",
+        "Search evaluated 8 trials (5 transformer, 3 ResNet18) via run_generated. Stopping is a process constraint (no resumable candidates), not a performance-ceiling inference from two similar trials.",
+        "Selection used validation metrics only (test_metrics_used: false), respecting the test-lock protocol",
+        "Selective-prediction coverage gap: validation achieves 80.0% coverage at target, test achieves 69.3% (abstain rate 30.7%, 2,206 samples to human review). This is a calibration-transfer effect between validation and test entropy distributions.",
+        "Test-domain note from profiling: CRC-VAL-HE-7K test images originate from a different clinical center, relevant for OOD AUROC interpretation in later stages.",
+        "Test-domain note: CRC-VAL-HE-7K test images originate from a different clinical center—relevant for OOD AUROC interpretation in later stages.",
+        "The 7.8-point validation-to-test gap (99.59%→91.78%) is documented with the separate-center provenance (official_test_separate_center: true) without asserting a specific causal mechanism. This is the most ecologically valid distribution-shift signal in the report.",
+        "The class_balance_aware_training idea cites the MedMNIST 28×28 pre-processing quote as evidence, but the quote does not support the class-weighted-loss hypothesis; the class-count range (7886–12885) is drawn from the local data profile, not the source. The evidentiary link is weak and the idea should be treated as a local design heuristic rather than a literature-supported hypothesis.",
+        "The compact_conv_stem_transformer architecture spec is internally consistent: conv 3×3 stride 4 pad 1 on 28×28 yields 7×7×64 (49 tokens × dim 64); 4 heads × head_dim 16 = model_dim 64; FFN hidden 128; GAP → 64-dim; linear 64→9.",
+        "The compacted_fields entries (history 29→20 items, comment truncations) are review-preview truncations, not incomplete persisted artefacts.",
+        "The compacted_fields entries (history 29→20 items, rationale truncation) are preview truncations for this review and do not indicate incomplete persisted artefacts",
+        "The curve_max_accuracy for t0006 (0.996801) exceeds the selected t0007 checkpoint (0.995902), but selection is based on the monitored best-epoch checkpoint metric, not the curve maximum, which is the correct protocol.",
+        "The model_search stage review (anomaly_model_search) correctly identified the stopping rationale as a system constraint (empty resumable_candidate_ids, no new experiments permitted) rather than a performance ceiling",
+        "The search explored 3 of 7 built-in architecture families (compact_transformer, multi_scale_transformer, resnet18). The agent_autonomous policy permits selective exploration, and the stopping was driven by a system constraint (no eligible candidates, no new experiments permitted) rather than family exhaustion.",
+        "The training curve (epochs 1–20 visible) shows healthy convergence: val_accuracy rises from 0.966 to 0.996 by epoch 17, with minor oscillation (±0.002) in subsequent epochs, typical of a well-tuned cosine schedule",
+        "The training-stage 'revise' flag (final_val_accuracy 0.996102 vs best_val_accuracy 0.995902, Δ=0.0002; rationale text mismatch) are minor documentation inconsistencies that do not affect checkpoint validity or evaluation correctness.",
+        "The two weakest test classes (cancer-associated stroma F1=0.667, smooth muscle F1=0.768) are histologically similar spindle-cell/fibrous tissues and are also among the smallest classes (421 and 592 samples).",
+        "Val-to-test accuracy gap of ~7.8 pp (0.995902 → 0.917827) is the most notable performance signal; it may reflect split-level distribution differences or mild overfitting to validation patterns in a 9-class histopathology task.",
+        "Worker isolation not enforced (local_subprocess); image_digest null. Operational notes only, not blocking.",
+        "Worker isolation not enforced (local_subprocess); image_digest null; LLM model qwen3.8:latest (ollama) digest recorded. Operational notes only.",
+        "best_configuration.representation.rationale describes the downstream architecture as a 'compact transformer operating on 16 patch tokens' but the selected model is ResNet18 (bundle pathmnist_resnet18_tuned_v2); the rationale text is mismatched to the actual architecture",
+        "class_balance_aware_training idea cites a MedMNIST pre-processing quote as evidence for class-weighted-loss, but the quote does not support that hypothesis; the class-count range is from local data profile, not the source.",
+        "compact_conv_stem_transformer is a legitimate new proposal (not among the seven built-in families) and is correctly pending independent review in the extension gate.",
+        "data_audit_report: all 11 checks passed, train_validation_overlap=0, test_inspected=false (appropriate for audit stage).",
+        "deterministic_torch=true, seed=42, code SHA256 anchored via canonical-text-v2; LLM model qwen3.8:latest (ollama) digest recorded for traceability.",
+        "families_evaluated is reported as [\"run_generated\"] reflecting the model_family classification; the underlying architectures span multiple built-in families as evidenced by the bundle IDs and parameters.",
+        "final_val_accuracy (0.996102) exceeds best_val_accuracy (0.995902) at best_epoch 17, yet early_stopping is the stop reason and best_epoch remains 17; if epoch 29 truly scored higher, the best-checkpoint tracking appears inconsistent",
+        "representation_plan.rationale contains a factual arithmetic error: states '16 patch tokens' for 7×7 non-overlapping patches on 28×28, but 7×7 = 49 tokens (confirmed by prior-art architecture spec).",
+        "representation_plan.rationale contains arithmetic error: states '16 patch tokens' for 7×7 non-overlapping patches on 28×28, but 7×7=49 tokens (confirmed by prior_art architecture spec: conv 3×3 stride 4 pad 1 → 7×7×64, 49 tokens × dim 64).",
+        "t0008 (resnet18_v3, dropout=0.25) underperformed both t0006 and t0007 (both dropout=0.3), indicating the dropout=0.3 setting was well-chosen and the search correctly identified the superior configuration.",
+        "tissue_geometric_aug proposal (hflip, vflip) is listed in the extension gate as pending_review, but these are built-in augmentations that do not require extension approval per pipeline policy; the gate entry is redundant and could cause unnecessary blocking if a reviewer is not assigned.",
+        "warning:curated excerpts are not live retrieval evidence"
+      ]
+    },
+    "schema_version": "1.0",
+    "technical_complete": false,
+    "trl7_evidence_complete": false
+  },
+  "payload_sha256": "0eed440f8c7b64d3b35f2a2f9b50dafb165f4a4d75785cc51678ab9069964f03",
+  "producer": "acceptance",
+  "run_id": "seed_42",
+  "sequence": 72,
+  "version": 2
+}

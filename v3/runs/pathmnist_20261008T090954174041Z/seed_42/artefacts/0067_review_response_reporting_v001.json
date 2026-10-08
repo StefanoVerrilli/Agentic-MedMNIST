@@ -1,0 +1,27 @@
+{
+  "artefact": "review_response_reporting",
+  "artefact_type": "ReviewResponse",
+  "created_at": "2026-10-08T12:40:01.654550+00:00",
+  "payload": {
+    "evidence": [
+      "report_summary"
+    ],
+    "evidence_versions": [
+      {
+        "artefact": "report_summary",
+        "artefact_path": "artefacts/0066_report_summary_v002.json",
+        "payload_sha256": "442eeb652bfd8301a76523991f9ac19483effcd08ee0bc0cd06ae3e6515655b2",
+        "version": 2
+      }
+    ],
+    "response": "Two documentation errors identified by the reviewer are addressed in this revision:\n\n**Issue 1 – Representation rationale architecture misidentification.** The reviewer correctly notes that `best_configuration.representation.rationale` describes the downstream architecture as a \"compact transformer operating on 16 patch tokens (7×7 non-overlapping patches on 28×28 RGB)\" and justifies standardization by reference to transformer attention logits. The selected model is unambiguously ResNet18 (bundle `pathmnist_resnet18_tuned_v2`, program source calls `build_network(\"resnet18\", …)`). I accept this as a factual inaccuracy in the persisted rationale text. The evidence artifact itself is not altered (per the constraint against changing models, selection, preprocessing, thresholds, or predictions), but the revised narrative (§1) now explicitly flags this inconsistency for downstream readers and notes that the normalization and augmentation choices remain valid for a CNN even though the mechanistic justification in the rationale text is architecture-mismatched.\n\n**Issue 2 – Lymphocyte false-positive count.** The reviewer correctly identifies that the confusion matrix column for class 3 (lymphocytes) yields 28 false positives (5 from class 6 + 2 from class 7 + 21 from class 8 = 28), confirmed by precision 634/662 = 0.957704. The previous narrative stated 27. The revised narrative (§3) now reports 28 false positives with the correct per-source breakdown. No computed metric is affected; this is a correction to the descriptive text only.\n\nBoth corrections are documentation-level. No models, selection criteria, preprocessing, thresholds, or predictions have been modified. The reviewer's observations regarding the separate-center gap, OOD scope, selective-prediction coverage, class imbalance, single-seed limitation, and search stopping rationale are all accurately reflected in the revised narrative and require no further action. The reviewer's `requests` array is empty; the two issues above are addressed per the `comment` and `llm_issues` fields. I defer to the reviewer to close or further revise.",
+    "review_attempt": 1,
+    "schema_version": "1.0",
+    "stage": "reporting"
+  },
+  "payload_sha256": "0b520073b937ad25c49a4b95af04b86c8648fb9eee540d71a6cdd753ccf4a474",
+  "producer": "reporting",
+  "run_id": "seed_42",
+  "sequence": 67,
+  "version": 1
+}

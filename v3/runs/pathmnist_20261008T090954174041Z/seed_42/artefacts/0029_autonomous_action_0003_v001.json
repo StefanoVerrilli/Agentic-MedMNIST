@@ -1,0 +1,67 @@
+{
+  "artefact": "autonomous_action_0003",
+  "artefact_type": "AutonomousSearchEvent",
+  "created_at": "2026-10-08T09:39:46.589178+00:00",
+  "payload": {
+    "decision": {
+      "action": "new_trial",
+      "additional_epochs": null,
+      "candidate_id": null,
+      "experiment": {
+        "batch_size": 256,
+        "bundle_id": "pathmnist_compact_wide_v2",
+        "epochs": 30,
+        "files": [
+          {
+            "code": "\"\"\"Compact transformer with widened hidden dimension for PathMNIST 28x28 histopathology.\"\"\"\nimport torch\nfrom lightning_components import build_network\nfrom worker_runtime import fit_model, batched_logits\n\n\ndef build_model(context):\n    parameters = context[\"parameters\"]\n    return build_network(\n        \"compact_transformer\",\n        in_channels=3,\n        n_classes=9,\n        hidden=parameters.get(\"hidden\", 256),\n        depth=parameters.get(\"depth\", 4),\n        dropout=parameters.get(\"dropout\", 0.1),\n        patch_size=parameters.get(\"patch_size\", 4),\n        num_heads=parameters.get(\"num_heads\", 4),\n        mlp_ratio=parameters.get(\"mlp_ratio\", 4),\n    )\n\n\ndef train(context):\n    return fit_model(context, build_model(context))\n\n\ndef predict(context):\n    model = build_model(context)\n    model.load_state_dict(torch.load(context[\"checkpoint\"], map_location=\"cpu\", weights_only=True))\n    return batched_logits(model, context[\"data\"][\"images\"], context[\"config\"])",
+            "path": "experiment.py"
+          }
+        ],
+        "hypothesis": "Widening the compact_transformer hidden dimension from 128 to 256 (while maintaining depth=4, 49-token conv tokenizer, 4 heads) will improve validation accuracy by providing greater representational capacity to distinguish subtle texture and morphological differences between visually confusable histopathology classes (smooth muscle vs stroma, normal mucosa vs adenocarcinoma, background vs debris). The 49-token sequence remains short enough to avoid overfitting on ~90k samples, and the wider attention/MLP layers can encode richer inter-cellular relationship patterns. Reducing label smoothing from 0.1 to 0.05 and lowering LR to 1.5e-4 should allow sharper decision boundaries in the final epochs without destabilizing training.",
+        "parameters": {
+          "depth": 4,
+          "dropout": 0.1,
+          "hidden": 256,
+          "mlp_ratio": 4,
+          "num_heads": 4,
+          "patch_size": 4
+        },
+        "training": {
+          "adam_beta1": 0.9,
+          "adam_beta2": 0.999,
+          "channel_cap": 256,
+          "class_weighting": true,
+          "cosine_eta_min": 0.0,
+          "early_stopping_min_delta": 0.003,
+          "early_stopping_monitor": "val_accuracy",
+          "early_stopping_patience": 5,
+          "gradient_clip_val": 1.0,
+          "label_smoothing": 0.05,
+          "lr": 0.00015,
+          "momentum": 0.9,
+          "nesterov": true,
+          "one_cycle_pct_start": 0.1,
+          "optimizer": "adamw",
+          "optimizer_eps": 1e-08,
+          "plateau_factor": 0.5,
+          "plateau_patience": 1,
+          "scales": [
+            2,
+            4,
+            7
+          ],
+          "scheduler": "cosine",
+          "weight_decay": 0.0001
+        }
+      },
+      "rationale": "Both completed trials achieved ~98.9% val accuracy. The compact_transformer (t0001) slightly edges out the multi_scale_transformer (t0002) at 0.9892 vs 0.9889 best val_acc, and trains 2x faster (445s vs 952s). The remaining ~1.1% errors are likely dominated by inherent label ambiguity in 28x28 histopathology patches (mixed tissue, confusable classes). To test whether additional model capacity can resolve subtle texture differences between confusable pairs (smooth muscle/stroma, normal mucosa/adenocarcinoma), I'll widen the compact_transformer from hidden=128 to hidden=256 while keeping depth=4 and the 49-token conv tokenizer. I'll also reduce label_smoothing from 0.1 to 0.05 (less aggressive regularization on already well-separated classes) and lower LR to 1.5e-4 for more stable convergence in the wider model. The cosine_eta_min=1e-6 prevents LR from hitting exactly zero, allowing final fine-tuning. This is a targeted capacity increase rather than a structural change, testing whether the bottleneck is representational width rather than architectural inductive bias."
+    },
+    "schema_version": "1.0",
+    "source": "qwen3.8:latest"
+  },
+  "payload_sha256": "64f92df71d9de02405ee8b823822089d6ba0fcc199b489a077cd5a3b74e47ffd",
+  "producer": "model_search",
+  "run_id": "seed_42",
+  "sequence": 29,
+  "version": 1
+}

@@ -1,0 +1,37 @@
+{
+  "artefact": "anomaly_preprocessing",
+  "artefact_type": "AnomalyReport",
+  "created_at": "2026-10-08T09:12:41.892886+00:00",
+  "payload": {
+    "action": "revise",
+    "attempt": 1,
+    "comment": "Preprocessing stage is functionally sound. Data integrity is fully verified: archive MD5/SHA256 match, split sizes (89996/10004/7180) identical to official PathMNIST sizes, no subsampling, 9-class 3-channel RGB 28×28 under the standard MedMNIST distribution. Class imbalance is modest (ratio 1.63) with near-identical train/val proportions. The representation plan correctly uses standardization with train-only statistics and six built-in augmentations (hflip, vflip, rotate90, rotate180, brightness, contrast), yielding augmentation_factor 7 and augmented_train_size 629,972 (89996×7), all internally consistent.\n\nThree warnings are noted but none are blocking:\n\n1. The extension gate contains a redundant entry for 'tissue_geometric_aug' (hflip, vflip). Per pipeline policy, built-in augmentations do not require extension approval, and pending proposals do not invalidate these primitives. The gate entry should be removed to avoid unnecessary reviewer assignment, but it does not block use of the augmentations.\n\n2. The prior-art stage relies on curated excerpts rather than live retrievals or retrieved abstracts. Per evidence-provenance policy, curated excerpts are unverified external evidence. The quotes establish traceability to cited papers but do not independently verify the specific design inferences drawn (e.g., conv-stem overfitting avoidance, patch granularity). This is a warning requesting verification, not a deterministic failure.\n\n3. The representation_plan.rationale states the downstream architecture operates on '16 patch tokens (7x7 non-overlapping patches on 28x28 RGB).' The arithmetic is inconsistent: 7×7 = 49 tokens, not 16. The prior-art observation correctly computes 49 tokens (conv 3×3 stride 4 pad 1 on 28×28 → 7×7×64). This is a documentation error in the rationale text; it does not affect the normalization computation or the actual architecture configuration.\n\nThe 'compact_conv_stem_transformer' proposal is correctly flagged as pending_review in the extension gate: it is not among the seven built-in families (tiny_cnn, residual_cnn, resnet18, vision_transformer, compact_transformer, multi_scale_transformer, feature_pyramid_transformer) and legitimately requires independent review before use. Gate status applies only to this specific proposal and does not block the preprocessing stage.\n\nCompacted fields (5) and omitted artefacts (3) are preview truncations for this review, not incomplete persisted artefacts. No regeneration is requested on that basis.\n\nNo deterministic findings are present. The test-domain note (CRC-VAL-HE-7K from a different clinical center) is correctly recorded for OOD AUROC interpretation in later stages. The stage may proceed.",
+    "deterministic_issues": [],
+    "llm_issues": [
+      "Extension gate contains a redundant pending_review entry for tissue_geometric_aug (hflip, vflip), which are built-in augmentations that do not require extension approval per pipeline policy.",
+      "Prior-art evidence is based on curated excerpts (unverified external evidence) rather than live retrievals or retrieved abstracts; specific design inferences (conv-stem overfitting avoidance, patch granularity) are not independently verified by the cited quotes.",
+      "representation_plan.rationale contains a factual arithmetic error: states '16 patch tokens' for 7×7 non-overlapping patches on 28×28, but 7×7 = 49 tokens (confirmed by prior-art architecture spec)."
+    ],
+    "observations": [
+      "Data integrity fully verified: archive MD5 a8b06965200029087d5bd730944a56c1 and SHA256 match verified hashes; split sizes identical to official; subsampled=false.",
+      "Class distribution well-balanced: imbalance ratio 1.63, train/val class proportions nearly identical (max Δ < 0.0001), 0 duplicates, 0 blank images.",
+      "All six augmentations in the representation plan (hflip, vflip, rotate90, rotate180, brightness, contrast) are built-in primitives requiring no extension approval.",
+      "Augmentation factor 7 (1 original + 6 augmentations) is consistent with augmented_train_size 629,972 = 89996 × 7.",
+      "compact_conv_stem_transformer is a legitimate new proposal (not among the seven built-in families) and is correctly pending independent review in the extension gate.",
+      "Test-domain note: CRC-VAL-HE-7K test images originate from a different clinical center—relevant for OOD AUROC interpretation in later stages.",
+      "Normalization uses standardize with train-only statistics (mean [0.7405, 0.5330, 0.7058], std [0.1237, 0.1768, 0.1244]); stats_source=train prevents test leakage.",
+      "deterministic_torch=true, seed=42, code SHA256 anchored via canonical-text-v2; LLM model qwen3.8:latest (ollama) digest recorded for traceability.",
+      "Compacted fields (5) and omitted artefacts (prior_art_brief, run_manifest, worker_evidence) are preview truncations for this review, not incomplete persisted artefacts."
+    ],
+    "requests": [],
+    "schema_version": "1.0",
+    "severity": "warning",
+    "source": "qwen3.8:latest",
+    "stage": "preprocessing"
+  },
+  "payload_sha256": "be6dae6608febbf093e70878c1e48aa5da06e37d55883a4d2c7f7eb02f92dd6f",
+  "producer": "reviewer",
+  "run_id": "seed_42",
+  "sequence": 17,
+  "version": 1
+}
