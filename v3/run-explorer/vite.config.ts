@@ -1,2 +1,2 @@
 import {defineConfig} from 'vite';
-export default defineConfig({build:{rollupOptions:{output:{manualChunks:{charts:['recharts']}}}}});
+export default defineConfig({build:{rollupOptions:{output:{manualChunks:{charts:['recharts'],flow:['@xyflow/react']}}}}});

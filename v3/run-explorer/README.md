@@ -20,6 +20,16 @@ The OLED layout uses a black background and colored task cards, with description
 
 The dashboard explains objectives, choices, observed outcomes and limits. It includes all 28 recorded decisions across its editorial briefs, the eight trials, the failed ninth proposal and recovery, and the reporting corrections. It does not display raw files, prompts or JSON, and it does not infer additional internal reasoning. Imported runs and the general-purpose replay explorer have been removed.
 
+## Agent call graph
+
+Click **Agent call graph** to open `#/graph`; **Back to dashboard** restores the previous task and step. A graph node’s **Explore this task** button instead opens that task at its first step. Direct graph links work on the same local server.
+
+There is one rectangle per agent/role, with all 56 invocations grouped into 15 directional connections. A connection label such as `#02 · ×12` means its first chronological call was number 2 and it was used 12 times. Click the label for a paginated list of passes, with original UTC timestamps and task context. Stage dispatches, independent reviews and subprocess operations have distinct connection colors.
+
+Use **Previous call / Next call** or keyboard arrows to highlight the next invocation. **Overview** clears the selection; **Fit graph** and zoom controls restore or inspect the whole diagram. Nothing advances automatically. Hover or focus an agent for three short points about its choices and contribution; click pins the summary, and Escape closes it.
+
+The numbering includes 12 stage starts, 12 reviewer invocations and 32 worker executions. Internal LLM decisions, retries of an LLM request, heartbeats and return values are not counted as extra agent invocations. Edges reflect orchestrator dispatch and stage-owned worker calls, rather than suggesting direct calls between consecutive task agents. Summaries focus on work and results; relevant limitations remain in the task descriptions.
+
 ## Verify
 
 ```powershell
