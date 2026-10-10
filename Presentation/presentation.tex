@@ -3,22 +3,21 @@
 %  Theme: Flux (installed globally in TEXMFHOME/tex/latex/flux-beamer)
 %  Build: pdflatex presentation.tex   (run twice for the frame numbers / TOC)
 %
-%  Organisation: three equal-length parts (shared talk), 6 slides each --
+%  Figures: figures/make_figures.py regenerates every chart from the run
+%  artefacts + pathmnist.npz. Evidence sources:
+%    flagship run  v3/runs/pathmnist_20261008T090954174041Z (autonomous, 1 seed)
+%    3-seed run    v2/runs/pathmnist_20261002T153115929285Z (git commit 0bbd1c5:
+%                  baseline, ablations, live arXiv retrieval; removed in 71250a1)
+%
+%  Organisation: three equal-length parts (shared talk), 8 slides each --
 %    1. "Motivation, Objectives & Plan"        -- Project Manager (Stefano Verrilli)
 %    2. "System Architecture & MVP"            -- Technical Manager (Giuseppe Todisco)
 %    3. "Prior Art, Governance & Validation"   -- Reviewer (Mohammad Dolatabadi)
-%  Section titles name the TOPIC each speaker covers, not the presenter split
-%  (attribution stays on the title page / institute line). Sections appear in
-%  the outline only; the Flux theme adds no divider slides.
-%  Slide-to-role assignment follows the proposal's responsibility table: TR
-%  owns architecture/agent-build content (incl. the Prior-Art Scout's design),
-%  REV owns audit/governance/acceptance content (incl. leakage-safety audit),
-%  PM owns scope/schedule/risk content.
+%  Section titles name the TOPIC each speaker covers; every slide is built
+%  around a figure or diagram, with at most a few short lines of text.
 % ============================================================================
 \documentclass[10pt,aspectratio=169]{beamer}
 
-% Flux is installed globally, so a plain \usetheme is enough.
-% Styles available: asphalt | blue | red | green | gray
 \usetheme[style=green]{flux}
 
 \usepackage[utf8]{inputenc}
@@ -26,14 +25,18 @@
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{graphicx}
+\usepackage{amssymb}
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning,shadows,backgrounds}
+\usetikzlibrary{arrows.meta,positioning,shadows,backgrounds,calc,fit}
 
-% palette echoing the Flux "green" style, for the proposal diagram
 \definecolor{fxgreen}{HTML}{5E7A29}
 \definecolor{fxlight}{HTML}{E7ECD8}
 \definecolor{fxgrey}{HTML}{E9E9E9}
 \definecolor{fxorange}{HTML}{C7791F}
+\definecolor{fxblue}{HTML}{2A78D6}
+\definecolor{stgood}{HTML}{0CA30C}
+\definecolor{stbad}{HTML}{D03B3B}
+\definecolor{stwait}{HTML}{C98500}
 \tikzset{
   box/.style={rounded corners=2pt, align=center, text width=2.35cm,
               minimum height=1.05cm, font=\small, inner sep=3pt},
@@ -42,11 +45,21 @@
   gov/.style={box, fill=fxorange!12, draw=fxorange, dashed, thick},
   arr/.style={-{Stealth[length=2mm]}, thick, draw=fxgreen},
 }
+\graphicspath{{figures/}}
 
-% -------- title metadata -----------------------------------------------------
+\usepackage{pifont}
+\newcommand{\ok}{\textcolor{stgood}{\ding{51}}}
+\newcommand{\no}{\textcolor{black!35}{--}}
+\newcommand{\wait}{\textcolor{stwait}{\ding{108}}}
+
+\newcommand{\stattile}[3][0.22]{%
+  \begin{minipage}[t]{#1\linewidth}\centering
+    {\usebeamercolor[fg]{title}\fontsize{17}{20}\selectfont\bfseries #2}\\[0.2em]
+    {\scriptsize #3}
+  \end{minipage}}
+
 \title{HAT-MedMNIST}
 \subtitle{A hybrid agentic training framework for MedMNIST}
-% keep the subtitle within the slide width
 \setbeamerfont{subtitle}{size=\large,series=\bfseries}
 \author{Giuseppe Todisco \and Stefano Verrilli \and Mohammad Dolatabadi}
 \institute{Technical Responsible \enspace$\cdot$\enspace Project Manager \enspace$\cdot$\enspace Reviewer
@@ -55,11 +68,8 @@
 
 \begin{document}
 
-% NOTE: with the Flux theme \titlepage already opens its own frame,
-% so it must NOT be wrapped in \begin{frame}...\end{frame}.
 \titlepage
 
-% ---------------------------------------------------------------------------
 \begin{frame}{Outline}
   \tableofcontents
 \end{frame}
@@ -67,175 +77,323 @@
 % ===========================================================================
 \section{Motivation, Objectives \& Plan}
 % ===========================================================================
-\begin{frame}{What it is}
-  A \textbf{modular, hybrid agentic framework} for training neural networks on
-  MedMNIST.
-  \vspace{0.6em}
-  \begin{itemize}
-    \item Role-specialised agents own \textbf{one duty each}.
-    \item They interact \textbf{only through versioned artefacts}.
-    \item An independent reviewer agent \textbf{audits every stage and can veto}.
-  \end{itemize}
-  \vspace{0.6em}
-  \begin{block}{The contribution}
-    The orchestration is the contribution --- \textbf{not} the classifier.
-  \end{block}
-\end{frame}
+\begin{frame}{Why HAT-MedMNIST}
+  \centering
+  \resizebox{0.80\textwidth}{!}{%
+  \begin{tikzpicture}[
+      n/.style={draw=black!45, fill=fxgrey, rounded corners=1.5pt, font=\scriptsize,
+                minimum width=1.05cm, minimum height=0.5cm, inner sep=1pt},
+      a/.style={circle, draw=black!45, fill=fxgrey, minimum size=0.55cm, inner sep=0pt, font=\scriptsize},
+      g/.style={circle, draw=fxgreen, fill=fxlight, thick, minimum size=0.55cm, inner sep=0pt, font=\scriptsize},
+      t/.style={font=\small\bfseries, align=center},
+      c/.style={font=\scriptsize, align=center, text=black!65}]
+    % panel 1: script pipeline
+    \begin{scope}
+      \node[t] at (1.6,2.7) {Script pipeline};
+      \node[n] (d) at (0,1.2) {data};
+      \node[n, right=0.12cm of d] (tr) {train};
+      \node[n, right=0.12cm of tr] (ev) {eval};
+      \node[draw=black!30, dashed, rounded corners, fit=(d)(tr)(ev), inner sep=4pt] {};
+      \node[c] at (1.6,0) {tightly coupled\\hard to audit};
+    \end{scope}
+    % panel 2: chatty LLM agents
+    \begin{scope}[xshift=4.9cm]
+      \node[t] at (1.2,2.7) {Typical LLM agents};
+      \foreach \i/\x/\y in {1/0.3/1.7, 2/2.1/1.7, 3/0.3/0.7, 4/2.1/0.7} \node[a] (q\i) at (\x,\y) {A\i};
+      \foreach \i/\j in {1/2,1/3,1/4,2/3,2/4,3/4} \draw[black!40] (q\i) -- (q\j);
+      \node[c] at (1.2,0) {random at every step\\locked to one vendor};
+    \end{scope}
+    % panel 3: HAT-MedMNIST
+    \begin{scope}[xshift=9.4cm]
+      \node[t, text=fxgreen] at (1.4,2.7) {HAT-MedMNIST};
+      \node[draw=fxgreen, fill=fxgreen, text=white, rounded corners=2pt, font=\scriptsize\bfseries,
+            minimum width=1.3cm, minimum height=0.5cm] (bb) at (1.4,1.2) {Blackboard};
+      \foreach \i/\x/\y in {1/0.1/1.9, 2/1.4/2.0, 3/2.7/1.9, 4/0.1/0.5, 5/2.7/0.5}
+        {\node[g] (h\i) at (\x,\y) {}; \draw[fxgreen, thick] (h\i) -- (bb);}
+      \node[circle, draw=fxorange, dashed, thick, fill=fxorange!12, minimum size=0.55cm, inner sep=0pt,
+            font=\scriptsize] (rv) at (1.4,0.35) {R};
+      \draw[fxorange, dashed, thick] (rv) -- (bb);
+      \node[c] at (1.4,-0.25) {typed contracts $\cdot$ provenance\\independent reviewer with veto};
+    \end{scope}
+  \end{tikzpicture}}
 
-\begin{frame}{Why it matters}
+  \vspace{0.5em}
   \begin{columns}[T]
-    \begin{column}{0.5\textwidth}
-      \textbf{Conventional pipelines}
+    \begin{column}{0.48\textwidth}
+      \small\textbf{The problem}
       \begin{itemize}
-        \item Tightly coupled.
-        \item Hard to reproduce and audit.
-      \end{itemize}
-      \vspace{0.8em}
-      \textbf{Typical LLM-agent frameworks}
-      \begin{itemize}
-        \item Non-determinism everywhere.
-        \item Locked to one proprietary model.
+        \item Training pipelines are monolithic scripts: hard to audit and to reproduce.
+        \item LLM-agent frameworks let a model improvise every step, tied to one vendor.
       \end{itemize}
     \end{column}
-    \begin{column}{0.5\textwidth}
-      \begin{block}{HAT-MedMNIST}
-        \begin{itemize}
-          \item Roles \emph{plus} explicit contracts.
-          \item Non-determinism confined to declared decisions.
-          \item Every choice is traceable.
-          \item An independent automated reviewer.
-        \end{itemize}
-      \end{block}
+    \begin{column}{0.48\textwidth}
+      \small\textbf{Our answer}
+      \begin{itemize}
+        \item One duty per agent; agents exchange only versioned artefacts.
+        \item LLM reasoning only at declared decision points, with a fallback.
+        \item An independent reviewer audits every stage and can veto.
+      \end{itemize}
     \end{column}
   \end{columns}
 \end{frame}
 
-\begin{frame}{Objectives}
-  \begin{itemize}
-    \item Cohesive, weakly-coupled agents that talk only via typed artefacts.
-    \item A \textbf{representation-architect} agent that reasons about the best input.
-    \item A \textbf{hybrid reasoning seam}: open models with heuristic fallback.
-    \item \textbf{Ambiguity handling} and leakage-safe data splits.
-    \item \textbf{Abstention} on the ``no confident finding'' case.
-    \item An integrated MVP demonstrated at \textbf{TRL 7}.
-  \end{itemize}
+\begin{frame}{The task in pictures: PathMNIST}
+  \begin{columns}[c]
+    \begin{column}{0.52\textwidth}
+      \centering
+      \includegraphics[width=\linewidth,height=0.82\textheight,keepaspectratio]{fig_samples.png}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \small
+      \textbf{Can software agents learn to tell colon tissue types apart?}\\[0.4em]
+      \begin{itemize}
+        \item PathMNIST: stained (H\&E) patches from colorectal cancer slides, part of MedMNIST v2.
+        \item 9 tissue classes, 107,180 images of only \textbf{28\,$\times$\,28 pixels}.
+        \item Train/validation from one source; test from \textbf{a different hospital}.
+        \item Small images keep experiments fast; the second hospital keeps the test honest.
+      \end{itemize}
+    \end{column}
+  \end{columns}
 \end{frame}
 
-\begin{frame}{Work packages}
-  \normalsize
-  \renewcommand{\arraystretch}{1.6}
-  \setlength{\tabcolsep}{18pt}
-  \begin{center}
-  \begin{tabular}{@{}ll@{}}
-    \toprule
-    \textbf{WP} & \textbf{Focus} \\
-    \midrule
-    WP1 & Requirements \& architecture \\
-    WP2 & Data understanding, representation \& prior-art scouting \\
-    WP3 & Hybrid orchestration \& prior-art-informed model design \\
-    WP4 & Evaluation, enrichment \& comparison \\
-    WP5 & MVP integration \& validation \\
-    WP6 & Consistency \& anomaly governance (cross-cutting) \\
-    \bottomrule
-  \end{tabular}
-  \end{center}
+\begin{frame}{The data at a glance}
+  \begin{columns}[c]
+    \begin{column}{0.56\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{fig_class_distribution.pdf}
+    \end{column}
+    \begin{column}{0.42\textwidth}
+      \small
+      \begin{itemize}
+        \item Official split: 89,996 / 10,004 / 7,180 images.
+        \item Training classes are near-balanced (largest/smallest = 1.63).
+        \item The test hospital differs: adipose 18.6\% vs 10.4\%, debris 4.7\% vs 11.5\%.
+        \item So test accuracy measures \textbf{transfer} to new data, not memory.
+      \end{itemize}
+    \end{column}
+  \end{columns}
 \end{frame}
 
-\begin{frame}{Indicative 12-month plan}
-  \normalsize
-  \renewcommand{\arraystretch}{1.5}
-  \setlength{\tabcolsep}{7pt}
-  \begin{center}
-  \begin{tabular}{@{}l*{12}{c}@{}}
-    \toprule
-    \textbf{WP\,/\,Month} & 1&2&3&4&5&6&7&8&9&10&11&12\\
-    \midrule
-    WP1 & \textbullet&\textbullet& & & & & & & & & & \\
-    WP2 & &\textbullet&\textbullet&\textbullet& & & & & & & & \\
-    WP3 & & &\textbullet&\textbullet&\textbullet&\textbullet&\textbullet& & & & & \\
-    WP4 & & & & &\textbullet&\textbullet&\textbullet&\textbullet&\textbullet& & & \\
-    WP5 & & & & & & & &\textbullet&\textbullet&\textbullet&\textbullet&\textbullet\\
-    WP6 & &\textbullet&\textbullet&\textbullet&\textbullet&\textbullet&\textbullet&\textbullet&\textbullet&\textbullet&\textbullet&\textbullet\\
-    \bottomrule
-  \end{tabular}
-  \end{center}
-  \vspace{0.4em}
-  {\footnotesize WP6 is cross-cutting across the whole timeline.}
+\begin{frame}{The plan: six work packages in twelve months}
+  \centering
+  \resizebox{0.92\textwidth}{!}{%
+  \begin{tikzpicture}[x=0.82cm, y=0.62cm,
+      wp/.style={fill=fxgreen, rounded corners=1.5pt, minimum height=0.36cm},
+      lab/.style={anchor=east, font=\scriptsize, align=right}]
+    \foreach \m in {1,...,12} {
+      \node[font=\tiny, text=black!55] at (\m-0.5, 0.55) {\m};
+      \draw[black!12] (\m-1, 0.25) -- (\m-1, -5.6);
+    }
+    \draw[black!12] (12, 0.25) -- (12, -5.6);
+    \node[font=\tiny, text=black!55, anchor=east] at (-0.15, 0.55) {month};
+    \foreach \r/\a/\b/\name/\goal in {
+        0/0/2/WP1/Requirements \& architecture,
+        1/1/4/WP2/{Data, representation \& prior art},
+        2/2/7/WP3/Hybrid orchestration \& model design,
+        3/4/9/WP4/Evaluation \& baseline comparison,
+        4/7/12/WP5/{MVP, abstention \& validation}} {
+      \node[lab] at (-0.15, -\r) {\textbf{\name}\enspace\goal};
+      \fill[fxgreen, rounded corners=1.5pt] (\a+0.08, -\r-0.2) rectangle (\b-0.08, -\r+0.2);
+    }
+    \node[lab] at (-0.15, -5) {\textbf{WP6}\enspace Reviewer governance};
+    \fill[fxorange!20, draw=fxorange, dashed, rounded corners=1.5pt] (1.08, -5.2) rectangle (11.92, -4.8);
+    \node[font=\tiny, text=fxorange] at (6.5, -5) {cross-cutting: audits every stage};
+  \end{tikzpicture}}
+
+  \vspace{0.8em}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \small
+      \begin{itemize}
+        \item Hybrid Agile / stage-gate: short iterations, a formal gate at the end of each WP.
+        \item Each WP delivers a reviewable output (D1--D6) with numeric KPIs.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \small
+      \begin{itemize}
+        \item WP6, the reviewer, runs alongside every other WP.
+        \item Goal: an integrated MVP demonstrated at \textbf{TRL 7} in month 12.
+      \end{itemize}
+    \end{column}
+  \end{columns}
 \end{frame}
 
-\begin{frame}{Risk plan}
-  \small
-  \renewcommand{\arraystretch}{1.3}
-  \setlength{\tabcolsep}{5pt}
-  \begin{center}
-  \begin{tabular}{@{}lp{1.9cm}p{4.3cm}@{}}
-    \toprule
-    \textbf{Risk} & \textbf{Impact\,/\,\allowbreak Prob.} & \textbf{Mitigation} \\
-    \midrule
-    Data leakage / invalid split    & High / Med & Train-only stats, seeded splits, reviewer gate before training \\
-    Non-deterministic LLM reasoning & Med / Med  & Temperature 0, heuristic fallback, logged provenance \\
-    Agent contract failure          & High / Med & Typed artefact contracts, orchestrator veto, fault-injection tests \\
-    Performance below baseline      & High / Med & Baseline-first strategy, ablations, documented negative results \\
-    Vendor lock-in                  & Med / Low  & Open-model seam, no proprietary dependency \\
-    \bottomrule
-  \end{tabular}
-  \end{center}
+\begin{frame}{Risk map}
+  \begin{columns}[c]
+    \begin{column}{0.50\textwidth}
+      \centering
+      \begin{tikzpicture}[x=1.8cm, y=1.2cm,
+          risk/.style={font=\scriptsize, align=center}]
+        \fill[black!3] (0,0) rectangle (3,3);
+        \fill[stbad!10] (1,2) rectangle (2,3);
+        \fill[stwait!12] (1,1) rectangle (2,2);
+        \fill[stwait!12] (0,1) rectangle (1,2);
+        \draw[black!25, xstep=1.8cm, ystep=1.2cm] (0,0) grid (3,3);
+        \foreach \i/\t in {0/Low, 1/Medium, 2/High} {
+          \node[font=\scriptsize, text=black!60] at (\i+0.5,-0.2) {\t};
+          \node[font=\scriptsize, text=black!60, anchor=east] at (-0.03,\i+0.5) {\t};
+        }
+        \node[font=\scriptsize\bfseries] at (1.5,-0.5) {Probability};
+        \node[font=\scriptsize\bfseries, rotate=90] at (-0.78,1.5) {Impact};
+        \node[risk] at (1.5,2.5) {Leakage \ok\\Contracts\\Below baseline \ok};
+        \node[risk] at (1.5,1.5) {LLM\\randomness};
+        \node[risk] at (0.5,1.5) {Vendor\\lock-in};
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \small
+      \begin{itemize}
+        \item \textbf{Leakage}: an audit gate blocks training until splits and statistics are checked.
+        \item \textbf{Contracts}: typed artefacts fail fast; the orchestrator can veto.
+        \item \textbf{Below baseline}: baseline-first, ablations, negative results reported.
+        \item \textbf{LLM randomness}: temperature 0, logged provenance, fallback.
+        \item \textbf{Lock-in}: any open model behind one interface.
+      \end{itemize}
+      {\scriptsize \ok\ already demonstrated in the runs}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{From first run to MVP: 14 runs in one month}
+  \begin{columns}[c]
+    \begin{column}{0.58\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{fig_run_history.pdf}
+    \end{column}
+    \begin{column}{0.40\textwidth}
+      \small
+      \begin{itemize}
+        \item \textbf{v1} (8 Sep): first end-to-end runs; one tie with the baseline.
+        \item \textbf{v2} (9 Sep--2 Oct): agents choose within a bounded search; every run beats the baseline, best 92.6\%.
+        \item \textbf{v3} (8 Oct): fully autonomous; agents write and launch their own experiment code.
+        \item Same official split throughout, so the runs are comparable.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{The flagship run in numbers}
+  \centering
+  \stattile{3\,h\,31\,min}{end-to-end, full dataset}\hfill
+  \stattile{8}{model trials, chosen by agents}\hfill
+  \stattile{28}{LLM decisions, local model}\hfill
+  \stattile{72}{versioned artefacts}
+  \vspace{1.0em}
+
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \small\textbf{What ran}
+      \begin{itemize}
+        \item 11 stages on the full dataset, one local CUDA machine.
+        \item LLM: qwen3.8 served locally by Ollama; no cloud model.
+        \item The search agent proposed and launched all 8 trials.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \small\textbf{Where the time went}
+      \begin{itemize}
+        \item Model search: 3 h 20 min, 95\% of the run.
+        \item All other stages together: about 11 minutes.
+        \item 56 recorded calls: 12 stage starts, 12 reviews, 32 worker jobs.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Road to TRL 7}
+  \centering
+  \begin{tikzpicture}[
+      done/.style={circle, fill=stgood, text=white, minimum size=0.75cm, font=\small\bfseries, inner sep=0pt},
+      todo/.style={circle, draw=stwait, very thick, fill=white, text=stwait, minimum size=0.75cm,
+                   font=\small\bfseries, inner sep=0pt},
+      goal/.style={circle, fill=fxgreen, text=white, minimum size=0.95cm, font=\small\bfseries, inner sep=0pt},
+      lab/.style={font=\scriptsize, align=center, text width=1.9cm}]
+    \foreach \i/\s/\t/\m/\l in {
+        0/done/\ding{51}/Autonomous end-to-end run/8 Oct,
+        1/done/\ding{51}/{3 seeds, baseline, ablations, live arXiv}/2 Oct,
+        2/todo/3/Fault-injection rate $\geq$90\%/WP6,
+        3/todo/4/Replay of the flagship run/WP5,
+        4/todo/5/Approve reviewer-issue mitigations/WP6,
+        5/todo/6/Independent demo and sign-off/WP5} {
+      \node[\s] (m\i) at (2.15*\i, 0) {\t};
+      \node[lab, below=0.15cm of m\i] {\m\\[1pt]{\color{black!50}\l}};
+    }
+    \node[goal] (g) at (2.15*6, 0) {TRL\,7};
+    \begin{scope}[on background layer]
+      \draw[thick, black!30, -{Stealth}] (m0) -- (g);
+    \end{scope}
+  \end{tikzpicture}
+
+  \vspace{0.8em}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \small\textbf{Done}
+      \begin{itemize}
+        \item Autonomous end-to-end run on the full dataset (8 Oct).
+        \item 3 seeds, conventional baseline, ablations and live arXiv sources (2 Oct).
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \small\textbf{Evidence still to file}
+      \begin{itemize}
+        \item Fault-injection report on the current code.
+        \item Replay of the flagship run; signed mitigation list for reviewer notes.
+        \item Demonstration by someone other than the implementer.
+      \end{itemize}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 % ===========================================================================
 \section{System Architecture \& MVP}
 % ===========================================================================
 \begin{frame}{The Blackboard architecture}
-  \vfill
   \centering
-  \resizebox{0.94\textwidth}{!}{\input{architecture_tikz_body}}
-  \vfill
+  \resizebox{0.72\textwidth}{!}{\input{architecture_tikz_body}}
+
+  \vspace{0.1em}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \footnotesize\textbf{Coordination}
+      \begin{itemize}
+        \item \textbf{Orchestrator}: sequences stages; holds no domain logic.
+        \item \textbf{Blackboard}: versioned, typed, checksummed artefacts plus a decision log.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \footnotesize\textbf{Control}
+      \begin{itemize}
+        \item \textbf{Reviewer}: audits after every stage; can request a retry or veto.
+        \item \textbf{0 direct agent calls}, verified on the code\textquotesingle s syntax tree.
+      \end{itemize}
+    \end{column}
+  \end{columns}
 \end{frame}
 
-\begin{frame}{Cohesion \& coupling}
-  \begin{itemize}
-    \item \textbf{No agent calls another.}
-    \item They share only versioned artefacts on a \textbf{Blackboard}.
-    \item A stateless \textbf{Orchestrator} sequences them.
-  \end{itemize}
-  \vspace{0.6em}
-  \begin{block}{The claim, made testable}
-    Any agent can be replaced or upgraded without touching another ---
-    \textbf{zero direct inter-agent calls}.
-  \end{block}
-\end{frame}
-
-\begin{frame}{The agents}
-  \small
-  \renewcommand{\arraystretch}{1.25}
-  \setlength{\tabcolsep}{13pt}
-  \begin{center}
-  \begin{tabular}{@{}lll@{}}
-    \toprule
-    \textbf{Agent} & \textbf{Duty} & \textbf{Kind} \\
-    \midrule
-    Orchestrator                 & sequencing, veto handling      & deterministic \\
-    Ingestion                    & load MedMNIST                  & deterministic \\
-    Profiling / Ambiguity        & profile data, flag ambiguity   & \textbf{hybrid} \\
-    Prior-Art Scout              & search literature, propose ideas & \textbf{hybrid} \\
-    Preprocessing                & architect the representation   & \textbf{hybrid} \\
-    Experiment Design            & pick the configuration         & \textbf{hybrid} \\
-    Training                     & train the selected model            & deterministic \\
-    Evaluation                   & test metrics                   & deterministic \\
-    Abstention / OOD             & refuse when unconfident        & deterministic \\
-    Reporting                    & assemble the dossier           & deterministic \\
-    Reviewer (WP6)               & consistency / anomaly, veto    & \textbf{hybrid} \\
-    \bottomrule
-  \end{tabular}
-  \end{center}
+\begin{frame}{Where the LLM is allowed to decide}
+  \begin{columns}[c]
+    \begin{column}{0.54\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{fig_llm_stages.pdf}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \small
+      \begin{itemize}
+        \item \textbf{Deterministic}: ingestion, data audit, training, evaluation, abstention. No task-agent LLM call.
+        \item \textbf{Judgement}: ambiguity, prior art, representation, architecture, search, report.
+        \item Model search uses most decisions: 10 of 16.
+        \item Every decision is logged with its prompt and source; the heuristic fallback was used once.
+      \end{itemize}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 \begin{frame}{The Prior-Art Scout}
-  A hybrid component of the pipeline: it reads the literature and feeds
-  \textbf{cited ideas} into representation (step 3) and architecture (step 4).
-  \vspace{0.2em}
-  \begin{center}
-  \resizebox{0.70\textwidth}{!}{%
+  \begin{columns}[c]
+    \begin{column}{0.54\textwidth}
+      \centering
+      \resizebox{\linewidth}{!}{%
   \begin{tikzpicture}[
     box/.append style={text width=2.0cm, minimum height=0.9cm, font=\footnotesize}]
     \node[det]                                  (prof)  {Profiling\\[-1pt]{\scriptsize step 2}};
@@ -248,160 +406,367 @@
     \draw[arr] (scout) -- (arch);
     \draw[arr, draw=fxorange, dashed] (rev) -- (scout);
   \end{tikzpicture}}
-  \end{center}
-  \vspace{0.8em}
-  {\footnotesize It \emph{advises} the hybrid decisions --- it never trains,
-  selects, or calls another agent.}
-\end{frame}
-
-\begin{frame}{The hybrid approach}
-  \begin{columns}[T]
-    \begin{column}{0.5\textwidth}
-      \textbf{Deterministic execution}
-      \begin{itemize}
-        \item data, splits, training, metrics, ranking.
-      \end{itemize}
-      \vspace{0.6em}
-      \textbf{Open-model reasoning, only at:}
-      \begin{itemize}
-        \item ambiguity assessment,
-        \item representation design,
-        \item configuration choice,
-        \item consistency review.
-      \end{itemize}
     \end{column}
-    \begin{column}{0.5\textwidth}
-      \begin{block}{No vendor lock-in}
-        Plug in a local open model. With none, it falls back to heuristics and
-        still runs offline and reproducibly.
-      \end{block}
-      \vspace{0.4em}
-      \begin{block}{Reproducible reasoning}
-        Every decision records its source; identical seeds and configs replay
-        the run.
-      \end{block}
+    \begin{column}{0.44\textwidth}
+      \small
+      \begin{itemize}
+        \item Searches arXiv; every source is snapshotted and checksummed.
+        \item Writes a cited brief that feeds representation and architecture.
+        \item Ranks existing options, or proposes new ones that wait at a review gate.
+        \item Advises only: never trains, selects or calls another agent.
+        \item Live sources in the 2 Oct run: 6 of 6.
+      \end{itemize}
     \end{column}
   \end{columns}
 \end{frame}
 
-\begin{frame}{The MVP}
-  \begin{itemize}
-    \item Runs end-to-end on \textbf{PathMNIST} (nine-class histology).
-    \item Preserves the \textbf{official split}; the test set is a different clinical centre.
-    \item Agents \textbf{search and train} bounded architectures automatically.
-    \item Compared against a \textbf{conventional baseline} on the same data and seeds.
-  \end{itemize}
+\begin{frame}{Representation: what the model sees}
+  \centering
+  \includegraphics[width=0.84\textwidth]{fig_augmentations.png}
+
+  \vspace{0.6em}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \small\textbf{Normalisation}
+      \begin{itemize}
+        \item Per-channel standardisation.
+        \item Statistics from \textbf{training images only}, reused unchanged for validation and test.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \small\textbf{Augmentation}
+      \begin{itemize}
+        \item 6 transforms picked by the representation agent from a label-preserving whitelist.
+        \item Tissue has no fixed orientation, so flips and rotations keep the label.
+        \item 89,996 images $\to$ 629,972 training views.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Autonomous model search}
+  \begin{columns}[c]
+    \begin{column}{0.58\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{fig_search_trials.pdf}
+    \end{column}
+    \begin{column}{0.40\textwidth}
+      \small
+      \begin{itemize}
+        \item The agent reads every past result before choosing the next trial.
+        \item Trials 1--5: compact and multi-scale transformers, best 99.17\%.
+        \item Trial 6: switch to ResNet-18, immediately better (99.54\%).
+        \item Selected on validation accuracy, macro-F1 as tie-break. \textbf{Test never seen.}
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{The winning architecture: ResNet-18 for 28\,$\times$\,28}
+  \centering
+  \resizebox{0.86\textwidth}{!}{%
+  \begin{tikzpicture}[
+      lay/.style={draw=fxgreen, fill=fxlight, rounded corners=1.5pt, minimum width=0.95cm,
+                  align=center, font=\scriptsize, inner sep=1pt},
+      io/.style={draw=black!40, fill=fxgrey, rounded corners=1.5pt, minimum width=0.95cm,
+                 align=center, font=\scriptsize, inner sep=1pt},
+      fl/.style={-{Stealth[length=1.6mm]}, draw=fxgreen, thick},
+      dim/.style={font=\tiny, text=black!60}]
+    \node[io,  minimum height=2.2cm]                  (in) {Input\\3 ch};
+    \node[lay, minimum height=2.2cm, right=4mm of in] (st) {Stem\\conv 3$\times$3\\64};
+    \node[lay, minimum height=2.2cm, right=4mm of st] (s1) {Stage 1\\2 blocks\\64};
+    \node[lay, minimum height=1.5cm, right=4mm of s1] (s2) {Stage 2\\2 blocks\\128};
+    \node[lay, minimum height=1.0cm, right=4mm of s2] (s3) {Stage 3\\2 blocks\\256};
+    \node[lay, minimum height=0.7cm, right=4mm of s3] (s4) {Stage 4\\512};
+    \node[io,  minimum height=0.7cm, right=4mm of s4] (gp) {Global\\avg pool};
+    \node[io,  minimum height=0.7cm, right=4mm of gp] (dr) {Dropout\\0.3};
+    \node[io,  minimum height=0.7cm, right=4mm of dr] (fc) {Linear\\512$\to$9};
+    \foreach \a/\b in {in/st,st/s1,s1/s2,s2/s3,s3/s4,s4/gp,gp/dr,dr/fc} \draw[fl] (\a) -- (\b);
+    \node[dim, below=1mm of in] {28$\times$28};
+    \node[dim, below=1mm of st] {28$\times$28};
+    \node[dim, below=1mm of s1] {28$\times$28};
+    \node[dim, below=1mm of s2] {14$\times$14};
+    \node[dim, below=1mm of s3] {7$\times$7};
+    \node[dim, below=1mm of s4] {4$\times$4};
+    \node[dim, below=1mm of gp] {512};
+    \node[dim, below=1mm of fc] {9 classes};
+  \end{tikzpicture}}
+
+  \vspace{0.6em}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \small\textbf{Network}
+      \begin{itemize}
+        \item CIFAR-style ResNet-18: 3$\times$3 stem and \textbf{no max-pool}, so small images keep detail.
+        \item 4 stages $\times$ 2 residual blocks, widths 64 $\to$ 512.
+        \item \textbf{11.17\,M} parameters, trained from scratch.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \small\textbf{Training recipe}
+      \begin{itemize}
+        \item AdamW, lr $2\!\times\!10^{-4}$, weight decay 0.01, cosine schedule.
+        \item Class-weighted loss, label smoothing 0.05, dropout 0.3.
+        \item Batch 256; early stopping with patience 12.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Training dynamics}
+  \begin{columns}[c]
+    \begin{column}{0.60\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{fig_training_curve.pdf}
+    \end{column}
+    \begin{column}{0.38\textwidth}
+      \small
+      \begin{itemize}
+        \item Validation accuracy passes 99\% by epoch 5.
+        \item Best checkpoint: epoch 17, \textbf{99.59\%}.
+        \item Early stopping at epoch 29, after 12 epochs without improvement.
+        \item Train loss stays near 0.28 because of label smoothing and augmentation, not underfitting.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{MVP result on the held-out hospital}
+  \begin{columns}[c]
+    \begin{column}{0.44\textwidth}
+      \centering
+      \includegraphics[width=\linewidth,height=0.78\textheight,keepaspectratio]{fig_confusion.pdf}
+    \end{column}
+    \begin{column}{0.54\textwidth}
+      \small
+      \stattile[0.32]{91.8\%}{test accuracy}\hfill\stattile[0.32]{0.981}{macro AUC}\hfill\stattile[0.32]{0.890}{macro-F1}\\[0.8em]
+      \begin{itemize}
+        \item 7,180 images from a hospital never seen in training; 95\% CI 91.1--92.4\%.
+        \item 7.8 points below validation: the cost of changing hospital.
+        \item Lymphocytes and background are perfect; cancer stroma is the weakest row.
+      \end{itemize}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 % ===========================================================================
 \section{Prior Art, Governance \& Validation}
 % ===========================================================================
 \begin{frame}{Leakage-safe by design}
-  \begin{itemize}
-    \item The search loop \textbf{never sees test metrics}.
-    \item Selection is driven by \textbf{validation only}.
-    \item The winner is frozen, then evaluated on test \textbf{once}.
-    \item Repeated seeds quantify run-to-run variance.
-  \end{itemize}
-  \vspace{0.6em}
-  \begin{block}{Independent audit}
-    A data-quality and leakage audit must pass \textbf{before} any training
-    begins.
-  \end{block}
+  \centering
+  \resizebox{0.86\textwidth}{!}{%
+  \begin{tikzpicture}[
+      sp/.style={rounded corners=2pt, minimum height=1.1cm, align=center, font=\small, text=white},
+      lb/.style={font=\scriptsize, align=center, text=black!70}]
+    \node[sp, fill=fxgreen, minimum width=7.2cm] (tr) at (0,0) {\textbf{Train} 89,996};
+    \node[sp, fill=fxblue, minimum width=1.6cm, right=0.15cm of tr] (va) {\textbf{Val}\\10,004};
+    \node[sp, fill=black!55, minimum width=2.2cm, right=0.6cm of va] (te) {\textbf{Test} 7,180\\[-1pt]{\scriptsize other hospital}};
+    \draw[very thick, stbad] ($(va.east)+(0.3,0.75)$) -- ($(va.east)+(0.3,-0.75)$);
+    \node[lb, above=0.25cm of tr] {normalisation statistics fitted here only};
+    \node[lb, above=0.25cm of va] {model\\selection};
+    \node[lb, above=0.25cm of te] {used once,\\after freezing};
+    \node[lb, below=0.25cm of te, text=stbad] {never seen by the search};
+  \end{tikzpicture}}
+
+  \vspace{0.9em}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \small\textbf{Rules}
+      \begin{itemize}
+        \item Normalisation fitted on training images only.
+        \item Model selection on validation only.
+        \item Test used once, after the model is frozen.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \small\textbf{Evidence in the run}
+      \begin{itemize}
+        \item \textbf{11/11} audit checks passed before training.
+        \item \textbf{0} images shared between train and validation.
+        \item \textbf{0} test metrics used in selection.
+      \end{itemize}
+    \end{column}
+  \end{columns}
 \end{frame}
 
-\begin{frame}{From literature to decisions}
-  Two levels, at very different cost:
-  \begin{itemize}
-    \item \textbf{Advise within bounds} --- rank \& justify existing options with
-          evidence. Cheap, safe, immediate.
-    \item \textbf{Propose new options} --- outside the current set; promoted
-          through a gate before anything runs.
-  \end{itemize}
-  \vspace{0.4em}
+\begin{frame}{The reviewer at work}
+  \centering
+  \resizebox{0.86\textwidth}{!}{%
+  \begin{tikzpicture}[
+      okc/.style={rounded corners=2pt, fill=stgood!15, draw=stgood, minimum width=1.9cm,
+                  minimum height=0.8cm, align=center, font=\scriptsize},
+      wc/.style={rounded corners=2pt, fill=stwait!15, draw=stwait, minimum width=1.9cm,
+                 minimum height=0.8cm, align=center, font=\scriptsize}]
+    \foreach \i/\y/\s/\n/\v in {0/0/okc/Ingestion/ok, 1/0/okc/Profiling/ok, 2/0/wc/Prior art/notes,
+        3/0/wc/Representation/notes, 4/0/wc/Data audit/notes, 5/0/okc/Architecture/ok,
+        0/1/wc/Model search/notes, 1/1/wc/Training/notes, 2/1/wc/Evaluation/notes,
+        3/1/okc/Abstention/ok, 4/1/wc/Reporting v1/notes, 5/1/wc/Reporting v2/notes} {
+      \node[\s] at (2.05*\i, -\y) {\n\\[-1pt]{\tiny\textbf{\v}}};
+    }
+  \end{tikzpicture}}
+
+  {\scriptsize\color{black!60} ok = no issues \quad notes = minor issues logged for the record}
+  \vspace{0.6em}
+
   \begin{columns}[T]
-    \begin{column}{0.5\textwidth}
-      \begin{block}{Representation (step 3)}
-        New label-preserving augmentations: validated, then whitelisted ---
-        \textbf{semi-automatic}.
-      \end{block}
+    \begin{column}{0.48\textwidth}
+      \small\textbf{What it checks}
+      \begin{itemize}
+        \item Consistency and arithmetic of every artefact.
+        \item Leakage, provenance and citation validity.
+        \item Written claims against the actual numbers.
+      \end{itemize}
     \end{column}
-    \begin{column}{0.5\textwidth}
-      \begin{block}{Architecture (step 4)}
-        A new family stays a \textbf{reviewed spec} --- implemented as a registry
-        entry, then runnable.
-      \end{block}
+    \begin{column}{0.48\textwidth}
+      \small\textbf{What it did}
+      \begin{itemize}
+        \item 12 reviews: 4 clean, 8 with minor notes, \textbf{0 vetoes}.
+        \item Caught a rationale claiming 16 image tokens instead of 49.
+        \item Requested a rewrite of the final report (v1 $\to$ v2).
+      \end{itemize}
     \end{column}
   \end{columns}
 \end{frame}
 
-\begin{frame}{Reproducible \& governed}
-  \begin{columns}[T]
-    \begin{column}{0.5\textwidth}
-      \textbf{Reproducible by design}
-      \begin{itemize}
-        \item Snapshot + checksum every source.
-        \item A rerun replays the cache.
-        \item Temperature 0; heuristic fallback when offline.
-      \end{itemize}
+\begin{frame}{Agents vs a conventional pipeline}
+  \begin{columns}[c]
+    \begin{column}{0.46\textwidth}
+      \centering
+      \includegraphics[width=0.92\textwidth]{fig_baseline.pdf}
     \end{column}
-    \begin{column}{0.5\textwidth}
-      \textbf{Governed (WP6)}
+    \begin{column}{0.52\textwidth}
+      \small
       \begin{itemize}
-        \item The Reviewer verifies every citation resolves.
-        \item Claims must be backed by a source.
-        \item It can \textbf{veto} the brief.
+        \item Same data, splits and seeds; the baseline is a fixed small-CNN recipe.
+        \item Agentic \textbf{92.1\%} vs conventional 83.0\%: \textbf{+9.1 points}, on every seed.
+        \item Ablation: representation off 80.9\% $\to$ standardise 86.3\% $\to$ + flip 91.3\%.
+        \item Evidence: 2 Oct run (v2 pipeline), seeds 42/47/72, live arXiv sources.
       \end{itemize}
     \end{column}
   \end{columns}
-  \vspace{0.6em}
-  \begin{block}{Measured}
-    100\% of ideas cited \enspace$\cdot$\enspace 0 hallucinated citations
-    \enspace$\cdot$\enspace brief reproducible from the cache.
-  \end{block}
 \end{frame}
 
-\begin{frame}{Governance as an agent (WP6)}
-  \begin{itemize}
-    \item An \textbf{independent reviewer} audits each stage.
-    \item It can request a \textbf{retry} or \textbf{veto} promotion.
-    \item It checks evidence, traceability and reproducibility.
-  \end{itemize}
-  \vspace{0.6em}
-  \begin{block}{Measured}
-    $\geq$90\% of injected inconsistencies detected \enspace$\cdot$\enspace
-    100\% of decisions logged \enspace$\cdot$\enspace full run reproducible.
-  \end{block}
+\begin{frame}{Error analysis: which tissues fail, and why}
+  \begin{columns}[c]
+    \begin{column}{0.54\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{fig_per_class.pdf}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \small
+      \begin{itemize}
+        \item 7 of 9 tissues reach $\geq$92\% recall at the new hospital.
+        \item \textbf{Cancer stroma}: 52\% recall but 93\% precision. Missed cases go to muscle (17\%), adenocarcinoma (14\%), debris (13\%).
+        \item At 28 pixels these tissues share fibrous texture.
+        \item The profiling agent flagged this risk \textbf{before training}.
+      \end{itemize}
+    \end{column}
+  \end{columns}
 \end{frame}
 
-\begin{frame}{Target: TRL 7}
-  \begin{block}{System prototype in a representative environment}
-    An end-to-end workflow --- ingestion, representation, coordinated decisions,
-    training, evaluation, abstention, auditing --- demonstrated by someone other
-    than the implementer.
-  \end{block}
+\begin{frame}{Knowing when not to answer}
+  \begin{columns}[c]
+    \begin{column}{0.52\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{fig_risk_coverage.pdf}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \small
+      \begin{itemize}
+        \item The model abstains when its predictive entropy is high.
+        \item Threshold set on validation for 80\% coverage; never tuned on test.
+        \item Test: keeps 69\% at \textbf{97.6\%} accuracy; 2,206 images go to human review.
+        \item Coverage drops at the new hospital: the model knows it is less sure.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Robustness check: corrupted inputs}
+  \centering
+  \includegraphics[width=0.52\textwidth]{fig_ood_noise.png}
+
+  \vspace{0.6em}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \small\textbf{Test}
+      \begin{itemize}
+        \item Gaussian pixel noise at three strengths.
+        \item Question: does the abstention score separate noisy from clean images?
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \small\textbf{Result}
+      \begin{itemize}
+        \item AUROC \textbf{0.943} on test (0.994 on validation).
+        \item At most 0.2\% of noisy images accepted.
+        \item Limit: noise is a proxy; staining and scanner shifts are untested.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Comparison with the state of the art}
+  \begin{columns}[c]
+    \begin{column}{0.64\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{fig_sota.pdf}\\
+      {\tiny Published: MedMNIST v2, Yang et al., \emph{Sci.\ Data} 2023, Table 3 (mean of $\geq$3 runs).}
+    \end{column}
+    \begin{column}{0.34\textwidth}
+      \small
+      Accuracy: \textbf{above every published baseline}.\\[0.5em]
+      AUC: slightly below the best ResNets.\\[0.5em]
+      Far ahead of AutoML tools, the closest kind of automated pipeline.
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Acceptance verdict}
+  \centering
+  \scriptsize
+  \renewcommand{\arraystretch}{1.12}
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{@{}lcc@{}}
+    \toprule
+    \textbf{Criterion} & \textbf{8 Oct} & \textbf{2 Oct} \\
+    \midrule
+    Typed, checksummed hand-offs        & \ok & \ok \\
+    Zero direct agent calls             & \ok & \ok \\
+    Leakage audit before training       & \ok & \ok \\
+    Cited ideas                         & \ok & \ok \\
+    Live web retrieval                  & \no & \ok \\
+    Validation-only selection           & \ok & \ok \\
+    Baseline comparison                 & \no & \ok \\
+    Representation ablations            & \no & \ok \\
+    Seed variance (3 seeds)             & \no & \ok \\
+    \bottomrule
+  \end{tabular}
+  \hspace{1.2em}
+  \begin{tabular}{@{}lcc@{}}
+    \toprule
+    \textbf{Criterion} & \textbf{8 Oct} & \textbf{2 Oct} \\
+    \midrule
+    Abstention and human hand-off       & \ok & \ok \\
+    Reviewer report on every stage      & \ok & \ok \\
+    Decision provenance                 & \ok & \ok \\
+    End-to-end run                      & \ok & \ok \\
+    Fault detection $\geq$90\%          & \wait & \wait \\
+    Full-run replay                     & \wait & \wait \\
+    Approved risk mitigations           & \wait & \wait \\
+    Independent TRL 7 sign-off          & \wait & \wait \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{0.8em}
+  \small
+  \ok\ evidenced \quad \no\ not run in that mode \quad \wait\ evidence not yet in the repository
   \vspace{0.4em}
-  \begin{itemize}
-    \item Research demonstrator on \textbf{benchmark data}.
-    \item \textbf{No clinical claims}; uncertain cases go to human review.
-  \end{itemize}
+
+  \stattile{\textcolor{stgood}{13 / 17}}{criteria evidenced}\hspace{2em}
+  \stattile{\textcolor{stwait}{4}}{need external evidence}
 \end{frame}
 
-\begin{frame}{Final acceptance criteria}
-  \begin{itemize}
-    \item All mandatory deliverables complete, versioned, and linked to requirements.
-    \item KPIs measured with documented procedures and objective evidence.
-    \item End-to-end hybrid workflow demonstrated, including abstention on uncertain cases.
-    \item Results reproducible from stored configs, code, data references and seeds.
-    \item No critical risk remains without an approved mitigation.
-  \end{itemize}
-  \vspace{0.6em}
-  \begin{block}{Reviewer sign-off}
-    Confirms coherence of the scientific advancement, industrial potential, and TRL~7 evidence.
-  \end{block}
-\end{frame}
-
-% ---------------------------------------------------------------------------
 \begin{frame}[plain]
   \begin{center}
     \vspace{1.2cm}
