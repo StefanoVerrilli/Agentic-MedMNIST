@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.3.26)  10 OCT 2026 14:56
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.3.26)  10 OCT 2026 15:05
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1073,17 +1073,17 @@ Package pdftex.def Info: figures/fig_class_distribution.pdf  used on input line
 ] [7
 
 ]
-<figures/fig_run_history.pdf, id=168, 338.64796pt x 163.73773pt>
+<figures/fig_run_history.pdf, id=168, 338.64796pt x 164.99829pt>
 File: figures/fig_run_history.pdf Graphic file (type pdf)
 <use figures/fig_run_history.pdf>
 Package pdftex.def Info: figures/fig_run_history.pdf  used on input line 293.
-(pdftex.def)             Requested size: 237.63817pt x 114.90044pt.
+(pdftex.def)             Requested size: 237.63817pt x 115.78502pt.
  [8
 
  <./figures/fig_run_history.pdf>] [9
 
 ]
-<figures/web_dashboard.jpg, id=231, 2742.245pt x 1541.76pt>
+<figures/web_dashboard.jpg, id=233, 2742.245pt x 1541.76pt>
 File: figures/web_dashboard.jpg Graphic file (type jpg)
 <use figures/web_dashboard.jpg>
 Package pdftex.def Info: figures/web_dashboard.jpg  used on input line 339.
@@ -1096,7 +1096,7 @@ Package pdftex.def Info: figures/web_dashboard.jpg  used on input line 339.
 ] (./architecture_tikz_body.tex) [12
 
 ]
-<figures/fig_llm_stages.pdf, id=261, 312.46112pt x 178.13538pt>
+<figures/fig_llm_stages.pdf, id=263, 312.46112pt x 178.13538pt>
 File: figures/fig_llm_stages.pdf Graphic file (type pdf)
 <use figures/fig_llm_stages.pdf>
 Package pdftex.def Info: figures/fig_llm_stages.pdf  used on input line 427.
@@ -1105,7 +1105,7 @@ Package pdftex.def Info: figures/fig_llm_stages.pdf  used on input line 427.
 [13
 
  <./figures/fig_llm_stages.pdf>]
-<figures/web_call_graph.jpg, id=322, 2669.975pt x 1324.95pt>
+<figures/web_call_graph.jpg, id=324, 2669.975pt x 1324.95pt>
 File: figures/web_call_graph.jpg Graphic file (type jpg)
 <use figures/web_call_graph.jpg>
 Package pdftex.def Info: figures/web_call_graph.jpg  used on input line 445.
@@ -1116,7 +1116,7 @@ Package pdftex.def Info: figures/web_call_graph.jpg  used on input line 445.
 [15
 
 ]
-<figures/fig_augmentations.png, id=337, 396.2805pt x 79.2561pt>
+<figures/fig_augmentations.png, id=339, 396.2805pt x 79.2561pt>
 File: figures/fig_augmentations.png Graphic file (type png)
 <use figures/fig_augmentations.png>
 Package pdftex.def Info: figures/fig_augmentations.png  used on input line 500.
@@ -1125,7 +1125,7 @@ Package pdftex.def Info: figures/fig_augmentations.png  used on input line 500.
  [16
 
  <./figures/fig_augmentations.png>]
-<figures/fig_search_trials.pdf, id=346, 334.44823pt x 165.52107pt>
+<figures/fig_search_trials.pdf, id=348, 334.44823pt x 165.52107pt>
 File: figures/fig_search_trials.pdf Graphic file (type pdf)
 <use figures/fig_search_trials.pdf>
 Package pdftex.def Info: figures/fig_search_trials.pdf  used on input line 518.
@@ -1136,7 +1136,7 @@ Package pdftex.def Info: figures/fig_search_trials.pdf  used on input line 518.
  <./figures/fig_search_trials.pdf>] [18
 
 ]
-<figures/fig_training_curve.pdf, id=418, 297.42744pt x 154.85614pt>
+<figures/fig_training_curve.pdf, id=420, 297.42744pt x 154.85614pt>
 File: figures/fig_training_curve.pdf Graphic file (type pdf)
 <use figures/fig_training_curve.pdf>
 Package pdftex.def Info: figures/fig_training_curve.pdf  used on input line 587
@@ -1145,7 +1145,7 @@ Package pdftex.def Info: figures/fig_training_curve.pdf  used on input line 587
  [19
 
  <./figures/fig_training_curve.pdf>]
-<figures/fig_confusion.pdf, id=466, 181.76117pt x 181.76117pt>
+<figures/fig_confusion.pdf, id=468, 181.76117pt x 181.76117pt>
 File: figures/fig_confusion.pdf Graphic file (type pdf)
 <use figures/fig_confusion.pdf>
 Package pdftex.def Info: figures/fig_confusion.pdf  used on input line 605.
@@ -1157,7 +1157,7 @@ Package pdftex.def Info: figures/fig_confusion.pdf  used on input line 605.
 ] [22
 
 ]
-<figures/fig_baseline.pdf, id=534, 192.85675pt x 166.6043pt>
+<figures/fig_baseline.pdf, id=536, 192.85675pt x 166.6043pt>
 File: figures/fig_baseline.pdf Graphic file (type pdf)
 <use figures/fig_baseline.pdf>
 Package pdftex.def Info: figures/fig_baseline.pdf  used on input line 702.
@@ -1165,7 +1165,7 @@ Package pdftex.def Info: figures/fig_baseline.pdf  used on input line 702.
  [23
 
  <./figures/fig_baseline.pdf>]
-<figures/fig_per_class.pdf, id=579, 273.63156pt x 194.28986pt>
+<figures/fig_per_class.pdf, id=581, 273.63156pt x 194.28986pt>
 File: figures/fig_per_class.pdf Graphic file (type pdf)
 <use figures/fig_per_class.pdf>
 Package pdftex.def Info: figures/fig_per_class.pdf  used on input line 720.
@@ -1173,7 +1173,7 @@ Package pdftex.def Info: figures/fig_per_class.pdf  used on input line 720.
  [24
 
  <./figures/fig_per_class.pdf>]
-<figures/web_per_class.jpg, id=635, 1887.05pt x 1149.29375pt>
+<figures/web_per_class.jpg, id=637, 1887.05pt x 1149.29375pt>
 File: figures/web_per_class.jpg Graphic file (type jpg)
 <use figures/web_per_class.jpg>
 Package pdftex.def Info: figures/web_per_class.jpg  used on input line 738.
@@ -1181,7 +1181,7 @@ Package pdftex.def Info: figures/web_per_class.jpg  used on input line 738.
  [25
 
  <./figures/web_per_class.jpg>]
-<figures/fig_risk_coverage.pdf, id=644, 206.79532pt x 167.0058pt>
+<figures/fig_risk_coverage.pdf, id=646, 206.79532pt x 167.0058pt>
 File: figures/fig_risk_coverage.pdf Graphic file (type pdf)
 <use figures/fig_risk_coverage.pdf>
 Package pdftex.def Info: figures/fig_risk_coverage.pdf  used on input line 756.
@@ -1190,7 +1190,7 @@ Package pdftex.def Info: figures/fig_risk_coverage.pdf  used on input line 756.
  [26
 
  <./figures/fig_risk_coverage.pdf>]
-<figures/fig_ood_noise.png, id=696, 250.7769pt x 74.4381pt>
+<figures/fig_ood_noise.png, id=698, 250.7769pt x 74.4381pt>
 File: figures/fig_ood_noise.png Graphic file (type png)
 <use figures/fig_ood_noise.png>
 Package pdftex.def Info: figures/fig_ood_noise.png  used on input line 780.
@@ -1199,7 +1199,7 @@ Package pdftex.def Info: figures/fig_ood_noise.png  used on input line 780.
 [27
 
  <./figures/fig_ood_noise.png>]
-<figures/fig_sota.pdf, id=705, 336.28764pt x 194.66113pt>
+<figures/fig_sota.pdf, id=707, 336.28764pt x 194.66113pt>
 File: figures/fig_sota.pdf Graphic file (type pdf)
 <use figures/fig_sota.pdf>
 Package pdftex.def Info: figures/fig_sota.pdf  used on input line 796.
@@ -1232,7 +1232,7 @@ Package rerunfilecheck Info: File `presentation.out' has not changed.
 Here is how much of TeX's memory you used:
  26554 strings out of 469006
  529176 string characters out of 5454813
- 933577 words of memory out of 5000000
+ 933569 words of memory out of 5000000
  54626 multiletter control sequences out of 15000+600000
  663505 words of font info for 119 fonts, out of 8000000 for 9000
  319 hyphenation exceptions out of 8191
@@ -1270,9 +1270,9 @@ fonts/type1/public/amsfonts/cm/cmsy6.pfb></Users/user/Library/texmf/fonts/type1
 fonts/cm/cmsy8.pfb></Users/user/Library/texmf/fonts/type1/public/amsfonts/cm/cm
 sy9.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/urw/zapfding/uzdr.
 pfb>
-Output written on presentation.pdf (30 pages, 1463343 bytes).
+Output written on presentation.pdf (30 pages, 1462306 bytes).
 PDF statistics:
- 1492 PDF objects out of 1728 (max. 8388607)
+ 1493 PDF objects out of 1728 (max. 8388607)
  372 compressed objects within 4 object streams
  64 named destinations out of 1000 (max. 500000)
  411 words of extra memory for PDF output out of 10000 (max. 10000000)

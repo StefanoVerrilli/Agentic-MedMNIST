@@ -274,7 +274,7 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}{From first run to MVP: 14 runs in one month}
+\begin{frame}{From first run to MVP: 14 runs, three versions}
   \begin{columns}[c]
     \begin{column}{0.58\textwidth}
       \centering
@@ -283,9 +283,9 @@
     \begin{column}{0.40\textwidth}
       \small
       \begin{itemize}
-        \item \textbf{v1} (8 Sep): first end-to-end runs; one tie with the baseline.
-        \item \textbf{v2} (9 Sep--2 Oct): agents choose within a bounded search; every run beats the baseline, best 92.6\%.
-        \item \textbf{v3} (8 Oct): fully autonomous; agents write and launch their own experiment code.
+        \item \textbf{v1}: first end-to-end runs; one tie with the baseline.
+        \item \textbf{v2}: agents choose within a bounded search; every run beats the baseline, best 92.6\%.
+        \item \textbf{v3}: fully autonomous; agents write and launch their own experiment code.
         \item Same official split throughout, so the runs are comparable.
       \end{itemize}
     \end{column}
@@ -347,8 +347,8 @@
       goal/.style={circle, fill=fxgreen, text=white, minimum size=0.95cm, font=\small\bfseries, inner sep=0pt},
       lab/.style={font=\scriptsize, align=center, text width=1.9cm}]
     \foreach \i/\s/\t/\m/\l in {
-        0/done/\ding{51}/Autonomous end-to-end run/8 Oct,
-        1/done/\ding{51}/{3 seeds, baseline, ablations, live arXiv}/2 Oct,
+        0/done/\ding{51}/Autonomous end-to-end run/v3,
+        1/done/\ding{51}/{3 seeds, baseline, ablations, live arXiv}/v2,
         2/todo/3/Fault-injection rate $\geq$90\%/WP6,
         3/todo/4/Replay of the flagship run/WP5,
         4/todo/5/Approve reviewer-issue mitigations/WP6,
@@ -367,8 +367,8 @@
     \begin{column}{0.48\textwidth}
       \small\textbf{Done}
       \begin{itemize}
-        \item Autonomous end-to-end run on the full dataset (8 Oct).
-        \item 3 seeds, conventional baseline, ablations and live arXiv sources (2 Oct).
+        \item Autonomous end-to-end run on the full dataset (v3).
+        \item 3 seeds, conventional baseline, ablations and live arXiv sources (v2).
       \end{itemize}
     \end{column}
     \begin{column}{0.48\textwidth}
@@ -469,7 +469,7 @@
         \item Writes a cited brief that feeds representation and architecture.
         \item Ranks existing options, or proposes new ones that wait at a review gate.
         \item Advises only: never trains, selects or calls another agent.
-        \item Live sources in the 2 Oct run: 6 of 6.
+        \item Live sources in the v2 three-seed run: 6 of 6.
       \end{itemize}
     \end{column}
   \end{columns}
@@ -695,7 +695,7 @@
         \item Same data, splits and seeds; the baseline is a fixed small-CNN recipe.
         \item Agentic \textbf{92.1\%} vs conventional 83.0\%: \textbf{+9.1 points}, on every seed.
         \item Ablation: representation off 80.9\% $\to$ standardise 86.3\% $\to$ + flip 91.3\%.
-        \item Evidence: 2 Oct run (v2 pipeline), seeds 42/47/72, live arXiv sources.
+        \item Evidence: v2 three-seed run, seeds 42/47/72, live arXiv sources.
       \end{itemize}
     \end{column}
   \end{columns}

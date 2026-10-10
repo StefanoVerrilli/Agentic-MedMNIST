@@ -363,7 +363,8 @@ def run_history():
     for i in (9, 11, 13):
         ax.annotate(f"{acc[i]:.1f}", (i, acc[i]), xytext=(0, 7), textcoords="offset points", ha="center",
                     fontsize=7, color=INK)
-    ax.set_xticks(x, [h[0][4:6] + "/" + h[0][6:8] for h in HISTORY], fontsize=6.5, rotation=90)
+    ax.set_xticks(x, [str(i + 1) for i in x], fontsize=7)
+    ax.set_xlabel("Run, in order")
     ax.set_xlim(-0.5, len(HISTORY) - 0.5)
     ax.set_ylim(74, 97)
     ax.set_ylabel("Test accuracy (%)")
