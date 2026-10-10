@@ -133,6 +133,29 @@ The pipeline audits the dataset before training, uses training-only preprocessin
 
 Seeds, source fingerprints and checksums support traceability. They do not, on their own, demonstrate that retraining reproduces identical predictions. Local subprocess execution does not imply enforced container isolation.
 
+### Complete the missing October 8 procedures
+
+From `v3`, inspect the latest original run without writing files or starting downloads:
+
+```bash
+python complete_run.py --dry-run
+```
+
+Create a separate derived experiment, then continue it after an interruption:
+
+```bash
+python complete_run.py --output-root runs/pathmnist_completion_oct08 --device cuda
+python complete_run.py --continue runs/pathmnist_completion_oct08
+```
+
+`--source-run` selects an original experiment directory explicitly; `--data-root` selects the official PathMNIST archive cache. Defaults select the latest original completed seed-42 experiment, excluding derived completions, and preserve its device. An existing output directory requires `--continue`.
+
+The script restores the protocol from v2 commit `0bbd1c5`: fixed `tiny_cnn` baseline and `representation_off`, `standardize_only`, `standardize_hflip` ablations for seeds **42,47,72**. It reuses the archived seed-42 metrics and trains the frozen selected model for seeds 47 and 72, for **14 new training jobs** in total. Each completed ablation is saved immediately; continuation verifies checksums before skipping completed work. No model search or Ollama decisions are repeated.
+
+Live arXiv sources and cited ideas are added as **post-training research**, without changing the original selection or representing them as pre-training evidence. Retrieval failures remain incomplete and can be retried with `--continue`. Missing original binary checkpoints are listed explicitly; their archived metrics are not presented as freshly verified inference. Available files with altered content are rejected. Windows CRLF conversion is tolerated only when restoring LF reproduces the recorded checksum; normalization occurs in the derived snapshot, leaving the source unchanged.
+
+The derived directory contains `source_snapshot/`, separate `seed_*` stores, `completion_manifest.json`, `experiment_summary.json`, and `completion_report.md`. Reports include per-seed baseline differences, all representation scenarios, and population mean/standard deviation. Partial results are marked incomplete. Acceptance reports retain unmet requirements; completing these four activities does not imply full acceptance. The official dataset is loaded or downloaded and checked against the original archive and split fingerprints before new training.
+
 ### Output layout
 
 With the default output root, experiments are stored under `v3/runs/pathmnist_<timestamp>/`:
