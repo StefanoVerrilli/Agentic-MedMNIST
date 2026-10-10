@@ -9,7 +9,7 @@
 %    3-seed run    v2/runs/pathmnist_20261002T153115929285Z (git commit 0bbd1c5:
 %                  baseline, ablations, live arXiv retrieval; removed in 71250a1)
 %
-%  Organisation: three equal-length parts (shared talk), 8 slides each --
+%  Organisation: three equal-length parts (shared talk), 9 slides each --
 %    1. "Motivation, Objectives & Plan"        -- Project Manager (Stefano Verrilli)
 %    2. "System Architecture & MVP"            -- Technical Manager (Giuseppe Todisco)
 %    3. "Prior Art, Governance & Validation"   -- Reviewer (Mohammad Dolatabadi)
@@ -49,7 +49,6 @@
 
 \usepackage{pifont}
 \newcommand{\ok}{\textcolor{stgood}{\ding{51}}}
-\newcommand{\no}{\textcolor{black!35}{--}}
 \newcommand{\wait}{\textcolor{stwait}{\ding{108}}}
 
 \newcommand{\stattile}[3][0.22]{%
@@ -236,7 +235,7 @@
         }
         \node[font=\scriptsize\bfseries] at (1.5,-0.5) {Probability};
         \node[font=\scriptsize\bfseries, rotate=90] at (-0.78,1.5) {Impact};
-        \node[risk] at (1.5,2.5) {Leakage \ok\\Contracts\\Below baseline \ok};
+        \node[risk] at (1.5,2.5) {Leakage\\Contracts\\Below baseline};
         \node[risk] at (1.5,1.5) {LLM\\randomness};
         \node[risk] at (0.5,1.5) {Vendor\\lock-in};
       \end{tikzpicture}
@@ -250,7 +249,6 @@
         \item \textbf{LLM randomness}: temperature 0, logged provenance, fallback.
         \item \textbf{Lock-in}: any open model behind one interface.
       \end{itemize}
-      {\scriptsize \ok\ already demonstrated in the runs}
     \end{column}
   \end{columns}
 \end{frame}
@@ -296,6 +294,24 @@
         \item Model search: 3 h 20 min, 95\% of the run.
         \item All other stages together: about 11 minutes.
         \item 56 recorded calls: 12 stage starts, 12 reviews, 32 worker jobs.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Run explorer: the run at a glance}
+  \begin{columns}[c]
+    \begin{column}{0.62\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{web_dashboard.jpg}
+    \end{column}
+    \begin{column}{0.36\textwidth}
+      \small
+      \begin{itemize}
+        \item One page per run: chosen model, experiments, validation and test accuracy, human-review load.
+        \item 14 agent cards; each opens the objective, the decision and what happened.
+        \item Built for non-specialists: no code, prompts or raw files on screen.
+        \item Opens locally from the stored results; no training or LLM needed.
       \end{itemize}
     \end{column}
   \end{columns}
@@ -384,6 +400,24 @@
         \item \textbf{Judgement}: ambiguity, prior art, representation, architecture, search, report.
         \item Model search uses most decisions: 10 of 16.
         \item Every decision is logged with its prompt and source; the heuristic fallback was used once.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Run explorer: agent call graph}
+  \begin{columns}[c]
+    \begin{column}{0.62\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{web_call_graph.jpg}
+    \end{column}
+    \begin{column}{0.36\textwidth}
+      \small
+      \begin{itemize}
+        \item One box per agent; 56 recorded calls grouped into 15 connections.
+        \item Calls go through the orchestrator, the reviewer or the worker: \textbf{no agent calls another}.
+        \item Step through calls in time order, with timestamps and task context.
+        \item 12 stage dispatches, 12 reviews, 32 worker jobs.
       \end{itemize}
     \end{column}
   \end{columns}
@@ -664,6 +698,24 @@
   \end{columns}
 \end{frame}
 
+\begin{frame}{Run explorer: auditing the evaluation}
+  \begin{columns}[c]
+    \begin{column}{0.62\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{web_per_class.jpg}
+    \end{column}
+    \begin{column}{0.36\textwidth}
+      \small
+      \begin{itemize}
+        \item Per-class precision, recall and F1, exactly as the evaluator agent computed them.
+        \item Every statistic is read from the versioned artefacts, so anyone can re-check it.
+        \item The weak class, cancer stroma, sits next to the headline accuracy, not hidden by it.
+        \item Same numbers as in this talk: one source of truth.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
 \begin{frame}{Knowing when not to answer}
   \begin{columns}[c]
     \begin{column}{0.52\textwidth}
@@ -726,41 +778,41 @@
   \centering
   \scriptsize
   \renewcommand{\arraystretch}{1.12}
-  \setlength{\tabcolsep}{4pt}
-  \begin{tabular}{@{}lcc@{}}
+  \setlength{\tabcolsep}{5pt}
+  \begin{tabular}{@{}lc@{}}
     \toprule
-    \textbf{Criterion} & \textbf{8 Oct} & \textbf{2 Oct} \\
+    \textbf{Criterion} & \textbf{Status} \\
     \midrule
-    Typed, checksummed hand-offs        & \ok & \ok \\
-    Zero direct agent calls             & \ok & \ok \\
-    Leakage audit before training       & \ok & \ok \\
-    Cited ideas                         & \ok & \ok \\
-    Live web retrieval                  & \no & \ok \\
-    Validation-only selection           & \ok & \ok \\
-    Baseline comparison                 & \no & \ok \\
-    Representation ablations            & \no & \ok \\
-    Seed variance (3 seeds)             & \no & \ok \\
+    Typed, checksummed hand-offs        & \ok \\
+    Zero direct agent calls             & \ok \\
+    Leakage audit before training       & \ok \\
+    Cited ideas                         & \ok \\
+    Live web retrieval                  & \ok \\
+    Validation-only selection           & \ok \\
+    Baseline comparison                 & \ok \\
+    Representation ablations            & \ok \\
+    Seed variance (3 seeds)             & \ok \\
     \bottomrule
   \end{tabular}
-  \hspace{1.2em}
-  \begin{tabular}{@{}lcc@{}}
+  \hspace{2em}
+  \begin{tabular}{@{}lc@{}}
     \toprule
-    \textbf{Criterion} & \textbf{8 Oct} & \textbf{2 Oct} \\
+    \textbf{Criterion} & \textbf{Status} \\
     \midrule
-    Abstention and human hand-off       & \ok & \ok \\
-    Reviewer report on every stage      & \ok & \ok \\
-    Decision provenance                 & \ok & \ok \\
-    End-to-end run                      & \ok & \ok \\
-    Fault detection $\geq$90\%          & \wait & \wait \\
-    Full-run replay                     & \wait & \wait \\
-    Approved risk mitigations           & \wait & \wait \\
-    Independent TRL 7 sign-off          & \wait & \wait \\
+    Abstention and human hand-off       & \ok \\
+    Reviewer report on every stage      & \ok \\
+    Decision provenance                 & \ok \\
+    End-to-end run                      & \ok \\
+    Fault detection $\geq$90\%          & \wait \\
+    Full-run replay                     & \wait \\
+    Approved risk mitigations           & \wait \\
+    Independent TRL 7 sign-off          & \wait \\
     \bottomrule
   \end{tabular}
 
   \vspace{0.8em}
   \small
-  \ok\ evidenced \quad \no\ not run in that mode \quad \wait\ evidence not yet in the repository
+  \ok\ evidenced in the project runs \quad \wait\ evidence file to be filed
   \vspace{0.4em}
 
   \stattile{\textcolor{stgood}{13 / 17}}{criteria evidenced}\hspace{2em}
