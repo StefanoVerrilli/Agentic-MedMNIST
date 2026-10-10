@@ -60,9 +60,30 @@
 \title{HAT-MedMNIST}
 \subtitle{A hybrid agentic training framework for MedMNIST}
 \setbeamerfont{subtitle}{size=\large,series=\bfseries}
-\author{Giuseppe Todisco \and Stefano Verrilli \and Mohammad Dolatabadi}
-\institute{Technical Responsible \enspace$\cdot$\enspace Project Manager \enspace$\cdot$\enspace Reviewer
-  \\[0.4em] Agentic AI / medical-image benchmarks}
+\author[Stefano Verrilli \quad Giuseppe Todisco \quad Mohammad Dolatabadi]{\texorpdfstring{%
+  \renewcommand{\arraystretch}{1.15}%
+  \begin{tabular}{@{}p{4.1cm}p{4.1cm}p{4.1cm}@{}}
+    \centering\normalsize\textbf{Stefano Verrilli} &
+    \centering\normalsize\textbf{Giuseppe Todisco} &
+    \centering\arraybackslash\normalsize\textbf{Mohammad Dolatabadi} \\
+    \centering{\small\color{fxgreen}Project Manager} &
+    \centering{\small\color{fxgreen}Technical Manager} &
+    \centering\arraybackslash{\small\color{fxgreen}Reviewer} \\
+    \centering{\scriptsize scope, schedule, resources, costs, risk management and reporting} &
+    \centering{\scriptsize architecture, agent design, representation and training strategy, integration} &
+    \centering\arraybackslash{\scriptsize independent review of KPIs, traceability, reproducibility and TRL; the WP6 reviewer agent}
+  \end{tabular}}{Stefano Verrilli, Giuseppe Todisco, Mohammad Dolatabadi}}
+\institute{Agentic AI / medical-image benchmarks}
+
+% Flux's footer prints the full \insertauthor (here a role table); use the short names.
+\setbeamertemplate{footline}{%
+\begin{beamercolorbox}[wd=\textwidth, center]{footer}%
+  \rule{0.95\paperwidth}{0.2pt}
+\end{beamercolorbox}%
+\begin{beamercolorbox}[wd=\textwidth, leftskip=0.3cm, rightskip=0.3cm, ht=0.3cm, dp=0.15cm]{footer text}%
+  \usebeamerfont{footnote}\copyright\ \insertshortauthor\hfill\insertframenumber%
+\end{beamercolorbox}%
+}
 \date{\today}
 
 \begin{document}
