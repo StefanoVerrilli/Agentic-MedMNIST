@@ -106,6 +106,8 @@ def run_representation_ablations(
     root: str | Path,
     *,
     template_config: TrainConfig,
+    completed_scenarios: list[AblationScenario] | None = None,
+    on_scenario=None,
 ) -> AblationReport:
     """Run the three proposal-required representation scenarios."""
     root_path = Path(root)
@@ -114,8 +116,23 @@ def run_representation_ablations(
         ("standardize_only", "standardize", []),
         ("standardize_hflip", "standardize", ["hflip"]),
     ]
+    completed = {item.name: item for item in (completed_scenarios or [])}
+    if len(completed) != len(completed_scenarios or []) or set(completed) - {item[0] for item in choices}:
+        raise ValueError("invalid completed ablation scenarios")
     results: list[AblationScenario] = []
     for name, normalization, augmentations in choices:
+        if name in completed:
+            item = completed[name]
+            if (item.seed != template_config.seed or item.normalization != normalization
+                    or item.augmentations != augmentations):
+                raise ValueError("completed ablation protocol mismatch")
+            from contracts import sha256_file
+            from research import contained_path
+            if not item.checkpoint_path or not item.checkpoint_sha256 or sha256_file(
+                    contained_path(root_path, item.checkpoint_path)) != item.checkpoint_sha256:
+                raise ValueError("completed ablation checkpoint checksum mismatch")
+            results.append(item)
+            continue
         decision = RepresentationDecision(
             normalization=normalization,
             augmentations=augmentations,
@@ -164,6 +181,8 @@ def run_representation_ablations(
                 ),
             )
         )
+        if on_scenario is not None:
+            on_scenario(results[-1])
     return AblationReport(
         scenarios=results,
         common_split_fingerprint=common_split_fingerprint(bundle),

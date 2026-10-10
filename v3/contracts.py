@@ -1095,6 +1095,24 @@ class AbstentionReport(Artefact):
     risk_coverage_curve: list[RiskCoveragePoint] = Field(default_factory=list)
 
 
+class CompletionManifest(Artefact):
+    """Provenance and resumable state for post-run evidence completion."""
+
+    source_run: str
+    source_seed: int = Field(ge=0)
+    source_files: dict[str, str]
+    source_code_sha256: str
+    completion_code_sha256: str
+    protocol_commit: str = "0bbd1c5"
+    seeds: list[int] = Field(default_factory=lambda: [42, 47, 72])
+    device: Literal["cpu", "cuda"]
+    research_timing: Literal["post_training"] = "post_training"
+    historical_checkpoint_verified: bool = False
+    historical_missing_files: list[str] = Field(default_factory=list)
+    operations: dict[str, str] = Field(default_factory=dict)
+    errors: dict[str, str] = Field(default_factory=dict)
+
+
 class BaselineReport(Artefact):
     dataset: Literal["pathmnist"]
     split_fingerprint: str
@@ -1134,6 +1152,12 @@ class AblationScenario(StrictModel):
 class AblationReport(Artefact):
     scenarios: list[AblationScenario] = Field(min_length=3)
     common_split_fingerprint: str
+
+
+class CompletedAblation(Artefact):
+    """One verified scenario, persisted before the complete suite is available."""
+
+    scenario: AblationScenario
 
 
 class ReportingStatus(Artefact):
