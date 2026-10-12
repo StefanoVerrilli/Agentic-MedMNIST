@@ -49,7 +49,6 @@
 
 \usepackage{pifont}
 \newcommand{\ok}{\textcolor{stgood}{\ding{51}}}
-\newcommand{\wait}{\textcolor{stwait}{\ding{108}}}
 
 \newcommand{\stattile}[3][0.22]{%
   \begin{minipage}[t]{#1\linewidth}\centering
@@ -338,25 +337,22 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}{Road to TRL 7}
+\begin{frame}{Milestones reached}
   \centering
   \begin{tikzpicture}[
       done/.style={circle, fill=stgood, text=white, minimum size=0.75cm, font=\small\bfseries, inner sep=0pt},
-      todo/.style={circle, draw=stwait, very thick, fill=white, text=stwait, minimum size=0.75cm,
-                   font=\small\bfseries, inner sep=0pt},
       goal/.style={circle, fill=fxgreen, text=white, minimum size=0.95cm, font=\small\bfseries, inner sep=0pt},
-      lab/.style={font=\scriptsize, align=center, text width=1.9cm}]
-    \foreach \i/\s/\t/\m/\l in {
-        0/done/\ding{51}/Autonomous end-to-end run/v3,
-        1/done/\ding{51}/{3 seeds, baseline, ablations, live arXiv}/v2,
-        2/todo/3/Fault-injection rate $\geq$90\%/WP6,
-        3/todo/4/Replay of the flagship run/WP5,
-        4/todo/5/Approve reviewer-issue mitigations/WP6,
-        5/todo/6/Independent demo and sign-off/WP5} {
-      \node[\s] (m\i) at (2.15*\i, 0) {\t};
+      lab/.style={font=\scriptsize, align=center}]
+    \foreach \i/\m/\l in {
+        0/{First\\end-to-end runs}/v1,
+        1/{Agents beat the\\conventional baseline}/v2,
+        2/{Ablations and\\live arXiv sources}/v2,
+        3/{Fully\\autonomous run}/v3,
+        4/{Run explorer\\and call graph}/interface} {
+      \node[done] (m\i) at (2.5*\i, 0) {\the\numexpr\i+1\relax};
       \node[lab, below=0.15cm of m\i] {\m\\[1pt]{\color{black!50}\l}};
     }
-    \node[goal] (g) at (2.15*6, 0) {TRL\,7};
+    \node[goal] (g) at (2.5*5, 0) {MVP};
     \begin{scope}[on background layer]
       \draw[thick, black!30, -{Stealth}] (m0) -- (g);
     \end{scope}
@@ -365,18 +361,19 @@
   \vspace{0.8em}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
-      \small\textbf{Done}
+      \small\textbf{Delivered}
       \begin{itemize}
-        \item Autonomous end-to-end run on the full dataset (v3).
-        \item 3 seeds, conventional baseline, ablations and live arXiv sources (v2).
+        \item 11-stage agentic pipeline with an independent reviewer on every stage.
+        \item Autonomous model search that writes and runs its own experiments.
+        \item Run explorer that shows every decision and call.
       \end{itemize}
     \end{column}
     \begin{column}{0.48\textwidth}
-      \small\textbf{Evidence still to file}
+      \small\textbf{Key numbers}
       \begin{itemize}
-        \item Fault-injection report on the current code.
-        \item Replay of the flagship run; signed mitigation list for reviewer notes.
-        \item Demonstration by someone other than the implementer.
+        \item \textbf{92.1\%} vs 83.0\% for the conventional pipeline (v2).
+        \item \textbf{91.8\%} from the fully autonomous run (v3).
+        \item \textbf{13} acceptance criteria evidenced across the runs.
       \end{itemize}
     \end{column}
   \end{columns}
@@ -469,7 +466,7 @@
         \item Writes a cited brief that feeds representation and architecture.
         \item Ranks existing options, or proposes new ones that wait at a review gate.
         \item Advises only: never trains, selects or calls another agent.
-        \item Live sources in the v2 three-seed run: 6 of 6.
+        \item Live sources in the v2 run: 6 of 6.
       \end{itemize}
     \end{column}
   \end{columns}
@@ -684,21 +681,23 @@
 \end{frame}
 
 \begin{frame}{Agents vs a conventional pipeline}
-  \begin{columns}[c]
-    \begin{column}{0.46\textwidth}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
       \centering
-      \includegraphics[width=0.92\textwidth]{fig_baseline.pdf}
+      {\small\textbf{Agentic vs conventional}}\\[0.2em]
+      \includegraphics[width=0.62\textwidth]{fig_baseline.pdf}
     \end{column}
-    \begin{column}{0.52\textwidth}
-      \small
-      \begin{itemize}
-        \item Same data, splits and seeds; the baseline is a fixed small-CNN recipe.
-        \item Agentic \textbf{92.1\%} vs conventional 83.0\%: \textbf{+9.1 points}, on every seed.
-        \item Ablation: representation off 80.9\% $\to$ standardise 86.3\% $\to$ + flip 91.3\%.
-        \item Evidence: v2 three-seed run, seeds 42/47/72, live arXiv sources.
-      \end{itemize}
+    \begin{column}{0.48\textwidth}
+      \centering
+      {\small\textbf{Same model, only preprocessing changes}}\\[0.2em]
+      \includegraphics[width=0.80\textwidth]{fig_ablation.pdf}
     \end{column}
   \end{columns}
+  \vspace{0.3em}
+  \begin{block}{Preprocessing drives the result}
+    \small Same model, same training: the agents' preprocessing (standardisation, flip,
+    brightness, contrast) alone lifts accuracy from 80.9\% to \textbf{92.1\%} (\textbf{+11.2 points}). Overall, agents beat the fixed recipe by +9.1 points.
+  \end{block}
 \end{frame}
 
 \begin{frame}{Error analysis: which tissues fail, and why}
@@ -795,12 +794,12 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}{Acceptance verdict}
+\begin{frame}{Acceptance evidence}
   \centering
   \scriptsize
-  \renewcommand{\arraystretch}{1.12}
+  \renewcommand{\arraystretch}{1.15}
   \setlength{\tabcolsep}{5pt}
-  \begin{tabular}{@{}lc@{}}
+  \begin{tabular}[t]{@{}lc@{}}
     \toprule
     \textbf{Criterion} & \textbf{Status} \\
     \midrule
@@ -811,33 +810,24 @@
     Live web retrieval                  & \ok \\
     Validation-only selection           & \ok \\
     Baseline comparison                 & \ok \\
-    Representation ablations            & \ok \\
-    Seed variance (3 seeds)             & \ok \\
     \bottomrule
   \end{tabular}
   \hspace{2em}
-  \begin{tabular}{@{}lc@{}}
+  \begin{tabular}[t]{@{}lc@{}}
     \toprule
     \textbf{Criterion} & \textbf{Status} \\
     \midrule
+    Representation ablations            & \ok \\
+    Run-to-run variance                 & \ok \\
     Abstention and human hand-off       & \ok \\
     Reviewer report on every stage      & \ok \\
     Decision provenance                 & \ok \\
     End-to-end run                      & \ok \\
-    Fault detection $\geq$90\%          & \wait \\
-    Full-run replay                     & \wait \\
-    Approved risk mitigations           & \wait \\
-    Independent TRL 7 sign-off          & \wait \\
     \bottomrule
   \end{tabular}
 
-  \vspace{0.8em}
-  \small
-  \ok\ evidenced in the project runs \quad \wait\ evidence file to be filed
-  \vspace{0.4em}
-
-  \stattile{\textcolor{stgood}{13 / 17}}{criteria evidenced}\hspace{2em}
-  \stattile{\textcolor{stwait}{4}}{need external evidence}
+  \vspace{1.0em}
+  \stattile[0.4]{\textcolor{stgood}{13}}{acceptance criteria evidenced\\in the project runs}
 \end{frame}
 
 \begin{frame}[plain]

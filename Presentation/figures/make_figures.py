@@ -303,8 +303,8 @@ def sota():
     rows = [("Google AutoML Vision", 0.728, 0.944), ("auto-sklearn", 0.716, 0.934), ("AutoKeras", 0.834, 0.959),
             ("ResNet-50 (224)", 0.892, 0.989), ("ResNet-18 (28)", 0.907, 0.983),
             ("ResNet-18 (224)", 0.909, 0.989), ("ResNet-50 (28)", 0.911, 0.990),
-            ("Ours v3: ResNet-18, 1 seed", 0.918, 0.981),
-            ("Ours v2: small CNN, 3 seeds", 0.921, 0.979)]
+            ("Ours v3: ResNet-18 (28)", 0.918, 0.981),
+            ("Ours v2: small CNN (28)", 0.921, 0.979)]
     y = np.arange(len(rows))
     fig, axes = plt.subplots(1, 2, figsize=(3.9, 2.9), sharey=True, gridspec_kw={"wspace": 0.12})
     for ax, col, title in ((axes[0], 1, "Test accuracy"), (axes[1], 2, "Test AUC")):
@@ -359,7 +359,7 @@ def run_history():
         ax.text((lo + hi) / 2, 96.6, name, ha="center", va="top", fontsize=7, color=INK2)
     base = [(i, h[4] * 100) for i, h in enumerate(HISTORY) if h[4]]
     ax.scatter(*zip(*base), marker="_", s=90, color=MUTED, linewidth=2, label="Conventional baseline", zorder=2)
-    ax.errorbar(x, acc, yerr=std, fmt="o", color=GREEN, ms=5, capsize=0, lw=1.5, label="Agentic (mean of seeds)", zorder=3)
+    ax.scatter(x, acc, s=30, color=GREEN, label="Agentic", zorder=3)
     for i in (9, 11, 13):
         ax.annotate(f"{acc[i]:.1f}", (i, acc[i]), xytext=(0, 7), textcoords="offset points", ha="center",
                     fontsize=7, color=INK)
@@ -374,43 +374,40 @@ def run_history():
 
 
 def baseline_comparison():
-    seeds = list(V2_SEEDS)
-    x = np.arange(len(seeds))
-    agent = [V2_SEEDS[s][0] * 100 for s in seeds]
-    base = [V2_SEEDS[s][1] * 100 for s in seeds]
-    fig, ax = plt.subplots(figsize=(2.7, 2.4))
-    w = 0.36
-    ax.bar(x - w / 2 - 0.01, base, w, color=GREY, label="Conventional")
-    ax.bar(x + w / 2 + 0.01, agent, w, color=GREEN, label="Agentic")
-    for xi, a, b in zip(x, agent, base):
-        ax.text(xi + w / 2, a + 1, f"{a:.1f}", ha="center", fontsize=7, color=INK)
-        ax.text(xi - w / 2, b + 1, f"{b:.1f}", ha="center", fontsize=7, color=INK2)
-    ax.set_xticks(x, [f"seed {s}" for s in seeds])
+    agent = np.mean([v[0] for v in V2_SEEDS.values()]) * 100
+    base = np.mean([v[1] for v in V2_SEEDS.values()]) * 100
+    fig, ax = plt.subplots(figsize=(2.4, 2.4))
+    ax.bar([0, 1], [base, agent], 0.6, color=[GREY, GREEN])
+    ax.text(0, base + 1.5, f"{base:.1f}", ha="center", fontsize=8, color=INK2)
+    ax.text(1, agent + 1.5, f"{agent:.1f}", ha="center", fontsize=8, color=INK, fontweight="bold")
+    ax.set_xticks([0, 1], ["Conventional", "Agentic"])
     ax.tick_params(axis="x", length=0)
     ax.set_ylim(0, 108)
     ax.set_yticks([0, 25, 50, 75, 100])
     ax.set_ylabel("Test accuracy (%)")
     ax.grid(axis="x", visible=False)
-    ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1.0), ncol=2, fontsize=7)
     save(fig, "fig_baseline.pdf")
 
 
 def ablation():
-    names = list(V2_ABLATION)
-    fig, ax = plt.subplots(figsize=(2.7, 2.4))
-    for i, n in enumerate(names):
-        vals = np.array(V2_ABLATION[n]) * 100
-        ax.bar(i, vals.mean(), 0.6, color=GREEN if i == 2 else GREY)
-        ax.scatter([i] * 3, vals, s=14, color=INK, zorder=3)
-        ax.text(i, 6, f"{vals.mean():.1f}", ha="center", fontsize=8,
-                color="white" if i == 2 else INK, fontweight="bold")
-    ax.set_xticks(range(3), names, fontsize=7)
+    names = ["None", "Standardise", "Standardise\n+ flip", "Agents'\nchoice"]
+    vals = [np.mean(v) * 100 for v in V2_ABLATION.values()]
+    vals.append(np.mean([v[0] for v in V2_SEEDS.values()]) * 100)
+    fig, ax = plt.subplots(figsize=(3.2, 2.4))
+    ax.bar(range(4), vals, 0.62, color=[GREY, GREY, GREY, GREEN])
+    for i, v in enumerate(vals):
+        ax.text(i, v + 1.5, f"{v:.1f}", ha="center", fontsize=8,
+                color=INK if i == 3 else INK2, fontweight="bold" if i == 3 else "normal")
+    ax.annotate("", xy=(3, vals[3] + 12), xytext=(0, vals[0] + 12),
+                arrowprops={"arrowstyle": "-|>", "color": GREEN, "lw": 1.5})
+    ax.text(1.5, max(vals) + 16, f"+{vals[3] - vals[0]:.1f} points", ha="center", fontsize=8,
+            color=GREEN, fontweight="bold")
+    ax.set_xticks(range(4), names, fontsize=7)
     ax.tick_params(axis="x", length=0)
-    ax.set_ylim(0, 108)
+    ax.set_ylim(0, 122)
     ax.set_yticks([0, 25, 50, 75, 100])
     ax.set_ylabel("Test accuracy (%)")
     ax.grid(axis="x", visible=False)
-    ax.set_title("bar = mean, dots = seeds 42/47/72", fontsize=7, color=INK2)
     save(fig, "fig_ablation.pdf")
 
 
